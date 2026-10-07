@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 import httpx
 
 from anychain.collectors.http import Budget, CollectorError, NotFoundError, make_client, request_json
+from anychain.collectors.types import InternalCall, Log, TokenTransfer, Transaction
 from anychain.config import ExplorerConfig
 
 MAX_PAGES = 5  # lists are paged; we stop here and declare the truncation
@@ -46,17 +47,20 @@ class ExplorerClient:
                 return items, False
         return items, True
 
-    def transaction(self, tx_hash: str) -> dict:
-        return self._get(f"/transactions/{tx_hash}")
+    def transaction(self, tx_hash: str) -> Transaction:
+        return Transaction.from_api(self._get(f"/transactions/{tx_hash}"))
 
-    def logs(self, tx_hash: str) -> tuple[list[dict], bool]:
-        return self._items(f"/transactions/{tx_hash}/logs")
+    def logs(self, tx_hash: str) -> tuple[list[Log], bool]:
+        items, truncated = self._items(f"/transactions/{tx_hash}/logs")
+        return [Log.from_api(i) for i in items], truncated
 
-    def token_transfers(self, tx_hash: str) -> tuple[list[dict], bool]:
-        return self._items(f"/transactions/{tx_hash}/token-transfers")
+    def token_transfers(self, tx_hash: str) -> tuple[list[TokenTransfer], bool]:
+        items, truncated = self._items(f"/transactions/{tx_hash}/token-transfers")
+        return [TokenTransfer.from_api(i) for i in items], truncated
 
-    def internal_transactions(self, tx_hash: str) -> tuple[list[dict], bool]:
-        return self._items(f"/transactions/{tx_hash}/internal-transactions")
+    def internal_transactions(self, tx_hash: str) -> tuple[list[InternalCall], bool]:
+        items, truncated = self._items(f"/transactions/{tx_hash}/internal-transactions")
+        return [InternalCall.from_api(i) for i in items], truncated
 
     def smart_contract(self, address: str) -> dict:
         """Contract metadata: abi (only when verified), name, proxy info."""

@@ -4,6 +4,7 @@ import time
 import httpx
 
 from anychain.collectors.http import RETRIES, Budget, CollectorError, make_client, request_json
+from anychain.collectors.types import RpcReceipt, RpcTransaction
 from anychain.config import RpcConfig
 
 # JSON-RPC error codes that mean "busy, try later" rather than "bad request".
@@ -52,11 +53,13 @@ class RpcClient:
             raise CollectorError(f"RPC {method} answered without a result", retryable=False)
         return payload["result"]
 
-    def transaction(self, tx_hash: str) -> dict | None:
-        return _dict_or_none(self.call("eth_getTransactionByHash", [tx_hash]), "eth_getTransactionByHash")
+    def transaction(self, tx_hash: str) -> RpcTransaction | None:
+        found = _dict_or_none(self.call("eth_getTransactionByHash", [tx_hash]), "eth_getTransactionByHash")
+        return RpcTransaction.from_rpc(found) if found is not None else None
 
-    def receipt(self, tx_hash: str) -> dict | None:
-        return _dict_or_none(self.call("eth_getTransactionReceipt", [tx_hash]), "eth_getTransactionReceipt")
+    def receipt(self, tx_hash: str) -> RpcReceipt | None:
+        found = _dict_or_none(self.call("eth_getTransactionReceipt", [tx_hash]), "eth_getTransactionReceipt")
+        return RpcReceipt.from_rpc(found) if found is not None else None
 
     def code_at(self, address: str, block: int | str) -> str:
         """Contract code at `address` as of `block` or "latest" ('0x' means none). Old blocks need an archive node."""
@@ -78,7 +81,10 @@ class RpcClient:
 
 
 def _dict_or_none(value: object, method: str) -> dict | None:
-    """null means "not found"; anything else that is not an object is a broken answer."""
-    if value is None or isinstance(value, dict):
+    """null means "not found"; an empty object or anything that is not an object is a broken answer."""
+    if value is None:
+        return None
+    if isinstance(value, dict) and value:
         return value
-    raise CollectorError(f"RPC {method} returned {type(value).__name__}, expected an object", retryable=False)
+    shape = "an empty object" if isinstance(value, dict) else type(value).__name__
+    raise CollectorError(f"RPC {method} returned {shape}, expected a transaction or receipt", retryable=False)
