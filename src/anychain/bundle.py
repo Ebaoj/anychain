@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from eth_utils import to_checksum_address
 
-from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, Fee, TokenRef, audit_fields, profile_for
+from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, Fee, FeePart, TokenRef, audit_fields, profile_for
 from anychain.collectors.explorer import MAX_PAGES, ExplorerClient
 from anychain.collectors.http import Budget, CollectorError, NotFoundError
 from anychain.collectors.rpc import RpcClient
@@ -64,15 +64,15 @@ def amount(raw: int, decimals: int) -> str:
     return f"{whole}.{str(frac).rjust(decimals, '0').rstrip('0')}"
 
 
-def party(ref: AddressRef | str | None, labels: dict[str, str] | None = None) -> str:
-    """An address with its explorer name, or else the config's label for it (address_labels)."""
+def party(ref: AddressRef | str | None, label_for: Callable[[str], str | None] | None = None) -> str:
+    """An address with its explorer name, or else the config's name for it (label_for)."""
     if ref is None or ref == "":
         return "(none)"
     if isinstance(ref, str):
         ref = AddressRef(ref)
     if ref.address is None:
         return "(unknown address)"
-    name = ref.name or (labels or {}).get(ref.address.lower())
+    name = ref.name or (label_for(ref.address) if label_for else None)
     return f"{ref.address} ({name})" if name else ref.address
 
 
@@ -148,7 +148,10 @@ class BundleBuilder:
                       "Check this part on the explorer page", retryable=False)
 
     def _party(self, ref: AddressRef | str | None) -> str:
-        return party(ref, self.cfg.address_labels)
+        return party(ref, self.cfg.label_for)
+
+    def _is_native_contract(self, address: str | None) -> bool:
+        return bool(address) and address.lower() in self.cfg.native_contracts
 
     def _gap(self, what: str, why: str, needed: str, retryable: bool) -> None:
         self.bundle.add_gap(what, why, needed, retryable)
@@ -227,7 +230,7 @@ class BundleBuilder:
         self._safely("Code delegations", lambda: self._add_authorizations(tx_hash, tx))
         self._safely("Call decoding", lambda: self._add_call(tx_hash, tx))
         covered_logs: set[int] = set()
-        self._safely("Token transfers", lambda: covered_logs.update(self._add_transfers(tx_hash)))
+        self._safely("Token transfers", lambda: covered_logs.update(self._add_transfers(tx_hash, tx)))
         self._safely("Internal calls", lambda: self._add_internal(tx_hash, tx))
         self._safely("Events", lambda: self._add_events(tx_hash, covered_logs))
         self._declare_undecoded_events()
@@ -284,7 +287,7 @@ class BundleBuilder:
         return f"(contract creation of {self._party(created)})" if created else "(contract creation)"
 
     def _add_fee(self, tx_hash: str, tx: Transaction) -> None:
-        fee = self.profile.fee(tx.raw)
+        fee = self._with_configured_fee_tokens(self.profile.fee(tx.raw))
         if fee is None:
             return
         text = f"Fee paid: {self._fee_text(fee)}."
@@ -302,6 +305,20 @@ class BundleBuilder:
             "parts": {p.label: self._fee_amount(p.raw, p.token) for p in fee.parts},
         })
 
+    def _with_configured_fee_tokens(self, fee: Fee | None) -> Fee | None:
+        """Describe fee tokens the explorer could not (e.g. Celo adapters), from config `fee_tokens`."""
+        if fee is None:
+            return None
+        parts, notes = [], [fee.note] if fee.note else []
+        for part in fee.parts:
+            known = self.cfg.fee_tokens.get((part.token.address or "").lower()) if part.token else None
+            if known is None:
+                parts.append(part)
+            else:
+                parts.append(FeePart(part.label, part.raw, TokenRef(part.token.address, known.symbol, known.decimals)))
+                notes += [known.note] if known.note else []
+        return Fee(parts, note=", ".join(notes) or None, warnings=fee.warnings)
+
     def _fee_amount(self, raw: int, token: TokenRef | None) -> str:
         """Decimal amount; raw integer units when the token's decimals are unknown."""
         if token is not None and token.decimals is None:
@@ -315,14 +332,17 @@ class BundleBuilder:
                 return f"{raw} raw units of {token.symbol}"
             return f"{self._fee_amount(raw, token)} {token.symbol if token else self.cfg.network.native_symbol}"
         token = fee.single_token
+        native = self.cfg.network.native_symbol
         if len(fee.parts) == 1:
             text = money(fee.total_raw, token)
+            if token is not None:
+                text += f", paid in {token.symbol} instead of {native}"
         elif token is not None or all(p.token is None for p in fee.parts):
             parts = " + ".join(f"{money(p.raw, p.token)} {p.label}" for p in fee.parts)
             text = f"{money(fee.total_raw, token)} in total: {parts}"
         else:
             text = " + ".join(f"{money(p.raw, p.token)} {p.label}" for p in fee.parts)
-        return f"{text}; {fee.note}" if fee.note else text
+        return f"{text} {fee.note}" if fee.note else text
 
     def _add_chain_facts(self, tx_hash: str, tx: Transaction) -> None:
         """Facts only this network type has, plus a check that the config's chain_type fits the payload."""
@@ -476,6 +496,11 @@ class BundleBuilder:
             else:
                 b.add("call", f"Plain {sym} transfer (no call data) to {self._party(to)}.", [source])
             return
+        if self._is_native_contract(to.address):
+            b.add("call", f"Called {self._party(to)}: built into the network's node, so it has no source code or "
+                  f"ABI; the call (selector {data[:10]}) is not decoded.", [source],
+                  {"selector": data[:10], "native_contract": True})
+            return
         delegate_here = self._delegations_applied(tx).get(to.address.lower())
         if delegate_here == ZERO_ADDRESS or (
                 delegate_here is None and to.is_contract is False and not to.implementations):
@@ -521,6 +546,10 @@ class BundleBuilder:
 
     def _declare_undecoded(self, topic: str, address: str, what: str, code_owner: str | None = None) -> None:
         """Gap for something we could not decode, saying whether the ABI is missing or just unreachable."""
+        if self._is_native_contract(address):
+            self._gap(topic, f"{address} is a native contract built into the node; no ABI exists for {what}",
+                      "The network's documentation of this native contract", retryable=False)
+            return
         if address.lower() in self.abi_lookup_failed:
             retryable = self.abi_lookup_failed[address.lower()]
             self._gap(topic, f"{what} on {address} not decoded because the ABI lookup failed",
@@ -534,14 +563,17 @@ class BundleBuilder:
                       "A verified contract on the explorer, or the contract ABI in a configured repo",
                       retryable=False)
 
-    def _add_transfers(self, tx_hash: str) -> set[int]:
+    def _add_transfers(self, tx_hash: str, tx: Transaction) -> set[int]:
         """Token transfers. Returns the log indexes they cover, so events skip them."""
         transfers, truncated = self.explorer.token_transfers(tx_hash)
         source = self._api_source(f"/transactions/{tx_hash}/token-transfers", "Explorer API: token transfers")
-        covered: set[int] = set()
-        for t in transfers:
-            if t.log_index is not None:
-                covered.add(t.log_index)
+        covered: set[int] = {t.log_index for t in transfers if t.log_index is not None}
+        native = self.cfg.network.native_token_contract
+        native_moves = [t for t in transfers if native and (t.token.address or "").lower() == native]
+        explorer_fee = self.profile.fee(tx.raw)
+        self._add_native_movements(native_moves, address_of(tx.sender),
+                                   explorer_fee.total_raw if explorer_fee else None, source)
+        for t in [t for t in transfers if t not in native_moves]:
             text = f"Token transfer: {self._transfer_what(t)} " \
                    f"from {self._party(t.sender)} to {self._party(t.recipient)}."
             self.bundle.add("token_transfer", text, [source],
@@ -550,6 +582,57 @@ class BundleBuilder:
             self._gap("Token transfers", f"more than {MAX_PAGES} pages of transfers",
                       "Open the explorer page for the full list", retryable=False)
         return covered
+
+    def _add_native_movements(self, moves: list[TokenTransfer], sender: str | None, explorer_fee: int | None,
+                              source: Source) -> None:
+        """Transfers of the native-token contract are the native currency moving, not a second asset.
+        When the network collects fees through a visible address, those moves are the fee flow."""
+        if not moves:
+            return
+        sym, collector = self.cfg.network.native_symbol, self.cfg.network.fee_collector
+        def is_collector(ref: AddressRef | None) -> bool:
+            return bool(collector) and (address_of(ref) or "").lower() == collector
+        to_collector = [t for t in moves if is_collector(t.recipient)]
+        from_collector = [t for t in moves if is_collector(t.sender)]
+        for t in moves:
+            if t in to_collector or t in from_collector:
+                continue
+            self.bundle.add("native_transfer", f"Native {sym} movement of {self._native_amount(t.value)} from "
+                            f"{self._party(t.sender)} to {self._party(t.recipient)} (the explorer also lists it as a "
+                            f"token transfer of the native-token contract; it is not a second asset).", [source],
+                            {"from": address_of(t.sender), "to": address_of(t.recipient), "value": t.value})
+        if to_collector:
+            self._add_fee_flow(to_collector, from_collector, sender, explorer_fee, source)
+
+    def _add_fee_flow(self, prepaid: list[TokenTransfer], refunded: list[TokenTransfer], sender: str | None,
+                      explorer_fee: int | None, source: Source) -> None:
+        """zkSync-style fees: a prepay to the fee collector minus refunds. Says who paid."""
+        sym = self.cfg.network.native_symbol
+        paid_in = sum(t.value or 0 for t in prepaid)
+        paid_out = sum(t.value or 0 for t in refunded)
+        payers = sorted({address_of(t.sender) for t in prepaid if address_of(t.sender)})
+        text = (f"Fee flow: {self._native_amount(paid_in)} prepaid to the fee collector by "
+                f"{', '.join(self._party(p) for p in payers)}, {self._native_amount(paid_out)} refunded; net fee "
+                f"{self._native_amount(paid_in - paid_out)}.")
+        others = [p for p in payers if not sender or p.lower() != sender.lower()]
+        if others:
+            text += f" The fee was paid by {', '.join(others)}, not by the sender (a paymaster)."
+        net = paid_in - paid_out
+        matches = explorer_fee is not None and net == explorer_fee
+        if explorer_fee is not None:
+            text += " This matches the explorer's fee." if matches else \
+                    f" The explorer's fee is {self._native_amount(explorer_fee)}, which does not match."
+        self.bundle.add("fee_flow", text, [source], {"prepaid": paid_in, "refunded": paid_out, "net": net,
+                                                    "payers": payers, "paymaster": bool(others),
+                                                    "matches_explorer_fee": matches})
+        if explorer_fee is not None and not matches:
+            self._gap("Fee", "the fee flow seen in transfers does not match the explorer's fee",
+                      "Check the fee on the explorer page", retryable=False)
+
+    def _native_amount(self, raw: int | None) -> str:
+        if raw is None:
+            return "an amount the explorer does not report"
+        return f"{amount(raw, self.cfg.network.native_decimals)} {self.cfg.network.native_symbol}"
 
     def _transfer_what(self, t: TokenTransfer) -> str:
         """'69.3484 USDC', '50 x NAME token #7', 'NAME token #443098', or the raw amount."""

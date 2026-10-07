@@ -74,6 +74,12 @@ class ChainFact:
     data: dict = field(default_factory=dict)
 
 
+def classified_as(tx: dict, kind: str) -> bool:
+    """Blockscout's own classification of the transaction (field `transaction_types`)."""
+    kinds = tx.get("transaction_types")
+    return isinstance(kinds, list) and kind in kinds
+
+
 class ChainProfile:
     """The generic EVM: only what every Blockscout-compatible explorer reports."""
 
@@ -119,26 +125,45 @@ class OptimismProfile(ChainProfile):
 
     chain_type = "optimism"
     owned_fields = frozenset({"l1_fee", "l1_fee_scalar", "l1_gas_price", "l1_gas_used",
-                              "da_footprint_gas_scalar", "op_withdrawals", "op_interop"})
+                              "da_footprint_gas_scalar", "op_withdrawals", "op_interop_messages", "operator_fee"})
     DEPOSIT_TX_TYPE = 126
 
     def fee(self, tx: dict) -> Fee | None:
+        """Blockscout's total is execution + L1 data fee + operator fee (fee_calc, since Isthmus)."""
         base = super().fee(tx)
-        l1 = _int(tx.get("l1_fee"))
-        if base is not None and l1 and l1 > base.total_raw:
-            return Fee(base.parts, warnings=[f"the explorer's L1 fee ({l1}) is larger than its total fee "
-                                             f"({base.total_raw}), so the fee is not split"])
-        if base is None or not l1:
+        if base is None:
+            return None
+        l1, operator = _int(tx.get("l1_fee")) or 0, _int(tx.get("operator_fee")) or 0
+        if not l1 and not operator:
             return base
-        # Verified live: Blockscout's `fee` already includes `l1_fee`.
-        return Fee([FeePart("L2 execution", base.total_raw - l1), FeePart("L1 data", l1)])
+        execution = base.total_raw - l1 - operator
+        if execution < 0:
+            return Fee(base.parts, warnings=[f"the explorer's L1 fee ({l1}) and operator fee ({operator}) exceed "
+                                             f"its total fee ({base.total_raw}), so the fee is not split"])
+        parts = [FeePart("L2 execution", execution)]
+        parts += [FeePart("L1 data", l1)] if l1 else []
+        parts += [FeePart("operator fee", operator)] if operator else []
+        return Fee(parts)
 
     def facts(self, tx: dict) -> list[ChainFact]:
         found = []
-        if _int(tx.get("type")) == self.DEPOSIT_TX_TYPE:
-            found.append(ChainFact("chain", "Deposit-type transaction (OP Stack type 126): not signed by an L2 "
-                                   "account. It is either a deposit from L1 or a system transaction the sequencer "
-                                   "adds to every block (such as the L1 attributes update).", {"deposit_type": True}))
+        if classified_as(tx, "op_stack_l1_attributes_transaction"):
+            found.append(ChainFact("chain", "L1 attributes transaction: the system transaction the sequencer puts "
+                                   "first in every block to record L1 data (OP Stack type 126, classified by the "
+                                   "explorer). Not a user deposit.", {"deposit_type": "l1_attributes"}))
+        elif _int(tx.get("type")) == self.DEPOSIT_TX_TYPE:
+            found.append(ChainFact("chain", "Deposit transaction (OP Stack type 126): created from L1, not signed "
+                                   "on L2; its gas was paid on L1. Usually a user deposit through the bridge; "
+                                   "network-upgrade deposits use the same type.", {"deposit_type": "deposit"}))
+        if classified_as(tx, "op_stack_post_exec_transaction"):
+            found.append(ChainFact("chain", "The explorer classifies this as an OP Stack post-execution transaction "
+                                   "(type 0x7D); its contents are not interpreted by this tool.",
+                                   {"post_exec": True}))
+        messages = tx.get("op_interop_messages")
+        if isinstance(messages, list) and messages:
+            found.append(ChainFact("chain", f"The explorer reports {len(messages)} cross-chain interop message(s) "
+                                   "for this transaction; their contents are not interpreted by this tool.",
+                                   {"interop_messages": len(messages)}))
         for w in tx.get("op_withdrawals") or []:
             if not isinstance(w, dict):
                 continue
@@ -164,8 +189,7 @@ class CeloProfile(OptimismProfile):
         address = token.get("address_hash")
         ref = TokenRef(address, token.get("symbol") or token.get("name") or address or "an unnamed token",
                        _int(token.get("decimals")))
-        return Fee([FeePart("fee", total, ref)], note=f"paid in {ref.symbol}, a Celo fee currency, instead of "
-                                                      "the native currency")
+        return Fee([FeePart("fee", total, ref)], note="as a Celo fee currency")
 
 
 class ZkSyncProfile(ChainProfile):
@@ -173,11 +197,16 @@ class ZkSyncProfile(ChainProfile):
 
     chain_type = "zksync"
     owned_fields = frozenset({"zksync"})
+    PRIORITY_TX_TYPE = 255  # L1 -> L2
 
     def facts(self, tx: dict) -> list[ChainFact]:
+        found = []
+        if _int(tx.get("type")) == self.PRIORITY_TX_TYPE:
+            found.append(ChainFact("chain", "Priority transaction (zkSync type 255): submitted through L1 and "
+                                   "executed on L2.", {"priority": True}))
         info = tx.get("zksync")
         if not isinstance(info, dict) or not info.get("status"):
-            return []
+            return found
         steps = [(label, info.get(f"{key}_transaction_hash")) for label, key in
                  (("committed", "commit"), ("proven", "prove"), ("executed", "execute"))]
         done = ", ".join(f"{label} in L1 transaction {h}" for label, h in steps if h)
@@ -185,13 +214,22 @@ class ZkSyncProfile(ChainProfile):
         if info.get("batch_number") is not None:
             text += f" (batch {info['batch_number']})"
         text += f"; {done}." if done else "; not yet committed to L1."
-        return [ChainFact("chain", text, {"l1_status": info["status"], "batch": info.get("batch_number")})]
+        return found + [ChainFact("chain", text, {"l1_status": info["status"], "batch": info.get("batch_number")})]
 
 
 class RskProfile(ChainProfile):
-    """Rootstock (CHAIN_TYPE=rsk): the explorer adds nothing we need to interpret yet."""
+    """Rootstock (CHAIN_TYPE=rsk): no extra fields, but the explorer classifies native-contract transactions."""
 
     chain_type = "rsk"
+
+    def facts(self, tx: dict) -> list[ChainFact]:
+        if classified_as(tx, "rootstock_remasc"):
+            return [ChainFact("chain", "The explorer classifies this as Rootstock's REMASC transaction: the "
+                              "per-block distribution of mining rewards, a system transaction.", {"remasc": True})]
+        if classified_as(tx, "rootstock_bridge"):
+            return [ChainFact("chain", "The explorer classifies this as a Rootstock bridge transaction (the "
+                              "native BTC peg contract).", {"bridge": True})]
+        return []
 
 
 PROFILES: dict[str, ChainProfile] = {p.chain_type: p for p in (

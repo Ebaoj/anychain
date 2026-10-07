@@ -32,6 +32,18 @@ class NetworkConfig(BaseModel):
     native_decimals: int = 18
     # Same values as Blockscout's CHAIN_TYPE; selects the profile in chains.py.
     chain_type: str = "default"
+    # Contract that also records native-currency movements as token transfers (zkSync's
+    # L2BaseToken, Celo's CELO token). Its transfers are the native movement, not a second asset.
+    native_token_contract: str | None = None
+    # Address that collects fees through visible transfers (zkSync's bootloader).
+    fee_collector: str | None = None
+
+    @field_validator("native_token_contract", "fee_collector")
+    @classmethod
+    def _optional_address(cls, v: str | None) -> str | None:
+        if v is not None and not (v.startswith("0x") and len(v) == 42):
+            raise ValueError(f"must be a 0x-prefixed 20-byte address, got {v!r}")
+        return v.lower() if v else v
 
     @field_validator("chain_type")
     @classmethod
@@ -79,6 +91,14 @@ class ExplorerConfig(BaseModel):
 
     def tx_url(self, tx_hash: str) -> str:
         return self.tx_url_template.format(base_url=self.base_url, hash=tx_hash)
+
+
+class FeeTokenConfig(BaseModel):
+    """How to read a fee paid through an address the explorer cannot describe (e.g. a Celo fee adapter)."""
+
+    symbol: str
+    decimals: int = Field(ge=0)  # decimals of the fee amount (the adapter's units, not the token's)
+    note: str | None = None
 
 
 class RpcConfig(BaseModel):
@@ -164,13 +184,25 @@ class AppConfig(BaseModel):
     # the explorer has no name for them. Network knowledge lives here, not in code.
     address_labels: dict[str, str] = {}
 
-    @field_validator("address_labels")
+    # Contracts built into the node (no bytecode or ABI to verify), e.g. Rootstock's Bridge.
+    native_contracts: dict[str, str] = {}
+    # Fee tokens the explorer cannot describe, keyed by the address in the fee (Celo adapters).
+    fee_tokens: dict[str, FeeTokenConfig] = {}
+
+    @field_validator("address_labels", "native_contracts", "fee_tokens")
     @classmethod
-    def _label_keys_are_addresses(cls, v: dict[str, str]) -> dict[str, str]:
+    def _keys_are_addresses(cls, v: dict) -> dict:
         bad = [k for k in v if not (isinstance(k, str) and k.startswith("0x") and len(k) == 42)]
         if bad:
-            raise ValueError(f"address_labels keys must be 0x-prefixed 20-byte addresses: {bad}")
-        return {k.lower(): label for k, label in v.items()}
+            raise ValueError(f"keys must be 0x-prefixed 20-byte addresses: {bad}")
+        return {k.lower(): value for k, value in v.items()}
+
+    def label_for(self, address: str) -> str | None:
+        """Config name for an address: a native contract or a labelled one."""
+        key = address.lower()
+        if key in self.native_contracts:
+            return f"{self.native_contracts[key]}, native contract"
+        return self.address_labels.get(key)
     abi_strategy: AbiStrategyConfig = AbiStrategyConfig()
     llm: LlmConfig
     assistant: AssistantConfig = AssistantConfig()
