@@ -1,6 +1,6 @@
 # Decisions
 
-Each entry: decision, alternatives, reason, trade-off.
+Each entry: decision, alternatives, reason, trade-off. Entries are history: when a later decision replaces an earlier one, the earlier text is struck through and points to the replacement.
 
 ## D1. Second network is Optimism, not Base
 - **Alternatives:** Base (spec's first suggestion), Sepolia.
@@ -83,13 +83,12 @@ A bug hunt with varied real transactions found facts that were well formatted, s
 - **Internal value only moves on `call` and `create`/`create2`.** `delegatecall` and `callcode` run another contract's code inside the caller, so their `value` is the caller's own context and nothing moves (Lido `submit`, `eth_lido_submit`, used to show a phantom ETH transfer to the Lido implementation). `callcode` is grouped with `delegatecall` on purpose: in the EVM its value goes from the caller to itself. A failed `call` with value moves nothing. Each internal fact carries `moves_value` (true / false / null when not known).
 - **`selfdestruct` is not interpreted yet:** no real recording exists, so its value is reported neutrally ("the explorer records a value of X") instead of guessing who received it.
 - **EIP-7702 (type 4):** each `authorization_list` entry becomes a fact ("delegation set" / "cleared" for address 0x0), with its status when not `ok`. A type-4 tx with no data and no value is described as a delegation change, not a "plain transfer". Limitation: we state the delegation; we do not explain what the delegated code did.
-- **Data sent to an account with no code** is not a function call and needs no ABI. We rely on the explorer's `is_contract`, skipping accounts with listed implementations (a 7702-delegated account runs code). Limitation: `is_contract` is today's state, not the state at the transaction's block.
+- ~~**Data sent to an account with no code** is not a function call and needs no ABI. We rely on the explorer's `is_contract`.~~ **Superseded by D18:** `is_contract` is today's state, so this is no longer asserted.
 - **Internal `create`** names the deployed contract from `created_contract`.
 - **Anonymous events** (no signature topic, e.g. MakerDAO `LogNote`) are decoded only when exactly one anonymous event of the ABI fits the log; otherwise the gap says so, instead of claiming the ABI is missing.
 - **RPC sources** now show the exact call (method + params), and the LLM receives each fact's sources, with the rule that it may repeat but never invent links.
 - **Review of D17 (fifth review):** the explorer's `is_contract` is today's state, so a 7702 account that delegated, acted and later revoked looked like "no code" (real tx 0xf5199e66…). Now:
-  - "Did the target run code in this tx?" is answered in this order: a valid delegation set or cleared by this very tx; a precompile (0x…01 to 0x…ff); the node's `eth_getCode` just before the block. If none can answer, we say so ("may or may not have been a function call") with a non-retryable gap asking for an archive RPC. Public nodes refuse old state (verified: a block ~1.5h old already needs "a personal token"), so this honest "unknown" is the common case.
-  - Without the explorer (RPC-only path) there is no `is_contract` flag; when old state is refused we fall back to today's code, the same criterion the explorer uses: code today = a contract.
+  - ~~"Did the target run code in this tx?" answered by a precompile range (0x…01 to 0x…ff) and the node's `eth_getCode` just before the block.~~ **Superseded by D18:** both rules produced false facts in real cases. What remains from this round: a valid delegation set or cleared by this very tx is trusted. (Also learned here: public nodes refuse old state; a block ~1.5h old already needed "a personal token".)
   - A delegation set in the same tx is used as an ABI source, so the call still decodes (`execute(bytes32,bytes)` on 0xf5199e66…).
   - Authorizations are stated as applied only when the explorer marks them `ok`; `invalid_*` ones say "was not applied", and a missing status says "validity not reported" (real tx 0x26118f7f…).
   - A type-4 tx with no data is described by what it carries ("N authorizations"), not by a claim that it "only changes delegation".
