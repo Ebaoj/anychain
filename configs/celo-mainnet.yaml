@@ -1,20 +1,20 @@
 network:
-  name: optimism-mainnet
-  chain_id: 10
-  native_symbol: ETH
+  name: celo-mainnet
+  chain_id: 42220
+  native_symbol: CELO
   native_decimals: 18
-  chain_type: optimism      # Blockscout CHAIN_TYPE of this explorer
+  chain_type: optimism-celo # Blockscout CHAIN_TYPE of this explorer
 
 explorer:
   type: blockscout
-  base_url: https://explorer.optimism.io
+  base_url: https://celo.blockscout.com
   api_path: /api/v2
   tx_url_template: "{base_url}/tx/{hash}"
   address_url_template: "{base_url}/address/{address}"
   timeout_s: 15
 
 rpc:
-  url: https://mainnet.optimism.io
+  url: https://forno.celo.org
   timeout_s: 10
   supports_debug_trace: false
 

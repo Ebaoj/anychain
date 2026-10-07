@@ -1,20 +1,20 @@
 network:
-  name: ethereum-mainnet
-  chain_id: 1
-  native_symbol: ETH
+  name: gnosis-mainnet
+  chain_id: 100
+  native_symbol: XDAI
   native_decimals: 18
-  chain_type: ethereum      # Blockscout CHAIN_TYPE of this explorer
+  chain_type: default       # Blockscout CHAIN_TYPE of this explorer
 
 explorer:
   type: blockscout
-  base_url: https://eth.blockscout.com
+  base_url: https://gnosisscan.io   # moved from gnosis.blockscout.com (HTTP 301) on 2026-10-07; same Blockscout v12
   api_path: /api/v2
   tx_url_template: "{base_url}/tx/{hash}"
   address_url_template: "{base_url}/address/{address}"
   timeout_s: 15
 
 rpc:
-  url: https://ethereum-rpc.publicnode.com
+  url: https://rpc.gnosischain.com
   timeout_s: 10
   supports_debug_trace: false
 

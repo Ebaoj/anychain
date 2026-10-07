@@ -1,0 +1,65 @@
+network:
+  name: zksync-era
+  chain_id: 324
+  native_symbol: ETH
+  native_decimals: 18
+  chain_type: zksync        # Blockscout CHAIN_TYPE of this explorer
+
+explorer:
+  type: blockscout
+  base_url: https://zksync.blockscout.com
+  api_path: /api/v2
+  tx_url_template: "{base_url}/tx/{hash}"
+  address_url_template: "{base_url}/address/{address}"
+  timeout_s: 15
+
+rpc:
+  url: https://mainnet.era.zksync.io
+  timeout_s: 10
+  supports_debug_trace: false
+
+repos:
+  - url: https://github.com/Uniswap/v2-periphery
+    ref: master
+    source_globs: ["contracts/**/*.sol"]
+    artifact_globs: ["**/artifacts/**/*.json", "**/out/**/*.json", "**/abi/**/*.json", "build/**/*.json"]
+  - url: https://github.com/circlefin/stablecoin-evm
+    ref: master
+    source_globs: ["contracts/**/*.sol"]
+
+address_map: {}
+
+# zkSync system contracts (matter-labs/era-contracts, system-contracts/contracts/Constants.sol).
+# The explorer has no names for them, and fees flow through the bootloader.
+address_labels:
+  "0x0000000000000000000000000000000000008001": "zkSync bootloader: collects fees and pays refunds"
+  "0x0000000000000000000000000000000000008003": "zkSync NonceHolder system contract"
+  "0x0000000000000000000000000000000000008006": "zkSync ContractDeployer system contract"
+  "0x0000000000000000000000000000000000008008": "zkSync L1Messenger system contract"
+  "0x0000000000000000000000000000000000008009": "zkSync MsgValueSimulator system contract"
+  "0x000000000000000000000000000000000000800a": "zkSync L2BaseToken: the native ETH balance contract"
+  "0x000000000000000000000000000000000000800b": "zkSync SystemContext system contract"
+  "0x000000000000000000000000000000000000800c": "zkSync BootloaderUtilities system contract"
+  "0x0000000000000000000000000000000000008010": "zkSync Keccak256 system contract"
+
+abi_strategy:
+  order: [explorer, repo_artifacts, repo_source_signatures, signature_db]
+  signature_db:
+    enabled: true
+    url: https://www.4byte.directory/api/v1
+
+llm:
+  provider: anthropic
+  model: claude-sonnet-5-5
+  max_tokens: 2000
+  temperature: 0
+
+assistant:
+  default_mode: support
+  language: pt-BR
+  max_clarifying_questions: 2
+  time_budget_s: 30             # total wait for one explanation; then answer with what we have
+
+storage:
+  sqlite_path: data/runs.db
+  cache_dir: data/cache

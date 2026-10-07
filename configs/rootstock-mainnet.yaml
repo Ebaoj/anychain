@@ -1,20 +1,20 @@
 network:
-  name: ethereum-mainnet
-  chain_id: 1
-  native_symbol: ETH
+  name: rootstock-mainnet
+  chain_id: 30
+  native_symbol: RBTC
   native_decimals: 18
-  chain_type: ethereum      # Blockscout CHAIN_TYPE of this explorer
+  chain_type: rsk           # Blockscout CHAIN_TYPE of this explorer
 
 explorer:
   type: blockscout
-  base_url: https://eth.blockscout.com
+  base_url: https://rootstock.blockscout.com
   api_path: /api/v2
   tx_url_template: "{base_url}/tx/{hash}"
   address_url_template: "{base_url}/address/{address}"
   timeout_s: 15
 
 rpc:
-  url: https://ethereum-rpc.publicnode.com
+  url: https://public-node.rsk.co
   timeout_s: 10
   supports_debug_trace: false
 
@@ -28,6 +28,12 @@ repos:
     source_globs: ["contracts/**/*.sol"]
 
 address_map: {}
+
+# Rootstock native contracts (rsksmart/rskj, PrecompiledContracts.java). Every block ends with a
+# system transaction from the zero address to REMASC, which distributes the block rewards.
+address_labels:
+  "0x0000000000000000000000000000000001000006": "Rootstock Bridge native contract (BTC peg)"
+  "0x0000000000000000000000000000000001000008": "Rootstock REMASC native contract (block rewards)"
 
 abi_strategy:
   order: [explorer, repo_artifacts, repo_source_signatures, signature_db]

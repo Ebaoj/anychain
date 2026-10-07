@@ -12,6 +12,10 @@ network:
   chain_id: 2009                   # 2008 for CloudWalk Testnet; confirm with eth_chainId on the RPC
   native_symbol: CWN
   native_decimals: 18              # confirm with the network team
+  # Set this to the CHAIN_TYPE your Blockscout runs with (ask its operator). A Stratus
+  # network is a standard EVM, so "default" is the likely value. AnyChain warns if the
+  # explorer's answers look like another type.
+  chain_type: default
 
 explorer:
   type: blockscout                 # any Blockscout-compatible API (v2)
@@ -22,9 +26,13 @@ explorer:
   timeout_s: 15
 
 rpc:
-  url: "<RPC_URL>"                 # read-only JSON-RPC endpoint
+  # Stratus can reject unidentified clients (stratus_disableUnknownClients). It reads the
+  # client name from ?app=<name> (or the x-app header), so keep the query string.
+  url: "<RPC_URL>?app=anychain"    # read-only JSON-RPC endpoint
   timeout_s: 10
-  supports_debug_trace: false      # set true if the node serves debug_traceTransaction
+  # Stratus serves debug_traceTransaction (src/eth/rpc/server.rs); phase 2 uses it to
+  # confirm failure points and code at execution time.
+  supports_debug_trace: true
 
 repos:
   # The BRLC contracts were public at github.com/cloudwalk/brlc-token until ~May 2024
@@ -37,6 +45,9 @@ repos:
     source_globs: ["contracts/**/*.sol"]
     artifact_globs: ["**/artifacts/**/*.json", "**/abi/**/*.json"]
 
+# Stratus returns a gas price of zero (eth_gasPrice -> 0x0): fees will show as 0 CWN,
+# which is correct for this network.
+address_labels: {}                 # optional: "0x...": "BRLC token (proxy)"
 address_map: {}                    # optional: "0x...": { repo: "<url>", contract: "<Name>" }
 
 abi_strategy:
