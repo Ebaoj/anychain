@@ -61,3 +61,25 @@ def test_receipt_transfer_decoding_covers_weth_deposits():
     _, _, _, receipt, _ = _answer_and_node("eth_uniswap_v2_swap")
     kinds = receipt_transfers(receipt, set())
     assert any(frm == "0x" + "0" * 40 for _, frm, _, _ in kinds)  # WETH Deposit shown as a mint
+
+
+def test_wrap_with_both_deposit_and_transfer_counts_once():
+    # Real shape (zkSync tx 0xe21abb35...): one wrap emits Deposit and Transfer(0x0 -> dst).
+    from anychain.oracle import TRANSFER, WETH_DEPOSIT
+    dst, amount = "0x" + "6e" * 20, "0x" + format(12512015561371302, "064x")
+    topic = lambda a: "0x" + "0" * 24 + a[2:]
+    receipt = {"logs": [
+        {"address": "0xweth", "topics": [WETH_DEPOSIT, topic(dst)], "data": amount},
+        {"address": "0xweth", "topics": [TRANSFER, topic("0x" + "0" * 40), topic(dst)], "data": amount},
+    ]}
+    assert len(receipt_transfers(receipt, set())) == 1
+
+
+def test_token_paid_fee_is_checked_against_the_node():
+    # Celo CIP-64: gasUsed * effectiveGasPrice is the fee in the fee token's (adapter's) units.
+    bundle, cfg, tx, receipt, corpus = _answer_and_node("celo_fee_currency")
+    fee = {c.name: c for c in check_answer(bundle, cfg, tx, receipt, corpus, fee_token_decimals=18)}["fee"]
+    assert fee.status == "pass"
+    next(e for e in bundle.items if e.kind == "fee").data["fee"] = "0.0036"
+    fee = {c.name: c for c in check_answer(bundle, cfg, tx, receipt, corpus, fee_token_decimals=18)}["fee"]
+    assert fee.status == "fail"

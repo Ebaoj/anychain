@@ -7,9 +7,11 @@ false fact or a limit of the check; every mismatch is reviewed by hand.
 Each check returns pass / fail / skip (skip = this check cannot judge this transaction, with why).
 """
 import re
+from collections import Counter
 from dataclasses import dataclass
 from decimal import Decimal
 
+from eth_abi import decode
 from eth_utils import event_signature_to_log_topic
 
 from anychain.config import AppConfig
@@ -22,6 +24,7 @@ def _topic(signature: str) -> str:
 
 TRANSFER = _topic("Transfer(address,address,uint256)")  # ERC-20 (2 indexed) and ERC-721 (3 indexed)
 TRANSFER_SINGLE = _topic("TransferSingle(address,address,address,uint256,uint256)")  # ERC-1155
+TRANSFER_BATCH = _topic("TransferBatch(address,address,address,uint256[],uint256[])")  # ERC-1155, one entry per id
 WETH_DEPOSIT = _topic("Deposit(address,uint256)")  # WETH-style wrap, listed by explorers as a mint
 WETH_WITHDRAWAL = _topic("Withdrawal(address,uint256)")  # WETH-style unwrap, listed as a burn
 ADDRESS_RE = re.compile(r"0x[0-9a-fA-F]{40}(?![0-9a-fA-F])")
@@ -64,7 +67,7 @@ def receipt_transfers(receipt: dict, skip_tokens: set[str]) -> list[tuple[str, s
     Mirrors what an explorer lists as token transfers: ERC-20/721 Transfer, ERC-1155
     TransferSingle, and WETH-style Deposit/Withdrawal (shown as mint/burn).
     """
-    found = []
+    found, wraps = [], []
     for log in receipt.get("logs") or []:
         topics = [t.lower() for t in log.get("topics") or []]
         token, data = (log.get("address") or "").lower(), log.get("data") or "0x"
@@ -78,21 +81,33 @@ def receipt_transfers(receipt: dict, skip_tokens: set[str]) -> list[tuple[str, s
         elif topics[0] == TRANSFER_SINGLE and len(topics) == 4 and len(words) == 2:
             # same "quantity x id" form the tool's data uses
             found.append((token, _topic_address(topics[2]), _topic_address(topics[3]), f"{int(words[1], 16)}x{int(words[0], 16)}"))
+        elif topics[0] == TRANSFER_BATCH and len(topics) == 4:
+            ids, values = decode(["uint256[]", "uint256[]"], bytes.fromhex(data[2:]))
+            for token_id, value in zip(ids, values):
+                found.append((token, _topic_address(topics[2]), _topic_address(topics[3]), f"{value}x{token_id}"))
         elif topics[0] == WETH_DEPOSIT and len(topics) == 2 and len(words) == 1:
-            found.append((token, ZERO, _topic_address(topics[1]), str(int(words[0], 16))))
+            wraps.append((token, ZERO, _topic_address(topics[1]), str(int(words[0], 16))))
         elif topics[0] == WETH_WITHDRAWAL and len(topics) == 2 and len(words) == 1:
-            found.append((token, _topic_address(topics[1]), ZERO, str(int(words[0], 16))))
+            wraps.append((token, _topic_address(topics[1]), ZERO, str(int(words[0], 16))))
+    # Some wrapped-ETH contracts emit both Deposit and Transfer(0x0 -> dst) for one wrap (seen on
+    # zkSync tx 0xe21abb35...): the explorer lists it once, so a Deposit only counts when the
+    # contract did not also emit the matching mint/burn Transfer.
+    for wrap in wraps:
+        if wrap in found:
+            found.remove(wrap)  # paired with its Transfer: keep a single entry
+        found.append(wrap)
     return found
 
 
 def check_answer(bundle: EvidenceBundle, cfg: AppConfig, tx: dict | None, receipt: dict | None,
-                 raw_corpus: str) -> list[Check]:
+                 raw_corpus: str, fee_token_decimals: int | None = None) -> list[Check]:
     """All checks for one answer. `tx`/`receipt` come straight from the node; `raw_corpus` is every
-    response body the tool received while answering (for the invented-address check)."""
+    response body the tool received while answering (for the invented-address check).
+    `fee_token_decimals`: decimals of the node's `feeCurrency` (Celo), resolved by the caller."""
     return [
         _check_status(bundle, receipt),
         _check_value(bundle, cfg, tx),
-        _check_fee(bundle, cfg, tx, receipt),
+        _check_fee(bundle, cfg, tx, receipt, fee_token_decimals),
         _check_token_transfers(bundle, cfg, receipt),
         _check_no_double_native(bundle),
         _check_addresses_exist(bundle, cfg, raw_corpus),
@@ -124,13 +139,21 @@ def _check_value(bundle: EvidenceBundle, cfg: AppConfig, tx: dict | None) -> Che
     return Check("value", "pass") if node == tool else Check("value", "fail", f"tool {tool}, node {node}")
 
 
-def _check_fee(bundle: EvidenceBundle, cfg: AppConfig, tx: dict | None, receipt: dict | None) -> Check:
+def _check_fee(bundle: EvidenceBundle, cfg: AppConfig, tx: dict | None, receipt: dict | None,
+               fee_token_decimals: int | None = None) -> Check:
     fee_fact = next((e for e in bundle.items if e.kind == "fee"), None)
     if fee_fact is None or receipt is None or tx is None:
         return Check("fee", "skip", "no fee fact or no node receipt")
     token = fee_fact.data.get("token")
     if token != cfg.network.native_symbol:
-        return Check("fee", "skip", f"fee paid in {token}: the node does not state it in a comparable unit")
+        # Fee paid in a token (Celo CIP-64): the node prices gas in that token, so
+        # gasUsed * effectiveGasPrice is the fee in the token's (or adapter's) units.
+        if not tx.get("feeCurrency") or fee_token_decimals is None:
+            return Check("fee", "skip", f"fee paid in {token}: fee currency or its decimals unknown")
+        expected = (_int(receipt.get("gasUsed")) or 0) * (_int(receipt.get("effectiveGasPrice")) or 0)
+        stated = _raw_units(str(fee_fact.data.get("fee")), fee_token_decimals)
+        return Check("fee", "pass") if stated == expected else \
+            Check("fee", "fail", f"tool {stated}, node gasUsed*effectiveGasPrice {expected} (in {token} units)")
     if any(_int(receipt.get(k)) for k in ("operatorFeeScalar", "operatorFeeConstant")):
         return Check("fee", "skip", "operator fee present: formula depends on the network upgrade")
     gas_used = _int(receipt.get("gasUsed"))
@@ -169,8 +192,8 @@ def _check_token_transfers(bundle: EvidenceBundle, cfg: AppConfig, receipt: dict
     tool.sort()
     if node == tool:
         return Check("token_transfers", "pass")
-    missing = [t for t in node if t not in tool]
-    extra = [t for t in tool if t not in node]
+    missing = list((Counter(node) - Counter(tool)).elements())  # counts repeats, not just presence
+    extra = list((Counter(tool) - Counter(node)).elements())
     return Check("token_transfers", "fail", f"in node logs only: {missing[:3]}; in tool only: {extra[:3]}")
 
 
