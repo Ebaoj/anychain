@@ -1,0 +1,249 @@
+"""Chain-type profiles: what each kind of EVM network adds on top of the common standard.
+
+The config names the network's type with `network.chain_type`, using Blockscout's own
+CHAIN_TYPE values (the operator of an explorer already knows theirs). A profile turns the
+type-specific parts of an explorer transaction into typed objects: how the fee was paid,
+and extra facts such as Optimism withdrawals or zkSync's status on L1.
+
+Unknown or profile-less types fall back to the generic profile, and the bundle declares
+what it could not interpret. Field shapes were checked on live explorers (DECISIONS D20).
+"""
+from dataclasses import dataclass, field
+
+# Every CHAIN_TYPE value Blockscout accepts (blockscout/config/config_helper.exs).
+BLOCKSCOUT_CHAIN_TYPES = frozenset({
+    "default", "arbitrum", "arc", "blackfort", "eden", "ethereum", "filecoin", "optimism", "rsk",
+    "scroll", "shibarium", "stability", "suave", "zetachain", "zilliqa", "zksync", "neon", "optimism-celo",
+})
+
+
+# Transaction fields every Blockscout v2 reports, whatever the chain type
+# (taken from a recorded eth.blockscout.com response, fixture eth_usdc_transfer).
+COMMON_FIELDS = frozenset({
+    "authorization_list", "base_fee_per_gas", "block_number", "confirmation_duration", "confirmations",
+    "created_contract", "decoded_input", "exchange_rate", "fee", "fhe_operations_count", "from", "gas_limit",
+    "gas_price", "gas_used", "has_error_in_internal_transactions", "hash", "historic_exchange_rate",
+    "is_pending_update", "max_fee_per_gas", "max_priority_fee_per_gas", "method", "nonce", "position",
+    "priority_fee", "raw_input", "result", "revert_reason", "status", "timestamp", "to", "token_transfers",
+    "token_transfers_overflow", "transaction_burnt_fee", "transaction_tag", "transaction_types", "type", "value",
+})
+
+
+@dataclass(frozen=True)
+class TokenRef:
+    """A token named by the explorer (used when a fee is not paid in the native currency)."""
+
+    address: str | None
+    symbol: str  # the explorer's symbol, else its name, else the token address
+    decimals: int | None  # None when the explorer does not report them: amounts stay raw
+
+
+@dataclass(frozen=True)
+class FeePart:
+    label: str  # e.g. "L2 execution", "L1 data", "blob data"
+    raw: int  # smallest units of `token`, or of the native currency when token is None
+    token: TokenRef | None = None
+
+
+@dataclass(frozen=True)
+class Fee:
+    """The fee a transaction paid, split into the parts the network charges."""
+
+    parts: list[FeePart]
+    note: str | None = None  # e.g. "paid in USD₮ instead of the native currency"
+    warnings: list[str] = field(default_factory=list)  # what makes this fee incomplete; become gaps
+
+    @property
+    def single_token(self) -> TokenRef | None:
+        tokens = {p.token for p in self.parts}
+        return tokens.pop() if len(tokens) == 1 else None
+
+    @property
+    def total_raw(self) -> int:
+        return sum(p.raw for p in self.parts)
+
+
+@dataclass(frozen=True)
+class ChainFact:
+    """One type-specific fact; the bundle numbers it and attaches the explorer source."""
+
+    kind: str
+    text: str
+    data: dict = field(default_factory=dict)
+
+
+def _int(value: object) -> int | None:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value, 16) if value.startswith("0x") else int(value)
+        except ValueError:
+            return None
+    return None
+
+
+class ChainProfile:
+    """The generic EVM: only what every Blockscout-compatible explorer reports."""
+
+    chain_type = "default"
+    owned_fields: frozenset[str] = frozenset()  # top-level tx fields this profile interprets
+
+    def fee(self, tx: dict) -> Fee | None:
+        total = _int((tx.get("fee") or {}).get("value"))
+        return Fee([FeePart("fee", total)]) if total is not None else None
+
+    def facts(self, tx: dict) -> list[ChainFact]:
+        return []
+
+
+class EthereumProfile(ChainProfile):
+    """Ethereum L1 (Blockscout CHAIN_TYPE=ethereum): adds blob transactions (EIP-4844, type 3)."""
+
+    chain_type = "ethereum"
+    owned_fields = frozenset({"blob_gas_used", "burnt_blob_fee", "max_fee_per_blob_gas",
+                              "blob_versioned_hashes", "blob_gas_price"})
+
+    def fee(self, tx: dict) -> Fee | None:
+        base = super().fee(tx)
+        blob = _int(tx.get("burnt_blob_fee"))
+        if base is not None and not blob and tx.get("blob_versioned_hashes"):
+            return Fee(base.parts, warnings=["the transaction carries blobs, but the explorer reports no blob fee; "
+                                             "the fee shown may be the execution part only"])
+        if base is None or not blob:
+            return base
+        # Verified live: Blockscout's `fee` is the execution fee only; the blob fee is charged on top.
+        return Fee([FeePart("execution", base.total_raw), FeePart("blob data, burnt", blob)])
+
+    def facts(self, tx: dict) -> list[ChainFact]:
+        hashes = tx.get("blob_versioned_hashes") or []
+        if not hashes:
+            return []
+        return [ChainFact("chain", f"Carried {len(hashes)} blob(s) of data (EIP-4844), using "
+                          f"{tx.get('blob_gas_used')} blob gas.", {"blobs": len(hashes)})]
+
+
+class OptimismProfile(ChainProfile):
+    """OP Stack L2 (CHAIN_TYPE=optimism): L1 data fee, L1->L2 deposits, L2->L1 withdrawals."""
+
+    chain_type = "optimism"
+    owned_fields = frozenset({"l1_fee", "l1_fee_scalar", "l1_gas_price", "l1_gas_used",
+                              "da_footprint_gas_scalar", "op_withdrawals", "op_interop"})
+    DEPOSIT_TX_TYPE = 126
+
+    def fee(self, tx: dict) -> Fee | None:
+        base = super().fee(tx)
+        l1 = _int(tx.get("l1_fee"))
+        if base is not None and l1 and l1 > base.total_raw:
+            return Fee(base.parts, warnings=[f"the explorer's L1 fee ({l1}) is larger than its total fee "
+                                             f"({base.total_raw}), so the fee is not split"])
+        if base is None or not l1:
+            return base
+        # Verified live: Blockscout's `fee` already includes `l1_fee`.
+        return Fee([FeePart("L2 execution", base.total_raw - l1), FeePart("L1 data", l1)])
+
+    def facts(self, tx: dict) -> list[ChainFact]:
+        found = []
+        if _int(tx.get("type")) == self.DEPOSIT_TX_TYPE:
+            found.append(ChainFact("chain", "Deposit-type transaction (OP Stack type 126): not signed by an L2 "
+                                   "account. It is either a deposit from L1 or a system transaction the sequencer "
+                                   "adds to every block (such as the L1 attributes update).", {"deposit_type": True}))
+        for w in tx.get("op_withdrawals") or []:
+            if not isinstance(w, dict):
+                continue
+            text = f"Started a withdrawal to L1 (nonce {w.get('nonce')}): the explorer reports status {w.get('status')!r}"
+            if w.get("l1_transaction_hash"):
+                text += f", finalized on L1 in transaction {w['l1_transaction_hash']}"
+            found.append(ChainFact("chain", text + ".", {"withdrawal_status": w.get("status"),
+                                                         "l1_transaction_hash": w.get("l1_transaction_hash")}))
+        return found
+
+
+class CeloProfile(OptimismProfile):
+    """Celo (CHAIN_TYPE=optimism-celo): an OP Stack L2 whose fees can be paid in a token."""
+
+    chain_type = "optimism-celo"
+    owned_fields = OptimismProfile.owned_fields | {"celo"}
+
+    def fee(self, tx: dict) -> Fee | None:
+        token = ((tx.get("celo") or {}).get("gas_token")) if isinstance(tx.get("celo"), dict) else None
+        total = _int((tx.get("fee") or {}).get("value"))
+        if not isinstance(token, dict) or total is None:
+            return super().fee(tx)
+        address = token.get("address_hash")
+        ref = TokenRef(address, token.get("symbol") or token.get("name") or address or "an unnamed token",
+                       _int(token.get("decimals")))
+        return Fee([FeePart("fee", total, ref)], note=f"paid in {ref.symbol}, a Celo fee currency, instead of "
+                                                      "the native currency")
+
+
+class ZkSyncProfile(ChainProfile):
+    """zkSync Era (CHAIN_TYPE=zksync): a zkEVM rollup; adds the transaction's status on L1."""
+
+    chain_type = "zksync"
+    owned_fields = frozenset({"zksync"})
+
+    def facts(self, tx: dict) -> list[ChainFact]:
+        info = tx.get("zksync")
+        if not isinstance(info, dict) or not info.get("status"):
+            return []
+        steps = [(label, info.get(f"{key}_transaction_hash")) for label, key in
+                 (("committed", "commit"), ("proven", "prove"), ("executed", "execute"))]
+        done = ", ".join(f"{label} in L1 transaction {h}" for label, h in steps if h)
+        text = f"Status on L1, as reported by the explorer: {info['status']!r}"
+        if info.get("batch_number") is not None:
+            text += f" (batch {info['batch_number']})"
+        text += f"; {done}." if done else "; not yet committed to L1."
+        return [ChainFact("chain", text, {"l1_status": info["status"], "batch": info.get("batch_number")})]
+
+
+class RskProfile(ChainProfile):
+    """Rootstock (CHAIN_TYPE=rsk): the explorer adds nothing we need to interpret yet."""
+
+    chain_type = "rsk"
+
+
+PROFILES: dict[str, ChainProfile] = {p.chain_type: p for p in (
+    ChainProfile(), EthereumProfile(), OptimismProfile(), CeloProfile(), ZkSyncProfile(), RskProfile())}
+
+# Fields any profile interprets, to tell "belongs to another chain type" from "unknown".
+# A field shared through inheritance (Celo has Optimism's) is credited to the base type.
+ALL_OWNED_FIELDS: dict[str, str] = {}
+for _profile in PROFILES.values():
+    for _name in sorted(_profile.owned_fields):
+        ALL_OWNED_FIELDS.setdefault(_name, _profile.chain_type)
+
+
+def profile_for(chain_type: str) -> tuple[ChainProfile, bool]:
+    """The profile for a chain type, and whether it is a dedicated one (False = generic fallback)."""
+    profile = PROFILES.get(chain_type)
+    return (profile, True) if profile else (PROFILES["default"], False)
+
+
+def present(tx: dict, name: str) -> bool:
+    """A field counts as reported only when it carries a value."""
+    value = tx.get(name)
+    return value not in (None, "", [], {}, "0", 0)
+
+
+@dataclass
+class FieldAudit:
+    """What the explorer reported beyond what the active profile interprets."""
+
+    other_types: dict[str, list[str]]  # chain type -> its fields found in this payload
+    unknown: list[str]  # structured fields no profile knows
+
+
+def audit_fields(tx: dict, profile: ChainProfile) -> FieldAudit:
+    """Compare the payload with the configured chain type, to catch a wrong `chain_type`
+    and to declare network-specific data nobody interprets."""
+    other: dict[str, list[str]] = {}
+    unknown: list[str] = []
+    for name in sorted(tx):
+        if name in COMMON_FIELDS or name in profile.owned_fields or not present(tx, name):
+            continue
+        if name in ALL_OWNED_FIELDS:
+            other.setdefault(ALL_OWNED_FIELDS[name], []).append(name)
+        elif isinstance(tx[name], (dict, list)):
+            unknown.append(name)  # new plain fields appear across Blockscout versions; blocks are chain data
+    return FieldAudit(other, unknown)

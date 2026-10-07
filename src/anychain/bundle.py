@@ -14,6 +14,7 @@ from anychain.collectors.http import Budget, CollectorError, NotFoundError
 from anychain.collectors.rpc import RpcClient
 from anychain.config import AppConfig
 from anychain.decoder import AbiDecoder
+from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, Fee, audit_fields, profile_for
 from anychain.models import EvidenceBundle, Source
 
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
@@ -62,14 +63,13 @@ def amount(raw: int, decimals: int) -> str:
     return f"{whole}.{str(frac).rjust(decimals, '0').rstrip('0')}"
 
 
-def party(value: dict | str | None) -> str:
-    """An address with its explorer label when there is one."""
+def party(value: dict | str | None, labels: dict[str, str] | None = None) -> str:
+    """An address with its explorer name, or else the config's label for it (address_labels)."""
     if not value:
         return "(none)"
-    if isinstance(value, str):
-        return value
-    address = value.get("hash", "(unknown address)")
-    name = value.get("name") or value.get("ens_domain_name")
+    address = value if isinstance(value, str) else value.get("hash", "(unknown address)")
+    name = None if isinstance(value, str) else (value.get("name") or value.get("ens_domain_name"))
+    name = name or (labels or {}).get(str(address).lower())
     return f"{address} ({name})" if name else address
 
 
@@ -121,6 +121,7 @@ class BundleBuilder:
         self.undecoded_events: set[str] = set()
         self.anonymous_unmatched: set[str] = set()
         self.bundle = EvidenceBundle(network=cfg.network.name, tx_hash="", status="unknown")
+        self.profile, self.dedicated_profile = profile_for(cfg.network.chain_type)
 
     def build(self, tx_hash: str) -> EvidenceBundle:
         self.bundle = EvidenceBundle(network=self.cfg.network.name, tx_hash=tx_hash, status="unknown")
@@ -166,6 +167,9 @@ class BundleBuilder:
         except Exception as exc:  # unexpected payload shape, decoding edge case...
             self._gap(topic, f"could not process the data ({type(exc).__name__}: {exc})",
                       "Check this part on the explorer page", retryable=False)
+
+    def _party(self, value: dict | str | None) -> str:
+        return party(value, self.cfg.address_labels)
 
     def _gap(self, what: str, why: str, needed: str, retryable: bool) -> None:
         self.bundle.add_gap(what, why, needed, retryable)
@@ -236,6 +240,7 @@ class BundleBuilder:
         if self.bundle.status in ("pending", "dropped"):
             return  # nothing below is final yet
         self._safely("Fee", lambda: self._add_fee(tx_hash, tx))
+        self._safely("Network-specific details", lambda: self._add_chain_facts(tx_hash, tx))
         self._safely("Revert reason", lambda: self._add_revert(tx_hash, tx))
         self._safely("Code delegations", lambda: self._add_authorizations(tx_hash, tx))
         self._safely("Call decoding", lambda: self._add_call(tx_hash, tx))
@@ -263,7 +268,7 @@ class BundleBuilder:
         sym = cfg.network.native_symbol
         value_raw = to_int(tx.get("value"))
         value = amount(value_raw, cfg.network.native_decimals) if value_raw is not None else "unknown"
-        sender, target = party(tx.get("from")), self._target_text(tx)
+        sender, target = self._party(tx.get("from")), self._target_text(tx)
         data = {"status": b.status, "from": address_of(tx.get("from")), "to": address_of(tx.get("to")),
                 "value": value, "tx_type": tx.get("type")}
 
@@ -293,19 +298,78 @@ class BundleBuilder:
 
     def _target_text(self, tx: dict) -> str:
         if tx.get("to"):
-            return party(tx["to"])
+            return self._party(tx["to"])
         created = tx.get("created_contract")
-        return f"(contract creation of {party(created)})" if created else "(contract creation)"
+        return f"(contract creation of {self._party(created)})" if created else "(contract creation)"
 
     def _add_fee(self, tx_hash: str, tx: dict) -> None:
-        fee = to_int((tx.get("fee") or {}).get("value"))
+        fee = self.profile.fee(tx)
         if fee is None:
             return
-        text = f"Fee paid: {amount(fee, self.cfg.network.native_decimals)} {self.cfg.network.native_symbol}."
+        text = f"Fee paid: {self._fee_text(fee)}."
+        for warning in fee.warnings:
+            self._gap("Fee", warning, "Check the fee on the explorer page", retryable=False)
+        unknown_decimals = [p.token for p in fee.parts if p.token and p.token.decimals is None]
+        for token in unknown_decimals:
+            self._gap("Fee", f"the explorer does not report the decimals of the fee token {token.address}, so the "
+                      "fee is shown in raw units", "The token's decimals (its contract or the explorer's token page)",
+                      retryable=False)
         if self.bundle.status == "failed":
             text += " The fee is charged even though the transaction failed."
         source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
-        self.bundle.add("fee", text, [source], {"fee": amount(fee, self.cfg.network.native_decimals)})
+        self.bundle.add("fee", text, [source], {
+            "fee": self._fee_amount(fee.total_raw, fee.single_token),
+            "token": fee.single_token.symbol if fee.single_token else self.cfg.network.native_symbol,
+            "parts": {p.label: self._fee_amount(p.raw, p.token) for p in fee.parts},
+        })
+
+    def _fee_amount(self, raw: int, token) -> str:
+        """Decimal amount; raw integer units when the token's decimals are unknown."""
+        if token is not None and token.decimals is None:
+            return str(raw)
+        return amount(raw, token.decimals if token else self.cfg.network.native_decimals)
+
+    def _fee_text(self, fee: Fee) -> str:
+        """'0.0001 ETH', '0.0001 ETH in total: 0.00008 ETH L2 execution + 0.00002 ETH L1 data', or a token fee."""
+        def money(raw, token):
+            if token is not None and token.decimals is None:
+                return f"{raw} raw units of {token.symbol}"
+            return f"{self._fee_amount(raw, token)} {token.symbol if token else self.cfg.network.native_symbol}"
+        token = fee.single_token
+        if len(fee.parts) == 1:
+            text = money(fee.total_raw, token)
+        elif token is not None or all(p.token is None for p in fee.parts):
+            parts = " + ".join(f"{money(p.raw, p.token)} {p.label}" for p in fee.parts)
+            text = f"{money(fee.total_raw, token)} in total: {parts}"
+        else:
+            text = " + ".join(f"{money(p.raw, p.token)} {p.label}" for p in fee.parts)
+        return f"{text}; {fee.note}" if fee.note else text
+
+    def _add_chain_facts(self, tx_hash: str, tx: dict) -> None:
+        """Facts only this network type has, plus a check that the config's chain_type fits the payload."""
+        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
+        for fact in self.profile.facts(tx):
+            self.bundle.add(fact.kind, fact.text, [source], fact.data)
+        configured = self.cfg.network.chain_type
+        if configured not in BLOCKSCOUT_CHAIN_TYPES:
+            self._gap("Chain type", f"chain_type {configured!r} is not a Blockscout CHAIN_TYPE value this tool knows "
+                      f"(typo, or an older/newer Blockscout); the generic profile is used",
+                      f"Check network.chain_type; known values: {', '.join(sorted(BLOCKSCOUT_CHAIN_TYPES))}",
+                      retryable=False)
+        elif not self.dedicated_profile:
+            self._gap("Network-specific details", f"chain_type {configured!r} has no dedicated profile yet, so only "
+                      "the details common to every EVM network are interpreted",
+                      "A profile for this chain type in chains.py", retryable=False)
+        audit = audit_fields(tx, self.profile)
+        for other_type, names in audit.other_types.items():
+            self._gap("Chain type", f"the config says chain_type {configured!r}, but the explorer reports "
+                      f"fields typical of {other_type!r} ({', '.join(names)})",
+                      f"Check network.chain_type; if this network is {other_type!r}, set it so these are interpreted",
+                      retryable=False)
+        if audit.unknown:
+            self._gap("Network-specific details", f"the explorer reports data this tool does not interpret: "
+                      f"{', '.join(audit.unknown)}", "A chain type profile that covers these fields",
+                      retryable=False)
 
     def _add_revert(self, tx_hash: str, tx: dict) -> None:
         if self.bundle.status != "failed":
@@ -313,6 +377,13 @@ class BundleBuilder:
         source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
         reason = tx.get("revert_reason")
         result = tx.get("result")
+        if isinstance(reason, dict) and not reason.get("method_call") and reason.get("raw") in ("0x", ""):
+            self.bundle.add("revert", "The transaction reverted without any revert data: no reason text and no "
+                            "custom error (e.g. a bare revert(), a failed assert in old Solidity, or a call to "
+                            "code that does not exist).", [source], {"revert_reason": reason})
+            return
+        if isinstance(reason, dict) and not reason.get("method_call") and not reason.get("raw"):
+            reason = None  # e.g. {"raw": null}: nothing reported
         if reason:
             self.bundle.add("revert", f"Explorer reports the revert reason: {describe_revert(reason)}.",
                             [source], {"revert_reason": reason})
@@ -396,22 +467,29 @@ class BundleBuilder:
         to = tx.get("to")
         if not to:
             created = tx.get("created_contract")
-            text = f"Contract creation: deployed {party(created)}." if created else "Contract creation transaction."
+            text = f"Contract creation: deployed {self._party(created)}." if created else "Contract creation transaction."
             b.add("call", text, [source], {"created": address_of(created)})
             return
         authorizations = tx.get("authorization_list") or []
+        if address_of(tx.get("from")) == ZERO_ADDRESS:
+            text = f"System transaction: sent from the zero address, which no one can sign for, to {self._party(to)}."
+            if data == "0x":
+                text += " It carries no call data."
+            b.add("call", text, [source], {"system": True})
+            if data == "0x":
+                return
         if data == "0x":
             if authorizations and not to_int(tx.get("value")):
                 b.add("call", f"No call data and no value were sent; the transaction carries {len(authorizations)} "
                       "EIP-7702 authorization(s), listed as delegation facts.", [source])
             else:
-                b.add("call", f"Plain {sym} transfer (no call data) to {party(to)}.", [source])
+                b.add("call", f"Plain {sym} transfer (no call data) to {self._party(to)}.", [source])
             return
         delegations = self._delegations_applied(tx)
         delegate_here = delegations.get(to["hash"].lower())
         if delegate_here == ZERO_ADDRESS or (
                 delegate_here is None and to.get("is_contract") is False and not implementation_addresses(to)):
-            self._add_data_to_codeless(party(to), (len(data) - 2) // 2, delegate_here == ZERO_ADDRESS,
+            self._add_data_to_codeless(self._party(to), (len(data) - 2) // 2, delegate_here == ZERO_ADDRESS,
                                        "The explorer lists it as having no contract code today", source)
             return
 
@@ -420,14 +498,14 @@ class BundleBuilder:
         decoder = self._decoder_for(address, ([delegate_here] if delegate_here else []) + implementation_addresses(to))
         decoded = decoder.decode_call(data) if decoder else None
         if decoded is None:
-            b.add("call", f"Called function with selector {data[:10]} on {party(to)}; not decoded.",
+            b.add("call", f"Called function with selector {data[:10]} on {self._party(to)}; not decoded.",
                   [source], {"selector": data[:10]})
             self._declare_undecoded("Call decoding", address, f"selector {data[:10]}", code_owner=delegate_here)
             return
         args = ", ".join(f"{a.name}={a.value}" for a in decoded.args)
         abi_source = self._api_source(f"/smart-contracts/{address}", "Explorer API: contract ABI")
         b.add("call",
-              f"Called {decoded.signature} on {party(to)} with {args}. "
+              f"Called {decoded.signature} on {self._party(to)} with {args}. "
               f"ABI source: {self.abi_notes[address.lower()]}.",
               [source, abi_source],
               {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
@@ -478,7 +556,7 @@ class BundleBuilder:
                 covered.add(to_int(t.get("log_index")))  # type: ignore[arg-type]
             token = t.get("token") or {}
             text = f"Token transfer: {self._transfer_what(token, t.get('total') or {})} " \
-                   f"from {party(t.get('from'))} to {party(t.get('to'))}."
+                   f"from {self._party(t.get('from'))} to {self._party(t.get('to'))}."
             self.bundle.add("token_transfer", text, [source],
                             {"token": token.get("address_hash"), "from": address_of(t.get("from")),
                              "to": address_of(t.get("to"))})
@@ -535,17 +613,17 @@ class BundleBuilder:
         ok = success is not False
 
         if kind in ("create", "create2"):
-            creator = party(it.get("from"))
+            creator = self._party(it.get("from"))
             if success is None:
                 return f"Internal {kind} by {creator}; the explorer does not say if the deployment succeeded.", None
             if not ok:
                 return f"Internal {kind} by {creator} failed: nothing was deployed or transferred.", False
             created = it.get("created_contract")
-            deployed = party(created) if created else "a contract whose address the explorer does not report"
+            deployed = self._party(created) if created else "a contract whose address the explorer does not report"
             text = f"Internal {kind} by {creator}: deployed {deployed}"
             return (f"{text} with {shown}." if value > 0 else f"{text}."), value > 0
 
-        route = f"from {party(it.get('from'))} to {party(it.get('to'))}"
+        route = f"from {self._party(it.get('from'))} to {self._party(it.get('to'))}"
         if kind == "call" and value > 0:
             if success is None:
                 return f"Internal call {route} with {shown} attached; the explorer does not say if it succeeded.", None
@@ -587,17 +665,17 @@ class BundleBuilder:
         event = decoder.decode_log(topics, log.get("data") or "0x") if decoder else None
         if event:
             args = ", ".join(f"{a.name}={a.value}" for a in event.args)
-            self.bundle.add("event", f"Event {event.signature} emitted by {party(emitter)}: {args}.", [source],
+            self.bundle.add("event", f"Event {event.signature} emitted by {self._party(emitter)}: {args}.", [source],
                             {"event": event.name, "args": {a.name: a.value for a in event.args}})
             return
         if decoder and decoder.could_be_anonymous(topics):
             # The first topic may be an argument, not a signature: do not label it "topic0".
-            self.bundle.add("event", f"Event with {len(topics)} topic(s) emitted by {party(emitter)} matched none "
+            self.bundle.add("event", f"Event with {len(topics)} topic(s) emitted by {self._party(emitter)} matched none "
                             "(or more than one) of the anonymous events in its ABI; not decoded.", [source])
             self.anonymous_unmatched.add(address)
             return
         topic0 = topics[0] if topics else "(none)"
-        self.bundle.add("event", f"Event with topic0 {topic0} emitted by {party(emitter)}; could not decode.", [source])
+        self.bundle.add("event", f"Event with topic0 {topic0} emitted by {self._party(emitter)}; could not decode.", [source])
         self.undecoded_events.add(address)
 
     def _declare_undecoded_events(self) -> None:

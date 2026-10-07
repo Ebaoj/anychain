@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, field_validator
 
+
 DEFAULT_CONFIG_ENV = "ANYCHAIN_CONFIG"
 
 
@@ -29,6 +30,17 @@ class NetworkConfig(BaseModel):
     chain_id: int = Field(ge=0)
     native_symbol: str
     native_decimals: int = 18
+    # Same values as Blockscout's CHAIN_TYPE; selects the profile in chains.py.
+    chain_type: str = "default"
+
+    @field_validator("chain_type")
+    @classmethod
+    def _chain_type_text(cls, v: str) -> str:
+        # Unknown values (older Blockscout versions, new chain types) are accepted: the
+        # generic profile is used and every answer says so. Only an empty value is an error.
+        if not v.strip():
+            raise ValueError("chain_type cannot be empty; use 'default' for a generic EVM")
+        return v.strip()
 
 
 class ExplorerConfig(BaseModel):
@@ -148,6 +160,17 @@ class AppConfig(BaseModel):
     rpc: RpcConfig
     repos: list[RepoConfig] = []
     address_map: dict[str, dict[str, str]] = {}
+    # Names for special addresses of this network (system contracts, bridges), shown when
+    # the explorer has no name for them. Network knowledge lives here, not in code.
+    address_labels: dict[str, str] = {}
+
+    @field_validator("address_labels")
+    @classmethod
+    def _label_keys_are_addresses(cls, v: dict[str, str]) -> dict[str, str]:
+        bad = [k for k in v if not (isinstance(k, str) and k.startswith("0x") and len(k) == 42)]
+        if bad:
+            raise ValueError(f"address_labels keys must be 0x-prefixed 20-byte addresses: {bad}")
+        return {k.lower(): label for k, label in v.items()}
     abi_strategy: AbiStrategyConfig = AbiStrategyConfig()
     llm: LlmConfig
     assistant: AssistantConfig = AssistantConfig()
