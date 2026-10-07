@@ -85,7 +85,9 @@
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x0882Ad7Dc61dFFCC312A9Aa8b30Ee11a10f42006",
-    "token": "0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e"
+    "token": "0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e",
+    "token_id": "443098",
+    "value": null
    },
    "id": "E4",
    "kind": "token_transfer",
@@ -103,7 +105,9 @@
    "data": {
     "from": "0x0882Ad7Dc61dFFCC312A9Aa8b30Ee11a10f42006",
     "to": "0x000000000004444c5dc75cB358380D2e3dE08A90",
-    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "token_id": null,
+    "value": 15886956381
    },
    "id": "E5",
    "kind": "token_transfer",

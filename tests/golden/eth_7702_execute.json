@@ -107,7 +107,9 @@
    "data": {
     "from": "0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e",
     "to": "0x000000000004444c5dc75cB358380D2e3dE08A90",
-    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "token_id": null,
+    "value": 399874205
    },
    "id": "E5",
    "kind": "token_transfer",

@@ -121,7 +121,9 @@
    "data": {
     "from": "0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B",
     "to": "0x7cCeE03D496cA86C3def8Cff1Bb81b9Ecd14Ff89",
-    "token": "0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5"
+    "token": "0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5",
+    "token_id": null,
+    "value": 23834975
    },
    "id": "E6",
    "kind": "token_transfer",

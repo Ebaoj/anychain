@@ -595,7 +595,8 @@ class BundleBuilder:
             text = f"Token transfer: {self._transfer_what(t)} " \
                    f"from {self._party(t.sender)} to {self._party(t.recipient)}."
             self.bundle.add("token_transfer", text, [source],
-                            {"token": t.token.address, "from": address_of(t.sender), "to": address_of(t.recipient)})
+                            {"token": t.token.address, "from": address_of(t.sender), "to": address_of(t.recipient),
+                             "value": t.value, "token_id": t.token_id})
         if truncated:
             self._gap("Token transfers", f"more than {MAX_PAGES} pages of transfers",
                       "Open the explorer page for the full list", retryable=False)

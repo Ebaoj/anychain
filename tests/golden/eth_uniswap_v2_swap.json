@@ -87,7 +87,9 @@
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "token_id": null,
+    "value": 200000000000000000
    },
    "id": "E4",
    "kind": "token_transfer",
@@ -105,7 +107,9 @@
    "data": {
     "from": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     "to": "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3",
-    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "token_id": null,
+    "value": 200000000000000000
    },
    "id": "E5",
    "kind": "token_transfer",
@@ -123,7 +127,9 @@
    "data": {
     "from": "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3",
     "to": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b",
-    "token": "0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa"
+    "token": "0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa",
+    "token_id": null,
+    "value": 12118418517751063
    },
    "id": "E6",
    "kind": "token_transfer",

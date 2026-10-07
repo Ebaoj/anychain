@@ -85,7 +85,9 @@
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF",
-    "token": "0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8"
+    "token": "0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8",
+    "token_id": "16",
+    "value": 1
    },
    "id": "E4",
    "kind": "token_transfer",
