@@ -1,0 +1,30 @@
+{
+ "GET https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9": {
+  "body": "{\"priority_fee\":\"36800000000000\",\"raw_input\":\"0x\",\"is_pending_update\":false,\"result\":\"success\",\"hash\":\"0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9\",\"max_fee_per_gas\":\"4968193070\",\"revert_reason\":null,\"confirmation_duration\":[0,12121.0],\"transaction_burnt_fee\":\"91195093508800\",\"type\":4,\"token_transfers_overflow\":false,\"confirmations\":226,\"position\":205,\"max_priority_fee_per_gas\":\"1000000000\",\"transaction_tag\":null,\"created_contract\":null,\"value\":\"0\",\"from\":{\"ens_domain_name\":null,\"hash\":\"0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"gas_used\":\"36800\",\"status\":\"ok\",\"to\":{\"ens_domain_name\":null,\"hash\":\"0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"authorization_list\":[{\"address_hash\":\"0x0000000000000000000000000000000000000000\",\"authority\":\"0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4\",\"chain_id\":\"1\",\"nonce\":\"212\",\"r\":\"50609596394528466051553839820396922306205122153442801849946272882766940840821\",\"s\":\"10408923978584708528183539537986266138056883851521952140085431453467645891673\",\"status\":\"ok\",\"v\":1}],\"method\":null,\"fee\":{\"type\":\"actual\",\"value\":\"127995093508800\"},\"gas_limit\":\"60000\",\"gas_price\":\"3478127541\",\"decoded_input\":null,\"fhe_operations_count\":0,\"token_transfers\":[],\"base_fee_per_gas\":\"2478127541\",\"timestamp\":\"2026-10-07T16:41:23.000000Z\",\"nonce\":211,\"historic_exchange_rate\":null,\"transaction_types\":[\"set_code_transaction\"],\"exchange_rate\":\"2568.89\",\"block_number\":26141769,\"has_error_in_internal_transactions\":false}",
+  "status": 200
+ },
+ "GET https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9/internal-transactions": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9/logs": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9/token-transfers": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "POST https://ethereum-rpc.publicnode.com eth_chainId []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"result\":\"0x1\",\"id\":1}\n",
+  "status": 200
+ },
+ "POST https://ethereum-rpc.publicnode.com eth_getTransactionByHash [\"0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"type\":\"0x4\",\"chainId\":\"0x1\",\"nonce\":\"0xd3\",\"gas\":\"0xea60\",\"maxFeePerGas\":\"0x128209c2e\",\"maxPriorityFeePerGas\":\"0x3b9aca00\",\"to\":\"0x4269d7f3e812ff9cdb73577b089458b3f42bfdc4\",\"value\":\"0x0\",\"accessList\":[],\"authorizationList\":[{\"chainId\":\"0x1\",\"address\":\"0x0000000000000000000000000000000000000000\",\"nonce\":\"0xd4\",\"yParity\":\"0x1\",\"r\":\"0x6fe404364dce4fc4cb2c44694521aaee26675695f3379837eae487c7b5fda375\",\"s\":\"0x17033e006f1d5e0eb14e09a6bb4f7366591f64e433eb7a18f1630fd487d8d459\"}],\"input\":\"0x\",\"r\":\"0xc10f761e114b0a60b925cb6b193bc510341ed6ba8277df582c9ffe392847d505\",\"s\":\"0x28c068b0a578577c879ade202a736cb76a29af200f9c1a46e4c7a404aa6a49f6\",\"yParity\":\"0x1\",\"v\":\"0x1\",\"hash\":\"0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9\",\"blockHash\":\"0x331023a658eb83ab7846ac0b514a6dd6b5fec59b4678c1774880994e8582b8a5\",\"blockNumber\":\"0x18ee449\",\"transactionIndex\":\"0xcd\",\"from\":\"0x4269d7f3e812ff9cdb73577b089458b3f42bfdc4\",\"gasPrice\":\"0xcf5003b5\",\"blockTimestamp\":\"0x6ac67633\"}}",
+  "status": 200
+ },
+ "POST https://ethereum-rpc.publicnode.com eth_getTransactionReceipt [\"0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"type\":\"0x4\",\"status\":\"0x1\",\"cumulativeGasUsed\":\"0x1559296\",\"logs\":[],\"logsBloom\":\"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"transactionHash\":\"0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9\",\"transactionIndex\":\"0xcd\",\"blockHash\":\"0x331023a658eb83ab7846ac0b514a6dd6b5fec59b4678c1774880994e8582b8a5\",\"blockNumber\":\"0x18ee449\",\"gasUsed\":\"0x8fc0\",\"effectiveGasPrice\":\"0xcf5003b5\",\"from\":\"0x4269d7f3e812ff9cdb73577b089458b3f42bfdc4\",\"to\":\"0x4269d7f3e812ff9cdb73577b089458b3f42bfdc4\",\"contractAddress\":null}}",
+  "status": 200
+ }
+}

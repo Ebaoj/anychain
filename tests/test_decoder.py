@@ -66,3 +66,35 @@ def test_indexed_dynamic_value_is_labelled_as_a_hash():
     topic0 = "0x" + event_signature_to_log_topic("Note(string)").hex()
     event = AbiDecoder(abi).decode_log([topic0, "0x" + "11" * 32], "0x")
     assert event.args[0].value.endswith("(hash of the string value)")
+
+
+def test_anonymous_event_needs_exactly_one_fitting_candidate():
+    vat = "0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B"
+    abi = recorded_body("eth_maker_vat", f"/smart-contracts/{vat}")["abi"]
+    log = next(l for l in recorded_body("eth_maker_vat", "/logs")["items"] if l["address"]["hash"] == vat)
+    topics = [t for t in log["topics"] if t]
+    event = AbiDecoder(abi).decode_log(topics, log["data"])
+    assert event.name == "LogNote" and event.signature.endswith("(anonymous event)")
+    twin = AbiDecoder(abi + [e for e in abi if e.get("anonymous")])  # two identical candidates: ambiguous
+    assert twin.decode_log(topics, log["data"]) is None
+
+
+def test_anonymous_event_must_use_all_the_log_data():
+    from eth_abi import encode
+    anon = {"type": "event", "name": "Anon", "anonymous": True, "inputs": [
+        {"name": "a", "type": "bytes32", "indexed": True}, {"name": "b", "type": "uint256", "indexed": True}]}
+    two_topics = ["0x" + "11" * 32, "0x" + "00" * 31 + "05"]
+    assert AbiDecoder([anon]).decode_log(two_topics, "0x") is not None
+    # Same topics but 32 bytes of data the event never writes (e.g. an Approval log): not this event.
+    leftover = "0x" + encode(["uint256"], [7]).hex()
+    assert AbiDecoder([anon]).decode_log(two_topics, leftover) is None
+
+
+def test_anonymous_event_accepts_unpadded_trailing_bytes():
+    from eth_abi import encode
+    note = {"type": "event", "name": "Note", "anonymous": True, "inputs": [
+        {"name": "sig", "type": "bytes4", "indexed": True}, {"name": "data", "type": "bytes", "indexed": False}]}
+    unpadded = encode(["bytes"], [b"\x01\x02\x03"])[:-29]  # contract wrote only the 3 real bytes
+    event = AbiDecoder([note]).decode_log(["0xbb35783b" + "00" * 28], "0x" + unpadded.hex())
+    assert event is not None and event.args[1].value == "0x010203"
+    assert AbiDecoder([note]).decode_log(["0xbb35783b" + "00" * 28], "0x" + unpadded.hex() + "ff") is None

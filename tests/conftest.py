@@ -24,6 +24,25 @@ CREATION_TX = "0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff942839
 ERC721_TX = "0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab"
 ERC1155_TX = "0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
 PENDING_TX = "0x44551be6bbd24fba2308724bebe6f10daf952d3b6d249603a56b16a719bc78d0"
+LIDO_TX = "0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"  # payable proxy
+REVOKE_7702_TX = "0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+EXECUTE_7702_TX = "0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305"
+DATA_TO_EOA_TX = "0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44"
+SAFE_DEPLOY_TX = "0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc"
+MAKER_TX = "0xaea61c0672217a85a63fbdddc14714b39ffa64baf25a526cf5a9ba74841484d7"  # anonymous events
+SET_THEN_REVOKED_7702_TX = "0xf5199e66f52f95ba3ed23340c81ef924296c684f9e0f8bb69975ab25ace3ff8c"
+INVALID_NONCE_7702_TX = "0x26118f7faf1f0c16a7e695d3a922811a9aa39ce2a3ffe57c0503012632d19960"
+
+# Every recorded Ethereum fixture, for checks that must hold on all of them.
+ETH_FIXTURES = {
+    "eth_usdc_transfer": USDC_TX, "eth_uniswap_v2_swap": SWAP_TX, "eth_failed_unverified_bot": FAILED_TX,
+    "eth_contract_creation": CREATION_TX, "eth_erc721_transfer": ERC721_TX, "eth_erc1155_transfer": ERC1155_TX,
+    "eth_pending_swap": PENDING_TX, "eth_lido_submit": LIDO_TX, "eth_7702_revoke": REVOKE_7702_TX,
+    "eth_7702_execute": EXECUTE_7702_TX, "eth_data_to_eoa": DATA_TO_EOA_TX, "eth_safe_deploy": SAFE_DEPLOY_TX,
+    "eth_maker_vat": MAKER_TX, "eth_7702_set_then_revoked": SET_THEN_REVOKED_7702_TX,
+    "eth_7702_invalid_nonce": INVALID_NONCE_7702_TX,
+    "eth_dsproxy_recipe": "0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a",
+}
 
 EXPLORER_HOST = "eth.blockscout.com"
 RPC_HOST = "ethereum-rpc.publicnode.com"

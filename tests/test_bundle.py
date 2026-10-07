@@ -3,14 +3,21 @@ import pytest
 
 from anychain.bundle import amount, build_bundle, describe_revert
 from tests.conftest import (
-    CREATION_TX, ERC721_TX, ERC1155_TX, EXPLORER_HOST, FAILED_TX, OP_TX, PENDING_TX, RPC_HOST,
-    SWAP_TX, USDC_TX, make_transport, mutated, replay_bundle,
+    CREATION_TX, DATA_TO_EOA_TX, ERC721_TX, ERC1155_TX, ETH_FIXTURES, EXECUTE_7702_TX, EXPLORER_HOST, FAILED_TX,
+    INVALID_NONCE_7702_TX, LIDO_TX, MAKER_TX, OP_TX, SET_THEN_REVOKED_7702_TX, PENDING_TX, REVOKE_7702_TX, RPC_HOST, SAFE_DEPLOY_TX, SWAP_TX, USDC_TX,
+    make_transport, mutated, recorded_body, replay_bundle,
 )
 
 USDC_PROXY = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 USDC_IMPL = "0x43506849D7C04F9138D1A2050bbF3A0c054402dd"
 RECEIPT = f'eth_getTransactionReceipt ["{USDC_TX}"]'
 RPC_TX = f'eth_getTransactionByHash ["{USDC_TX}"]'
+
+
+def _records(fixture):
+    import json
+    from tests.conftest import FIXTURES
+    return json.loads((FIXTURES / f"{fixture}.json").read_text())
 
 
 def _rpc_result(fixture, suffix, change):
@@ -71,7 +78,13 @@ def test_swap_has_transfers_events_and_cross_check(eth_cfg):
 
 def test_transfer_logs_are_not_repeated_as_events(eth_cfg):
     b = replay_bundle(eth_cfg, SWAP_TX, "eth_uniswap_v2_swap")
-    assert "Transfer" not in [e.data.get("event") for e in b.items if e.kind == "event"]
+    events = [e.data.get("event") for e in b.items if e.kind == "event"]
+    assert events == ["Sync", "Swap"]  # decoding works, and only the non-transfer logs are events
+    recorded_logs = recorded_body("eth_uniswap_v2_swap", "/logs")["items"]
+    recorded_transfers = recorded_body("eth_uniswap_v2_swap", "/token-transfers")["items"]
+    token_facts = [e for e in b.items if e.kind == "token_transfer"]
+    assert len(token_facts) == len(recorded_transfers)
+    assert len(token_facts) + len(events) == len(recorded_logs)
 
 
 def test_same_code_other_network_only_config_changes(op_cfg):
@@ -85,7 +98,9 @@ def test_nft_transfers_show_token_ids(eth_cfg):
     nft = replay_bundle(eth_cfg, ERC721_TX, "eth_erc721_transfer")
     assert "token #443098" in _texts(nft)
     multi = replay_bundle(eth_cfg, ERC1155_TX, "eth_erc1155_transfer")
-    assert "1 x " in _texts(multi) and "token #16" in _texts(multi)
+    assert "Token transfer: 1 x 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 token #16 " \
+           "from 0x0000000000000000000000000000000000000000 to 0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF." \
+           in _texts(multi)  # this token has no symbol or name on the explorer, so its address is shown
 
 
 # ---- failed, pending, creation ------------------------------------------------
@@ -145,10 +160,33 @@ def test_slow_explorer_endpoint_becomes_a_retryable_gap(eth_cfg):
 # ---- degradation -----------------------------------------------------------------
 
 def test_explorer_down_falls_back_to_rpc(eth_cfg):
-    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer", offline_hosts={EXPLORER_HOST})
+    # Recorded with the explorer unreachable, so the node's real eth_getCode answers are in the
+    # fixture: the old block is refused (no archive state), today's code shows USDC is a contract.
+    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_rpc_only", offline_hosts={EXPLORER_HOST})
     assert b.status == "success"
     assert b.items[0].text.startswith("(From RPC only)")
+    assert "Called function with selector 0xa9059cbb" in _texts(b)
     assert _gap(b, "Call decoding").retryable
+    assert _gap(b, "Code at execution time") is None
+
+
+def test_rpc_only_receipt_without_status_says_outcome_unknown(eth_cfg):
+    def no_status(receipt):
+        receipt.pop("status")
+        return receipt
+    overrides = _rpc_result("eth_usdc_rpc_only", RECEIPT, no_status)
+    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_rpc_only", offline_hosts={EXPLORER_HOST}, overrides=overrides)
+    assert b.status == "unknown" and "outcome not recorded" in b.items[0].text
+    assert "predates it" in _gap(b, "Outcome").why
+
+
+def test_rpc_only_type4_is_not_described_as_settled(eth_cfg):
+    def with_authorization(tx):
+        return tx | {"type": "0x4", "authorizationList": [{"address": "0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B"}]}
+    overrides = _rpc_result("eth_usdc_rpc_only", RPC_TX, with_authorization)
+    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_rpc_only", offline_hosts={EXPLORER_HOST}, overrides=overrides)
+    delegation = next(e for e in b.items if e.kind == "delegation")
+    assert "not checked without the explorer" in delegation.text and delegation.data["applied"] is None
 
 
 def test_rpc_down_keeps_explorer_facts_and_declares_gap(eth_cfg):
@@ -259,7 +297,9 @@ def test_rpc_only_pending(eth_cfg):
 def test_explorer_lagging_behind_rpc_uses_the_receipt(eth_cfg):
     def still_pending(body):
         body.update(status=None, result="pending", block_number=None)
-    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer", overrides=mutated("eth_usdc_transfer", USDC_TX, still_pending))
+    usdc_code_today = {k: v for k, v in _records("eth_usdc_rpc_only").items() if '"latest"]' in k}  # real node answer
+    overrides = mutated("eth_usdc_transfer", USDC_TX, still_pending) | {k.split(" ", 2)[2]: v for k, v in usdc_code_today.items()}
+    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer", overrides=overrides)
     assert b.status == "success"
     assert b.items[0].text.startswith("(From RPC only)")
     assert _gap(b, "Explorer index").retryable
@@ -311,3 +351,194 @@ def test_malformed_receipt_is_a_gap(eth_cfg):
     overrides = {RECEIPT: {"status": 200, "body": '{"jsonrpc":"2.0","id":1,"result":[]}'}}
     b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer", overrides=overrides)
     assert "expected an object" in _gap(b, "RPC transaction data").why
+
+
+# ---- transaction types found by the Fable bug hunt (all real recordings) ----------
+
+def test_delegatecall_value_is_not_a_transfer(eth_cfg):
+    b = replay_bundle(eth_cfg, LIDO_TX, "eth_lido_submit")
+    internal = [e for e in b.items if e.kind == "internal_call"]
+    assert not any("ETH transfer" in e.text for e in internal)
+    lido = next(e for e in internal if "(Lido)" in e.text)
+    assert lido.text.startswith("Internal delegatecall") and "no ETH moved" in lido.text
+    assert lido.data["moves_value"] is False
+    assert "0.046651189999999999 STETH" in _texts(b)  # what the user received
+
+
+def test_failed_internal_call_with_value_moves_nothing(eth_cfg):
+    def fail_with_value(body):
+        body["items"][0].update(type="call", value="1000", success=False)
+    overrides = mutated("eth_lido_submit", "/internal-transactions", fail_with_value)
+    b = replay_bundle(eth_cfg, LIDO_TX, "eth_lido_submit", overrides=overrides)
+    first = next(e for e in b.items if e.kind == "internal_call")
+    assert "but failed; nothing was transferred" in first.text and first.data["moves_value"] is False
+
+
+def test_7702_delegation_cleared_is_not_a_plain_transfer(eth_cfg):
+    b = replay_bundle(eth_cfg, REVOKE_7702_TX, "eth_7702_revoke")
+    assert "Code delegation cleared by this transaction: 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4" in _texts(b)
+    assert "carries 1 EIP-7702 authorization(s)" in _texts(b)
+    assert "Plain ETH transfer" not in _texts(b)
+    assert b.items[0].data["tx_type"] == 4
+
+
+def test_7702_execute_tx_states_delegation_and_decodes(eth_cfg):
+    b = replay_bundle(eth_cfg, EXECUTE_7702_TX, "eth_7702_execute")
+    assert "runs the code of 0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B" in _texts(b)
+    assert "Called execute(bytes32,bytes)" in _texts(b)
+
+
+def test_data_to_account_without_code_today_is_not_called_a_non_call(eth_cfg):
+    transport = make_transport("eth_data_to_eoa")
+    b = replay_bundle(eth_cfg, DATA_TO_EOA_TX, "eth_data_to_eoa", transport=transport)
+    assert "does not say whether this was a function call" in _texts(b) and "selector" not in _texts(b)
+    assert _gap(b, "Call decoding") is None
+    assert "execution trace" in _gap(b, "Code at execution time").needed
+    to = "0x9BE0c82d5bA973a9e6861695626D4F9983e80C88"
+    assert not any(k.endswith(f"/smart-contracts/{to}") for k in transport.calls)  # no pointless ABI lookup
+    assert not any("eth_getCode" in k for k in transport.calls)  # old state is not used as proof
+
+
+def test_precompile_is_never_called_a_codeless_account(op_cfg):
+    # Real OP tx to the P256 precompile at 0x...0100: it executes with no stored code.
+    tx = "0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
+    b = replay_bundle(op_cfg, tx, "op_p256_precompile")
+    assert "not a function call" not in _texts(b)
+    assert "does not say whether this was a function call" in _texts(b)
+
+
+def test_delegation_cleared_in_the_same_tx_is_asserted(eth_cfg):
+    to = "0x9BE0c82d5bA973a9e6861695626D4F9983e80C88"
+    def cleared_here(body):
+        body["authorization_list"] = [{"authority": to, "address_hash": "0x" + "0" * 40, "status": "ok"}]
+    overrides = mutated("eth_data_to_eoa", DATA_TO_EOA_TX, cleared_here)
+    b = replay_bundle(eth_cfg, DATA_TO_EOA_TX, "eth_data_to_eoa", overrides=overrides)
+    assert "whose code delegation this transaction cleared before running" in _texts(b)
+    assert _gap(b, "Code at execution time") is None
+
+
+def test_superseded_authorization_is_not_stated_as_in_effect(eth_cfg):
+    authority = "0x5718713439b078594dc4c96cbBB0E4F9491dF050"
+    def set_then_replace(body):
+        first = next(a for a in body["authorization_list"] if a["authority"] == authority)
+        body["authorization_list"].append(first | {"address_hash": "0x" + "0" * 40})  # later: cleared
+    overrides = mutated("eth_7702_invalid_nonce", INVALID_NONCE_7702_TX, set_then_replace)
+    b = replay_bundle(eth_cfg, INVALID_NONCE_7702_TX, "eth_7702_invalid_nonce", overrides=overrides)
+    facts = [e.text for e in b.items if e.kind == "delegation" and authority in e.text]
+    assert any("replaced by a later authorization" in f for f in facts)
+    assert any("Code delegation cleared by this transaction" in f for f in facts)
+    assert not any("from here on" in f for f in facts)
+
+
+def test_7702_delegation_set_in_same_tx_counts_as_code(eth_cfg):
+    # The account delegated in this tx and revoked later: today the explorer says "no code".
+    b = replay_bundle(eth_cfg, SET_THEN_REVOKED_7702_TX, "eth_7702_set_then_revoked")
+    assert "Called execute(bytes32,bytes) on 0x70fB4195638281fAA69472DBD7D8f9B65f535E7F" in _texts(b)
+    assert "no contract code" not in _texts(b)
+
+
+def test_7702_invalid_authorization_is_not_stated_as_applied(eth_cfg):
+    b = replay_bundle(eth_cfg, INVALID_NONCE_7702_TX, "eth_7702_invalid_nonce")
+    invalid = next(e for e in b.items if e.kind == "delegation" and "0x862B237a" in e.text)
+    assert "was not applied: the explorer marks it 'invalid_nonce'" in invalid.text
+    assert "from here on" not in invalid.text and invalid.data["applied"] is False
+
+
+def test_internal_call_without_success_flag_is_not_called_a_transfer(eth_cfg):
+    def unknown_success(body):
+        body["items"][0].update(type="call", value="1000")
+        body["items"][0].pop("success", None)
+    overrides = mutated("eth_lido_submit", "/internal-transactions", unknown_success)
+    b = replay_bundle(eth_cfg, LIDO_TX, "eth_lido_submit", overrides=overrides)
+    first = next(e for e in b.items if e.kind == "internal_call")
+    assert "does not say if it succeeded" in first.text and first.data["moves_value"] is None
+
+
+def test_internal_create_names_the_deployed_contract(eth_cfg):
+    b = replay_bundle(eth_cfg, SAFE_DEPLOY_TX, "eth_safe_deploy")
+    assert "Internal create by 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67 (SafeProxyFactory): " \
+           "deployed 0x9542f2eC81233818a18346cA2D1E673aA7db7E12." in _texts(b)
+    assert "(none)" not in _texts(b)
+
+
+def test_anonymous_events_decode_when_exactly_one_fits(eth_cfg):
+    b = replay_bundle(eth_cfg, MAKER_TX, "eth_maker_vat")
+    vat = [e for e in b.items if e.kind == "event" and "(Vat)" in e.text]
+    assert vat and all("LogNote(" in e.text and "(anonymous event)" in e.text for e in vat)
+    assert "topic0 0xbb35783b" not in _texts(b)
+    assert not any("0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B" in g.why for g in b.gaps)
+
+
+@pytest.mark.parametrize("fixture,tx_hash", sorted(ETH_FIXTURES.items()))
+def test_no_internal_jargon_reaches_the_user(eth_cfg, fixture, tx_hash):
+    b = replay_bundle(eth_cfg, tx_hash, fixture)
+    words = _texts(b) + " ".join(f"{g.why} {g.needed}" for g in b.gaps)
+    for jargon in ("Byzantium", "phase 2", "phase"):
+        assert jargon not in words
+
+
+# ---- seventh review (Fable) ------------------------------------------------------
+
+def test_normal_event_on_contract_with_anonymous_events_keeps_topic0(eth_cfg):
+    # Real DeFi Saver recipe: DSProxy's ABI has an anonymous LogNote, but these logs are
+    # normal ActionEvent logs from delegatecalled actions, missing from the DSProxy ABI.
+    tx = "0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a"
+    b = replay_bundle(eth_cfg, tx, "eth_dsproxy_recipe")
+    assert "Event with topic0 0x2b6d22f4" in _texts(b)
+    assert "anonymous events in its ABI" not in _texts(b)
+    assert not any("declares anonymous events" in g.why for g in b.gaps)
+
+
+def test_authorization_without_delegate_field_is_unknown_not_cleared(eth_cfg):
+    def rename(body):
+        for auth in body["authorization_list"]:
+            auth["delegate_renamed"] = auth.pop("address_hash")
+    overrides = mutated("eth_7702_execute", EXECUTE_7702_TX, rename)
+    b = replay_bundle(eth_cfg, EXECUTE_7702_TX, "eth_7702_execute", overrides=overrides)
+    assert "does not report the new target" in _texts(b)
+    assert "not a function call" not in _texts(b) and "runs the code of None" not in _texts(b)
+
+
+def test_authorization_with_legacy_address_field_is_read(eth_cfg):
+    def legacy(body):
+        for auth in body["authorization_list"]:
+            auth["address"] = auth.pop("address_hash")
+    overrides = mutated("eth_7702_execute", EXECUTE_7702_TX, legacy)
+    b = replay_bundle(eth_cfg, EXECUTE_7702_TX, "eth_7702_execute", overrides=overrides)
+    assert "runs the code of 0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B" in _texts(b)
+
+
+def test_rpc_only_failed_code_read_keeps_selector_and_is_retryable(eth_cfg):
+    overrides = {'eth_getCode ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "latest"]': {"timeout": True}}
+    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_rpc_only", offline_hosts={EXPLORER_HOST}, overrides=overrides)
+    assert "Called function with selector 0xa9059cbb" in _texts(b)
+    assert _gap(b, "Contract check").retryable
+    assert _gap(b, "Code at execution time") is None
+
+
+def test_undecoded_call_on_delegated_account_names_the_delegate(op_cfg):
+    tx = "0x86aec918026c7099a71e63d616ccba848a5bb1a03e39c6f5314a615c04733923"
+    b = replay_bundle(op_cfg, tx, "op_7702_batch")
+    gap = _gap(b, "Call decoding")
+    assert "ran the code of 0xec15C4d4" in gap.why and gap.needed.startswith("0xec15C4d4")
+
+
+def test_superseded_authorization_is_not_marked_applied(eth_cfg):
+    authority = "0x5718713439b078594dc4c96cbBB0E4F9491dF050"
+    def set_then_replace(body):
+        first = next(a for a in body["authorization_list"] if a["authority"] == authority)
+        body["authorization_list"].append(first | {"address_hash": "0x" + "0" * 40})
+    overrides = mutated("eth_7702_invalid_nonce", INVALID_NONCE_7702_TX, set_then_replace)
+    b = replay_bundle(eth_cfg, INVALID_NONCE_7702_TX, "eth_7702_invalid_nonce", overrides=overrides)
+    replaced = next(e for e in b.items if e.kind == "delegation" and "replaced by a later" in e.text)
+    assert replaced.data["applied"] is False and replaced.data["superseded"] is True
+
+
+def test_internal_create_without_success_flag_is_not_asserted(eth_cfg):
+    def unknown(body):
+        create = next(i for i in body["items"] if i["type"] == "create")
+        create.pop("success", None)
+    overrides = mutated("eth_safe_deploy", "/internal-transactions", unknown)
+    b = replay_bundle(eth_cfg, SAFE_DEPLOY_TX, "eth_safe_deploy", overrides=overrides)
+    create = next(e for e in b.items if e.kind == "internal_call" and "create" in e.text)
+    assert "does not say if the deployment succeeded" in create.text and create.data["moves_value"] is None

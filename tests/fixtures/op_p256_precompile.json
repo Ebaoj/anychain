@@ -1,0 +1,30 @@
+{
+ "GET https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a": {
+  "body": "{\"l1_gas_used\":\"2222\",\"priority_fee\":\"26314000000\",\"raw_input\":\"0xac4d282a00000000000000000000000093a4adece97e85e58ab8ac0c6a953a0089943fd000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000041045731a3adb5f060495696c0c50d5257a582c48b495ebdab2c9c48add2ff6fdaa9c3c00e70eeba36338d5c55606d800921c869a981b9a86156e9572d971e19ac9200000000000000000000000000000000000000000000000000000000000000\",\"is_pending_update\":false,\"op_withdrawals\":[],\"result\":\"success\",\"hash\":\"0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a\",\"max_fee_per_gas\":\"1001059\",\"revert_reason\":null,\"confirmation_duration\":[0,2.0e3],\"transaction_burnt_fee\":\"23235262\",\"type\":2,\"token_transfers_overflow\":false,\"confirmations\":19748928,\"position\":13,\"max_priority_fee_per_gas\":\"1000000\",\"transaction_tag\":null,\"created_contract\":null,\"value\":\"0\",\"l1_fee_scalar\":\"0\",\"from\":{\"ens_domain_name\":null,\"hash\":\"0x93a4Adece97e85e58ab8aC0C6A953a0089943fD0\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"gas_used\":\"26314\",\"status\":\"ok\",\"to\":{\"ens_domain_name\":null,\"hash\":\"0x0000000000000000000000000000000000000100\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"authorization_list\":[],\"l1_fee\":\"35299313360\",\"method\":null,\"fee\":{\"type\":\"actual\",\"value\":\"61636548622\"},\"gas_limit\":\"26657\",\"gas_price\":\"1000883\",\"decoded_input\":null,\"l1_gas_price\":\"3037962581\",\"fhe_operations_count\":0,\"token_transfers\":[],\"base_fee_per_gas\":\"883\",\"timestamp\":\"2025-07-07T14:00:53.000000Z\",\"nonce\":17,\"historic_exchange_rate\":\"2542.5\",\"transaction_types\":[],\"exchange_rate\":\"2560.04\",\"block_number\":138149038,\"has_error_in_internal_transactions\":false}",
+  "status": 200
+ },
+ "GET https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a/internal-transactions": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a/logs": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a/token-transfers": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "POST https://mainnet.optimism.io eth_chainId []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"result\":\"0xa\",\"id\":1}\n",
+  "status": 200
+ },
+ "POST https://mainnet.optimism.io eth_getTransactionByHash [\"0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"result\":{\"accessList\":[],\"blockHash\":\"0xa907e016e006dcea62e400e7ada3a13994afa9d10aba8997ba2a736719e2e8bb\",\"blockNumber\":\"0x83bfcae\",\"blockTimestamp\":\"0x686bd315\",\"chainId\":\"0xa\",\"from\":\"0x93a4adece97e85e58ab8ac0c6a953a0089943fd0\",\"gas\":\"0x6821\",\"gasPrice\":\"0xf45b3\",\"hash\":\"0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a\",\"input\":\"0xac4d282a00000000000000000000000093a4adece97e85e58ab8ac0c6a953a0089943fd000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000041045731a3adb5f060495696c0c50d5257a582c48b495ebdab2c9c48add2ff6fdaa9c3c00e70eeba36338d5c55606d800921c869a981b9a86156e9572d971e19ac9200000000000000000000000000000000000000000000000000000000000000\",\"maxFeePerGas\":\"0xf4663\",\"maxPriorityFeePerGas\":\"0xf4240\",\"nonce\":\"0x11\",\"r\":\"0x3bc8aefca95d37251d3dcef50e28e92a645ae1d2a995679218dd1df92c71b768\",\"s\":\"0x2f95c4c3010ff75530ec7a169910d99e55e91d7a53eabea1de7888e4cda96eb1\",\"to\":\"0x0000000000000000000000000000000000000100\",\"transactionIndex\":\"0xd\",\"type\":\"0x2\",\"v\":\"0x1\",\"value\":\"0x0\",\"yParity\":\"0x1\"},\"id\":1}\n",
+  "status": 200
+ },
+ "POST https://mainnet.optimism.io eth_getTransactionReceipt [\"0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"result\":{\"blockHash\":\"0xa907e016e006dcea62e400e7ada3a13994afa9d10aba8997ba2a736719e2e8bb\",\"blockNumber\":\"0x83bfcae\",\"contractAddress\":null,\"cumulativeGasUsed\":\"0x582a1e\",\"effectiveGasPrice\":\"0xf45b3\",\"from\":\"0x93a4adece97e85e58ab8ac0c6a953a0089943fd0\",\"gasUsed\":\"0x66ca\",\"l1BaseFeeScalar\":\"0x146b\",\"l1BlobBaseFee\":\"0x1\",\"l1BlobBaseFeeScalar\":\"0xf79c5\",\"l1Fee\":\"0x83800c6d0\",\"l1GasPrice\":\"0xb513a155\",\"l1GasUsed\":\"0x8ae\",\"logs\":[],\"logsBloom\":\"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"status\":\"0x1\",\"to\":\"0x0000000000000000000000000000000000000100\",\"transactionHash\":\"0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a\",\"transactionIndex\":\"0xd\",\"type\":\"0x2\"},\"id\":1}\n",
+  "status": 200
+ }
+}
