@@ -19,6 +19,12 @@ from anychain.models import EvidenceBundle, Source
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
 MAX_EVENTS = 40
 MAX_INTERNAL = 30
+ZERO_ADDRESS = "0x" + "0" * 40
+
+# Internal call types whose `value` is only the caller's context, never a payment:
+# delegatecall and callcode run another contract's code inside the caller, so any
+# value stays with the caller; staticcall cannot carry value. (See DECISIONS D17.)
+VALUE_IS_CONTEXT = {"delegatecall", "callcode", "staticcall"}
 
 class InvalidHashError(ValueError):
     """The input is not a transaction hash."""
@@ -73,6 +79,13 @@ def implementation_addresses(value: dict) -> list[str]:
     return [i["address_hash"] for i in impls if isinstance(i, dict) and isinstance(i.get("address_hash"), str)]
 
 
+def delegate_of(auth: dict) -> str | None:
+    """Delegate address of an EIP-7702 authorization. Blockscout calls it `address_hash`
+    (older versions: `address`). None when absent: never read a missing value as "cleared"."""
+    target = auth.get("address_hash") or auth.get("address")
+    return target if isinstance(target, str) else None
+
+
 def address_of(value: dict | None) -> str | None:
     return value.get("hash") if isinstance(value, dict) else None
 
@@ -106,6 +119,7 @@ class BundleBuilder:
         self.explorer_not_found = False
         self.explorer_answered = False  # True when the explorer responded at all (even with 404)
         self.undecoded_events: set[str] = set()
+        self.anonymous_unmatched: set[str] = set()
         self.bundle = EvidenceBundle(network=cfg.network.name, tx_hash="", status="unknown")
 
     def build(self, tx_hash: str) -> EvidenceBundle:
@@ -223,6 +237,7 @@ class BundleBuilder:
             return  # nothing below is final yet
         self._safely("Fee", lambda: self._add_fee(tx_hash, tx))
         self._safely("Revert reason", lambda: self._add_revert(tx_hash, tx))
+        self._safely("Code delegations", lambda: self._add_authorizations(tx_hash, tx))
         self._safely("Call decoding", lambda: self._add_call(tx_hash, tx))
         covered_logs: set[int] = set()
         self._safely("Token transfers", lambda: covered_logs.update(self._add_transfers(tx_hash)))
@@ -249,7 +264,8 @@ class BundleBuilder:
         value_raw = to_int(tx.get("value"))
         value = amount(value_raw, cfg.network.native_decimals) if value_raw is not None else "unknown"
         sender, target = party(tx.get("from")), self._target_text(tx)
-        data = {"status": b.status, "from": address_of(tx.get("from")), "to": address_of(tx.get("to")), "value": value}
+        data = {"status": b.status, "from": address_of(tx.get("from")), "to": address_of(tx.get("to")),
+                "value": value, "tx_type": tx.get("type")}
 
         if b.status == "pending":
             b.add("overview", f"Transaction is pending: not yet included in a block. From {sender} to {target}. "
@@ -304,7 +320,74 @@ class BundleBuilder:
             self.bundle.add("revert", f"Explorer reports the failure as: {result!r}.", [source], {"result": result})
         else:
             self._gap("Revert reason", "the explorer did not report why the transaction failed",
-                      "Re-executing the call on the RPC (phase 2) or a node with debug tracing", retryable=False)
+                      "A node that can re-execute or trace the call (debug/trace RPC)", retryable=False)
+
+    def _add_authorizations(self, tx_hash: str, tx: dict) -> None:
+        """EIP-7702 (type 4): accounts that set or cleared the contract code they run.
+
+        Only an authorization the explorer marks "ok" took effect, and when one account
+        has several valid ones in the same tx, the last one wins (EIP-7702 order).
+        """
+        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
+        auths = [a for a in tx.get("authorization_list") or [] if isinstance(a, dict)]
+        last_valid = {str(a.get("authority")).lower(): n for n, a in enumerate(auths) if a.get("status") == "ok"}
+        for n, auth in enumerate(auths):
+            authority = auth.get("authority") or "an account the explorer does not name"
+            target, status = delegate_of(auth), auth.get("status")
+            clears = target == ZERO_ADDRESS
+            what = ("clear its code delegation" if clears else
+                    f"run the code of {target}" if target else "change its code delegation (target not reported)")
+            if status == "ok" and target is None:
+                text = f"Code delegation of {authority} changed by this transaction (EIP-7702); the explorer does " \
+                       "not report the new target."
+            elif status == "ok" and last_valid.get(str(auth.get("authority")).lower()) != n:
+                text = f"EIP-7702 authorization for {authority} to {what} was valid but replaced by a later " \
+                       "authorization for the same account in this transaction."
+            elif status == "ok" and clears:
+                text = f"Code delegation cleared by this transaction: {authority} stops running delegated code (EIP-7702)."
+            elif status == "ok":
+                text = f"Code delegation set by this transaction: from here on, {authority} runs the code of {target} (EIP-7702)."
+            else:
+                verdict = (f"was not applied: the explorer marks it {status!r}" if status
+                           else "has no validity reported by the explorer")
+                text = f"EIP-7702 authorization for {authority} to {what} {verdict}."
+            superseded = status == "ok" and last_valid.get(str(auth.get("authority")).lower()) != n
+            applied = (False if superseded else True) if status == "ok" else (False if status else None)
+            self.bundle.add("delegation", text, [source],
+                            {"authority": auth.get("authority"), "delegate": target, "status": status,
+                             "applied": applied, "superseded": superseded})
+
+    def _delegations_applied(self, tx: dict) -> dict[str, str]:
+        """Lowercase authority -> delegate address in effect after this tx's valid authorizations
+        (ZERO_ADDRESS when cleared). Authorizations are applied before execution; the last valid one wins."""
+        result = {}
+        for auth in tx.get("authorization_list") or []:
+            if isinstance(auth, dict) and auth.get("status") == "ok" and isinstance(auth.get("authority"), str):
+                if delegate_of(auth) is None:
+                    result.pop(auth["authority"].lower(), None)  # target unknown: claim nothing
+                else:
+                    result[auth["authority"].lower()] = delegate_of(auth)
+        return result
+
+    def _add_data_to_codeless(self, to_text: str, size: int, cleared_here: bool, today_basis: str,
+                              source: Source) -> None:
+        """Data sent to an account without code today. We only assert "no code" when this very
+        transaction cleared the account's delegation; otherwise we say what is unknown.
+
+        Why not ask the node for the code before the block: code can appear earlier in the
+        same block, and precompiles (which differ per chain and fork) run with no stored code.
+        """
+        if cleared_here:
+            self.bundle.add("call", f"Sent {size} bytes of data to {to_text}, whose code delegation this transaction "
+                            "cleared before running; data sent to an account without code is not a function call.",
+                            [source], {"data_bytes": size, "had_code": False})
+            return
+        self.bundle.add("call", f"Sent {size} bytes of data to {to_text}. {today_basis}; this tool cannot confirm "
+                        "the account's code at the moment the transaction ran, so it does not say whether this "
+                        "was a function call.", [source], {"data_bytes": size, "had_code": None})
+        self._gap("Code at execution time", "an account's code during a transaction cannot be confirmed from the "
+                  "explorer or a plain state read (code can change within a block, and built-in precompiles run "
+                  "without stored code)", "An execution trace of the transaction (debug/trace RPC)", retryable=False)
 
     def _add_call(self, tx_hash: str, tx: dict) -> None:
         b, sym = self.bundle, self.cfg.network.native_symbol
@@ -316,17 +399,30 @@ class BundleBuilder:
             text = f"Contract creation: deployed {party(created)}." if created else "Contract creation transaction."
             b.add("call", text, [source], {"created": address_of(created)})
             return
+        authorizations = tx.get("authorization_list") or []
         if data == "0x":
-            b.add("call", f"Plain {sym} transfer (no call data) to {party(to)}.", [source])
+            if authorizations and not to_int(tx.get("value")):
+                b.add("call", f"No call data and no value were sent; the transaction carries {len(authorizations)} "
+                      "EIP-7702 authorization(s), listed as delegation facts.", [source])
+            else:
+                b.add("call", f"Plain {sym} transfer (no call data) to {party(to)}.", [source])
+            return
+        delegations = self._delegations_applied(tx)
+        delegate_here = delegations.get(to["hash"].lower())
+        if delegate_here == ZERO_ADDRESS or (
+                delegate_here is None and to.get("is_contract") is False and not implementation_addresses(to)):
+            self._add_data_to_codeless(party(to), (len(data) - 2) // 2, delegate_here == ZERO_ADDRESS,
+                                       "The explorer lists it as having no contract code today", source)
             return
 
         address = to["hash"]
-        decoder = self._decoder_for(address, implementation_addresses(to))
+        # Code the account ran: a delegation set by this very tx first, then today's listed implementations.
+        decoder = self._decoder_for(address, ([delegate_here] if delegate_here else []) + implementation_addresses(to))
         decoded = decoder.decode_call(data) if decoder else None
         if decoded is None:
             b.add("call", f"Called function with selector {data[:10]} on {party(to)}; not decoded.",
                   [source], {"selector": data[:10]})
-            self._declare_undecoded("Call decoding", address, f"selector {data[:10]}")
+            self._declare_undecoded("Call decoding", address, f"selector {data[:10]}", code_owner=delegate_here)
             return
         args = ", ".join(f"{a.name}={a.value}" for a in decoded.args)
         abi_source = self._api_source(f"/smart-contracts/{address}", "Explorer API: contract ABI")
@@ -357,13 +453,16 @@ class BundleBuilder:
         self.bundle.abi_sources[address] = note
         return decoder
 
-    def _declare_undecoded(self, topic: str, address: str, what: str) -> None:
+    def _declare_undecoded(self, topic: str, address: str, what: str, code_owner: str | None = None) -> None:
         """Gap for something we could not decode, saying whether the ABI is missing or just unreachable."""
         if address.lower() in self.abi_lookup_failed:
             retryable = self.abi_lookup_failed[address.lower()]
             self._gap(topic, f"{what} on {address} not decoded because the ABI lookup failed",
                       "Try again in a few minutes" if retryable else "Check the contract on the explorer page",
                       retryable)
+        elif code_owner:
+            self._gap(topic, f"{address} ran the code of {code_owner} (EIP-7702), and no ABI for it matches {what}",
+                      f"{code_owner} verified on the explorer, or its ABI in a configured repo", retryable=False)
         else:
             self._gap(topic, f"no ABI for {address} matches {what}",
                       "A verified contract on the explorer, or the contract ABI in a configured repo",
@@ -416,20 +515,50 @@ class BundleBuilder:
         reads = [it for it in items if it.get("type") == "staticcall"]
         calls = [it for it in items if it.get("type") != "staticcall"]
         for it in calls[:MAX_INTERNAL]:
-            value = to_int(it.get("value")) or 0
-            failed = " (this internal call failed)" if it.get("success") is False else ""
-            route = f"from {party(it.get('from'))} to {party(it.get('to'))}"
-            if value > 0:
-                text = f"Internal {sym} transfer of {amount(value, dec)} {sym} {route}{failed}."
-            else:
-                text = f"Internal {it.get('type')} {route}{failed}."
-            self.bundle.add("internal_call", text, [source], {"type": it.get("type"), "value": str(value)})
+            text, moves_value = self._internal_text(it, sym, dec)
+            self.bundle.add("internal_call", text, [source],
+                            {"type": it.get("type"), "value": str(to_int(it.get("value")) or 0),
+                             "moves_value": moves_value})
         if reads:
             self.bundle.add("internal_call", f"{len(reads)} read-only staticcall(s) (no state change) not listed.",
                             [source], {"staticcalls": len(reads)})
         if truncated or len(calls) > MAX_INTERNAL:
             self._gap("Internal calls", f"showing the first {MAX_INTERNAL}",
                       "Open the explorer page for the full list", retryable=False)
+
+    def _internal_text(self, it: dict, sym: str, dec: int) -> tuple[str, bool | None]:
+        """Describe one internal call, and say whether native value really moved (None: not known)."""
+        kind = it.get("type")
+        value = to_int(it.get("value")) or 0
+        shown = f"{amount(value, dec)} {sym}"
+        success = it.get("success")  # True, False, or None when the explorer does not say
+        ok = success is not False
+
+        if kind in ("create", "create2"):
+            creator = party(it.get("from"))
+            if success is None:
+                return f"Internal {kind} by {creator}; the explorer does not say if the deployment succeeded.", None
+            if not ok:
+                return f"Internal {kind} by {creator} failed: nothing was deployed or transferred.", False
+            created = it.get("created_contract")
+            deployed = party(created) if created else "a contract whose address the explorer does not report"
+            text = f"Internal {kind} by {creator}: deployed {deployed}"
+            return (f"{text} with {shown}." if value > 0 else f"{text}."), value > 0
+
+        route = f"from {party(it.get('from'))} to {party(it.get('to'))}"
+        if kind == "call" and value > 0:
+            if success is None:
+                return f"Internal call {route} with {shown} attached; the explorer does not say if it succeeded.", None
+            if ok:
+                return f"Internal {sym} transfer of {shown} {route}.", True
+            return f"Internal call {route} tried to send {shown} but failed; nothing was transferred.", False
+
+        text = f"Internal {kind} {route}" + ("" if ok else " (this internal call failed)")
+        if value > 0 and kind in VALUE_IS_CONTEXT:
+            return f"{text}; no {sym} moved (the value is the caller's own context).", False
+        if value > 0:  # e.g. selfdestruct: not yet seen in a real recording, so not interpreted
+            return f"{text}; the explorer records a value of {shown} on it.", None
+        return f"{text}.", False
 
     def _add_events(self, tx_hash: str, covered_logs: set[int]) -> None:
         items, truncated = self.explorer.logs(tx_hash)
@@ -461,6 +590,12 @@ class BundleBuilder:
             self.bundle.add("event", f"Event {event.signature} emitted by {party(emitter)}: {args}.", [source],
                             {"event": event.name, "args": {a.name: a.value for a in event.args}})
             return
+        if decoder and decoder.could_be_anonymous(topics):
+            # The first topic may be an argument, not a signature: do not label it "topic0".
+            self.bundle.add("event", f"Event with {len(topics)} topic(s) emitted by {party(emitter)} matched none "
+                            "(or more than one) of the anonymous events in its ABI; not decoded.", [source])
+            self.anonymous_unmatched.add(address)
+            return
         topic0 = topics[0] if topics else "(none)"
         self.bundle.add("event", f"Event with topic0 {topic0} emitted by {party(emitter)}; could not decode.", [source])
         self.undecoded_events.add(address)
@@ -469,6 +604,9 @@ class BundleBuilder:
         """One gap per contract with undecoded events, not one per event."""
         for address in sorted(self.undecoded_events):
             self._declare_undecoded("Event decoding", address, "its events")
+        for address in sorted(self.anonymous_unmatched):
+            self._gap("Event decoding", f"{address} declares anonymous events (no signature topic); some of its "
+                      "logs fit none or several of them", "Check those logs on the explorer page", retryable=False)
 
     # ---- rpc path ----------------------------------------------------------
 
@@ -494,7 +632,7 @@ class BundleBuilder:
         else:
             value_text = f"Native value: {value} {sym}."
         if b.status == "unknown":
-            self._gap("Outcome", "this receipt predates the status field (pre-Byzantium)",
+            self._gap("Outcome", "this receipt has no status field (the node's receipt format predates it)",
                       "The explorer, which infers the outcome from execution traces", retryable=False)
         b.add("overview",
               f"(From RPC only) Transaction {verb} in block {to_int(tx.get('blockNumber'))}. "
@@ -503,7 +641,18 @@ class BundleBuilder:
               [source], {"status": b.status, "from": tx.get("from"), "to": tx.get("to")})
 
         data = tx.get("input") or "0x"
-        if tx.get("to") and data != "0x":
+        authorizations = tx.get("authorizationList") or []
+        if authorizations:
+            delegates = ", ".join(sorted({str(a.get("address")) for a in authorizations if isinstance(a, dict)}))
+            b.add("delegation", f"Transaction carries {len(authorizations)} EIP-7702 authorization(s) naming "
+                  f"{delegates}; who signed them and whether they were valid is not checked without the explorer.",
+                  [source], {"applied": None})
+            self._gap("Code delegations", "signers and validity of EIP-7702 authorizations need the explorer",
+                      "Explorer API reachable", retryable=True)
+        if tx.get("to") and data == "0x" and authorizations and not to_int(tx.get("value")):
+            b.add("call", f"No call data and no value were sent; the transaction carries {len(authorizations)} "
+                  "EIP-7702 authorization(s).", [source])
+        elif tx.get("to") and data != "0x":
             self._add_rpc_call(to_checksum_address(tx["to"]), data, source)
         logs = receipt.get("logs") or []
         b.add("receipt", f"Receipt has {len(logs)} log(s).", [source])
@@ -516,6 +665,18 @@ class BundleBuilder:
 
     def _add_rpc_call(self, to: str, data: str, source: Source) -> None:
         """Decode the call from RPC data, using the explorer's ABI when the explorer answers."""
+        # Without the explorer there is no "is it a contract?" flag: use the node's code today,
+        # the same criterion the explorer applies. Code today = a contract.
+        try:
+            has_code_today = self.rpc.code_at(to, "latest") not in ("0x", "")
+        except CollectorError as exc:
+            has_code_today = None
+            self._gap("Contract check", f"could not read whether {to} has contract code: {exc}",
+                      "Try again in a few minutes", exc.retryable)
+        if has_code_today is False:
+            self._add_data_to_codeless(to, (len(data) - 2) // 2, False,
+                                       "The node shows no contract code at this address today", source)
+            return
         decoder = self._decoder_for(to) if self.explorer_answered else None
         decoded = decoder.decode_call(data) if decoder else None
         if decoded:

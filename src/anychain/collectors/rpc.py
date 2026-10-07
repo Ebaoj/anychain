@@ -58,6 +58,13 @@ class RpcClient:
     def receipt(self, tx_hash: str) -> dict | None:
         return _dict_or_none(self.call("eth_getTransactionReceipt", [tx_hash]), "eth_getTransactionReceipt")
 
+    def code_at(self, address: str, block: int | str) -> str:
+        """Contract code at `address` as of `block` or "latest" ('0x' means none). Old blocks need an archive node."""
+        value = self.call("eth_getCode", [address, hex(block) if isinstance(block, int) else block])
+        if not isinstance(value, str):
+            raise CollectorError(f"RPC eth_getCode returned {value!r}", retryable=False)
+        return value
+
     def chain_id(self) -> int:
         """The node's chain id. The standard is a hex string; some nodes send a plain number."""
         value = self.call("eth_chainId", [])
