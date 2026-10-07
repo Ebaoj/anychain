@@ -129,6 +129,7 @@ flowchart LR
 
     subgraph collectors["collectors/"]
         http["http.py<br/>retries, budget,<br/>retryable errors"]
+        types["types.py<br/>typed objects: Transaction,<br/>InternalCall, TokenTransfer, Log..."]
         explorer["explorer.py<br/>Blockscout"]
         rpc["rpc.py<br/>JSON-RPC"]
         replay["replay.py<br/>record / replay<br/>real traffic for tests"]
@@ -151,6 +152,9 @@ flowchart LR
     bundle --> chains
     explorer --> http
     rpc --> http
+    explorer --> types
+    rpc --> types
+    bundle --> types
     writer --> prompts
     replay -.used by tests.-> explorer
     replay -.used by tests.-> rpc
@@ -184,5 +188,6 @@ flowchart TD
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-07, typed objects (D21):** explorer and RPC answers become typed objects once, in `collectors/types.py`.
 - **2026-10-07, chain-type profiles (D20):** config names the Blockscout CHAIN_TYPE; profiles for six network types; address labels in config.
 - **2026-10-07, phase 1 review rounds:** EIP-7702 delegates as an ABI source; accounts without code today are never asserted codeless (D18).

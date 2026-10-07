@@ -129,6 +129,7 @@ flowchart LR
 
     subgraph collectors["collectors/"]
         http["http.py<br/>novas tentativas, teto de tempo,<br/>erro de rede ou de pedido"]
+        types["types.py<br/>objetos tipados: Transaction,<br/>InternalCall, TokenTransfer, Log..."]
         explorer["explorer.py<br/>Blockscout"]
         rpc["rpc.py<br/>JSON-RPC"]
         replay["replay.py<br/>grava e repete tráfego real<br/>para os testes"]
@@ -151,6 +152,9 @@ flowchart LR
     bundle --> chains
     explorer --> http
     rpc --> http
+    explorer --> types
+    rpc --> types
+    bundle --> types
     writer --> prompts
     replay -.usado nos testes.-> explorer
     replay -.usado nos testes.-> rpc
@@ -186,4 +190,5 @@ flowchart TD
 - **07/10/2026, fim da Fase 1:** primeira versão. Linha de montagem, sequência de um `explain`, mapa do código, classificação das lacunas.
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
+- **07/10/2026, objetos tipados (D21):** as respostas do explorador e do nó viram objetos tipados uma única vez, em `collectors/types.py`.
 - **07/10/2026, perfis por tipo de rede (D20):** a configuração declara o CHAIN_TYPE do Blockscout; perfis para seis tipos de rede; rótulos de endereços na configuração.

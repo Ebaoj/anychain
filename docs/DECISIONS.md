@@ -134,3 +134,20 @@ A bug hunt with varied real transactions found facts that were well formatted, s
   - An unknown `chain_type` value no longer stops the config from loading: the generic profile is used and a "Chain type" gap says so (older Blockscout versions used values such as `celo`).
   - Fee fallbacks are no longer silent: blobs without a reported blob fee, or an L1 fee larger than the total, raise a "Fee" gap.
   - **Known limitation:** plain (non-structured) fields of chain types we have no profile for are not detected (e.g. a hypothetical `zkevm_*` scalar); only structured blocks are declared. New plain fields appear in every Blockscout release, so flagging them would be noise.
+
+## D21. Explorer and RPC answers become typed objects at the edge
+- **Why (Joabe):** after D20, chain-specific logic lived in classes, but `bundle.py` still read raw dicts: 110 `.get(...)` calls, `to` read in 10 places. A renamed Blockscout field (EIP-7702 `address_hash` vs `address`) had to be handled in several places, and every reader had its own guards.
+- **Decision:** `collectors/types.py` parses each answer once into frozen dataclasses: `AddressRef`, `Token`, `Authorization`, `RevertReason`, `Transaction`, `TokenTransfer`, `InternalCall`, `Log`, `RpcTransaction`, `RpcReceipt`. The explorer and RPC clients return these objects. Parsing never raises on an odd field: it becomes `None` (unknown). Field-name variations of transaction data live here (one exception: `explorer.py` reads the proxy-implementation field of contract metadata).
+- **Alternatives:** pydantic models (rejected: a strict validation error would cost the whole object, while we want field-level tolerance); keep dicts (rejected: the reason for this change).
+- **Safety net:** `tests/test_golden.py` freezes the full answer of all 31 recorded transactions. The refactor had to keep every one identical, word for word, and did. Regenerating golden answers is a deliberate step (`ANYCHAIN_UPDATE_GOLDEN=1`) whose diff is reviewed.
+- **Kept raw on purpose:** a few evidence `data` values (block, timestamp, gas as the explorer sent them, the original revert object) stay exactly as received, so golden answers did not change. Chain profiles still read `tx.raw`: each profile is the edge parser for its own chain-specific block.
+- **Result:** `bundle.py` raw reads went from 110 to 10, and those 10 are the program's own dicts or the deliberately raw values.
+- **Ninth review (Fable), with a differential harness:** 13,151 mutated-fixture cases run through the pre-refactor and the new code. All 31 real recordings were identical, most differences were stricter parsing (improvements), and these regressions were found and fixed:
+  - A missing address was filled with the text "(unknown address)" and then used as a real address, even in HTTP requests. `AddressRef.address` is now `None` when unreadable; a call without a readable target and a log without a readable emitter become gaps.
+  - Unreadable fields silently took a default meaning: non-text or missing `raw_input` was read as "no call data" and stated as a plain transfer. Now `raw_input`/`input` are `None` when absent or not text (Blockscout and JSON-RPC always send them, "0x" when empty) and become a gap; a non-list `authorization_list` becomes a gap.
+  - `{"method_call": ""}` re-opened the D20 fix ("undecoded revert data 0x"): an empty name now means "not decoded".
+  - Empty `{}` RPC answers are rejected as broken payloads instead of being read as a mined transaction.
+  - "Called f() on X with ." on calls and events without arguments (every OP Stack L1 attributes tx): the only golden answer that changed, on purpose.
+  - The golden test approved a missing golden file by writing it; it now fails unless regeneration is requested.
+  - `tests/test_types.py` tests the parsers directly with the odd shapes the harness found. Dead fields and a duplicate int parser were removed.
+  - Rerun of the same harness after the fixes: zero invented addresses, zero placeholder requests, zero crashes.
