@@ -18,3 +18,5 @@ uv run pytest
 ```
 
 Flags: `--mode support|developer|auditor`, `--json` (evidence bundle), `--no-llm` (evidence only).
+
+Tests run offline against real recorded responses (`tests/fixtures/`, recorded with `scripts/record_fixture.py`).
