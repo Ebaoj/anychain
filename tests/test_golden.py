@@ -43,8 +43,10 @@ FIXTURE_NAMES = sorted(p.stem for p in FIXTURES.glob("*.json"))
 def test_answer_matches_golden(fixture):
     path = GOLDEN / f"{fixture}.json"
     actual = _snapshot(fixture)
-    if os.environ.get("ANYCHAIN_UPDATE_GOLDEN") == "1" or not path.exists():
+    if os.environ.get("ANYCHAIN_UPDATE_GOLDEN") == "1":
         GOLDEN.mkdir(exist_ok=True)
         path.write_text(json.dumps(actual, indent=1, ensure_ascii=False, sort_keys=True) + "\n")
-        pytest.skip("golden written; review it with git diff")
+        pytest.skip("golden written on purpose; review it with git diff")
+    # A missing golden is a failure, never a silent approval of whatever the code says today.
+    assert path.exists(), f"no golden answer for {fixture}; create it with ANYCHAIN_UPDATE_GOLDEN=1 and review it"
     assert actual == json.loads(path.read_text()), f"answer changed for {fixture}; see the diff above"

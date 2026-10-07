@@ -1,7 +1,7 @@
 """The evidence bundle on real transactions: happy paths and every kind of trouble."""
 import pytest
 
-from anychain.bundle import amount, build_bundle, describe_revert
+from anychain.bundle import amount, build_bundle
 from tests.conftest import (
     CREATION_TX, DATA_TO_EOA_TX, ERC721_TX, ERC1155_TX, ETH_FIXTURES, EXECUTE_7702_TX, EXPLORER_HOST, FAILED_TX,
     INVALID_NONCE_7702_TX, LIDO_TX, MAKER_TX, OP_TX, SET_THEN_REVOKED_7702_TX, PENDING_TX, REVOKE_7702_TX, RPC_HOST, SAFE_DEPLOY_TX, SWAP_TX, USDC_TX,
@@ -42,12 +42,6 @@ def test_amount_is_exact():
     assert amount(10**18, 18) == "1"
     assert amount(1, 18) == "0.000000000000000001"
     assert amount(5, 0) == "5"
-
-
-def test_revert_reason_formats():
-    decoded = {"method_call": "Error(string reason)", "parameters": [{"name": "reason", "value": "EXPIRED"}]}
-    assert describe_revert(decoded) == "Error(string reason) with reason='EXPIRED'"
-    assert describe_revert({"raw": "0x1234"}) == "undecoded revert data 0x1234"
 
 
 # ---- successful transactions -------------------------------------------------
@@ -350,7 +344,7 @@ def test_abi_lookup_bad_request_is_consistently_not_retryable(eth_cfg):
 def test_malformed_receipt_is_a_gap(eth_cfg):
     overrides = {RECEIPT: {"status": 200, "body": '{"jsonrpc":"2.0","id":1,"result":[]}'}}
     b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer", overrides=overrides)
-    assert "expected an object" in _gap(b, "RPC transaction data").why
+    assert "expected a transaction or receipt" in _gap(b, "RPC transaction data").why
 
 
 # ---- transaction types found by the Fable bug hunt (all real recordings) ----------

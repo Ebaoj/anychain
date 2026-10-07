@@ -91,7 +91,7 @@
      "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x4200000000000000000000000000000000000015"
     }
    ],
-   "text": "Called setL1BlockValuesJovian() on 0x4200000000000000000000000000000000000015 (Proxy) with . ABI source: explorer: verified contract Proxy proxy -> L1Block."
+   "text": "Called setL1BlockValuesJovian() on 0x4200000000000000000000000000000000000015 (Proxy). ABI source: explorer: verified contract Proxy proxy -> L1Block."
   },
   {
    "data": {
