@@ -1,0 +1,101 @@
+{
+ "abi_sources": {},
+ "gaps": [
+  {
+   "needed": "An execution trace of the transaction (debug/trace RPC)",
+   "retryable": false,
+   "what": "Code at execution time",
+   "why": "an account's code during a transaction cannot be confirmed from the explorer or a plain state read (code can change within a block, and built-in precompiles run without stored code)"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "block": 138149038,
+    "from": "0x93a4Adece97e85e58ab8aC0C6A953a0089943fD0",
+    "gas_limit": "26657",
+    "gas_used": "26314",
+    "status": "success",
+    "timestamp": "2025-07-07T14:00:53.000000Z",
+    "to": "0x0000000000000000000000000000000000000100",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://explorer.optimism.io/tx/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
+    }
+   ],
+   "text": "Transaction succeeded in block 138149038 at 2025-07-07T14:00:53.000000Z. From 0x93a4Adece97e85e58ab8aC0C6A953a0089943fD0 to 0x0000000000000000000000000000000000000100. Native value sent: 0 ETH. Gas used 26314 of limit 26657."
+  },
+  {
+   "data": {
+    "fee": "0.000000061636548622",
+    "parts": {
+     "L1 data": "0.00000003529931336",
+     "L2 execution": "0.000000026337235262"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
+    }
+   ],
+   "text": "Fee paid: 0.000000061636548622 ETH in total: 0.000000026337235262 ETH L2 execution + 0.00000003529931336 ETH L1 data."
+  },
+  {
+   "data": {
+    "data_bytes": 196,
+    "had_code": null
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
+    }
+   ],
+   "text": "Sent 196 bytes of data to 0x0000000000000000000000000000000000000100. The explorer lists it as having no contract code today; this tool cannot confirm the account's code at the moment the transaction ran, so it does not say whether this was a function call."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E4",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.optimism.io"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "optimism-mainnet",
+ "status": "success",
+ "tx_hash": "0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
+}

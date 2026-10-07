@@ -1,0 +1,76 @@
+{
+ "abi_sources": {},
+ "gaps": [
+  {
+   "needed": "Explorer API reachable and indexing this transaction",
+   "retryable": true,
+   "what": "Explorer transaction data",
+   "why": "https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 failed after 3 attempts: ConnectError: simulated outage of eth.blockscout.com"
+  },
+  {
+   "needed": "Explorer API reachable, or the contract ABI in a configured repo",
+   "retryable": true,
+   "what": "Call decoding",
+   "why": "explorer unavailable, so no ABI could be fetched"
+  },
+  {
+   "needed": "Explorer API reachable",
+   "retryable": true,
+   "what": "Event decoding",
+   "why": "explorer unavailable, so events stay undecoded"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "from": "0xca62c34d54b445283121905f19193416212117c4",
+    "status": "success",
+    "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "(From RPC only) Transaction succeeded in block 26141501. From 0xca62c34d54b445283121905f19193416212117c4 to 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48. Native value: 0 ETH. Gas used 40360 of limit 45758."
+  },
+  {
+   "data": {
+    "selector": "0xa9059cbb"
+   },
+   "id": "E2",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "Called function with selector 0xa9059cbb on 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48; not decoded."
+  },
+  {
+   "data": {},
+   "id": "E3",
+   "kind": "receipt",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "Receipt has 1 log(s)."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952"
+}

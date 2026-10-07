@@ -1,0 +1,30 @@
+{
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee": {
+  "body": "{\"priority_fee\":null,\"raw_input\":\"0x\",\"is_pending_update\":false,\"result\":\"success\",\"hash\":\"0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee\",\"max_fee_per_gas\":null,\"revert_reason\":null,\"confirmation_duration\":[0,2.95e4],\"transaction_burnt_fee\":null,\"type\":0,\"token_transfers_overflow\":false,\"confirmations\":42,\"position\":4,\"max_priority_fee_per_gas\":null,\"transaction_tag\":null,\"created_contract\":null,\"value\":\"0\",\"from\":{\"ens_domain_name\":null,\"hash\":\"0x0000000000000000000000000000000000000000\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":{\"tags\":[{\"meta\":{},\"name\":\"Null: 0x000...000\",\"ordinal\":10,\"slug\":\"null-0x000000\",\"tagType\":\"name\"},{\"meta\":{},\"name\":\"Metamask User\",\"ordinal\":0,\"slug\":\"metamask-user\",\"tagType\":\"generic\"},{\"meta\":{},\"name\":\"Imtoken User\",\"ordinal\":0,\"slug\":\"imtoken-user\",\"tagType\":\"generic\"},{\"meta\":{},\"name\":\"Miner\",\"ordinal\":0,\"slug\":\"miner\",\"tagType\":\"generic\"}]},\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"gas_used\":\"0\",\"status\":\"ok\",\"to\":{\"ens_domain_name\":null,\"hash\":\"0x0000000000000000000000000000000001000008\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"authorization_list\":[],\"method\":null,\"fee\":{\"type\":\"actual\",\"value\":\"0\"},\"gas_limit\":\"0\",\"gas_price\":\"0\",\"decoded_input\":null,\"fhe_operations_count\":0,\"token_transfers\":[],\"base_fee_per_gas\":null,\"timestamp\":\"2026-10-07T18:48:07.000000Z\",\"nonce\":9305354,\"historic_exchange_rate\":null,\"transaction_types\":[\"rootstock_remasc\"],\"exchange_rate\":\"83388\",\"block_number\":9305355,\"has_error_in_internal_transactions\":false}",
+  "status": 200
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee/internal-transactions": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee/logs": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee/token-transfers": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_chainId []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x1e\"}\n",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_getTransactionByHash [\"0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"hash\":\"0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee\",\"nonce\":\"0x8dfd0a\",\"blockHash\":\"0xd61a6de7b6429abe71dc9d335807d3e24362b54c89c8cf470c26c454b2d04159\",\"blockNumber\":\"0x8dfd0b\",\"transactionIndex\":\"0x4\",\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x0000000000000000000000000000000001000008\",\"gas\":\"0x0\",\"gasPrice\":\"0x0\",\"value\":\"0x0\",\"input\":\"0x\",\"v\":\"0x0\",\"r\":\"0x0\",\"s\":\"0x0\",\"type\":\"0x0\"}}\n",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_getTransactionReceipt [\"0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"transactionHash\":\"0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee\",\"transactionIndex\":\"0x4\",\"blockHash\":\"0xd61a6de7b6429abe71dc9d335807d3e24362b54c89c8cf470c26c454b2d04159\",\"blockNumber\":\"0x8dfd0b\",\"cumulativeGasUsed\":\"0x4fdf7\",\"gasUsed\":\"0x0\",\"contractAddress\":null,\"logs\":[],\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x0000000000000000000000000000000001000008\",\"status\":\"0x1\",\"logsBloom\":\"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"type\":\"0x0\",\"effectiveGasPrice\":\"0x0\"}}\n",
+  "status": 200
+ }
+}

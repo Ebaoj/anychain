@@ -1,0 +1,217 @@
+{
+ "abi_sources": {
+  "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84": "explorer: verified contract AppProxyUpgradeable proxy -> Lido"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 26141730,
+    "from": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE",
+    "gas_limit": "131601",
+    "gas_used": "76983",
+    "status": "success",
+    "timestamp": "2026-10-07T16:33:35.000000Z",
+    "to": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+    "tx_type": 2,
+    "value": "0.04665119"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"
+    }
+   ],
+   "text": "Transaction succeeded in block 26141730 at 2026-10-07T16:33:35.000000Z. From 0x940b2f530e7f1F456905D6A39A047f05bebee5AE to 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable). Native value sent: 0.04665119 ETH. Gas used 76983 of limit 131601."
+  },
+  {
+   "data": {
+    "fee": "0.00023600391086427",
+    "parts": {
+     "fee": "0.00023600391086427"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"
+    }
+   ],
+   "text": "Fee paid: 0.00023600391086427 ETH."
+  },
+  {
+   "data": {
+    "args": {
+     "_referral": "0x11d00000000000000000000000000000000011d0"
+    },
+    "function": "submit"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+    }
+   ],
+   "text": "Called submit(address) on 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable) with _referral=0x11d00000000000000000000000000000000011d0. ABI source: explorer: verified contract AppProxyUpgradeable proxy -> Lido."
+  },
+  {
+   "data": {
+    "from": "0x0000000000000000000000000000000000000000",
+    "to": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE",
+    "token": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.046651189999999999 STETH from 0x0000000000000000000000000000000000000000 to 0x940b2f530e7f1F456905D6A39A047f05bebee5AE."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable) to 0xb8FFC3Cd6e7Cf5a098A1c92F48009765B24088Dc (KernelProxy)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xb8FFC3Cd6e7Cf5a098A1c92F48009765B24088Dc (KernelProxy) to 0x2b33CF282f867A7FF693A66e11B0FcC5552e4425 (Kernel)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "46651190000000000"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable) to 0x028271E30a695c0527A0C50cA30603feD004cDb0 (Lido); no ETH moved (the value is the caller's own context)."
+  },
+  {
+   "data": {
+    "args": {
+     "amount": "46651190000000000",
+     "referral": "0x11d00000000000000000000000000000000011d0",
+     "sender": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE"
+    },
+    "event": "Submitted"
+   },
+   "id": "E8",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b/logs"
+    }
+   ],
+   "text": "Event Submitted(address,uint256,address) emitted by 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable): sender=0x940b2f530e7f1F456905D6A39A047f05bebee5AE, amount=46651190000000000, referral=0x11d00000000000000000000000000000000011d0."
+  },
+  {
+   "data": {
+    "args": {
+     "from": "0x0000000000000000000000000000000000000000",
+     "sharesValue": "37447215419557630",
+     "to": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE"
+    },
+    "event": "TransferShares"
+   },
+   "id": "E9",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b/logs"
+    }
+   ],
+   "text": "Event TransferShares(address,address,uint256) emitted by 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable): from=0x0000000000000000000000000000000000000000, to=0x940b2f530e7f1F456905D6A39A047f05bebee5AE, sharesValue=37447215419557630."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E10",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"
+}

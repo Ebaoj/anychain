@@ -1,0 +1,100 @@
+{
+ "abi_sources": {},
+ "gaps": [
+  {
+   "needed": "An execution trace of the transaction (debug/trace RPC)",
+   "retryable": false,
+   "what": "Code at execution time",
+   "why": "an account's code during a transaction cannot be confirmed from the explorer or a plain state read (code can change within a block, and built-in precompiles run without stored code)"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "block": 26141796,
+    "from": "0x52ee324F2bCD0c5363d713eb9f62D1eE47266ac1",
+    "gas_limit": "22570",
+    "gas_used": "22570",
+    "status": "success",
+    "timestamp": "2026-10-07T16:46:47.000000Z",
+    "to": "0x9BE0c82d5bA973a9e6861695626D4F9983e80C88",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44"
+    }
+   ],
+   "text": "Transaction succeeded in block 26141796 at 2026-10-07T16:46:47.000000Z. From 0x52ee324F2bCD0c5363d713eb9f62D1eE47266ac1 to 0x9BE0c82d5bA973a9e6861695626D4F9983e80C88. Native value sent: 0 ETH. Gas used 22570 of limit 22570."
+  },
+  {
+   "data": {
+    "fee": "0.00017567720809588",
+    "parts": {
+     "fee": "0.00017567720809588"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44"
+    }
+   ],
+   "text": "Fee paid: 0.00017567720809588 ETH."
+  },
+  {
+   "data": {
+    "data_bytes": 43,
+    "had_code": null
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44"
+    }
+   ],
+   "text": "Sent 43 bytes of data to 0x9BE0c82d5bA973a9e6861695626D4F9983e80C88. The explorer lists it as having no contract code today; this tool cannot confirm the account's code at the moment the transaction ran, so it does not say whether this was a function call."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E4",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x863b5a09226c4304b44b1583a84dcc7098b9ff6bad34dde5eb49c8ac6c5a9a44"
+}

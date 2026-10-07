@@ -1,0 +1,88 @@
+{
+ "abi_sources": {},
+ "gaps": [
+  {
+   "needed": "An RPC endpoint with full (archive) history",
+   "retryable": false,
+   "what": "RPC transaction data",
+   "why": "the RPC node returned nothing for a transaction the explorer has; it may not keep old history"
+  },
+  {
+   "needed": "Try again in a few minutes",
+   "retryable": true,
+   "what": "Internal calls",
+   "why": "https://eth.blockscout.com/api/v2/transactions/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396/internal-transactions failed after 3 attempts: ReadTimeout: recorded timeout for GET https://eth.blockscout.com/api/v2/transactions/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396/internal-transactions"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "block": 10000835,
+    "from": "0x9C33eaCc2F50E39940D3AfaF2c7B8246B681A374",
+    "gas_limit": "3049335",
+    "gas_used": "3049335",
+    "status": "success",
+    "timestamp": "2020-05-04T16:34:02.000000Z",
+    "to": null,
+    "tx_type": null,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396"
+    }
+   ],
+   "text": "Transaction succeeded in block 10000835 at 2020-05-04T16:34:02.000000Z. From 0x9C33eaCc2F50E39940D3AfaF2c7B8246B681A374 to (contract creation of 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f (UniswapV2Factory)). Native value sent: 0 ETH. Gas used 3049335 of limit 3049335."
+  },
+  {
+   "data": {
+    "fee": "0.0609867",
+    "parts": {
+     "fee": "0.0609867"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396"
+    }
+   ],
+   "text": "Fee paid: 0.0609867 ETH."
+  },
+  {
+   "data": {
+    "created": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396"
+    }
+   ],
+   "text": "Contract creation: deployed 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f (UniswapV2Factory)."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396"
+}

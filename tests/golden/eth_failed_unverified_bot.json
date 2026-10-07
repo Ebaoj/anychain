@@ -1,0 +1,341 @@
+{
+ "abi_sources": {
+  "0x278d858f05b94576C1E6f73285886876ff6eF8D2": "none"
+ },
+ "gaps": [
+  {
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x278d858f05b94576C1E6f73285886876ff6eF8D2 matches selector 0x70521ae9"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "block": 26141518,
+    "from": "0xd05E8724aD399Bb618497b1bf66a4A24Ab156351",
+    "gas_limit": "600000",
+    "gas_used": "133145",
+    "status": "failed",
+    "timestamp": "2026-10-07T15:51:11.000000Z",
+    "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 26141518 at 2026-10-07T15:51:11.000000Z. From 0xd05E8724aD399Bb618497b1bf66a4A24Ab156351 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2. Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 133145 of limit 600000."
+  },
+  {
+   "data": {
+    "fee": "0.000294067451118215",
+    "parts": {
+     "fee": "0.000294067451118215"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+    }
+   ],
+   "text": "Fee paid: 0.000294067451118215 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "INSUFFICIENT_OUTPUT_AMOUNT"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='INSUFFICIENT_OUTPUT_AMOUNT'."
+  },
+  {
+   "data": {
+    "selector": "0x70521ae9"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+    }
+   ],
+   "text": "Called function with selector 0x70521ae9 on 0x278d858f05b94576C1E6f73285886876ff6eF8D2; not decoded."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "91541598301954665"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 tried to send 0.091541598301954665 ETH but failed; nothing was transferred."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "91541598301954665"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) tried to send 0.091541598301954665 ETH but failed; nothing was transferred."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE (BeamToken) (this internal call failed)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+  },
+  {
+   "data": {
+    "staticcalls": 4
+   },
+   "id": "E16",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
+    }
+   ],
+   "text": "4 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E17",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "failed",
+ "tx_hash": "0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+}

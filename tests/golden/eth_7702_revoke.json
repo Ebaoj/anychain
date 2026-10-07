@@ -1,0 +1,110 @@
+{
+ "abi_sources": {},
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 26141769,
+    "from": "0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4",
+    "gas_limit": "60000",
+    "gas_used": "36800",
+    "status": "success",
+    "timestamp": "2026-10-07T16:41:23.000000Z",
+    "to": "0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4",
+    "tx_type": 4,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+    }
+   ],
+   "text": "Transaction succeeded in block 26141769 at 2026-10-07T16:41:23.000000Z. From 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4 to 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4. Native value sent: 0 ETH. Gas used 36800 of limit 60000."
+  },
+  {
+   "data": {
+    "fee": "0.0001279950935088",
+    "parts": {
+     "fee": "0.0001279950935088"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+    }
+   ],
+   "text": "Fee paid: 0.0001279950935088 ETH."
+  },
+  {
+   "data": {
+    "applied": true,
+    "authority": "0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4",
+    "delegate": "0x0000000000000000000000000000000000000000",
+    "status": "ok",
+    "superseded": false
+   },
+   "id": "E3",
+   "kind": "delegation",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+    }
+   ],
+   "text": "Code delegation cleared by this transaction: 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4 stops running delegated code (EIP-7702)."
+  },
+  {
+   "data": {},
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+    }
+   ],
+   "text": "No call data and no value were sent; the transaction carries 1 EIP-7702 authorization(s), listed as delegation facts."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E5",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
+}

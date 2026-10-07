@@ -1,0 +1,122 @@
+{
+ "abi_sources": {
+  "0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5": "explorer: verified contract RIFToken"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 9305291,
+    "from": "0x1A9bDCd4f23051dD5376484579672675831871a5",
+    "gas_limit": "74680",
+    "gas_used": "22340",
+    "status": "success",
+    "timestamp": "2026-10-07T18:13:22.000000Z",
+    "to": "0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://rootstock.blockscout.com/tx/0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351"
+    }
+   ],
+   "text": "Transaction succeeded in block 9305291 at 2026-10-07T18:13:22.000000Z. From 0x1A9bDCd4f23051dD5376484579672675831871a5 to 0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5 (RIFToken). Native value sent: 0 RBTC. Gas used 22340 of limit 74680."
+  },
+  {
+   "data": {
+    "fee": "0.000000582305504",
+    "parts": {
+     "fee": "0.000000582305504"
+    },
+    "token": "RBTC"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351"
+    }
+   ],
+   "text": "Fee paid: 0.000000582305504 RBTC."
+  },
+  {
+   "data": {
+    "args": {
+     "_to": "0x859e409B84a79bf8B1E6d012Eb6940483C3496de",
+     "_value": "24013533870382100514296"
+    },
+    "function": "transfer"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://rootstock.blockscout.com/api/v2/smart-contracts/0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5"
+    }
+   ],
+   "text": "Called transfer(address,uint256) on 0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5 (RIFToken) with _to=0x859e409B84a79bf8B1E6d012Eb6940483C3496de, _value=24013533870382100514296. ABI source: explorer: verified contract RIFToken."
+  },
+  {
+   "data": {
+    "from": "0x1A9bDCd4f23051dD5376484579672675831871a5",
+    "to": "0x859E409b84a79bf8B1e6d012eB6940483C3496de",
+    "token": "0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 24013.533870382100514296 RIF from 0x1A9bDCd4f23051dD5376484579672675831871a5 to 0x859E409b84a79bf8B1e6d012eB6940483C3496de."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E5",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "rootstock-mainnet",
+ "status": "success",
+ "tx_hash": "0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351"
+}

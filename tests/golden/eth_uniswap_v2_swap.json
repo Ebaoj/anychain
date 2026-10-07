@@ -1,0 +1,293 @@
+{
+ "abi_sources": {
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": "explorer: verified contract UniswapV2Router02",
+  "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3": "explorer: verified contract UniswapV2Pair"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 26141518,
+    "from": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b",
+    "gas_limit": "300000",
+    "gas_used": "131767",
+    "status": "success",
+    "timestamp": "2026-10-07T15:51:11.000000Z",
+    "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "tx_type": 2,
+    "value": "0.2"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"
+    }
+   ],
+   "text": "Transaction succeeded in block 26141518 at 2026-10-07T15:51:11.000000Z. From 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02). Native value sent: 0.2 ETH. Gas used 131767 of limit 300000."
+  },
+  {
+   "data": {
+    "fee": "0.000294808567110131",
+    "parts": {
+     "fee": "0.000294808567110131"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"
+    }
+   ],
+   "text": "Fee paid: 0.000294808567110131 ETH."
+  },
+  {
+   "data": {
+    "args": {
+     "amountOutMin": "0",
+     "deadline": "1791388271",
+     "path": "[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa]",
+     "to": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b"
+    },
+    "function": "swapExactETHForTokensSupportingFeeOnTransferTokens"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "Called swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256) on 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) with amountOutMin=0, path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa], to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b, deadline=1791388271. ABI source: explorer: verified contract UniswapV2Router02."
+  },
+  {
+   "data": {
+    "from": "0x0000000000000000000000000000000000000000",
+    "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.2 WETH from 0x0000000000000000000000000000000000000000 to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02)."
+  },
+  {
+   "data": {
+    "from": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "to": "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3",
+    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+   },
+   "id": "E5",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.2 WETH from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2)."
+  },
+  {
+   "data": {
+    "from": "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3",
+    "to": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b",
+    "token": "0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa"
+   },
+   "id": "E6",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 12118418.517751063 BUNKER from 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2) to 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b."
+  },
+  {
+   "data": {
+    "moves_value": true,
+    "type": "call",
+    "value": "200000000000000000"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/internal-transactions"
+    }
+   ],
+   "text": "Internal ETH transfer of 0.2 ETH from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2) to 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa (Bunker Mode)."
+  },
+  {
+   "data": {
+    "staticcalls": 7
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/internal-transactions"
+    }
+   ],
+   "text": "7 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "data": {
+    "args": {
+     "reserve0": "8492451845051793135",
+     "reserve1": "503968916733373231"
+    },
+    "event": "Sync"
+   },
+   "id": "E12",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/logs"
+    }
+   ],
+   "text": "Event Sync(uint112,uint112) emitted by 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2): reserve0=8492451845051793135, reserve1=503968916733373231."
+  },
+  {
+   "data": {
+    "args": {
+     "amount0In": "200000000000000000",
+     "amount0Out": "0",
+     "amount1In": "0",
+     "amount1Out": "12118418517751063",
+     "sender": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+     "to": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b"
+    },
+    "event": "Swap"
+   },
+   "id": "E13",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a/logs"
+    }
+   ],
+   "text": "Event Swap(address,uint256,uint256,uint256,uint256,address) emitted by 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2): sender=0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, amount0In=200000000000000000, amount1In=0, amount0Out=0, amount1Out=12118418517751063, to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E14",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"
+}

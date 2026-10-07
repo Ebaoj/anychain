@@ -1,0 +1,451 @@
+{
+ "abi_sources": {
+  "0x1a810e0B6c2dd5629AFa2f0c898b9512C6F78846": "explorer: verified contract UniswapV3Pool",
+  "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e": "explorer: verified contract TransparentUpgradeableProxy proxy -> TetherTokenCeloExtension",
+  "0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff": "explorer: verified contract TransparentUpgradeableProxy proxy -> CeloOFTExtension",
+  "0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9": "explorer: verified contract UniswapV3Pool",
+  "0xce16F69375520ab01377ce7B88f5BA8C48F8D666": "explorer: verified contract SquidRouterProxy proxy -> SquidRouter"
+ },
+ "gaps": [
+  {
+   "needed": "The token's decimals (its contract or the explorer's token page)",
+   "retryable": false,
+   "what": "Fee",
+   "why": "the explorer does not report the decimals of the fee token 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B, so the fee is shown in raw units"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "block": 79498199,
+    "from": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "gas_limit": "840300",
+    "gas_used": "416777",
+    "status": "success",
+    "timestamp": "2026-10-07T18:49:17.000000Z",
+    "to": "0xce16F69375520ab01377ce7B88f5BA8C48F8D666",
+    "tx_type": 123,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://celo.blockscout.com/tx/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
+    }
+   ],
+   "text": "Transaction succeeded in block 79498199 at 2026-10-07T18:49:17.000000Z. From 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6 to 0xce16F69375520ab01377ce7B88f5BA8C48F8D666 (SquidRouterProxy). Native value sent: 0 CELO. Gas used 416777 of limit 840300."
+  },
+  {
+   "data": {
+    "fee": "7822697203928125",
+    "parts": {
+     "fee": "7822697203928125"
+    },
+    "token": "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
+    }
+   ],
+   "text": "Fee paid: 7822697203928125 raw units of 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B; paid in 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B, a Celo fee currency, instead of the native currency."
+  },
+  {
+   "data": {
+    "args": {
+     "amount": "29",
+     "calls": "[(0, 0xaf37e8b6c9ed7f6318979f56fc287d76c30847ff, 0, 0x095ea7b30000000000000000000000005615cdab10dc425a742d643d949a7f474c01abc4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 0x000000000000000000000000af37e8b6c9ed7f6318979f56fc287d76c30847ff0000000000000000000000000000000000000000000000000000000000000001), (0, 0x5615cdab10dc425a742d643d949a7f474c01abc4, 0, 0x04e45aaf000000000000000000000000af37e8b6c9ed7f6318979f56fc287d76c30847ff00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000bb8000000000000000000000000ad6cea45f98444a922a2b4fe96b8c90f0862d2f4000000000000000000000000000000000000000000000000000000000000001d000000000000000000000000000000000000000000000000000000000001c01a0000000000000000000000000000000000000000000000000000000000000000, 0x000000000000000000000000af37e8b6c9ed7f6318979f56fc287d76c30847ff0000000000000000000000000000000000000000000000000000000000000004), (0, 0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e, 0, 0xa9059cbb00000000000000000000000096ce844a64a0fa4b19b44a6a1b9aa1aa78b662ee000000000000000000000000000000000000000000000000000000000000023f, 0x00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000001), (0, 0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e, 0, 0x095ea7b30000000000000000000000005615cdab10dc425a742d643d949a7f474c01abc4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 0x00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000001), (1, 0x5615cdab10dc425a742d643d949a7f474c01abc4, 0, 0x04e45aaf00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e000000000000000000000000ceba9300f2b948710d2653dd7b07f33a8b32118c0000000000000000000000000000000000000000000000000000000000000064000000000000000000000000fcbf70a6ed5e856bb388ceb622514c80726efbb6000000000000000000000000000000000000000000000000000000000001bf35000000000000000000000000000000000000000000000000000000000001bce80000000000000000000000000000000000000000000000000000000000000000, 0x00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000004)]",
+     "token": "0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff"
+    },
+    "function": "fundAndRunMulticall"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://celo.blockscout.com/api/v2/smart-contracts/0xce16F69375520ab01377ce7B88f5BA8C48F8D666"
+    }
+   ],
+   "text": "Called fundAndRunMulticall(address,uint256,(uint8,address,uint256,bytes,bytes)[]) on 0xce16F69375520ab01377ce7B88f5BA8C48F8D666 (SquidRouterProxy) with token=0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff, amount=29, calls=[(0, 0xaf37e8b6c9ed7f6318979f56fc287d76c30847ff, 0, 0x095ea7b30000000000000000000000005615cdab10dc425a742d643d949a7f474c01abc4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 0x000000000000000000000000af37e8b6c9ed7f6318979f56fc287d76c30847ff0000000000000000000000000000000000000000000000000000000000000001), (0, 0x5615cdab10dc425a742d643d949a7f474c01abc4, 0, 0x04e45aaf000000000000000000000000af37e8b6c9ed7f6318979f56fc287d76c30847ff00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000bb8000000000000000000000000ad6cea45f98444a922a2b4fe96b8c90f0862d2f4000000000000000000000000000000000000000000000000000000000000001d000000000000000000000000000000000000000000000000000000000001c01a0000000000000000000000000000000000000000000000000000000000000000, 0x000000000000000000000000af37e8b6c9ed7f6318979f56fc287d76c30847ff0000000000000000000000000000000000000000000000000000000000000004), (0, 0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e, 0, 0xa9059cbb00000000000000000000000096ce844a64a0fa4b19b44a6a1b9aa1aa78b662ee000000000000000000000000000000000000000000000000000000000000023f, 0x00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000001), (0, 0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e, 0, 0x095ea7b30000000000000000000000005615cdab10dc425a742d643d949a7f474c01abc4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 0x00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000001), (1, 0x5615cdab10dc425a742d643d949a7f474c01abc4, 0, 0x04e45aaf00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e000000000000000000000000ceba9300f2b948710d2653dd7b07f33a8b32118c0000000000000000000000000000000000000000000000000000000000000064000000000000000000000000fcbf70a6ed5e856bb388ceb622514c80726efbb6000000000000000000000000000000000000000000000000000000000001bf35000000000000000000000000000000000000000000000000000000000001bce80000000000000000000000000000000000000000000000000000000000000000, 0x00000000000000000000000048065fbbe25f71c9282ddf5e1cd6d6a887483d5e0000000000000000000000000000000000000000000000000000000000000004)]. ABI source: explorer: verified contract SquidRouterProxy proxy -> SquidRouter."
+  },
+  {
+   "data": {
+    "from": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "to": "0x0000000000000000000000000000000000000000",
+    "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.015772 USDC from 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6 to 0x0000000000000000000000000000000000000000."
+  },
+  {
+   "data": {
+    "from": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "to": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+    "token": "0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff"
+   },
+   "id": "E5",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.000029 XAUt0 from 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6 to 0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4 (SquidMulticall)."
+  },
+  {
+   "data": {
+    "from": "0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9",
+    "to": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+    "token": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+   },
+   "id": "E6",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.11506 USDT from 0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9 (UniswapV3Pool) to 0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4 (SquidMulticall)."
+  },
+  {
+   "data": {
+    "from": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+    "to": "0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9",
+    "token": "0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff"
+   },
+   "id": "E7",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.000029 XAUt0 from 0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4 (SquidMulticall) to 0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9 (UniswapV3Pool)."
+  },
+  {
+   "data": {
+    "from": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+    "to": "0x96CE844A64A0FA4B19B44a6a1b9AA1AA78B662Ee",
+    "token": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+   },
+   "id": "E8",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.000575 USDT from 0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4 (SquidMulticall) to 0x96CE844A64A0FA4B19B44a6a1b9AA1AA78B662Ee."
+  },
+  {
+   "data": {
+    "from": "0x1a810e0B6c2dd5629AFa2f0c898b9512C6F78846",
+    "to": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C"
+   },
+   "id": "E9",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.114446 USDC from 0x1a810e0B6c2dd5629AFa2f0c898b9512C6F78846 (UniswapV3Pool) to 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6."
+  },
+  {
+   "data": {
+    "from": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+    "to": "0x1a810e0B6c2dd5629AFa2f0c898b9512C6F78846",
+    "token": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+   },
+   "id": "E10",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.114485 USDT from 0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4 (SquidMulticall) to 0x1a810e0B6c2dd5629AFa2f0c898b9512C6F78846 (UniswapV3Pool)."
+  },
+  {
+   "data": {
+    "from": "0x0000000000000000000000000000000000000000",
+    "to": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C"
+   },
+   "id": "E11",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.015772 USDC from 0x0000000000000000000000000000000000000000 to 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6."
+  },
+  {
+   "data": {
+    "from": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "to": "0x4200000000000000000000000000000000000011",
+    "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C"
+   },
+   "id": "E12",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0 USDC from 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6 to 0x4200000000000000000000000000000000000011 (Proxy)."
+  },
+  {
+   "data": {
+    "from": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+    "to": "0xcD437749E43A154C07F3553504c68fBfD56B8778",
+    "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C"
+   },
+   "id": "E13",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.007823 USDC from 0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6 to 0xcD437749E43A154C07F3553504c68fBfD56B8778 (FeeHandlerProxy)."
+  },
+  {
+   "data": {
+    "args": {
+     "owner": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+     "spender": "0xce16F69375520ab01377ce7B88f5BA8C48F8D666",
+     "value": "115792089237316195423570985008687907853269984665640564039457584007913129479261"
+    },
+    "event": "Approval"
+   },
+   "id": "E14",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff (TransparentUpgradeableProxy): owner=0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6, spender=0xce16F69375520ab01377ce7B88f5BA8C48F8D666, value=115792089237316195423570985008687907853269984665640564039457584007913129479261."
+  },
+  {
+   "data": {
+    "args": {
+     "owner": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+     "spender": "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+     "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+    },
+    "event": "Approval"
+   },
+   "id": "E15",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff (TransparentUpgradeableProxy): owner=0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4, spender=0x5615CDAb10dc425a742d643d949a7F474C01abc4, value=115792089237316195423570985008687907853269984665640564039457584007913129639935."
+  },
+  {
+   "data": {
+    "args": {
+     "owner": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+     "spender": "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+     "value": "115792089237316195423570985008687907853269984665640564039457584007913129639906"
+    },
+    "event": "Approval"
+   },
+   "id": "E16",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff (TransparentUpgradeableProxy): owner=0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4, spender=0x5615CDAb10dc425a742d643d949a7F474C01abc4, value=115792089237316195423570985008687907853269984665640564039457584007913129639906."
+  },
+  {
+   "data": {
+    "args": {
+     "amount0": "-115060",
+     "amount1": "29",
+     "liquidity": "31647460895",
+     "recipient": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+     "sender": "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+     "sqrtPriceX96": "1235935357464236847082373116",
+     "tick": "-83215"
+    },
+    "event": "Swap"
+   },
+   "id": "E17",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Swap(address,address,int256,int256,uint160,uint128,int24) emitted by 0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9 (UniswapV3Pool): sender=0x5615CDAb10dc425a742d643d949a7F474C01abc4, recipient=0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4, amount0=-115060, amount1=29, sqrtPriceX96=1235935357464236847082373116, liquidity=31647460895, tick=-83215."
+  },
+  {
+   "data": {
+    "args": {
+     "owner": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+     "spender": "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+     "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+    },
+    "event": "Approval"
+   },
+   "id": "E18",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD): owner=0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4, spender=0x5615CDAb10dc425a742d643d949a7F474C01abc4, value=115792089237316195423570985008687907853269984665640564039457584007913129639935."
+  },
+  {
+   "data": {
+    "args": {
+     "owner": "0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4",
+     "spender": "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+     "value": "115792089237316195423570985008687907853269984665640564039457584007913129525450"
+    },
+    "event": "Approval"
+   },
+   "id": "E19",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD): owner=0xaD6Cea45f98444a922a2b4fE96b8C90F0862D2F4, spender=0x5615CDAb10dc425a742d643d949a7F474C01abc4, value=115792089237316195423570985008687907853269984665640564039457584007913129525450."
+  },
+  {
+   "data": {
+    "args": {
+     "amount0": "114485",
+     "amount1": "-114446",
+     "liquidity": "327676200376361",
+     "recipient": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
+     "sender": "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+     "sqrtPriceX96": "79218985667862465784559577886",
+     "tick": "-3"
+    },
+    "event": "Swap"
+   },
+   "id": "E20",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d/logs"
+    }
+   ],
+   "text": "Event Swap(address,address,int256,int256,uint160,uint128,int24) emitted by 0x1a810e0B6c2dd5629AFa2f0c898b9512C6F78846 (UniswapV3Pool): sender=0x5615CDAb10dc425a742d643d949a7F474C01abc4, recipient=0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6, amount0=114485, amount1=-114446, sqrtPriceX96=79218985667862465784559577886, liquidity=327676200376361, tick=-3."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E21",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "celo-mainnet",
+ "status": "success",
+ "tx_hash": "0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
+}

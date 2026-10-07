@@ -1,0 +1,135 @@
+{
+ "abi_sources": {
+  "0x4200000000000000000000000000000000000015": "explorer: verified contract Proxy proxy -> L1Block"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 157899597,
+    "from": "0xDeaDDEaDDeAdDeAdDEAdDEaddeAddEAdDEAd0001",
+    "gas_limit": "1000000",
+    "gas_used": "46242",
+    "status": "success",
+    "timestamp": "2026-10-07T18:32:51.000000Z",
+    "to": "0x4200000000000000000000000000000000000015",
+    "tx_type": 126,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://explorer.optimism.io/tx/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
+    }
+   ],
+   "text": "Transaction succeeded in block 157899597 at 2026-10-07T18:32:51.000000Z. From 0xDeaDDEaDDeAdDeAdDEAdDEaddeAddEAdDEAd0001 (OP Stack depositor system account (sequencer, not a user)) to 0x4200000000000000000000000000000000000015 (Proxy). Native value sent: 0 ETH. Gas used 46242 of limit 1000000."
+  },
+  {
+   "data": {
+    "fee": "0",
+    "parts": {
+     "fee": "0"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
+    }
+   ],
+   "text": "Fee paid: 0 ETH."
+  },
+  {
+   "data": {
+    "deposit_type": true
+   },
+   "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
+    }
+   ],
+   "text": "Deposit-type transaction (OP Stack type 126): not signed by an L2 account. It is either a deposit from L1 or a system transaction the sequencer adds to every block (such as the L1 attributes update)."
+  },
+  {
+   "data": {
+    "args": {},
+    "function": "setL1BlockValuesJovian"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x4200000000000000000000000000000000000015"
+    }
+   ],
+   "text": "Called setL1BlockValuesJovian() on 0x4200000000000000000000000000000000000015 (Proxy) with . ABI source: explorer: verified contract Proxy proxy -> L1Block."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x4200000000000000000000000000000000000015 (Proxy) to 0x6a97C5D55A21265326150Efe12FC30Fb21cbff56 (L1Block)."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E6",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.optimism.io"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "optimism-mainnet",
+ "status": "success",
+ "tx_hash": "0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
+}

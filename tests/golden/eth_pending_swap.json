@@ -1,0 +1,42 @@
+{
+ "abi_sources": {},
+ "gaps": [
+  {
+   "needed": "Wait for it to be mined, then ask again",
+   "retryable": true,
+   "what": "Final outcome",
+   "why": "the transaction is still pending"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "from": "0xab01a33D49465342b94D2B9388699C1419a7E68B",
+    "status": "pending",
+    "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "tx_type": 0,
+    "value": "0.01037827"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x44551be6bbd24fba2308724bebe6f10daf952d3b6d249603a56b16a719bc78d0"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x44551be6bbd24fba2308724bebe6f10daf952d3b6d249603a56b16a719bc78d0"
+    }
+   ],
+   "text": "Transaction is pending: not yet included in a block. From 0xab01a33D49465342b94D2B9388699C1419a7E68B to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02). Native value offered: 0.01037827 ETH. Nothing is final until it is mined."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "pending",
+ "tx_hash": "0x44551be6bbd24fba2308724bebe6f10daf952d3b6d249603a56b16a719bc78d0"
+}

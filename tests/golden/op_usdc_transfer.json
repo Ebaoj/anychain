@@ -1,0 +1,141 @@
+{
+ "abi_sources": {
+  "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85": "explorer: verified contract FiatTokenProxy proxy -> FiatTokenV2_2"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 157894754,
+    "from": "0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a",
+    "gas_limit": "94433",
+    "gas_used": "57371",
+    "status": "success",
+    "timestamp": "2026-10-07T15:51:25.000000Z",
+    "to": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://explorer.optimism.io/tx/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921"
+    }
+   ],
+   "text": "Transaction succeeded in block 157894754 at 2026-10-07T15:51:25.000000Z. From 0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a to 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85 (USD Coin). Native value sent: 0 ETH. Gas used 57371 of limit 94433."
+  },
+  {
+   "data": {
+    "fee": "0.000000026584116078",
+    "parts": {
+     "L1 data": "0.00000002637941635",
+     "L2 execution": "0.000000000204699728"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921"
+    }
+   ],
+   "text": "Fee paid: 0.000000026584116078 ETH in total: 0.000000000204699728 ETH L2 execution + 0.00000002637941635 ETH L1 data."
+  },
+  {
+   "data": {
+    "args": {
+     "to": "0xe0F95c9180a137C826478cD4827CC53bAB8a6C89",
+     "value": "199820981"
+    },
+    "function": "transfer"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+    }
+   ],
+   "text": "Called transfer(address,uint256) on 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85 (USD Coin) with to=0xe0F95c9180a137C826478cD4827CC53bAB8a6C89, value=199820981. ABI source: explorer: verified contract FiatTokenProxy proxy -> FiatTokenV2_2."
+  },
+  {
+   "data": {
+    "from": "0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a",
+    "to": "0xe0F95c9180a137C826478cD4827CC53bAB8a6C89",
+    "token": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 199.820981 USDC from 0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a to 0xe0F95c9180a137C826478cD4827CC53bAB8a6C89."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85 (USD Coin) to 0xdEd3b9a8DBeDC2F9CB725B55d0E686A81E6d06dC (FiatTokenV2_2)."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E6",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.optimism.io"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "optimism-mainnet",
+ "status": "success",
+ "tx_hash": "0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921"
+}

@@ -1,0 +1,221 @@
+{
+ "abi_sources": {
+  "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67": "explorer: verified contract SafeProxyFactory",
+  "0x9542f2eC81233818a18346cA2D1E673aA7db7E12": "explorer: verified contract SafeProxy proxy -> Safe"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 26141676,
+    "from": "0xe51b42777c480a7F95F4f21699C5821779BBe2Ac",
+    "gas_limit": "322124",
+    "gas_used": "314791",
+    "status": "success",
+    "timestamp": "2026-10-07T16:22:47.000000Z",
+    "to": "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc"
+    }
+   ],
+   "text": "Transaction succeeded in block 26141676 at 2026-10-07T16:22:47.000000Z. From 0xe51b42777c480a7F95F4f21699C5821779BBe2Ac to 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67 (SafeProxyFactory). Native value sent: 0 ETH. Gas used 314791 of limit 322124."
+  },
+  {
+   "data": {
+    "fee": "0.0013432143302476",
+    "parts": {
+     "fee": "0.0013432143302476"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc"
+    }
+   ],
+   "text": "Fee paid: 0.0013432143302476 ETH."
+  },
+  {
+   "data": {
+    "args": {
+     "_singleton": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+     "initializer": "0xb63e800d00000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000bd89a1ce4dde368ffab0ec35506eece0b1ffdc540000000000000000000000000000000000000000000000000000000000000180000000000000000000000000fd0732dc9e303f09fcef3a7388ad10a83459ec99000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005afe7a11e70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000c2c848593dc4d98a3c1c0bb4861610f880f72b6d000000000000000000000000b6bd12fb1935566540d00ecac5646ca3d21fab7a000000000000000000000000181c917bbac62914458f86a6c1cd6681d5a4bb210000000000000000000000000000000000000000000000000000000000000024fe51f64300000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c76200000000000000000000000000000000000000000000000000000000",
+     "saltNonce": "0"
+    },
+    "function": "createProxyWithNonce"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67"
+    }
+   ],
+   "text": "Called createProxyWithNonce(address,bytes,uint256) on 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67 (SafeProxyFactory) with _singleton=0x41675C099F32341bf84BFc5382aF534df5C7461a, initializer=0xb63e800d00000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000bd89a1ce4dde368ffab0ec35506eece0b1ffdc540000000000000000000000000000000000000000000000000000000000000180000000000000000000000000fd0732dc9e303f09fcef3a7388ad10a83459ec99000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005afe7a11e70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000c2c848593dc4d98a3c1c0bb4861610f880f72b6d000000000000000000000000b6bd12fb1935566540d00ecac5646ca3d21fab7a000000000000000000000000181c917bbac62914458f86a6c1cd6681d5a4bb210000000000000000000000000000000000000000000000000000000000000024fe51f64300000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c76200000000000000000000000000000000000000000000000000000000, saltNonce=0. ABI source: explorer: verified contract SafeProxyFactory."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "create",
+    "value": "0"
+   },
+   "id": "E4",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc/internal-transactions"
+    }
+   ],
+   "text": "Internal create by 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67 (SafeProxyFactory): deployed 0x9542f2eC81233818a18346cA2D1E673aA7db7E12."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67 (SafeProxyFactory) to 0x9542f2eC81233818a18346cA2D1E673aA7db7E12."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x9542f2eC81233818a18346cA2D1E673aA7db7E12 to 0x41675C099F32341bf84BFc5382aF534df5C7461a (Safe)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x9542f2eC81233818a18346cA2D1E673aA7db7E12 to 0xBD89A1CE4DDe368FFAB0eC35506eEcE0b1fFdc54 (SafeToL2Setup)."
+  },
+  {
+   "data": {
+    "args": {
+     "fallbackHandler": "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99",
+     "initializer": "0xBD89A1CE4DDe368FFAB0eC35506eEcE0b1fFdc54",
+     "initiator": "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67",
+     "owners": "[0xc2c848593dc4D98A3c1c0BB4861610F880f72B6D, 0xb6bD12fb1935566540D00EcAc5646Ca3D21FAB7a, 0x181c917BbAC62914458F86a6c1cD6681d5a4bB21]",
+     "threshold": "2"
+    },
+    "event": "SafeSetup"
+   },
+   "id": "E8",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc/logs"
+    }
+   ],
+   "text": "Event SafeSetup(address,address[],uint256,address,address) emitted by 0x9542f2eC81233818a18346cA2D1E673aA7db7E12: initiator=0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67, owners=[0xc2c848593dc4D98A3c1c0BB4861610F880f72B6D, 0xb6bD12fb1935566540D00EcAc5646Ca3D21FAB7a, 0x181c917BbAC62914458F86a6c1cD6681d5a4bB21], threshold=2, initializer=0xBD89A1CE4DDe368FFAB0eC35506eEcE0b1fFdc54, fallbackHandler=0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99."
+  },
+  {
+   "data": {
+    "args": {
+     "proxy": "0x9542f2eC81233818a18346cA2D1E673aA7db7E12",
+     "singleton": "0x41675C099F32341bf84BFc5382aF534df5C7461a"
+    },
+    "event": "ProxyCreation"
+   },
+   "id": "E9",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc/logs"
+    }
+   ],
+   "text": "Event ProxyCreation(address,address) emitted by 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67 (SafeProxyFactory): proxy=0x9542f2eC81233818a18346cA2D1E673aA7db7E12, singleton=0x41675C099F32341bf84BFc5382aF534df5C7461a."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E10",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x31c661a8df887c34b19812ba41074a62644cb4ed498c7b7821ae435000175ebc"
+}

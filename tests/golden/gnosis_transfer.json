@@ -1,0 +1,144 @@
+{
+ "abi_sources": {
+  "0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd": "explorer: verified contract PBNJ"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 48638982,
+    "from": "0x7F782E0198D43e9192D134451Cff1caD849575C3",
+    "gas_limit": "100000",
+    "gas_used": "42119",
+    "status": "success",
+    "timestamp": "2026-10-07T18:17:25.000000Z",
+    "to": "0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://gnosisscan.io/tx/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b"
+    }
+   ],
+   "text": "Transaction succeeded in block 48638982 at 2026-10-07T18:17:25.000000Z. From 0x7F782E0198D43e9192D134451Cff1caD849575C3 to 0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd (PBNJ). Native value sent: 0 XDAI. Gas used 42119 of limit 100000."
+  },
+  {
+   "data": {
+    "fee": "0.000000000000505428",
+    "parts": {
+     "fee": "0.000000000000505428"
+    },
+    "token": "XDAI"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b"
+    }
+   ],
+   "text": "Fee paid: 0.000000000000505428 XDAI."
+  },
+  {
+   "data": {
+    "args": {
+     "amount": "1",
+     "recipient": "0x7F782E0198D43e9192D134451Cff1caD849575C3",
+     "sender": "0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312"
+    },
+    "function": "transferFrom"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://gnosisscan.io/api/v2/smart-contracts/0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd"
+    }
+   ],
+   "text": "Called transferFrom(address,address,uint256) on 0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd (PBNJ) with sender=0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312, recipient=0x7F782E0198D43e9192D134451Cff1caD849575C3, amount=1. ABI source: explorer: verified contract PBNJ."
+  },
+  {
+   "data": {
+    "from": "0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312",
+    "to": "0x7F782E0198D43e9192D134451Cff1caD849575C3",
+    "token": "0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.000000000000000001 PBNJ from 0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312 to 0x7F782E0198D43e9192D134451Cff1caD849575C3."
+  },
+  {
+   "data": {
+    "args": {
+     "owner": "0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312",
+     "spender": "0x7F782E0198D43e9192D134451Cff1caD849575C3",
+     "value": "99999999999999999999999999"
+    },
+    "event": "Approval"
+   },
+   "id": "E5",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd (PBNJ): owner=0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312, spender=0x7F782E0198D43e9192D134451Cff1caD849575C3, value=99999999999999999999999999."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E6",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://rpc.gnosischain.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "gnosis-mainnet",
+ "status": "success",
+ "tx_hash": "0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b"
+}

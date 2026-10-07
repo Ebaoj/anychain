@@ -1,0 +1,92 @@
+{
+ "abi_sources": {},
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 9305355,
+    "from": "0x0000000000000000000000000000000000000000",
+    "gas_limit": "0",
+    "gas_used": "0",
+    "status": "success",
+    "timestamp": "2026-10-07T18:48:07.000000Z",
+    "to": "0x0000000000000000000000000000000001000008",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://rootstock.blockscout.com/tx/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
+    }
+   ],
+   "text": "Transaction succeeded in block 9305355 at 2026-10-07T18:48:07.000000Z. From 0x0000000000000000000000000000000000000000 to 0x0000000000000000000000000000000001000008 (Rootstock REMASC native contract (block rewards)). Native value sent: 0 RBTC. Gas used 0 of limit 0."
+  },
+  {
+   "data": {
+    "fee": "0",
+    "parts": {
+     "fee": "0"
+    },
+    "token": "RBTC"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
+    }
+   ],
+   "text": "Fee paid: 0 RBTC."
+  },
+  {
+   "data": {
+    "system": true
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
+    }
+   ],
+   "text": "System transaction: sent from the zero address, which no one can sign for, to 0x0000000000000000000000000000000001000008 (Rootstock REMASC native contract (block rewards)). It carries no call data."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E4",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "rootstock-mainnet",
+ "status": "success",
+ "tx_hash": "0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
+}

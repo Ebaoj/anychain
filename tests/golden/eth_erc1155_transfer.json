@@ -1,0 +1,141 @@
+{
+ "abi_sources": {
+  "0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8": "explorer: verified contract Trinkets"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 26141646,
+    "from": "0xff7a3205aE437d5F2232D14Ab3ec4F42FA7EF7AF",
+    "gas_limit": "72052",
+    "gas_used": "71187",
+    "status": "success",
+    "timestamp": "2026-10-07T16:16:47.000000Z",
+    "to": "0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
+    }
+   ],
+   "text": "Transaction succeeded in block 26141646 at 2026-10-07T16:16:47.000000Z. From 0xff7a3205aE437d5F2232D14Ab3ec4F42FA7EF7AF to 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 (Trinkets). Native value sent: 0 ETH. Gas used 71187 of limit 72052."
+  },
+  {
+   "data": {
+    "fee": "0.000359131625468688",
+    "parts": {
+     "fee": "0.000359131625468688"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
+    }
+   ],
+   "text": "Fee paid: 0.000359131625468688 ETH."
+  },
+  {
+   "data": {
+    "args": {
+     "amount": "1",
+     "id": "16",
+     "recipients": "[0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF]"
+    },
+    "function": "airdrop"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8"
+    }
+   ],
+   "text": "Called airdrop(address[],uint256,uint256) on 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 (Trinkets) with recipients=[0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF], id=16, amount=1. ABI source: explorer: verified contract Trinkets."
+  },
+  {
+   "data": {
+    "from": "0x0000000000000000000000000000000000000000",
+    "to": "0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF",
+    "token": "0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8"
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 1 x 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 token #16 from 0x0000000000000000000000000000000000000000 to 0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 (Trinkets) to 0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E6",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
+}

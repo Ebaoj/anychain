@@ -1,0 +1,166 @@
+{
+ "abi_sources": {
+  "0x4200000000000000000000000000000000000016": "explorer: verified contract Proxy proxy -> L2ToL1MessagePasser"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 156921942,
+    "from": "0x4ceA68bfa2fAC3e11eB05680894D9F13ab99eCD0",
+    "gas_limit": "78005",
+    "gas_used": "59186",
+    "status": "success",
+    "timestamp": "2026-09-15T03:24:21.000000Z",
+    "to": "0x4200000000000000000000000000000000000016",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://explorer.optimism.io/tx/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217"
+    }
+   ],
+   "text": "Transaction succeeded in block 156921942 at 2026-09-15T03:24:21.000000Z. From 0x4ceA68bfa2fAC3e11eB05680894D9F13ab99eCD0 to 0x4200000000000000000000000000000000000016 (Proxy). Native value sent: 0 ETH. Gas used 59186 of limit 78005."
+  },
+  {
+   "data": {
+    "fee": "0.000000001246395165",
+    "parts": {
+     "L1 data": "0.000000001160930581",
+     "L2 execution": "0.000000000085464584"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217"
+    }
+   ],
+   "text": "Fee paid: 0.000000001246395165 ETH in total: 0.000000000085464584 ETH L2 execution + 0.000000001160930581 ETH L1 data."
+  },
+  {
+   "data": {
+    "l1_transaction_hash": null,
+    "withdrawal_status": "Ready to prove"
+   },
+   "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217"
+    }
+   ],
+   "text": "Started a withdrawal to L1 (nonce 34593): the explorer reports status 'Ready to prove'."
+  },
+  {
+   "data": {
+    "args": {
+     "_data": "0x",
+     "_gasLimit": "200000",
+     "_target": "0x76aDf26D920204868BA9a4EA1944Ea4fF9D0D255"
+    },
+    "function": "initiateWithdrawal"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x4200000000000000000000000000000000000016"
+    }
+   ],
+   "text": "Called initiateWithdrawal(address,uint256,bytes) on 0x4200000000000000000000000000000000000016 (Proxy) with _target=0x76aDf26D920204868BA9a4EA1944Ea4fF9D0D255, _gasLimit=200000, _data=0x. ABI source: explorer: verified contract Proxy proxy -> L2ToL1MessagePasser."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x4200000000000000000000000000000000000016 (Proxy) to 0x27E51B2254433A3284D9ba73Ea551C397DB2a124 (L2ToL1MessagePasser)."
+  },
+  {
+   "data": {
+    "args": {
+     "data": "0x",
+     "gasLimit": "200000",
+     "nonce": "1766847064778384329583297500742918515827483896875618958121606201292654369",
+     "sender": "0x4ceA68bfa2fAC3e11eB05680894D9F13ab99eCD0",
+     "target": "0x76aDf26D920204868BA9a4EA1944Ea4fF9D0D255",
+     "value": "0",
+     "withdrawalHash": "0xeea7462b1f371fd7ec7a763ddd075c02db1239d7814e4d0765699a79781a4513"
+    },
+    "event": "MessagePassed"
+   },
+   "id": "E6",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217/logs"
+    }
+   ],
+   "text": "Event MessagePassed(uint256,address,address,uint256,uint256,bytes,bytes32) emitted by 0x4200000000000000000000000000000000000016 (Proxy): nonce=1766847064778384329583297500742918515827483896875618958121606201292654369, sender=0x4ceA68bfa2fAC3e11eB05680894D9F13ab99eCD0, target=0x76aDf26D920204868BA9a4EA1944Ea4fF9D0D255, value=0, gasLimit=200000, data=0x, withdrawalHash=0xeea7462b1f371fd7ec7a763ddd075c02db1239d7814e4d0765699a79781a4513."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E7",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.optimism.io"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "optimism-mainnet",
+ "status": "success",
+ "tx_hash": "0x300df618a29d14ade1e644d22f8ac134bcbe99ac64e0aa2ca2db3309522f8217"
+}
