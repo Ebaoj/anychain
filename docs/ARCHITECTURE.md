@@ -21,7 +21,7 @@ One rule shapes everything: facts are collected **without any AI**, numbered, an
 flowchart TD
     IN["Input<br/>tx hash + mode + question"] --> CFG
 
-    CFG["Config (YAML)<br/>explorer, RPC, repos, LLM model<br/>one file per network"]
+    CFG["Config (YAML)<br/>explorer, RPC, repos, LLM model,<br/>chain_type, address labels<br/>one file per network"]
 
     CFG --> COL
     subgraph COL["1. Collectors"]
@@ -31,6 +31,8 @@ flowchart TD
     end
 
     COL --> DEC["2. Decoder<br/>calldata, events, anonymous events<br/>ABI from explorer"]
+    DEC --> PRO["Chain-type profile<br/>default, ethereum, optimism,<br/>optimism-celo, rsk, zksync<br/>fees, L1 status, deposits"]
+    PRO --> BUN
     DEC --> CAS["ABI cascade<br/>repo artifacts, source signatures,<br/>4byte, raw"]
     DEC --> DIAG["3. Diagnostics<br/>only if failed: revert reason,<br/>eth_call state reads, rules"]
     DEC --> BUN
@@ -52,7 +54,7 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,BUN,WRI,REN,OUT,CLI done
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI done
     class REPO,CAS,DIAG,VAL next
     class API,DB later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
@@ -119,6 +121,7 @@ flowchart LR
 
     subgraph core["Core"]
         config["config.py<br/>load + validate YAML"]
+        chains["chains.py<br/>one profile per chain type"]
         bundle["bundle.py<br/>builds the evidence"]
         decoder["decoder.py<br/>ABI decoding"]
         models["models.py<br/>Evidence, Gap, Bundle"]
@@ -145,6 +148,7 @@ flowchart LR
     bundle --> rpc
     bundle --> decoder
     bundle --> models
+    bundle --> chains
     explorer --> http
     rpc --> http
     writer --> prompts
@@ -180,4 +184,5 @@ flowchart TD
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-07, chain-type profiles (D20):** config names the Blockscout CHAIN_TYPE; profiles for six network types; address labels in config.
 - **2026-10-07, phase 1 review rounds:** EIP-7702 delegates as an ABI source; accounts without code today are never asserted codeless (D18).

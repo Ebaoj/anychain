@@ -21,7 +21,7 @@ Uma regra molda tudo: os fatos são coletados **sem nenhuma IA**, numerados e ac
 flowchart TD
     IN["Entrada<br/>hash da transação + modo + pergunta"] --> CFG
 
-    CFG["Configuração (YAML)<br/>explorador, nó RPC, repositórios, modelo de IA<br/>um arquivo por rede"]
+    CFG["Configuração (YAML)<br/>explorador, nó RPC, repositórios, modelo de IA,<br/>tipo de rede, rótulos de endereços<br/>um arquivo por rede"]
 
     CFG --> COL
     subgraph COL["1. Coletores"]
@@ -31,6 +31,8 @@ flowchart TD
     end
 
     COL --> DEC["2. Decodificador<br/>chamadas, eventos, eventos anônimos<br/>ABI do explorador, delegações EIP-7702"]
+    DEC --> PRO["Perfil do tipo de rede<br/>default, ethereum, optimism,<br/>optimism-celo, rsk, zksync<br/>taxas, estado na L1, depósitos"]
+    PRO --> BUN
     DEC --> CAS["Cascata de ABI<br/>artefatos do repo, assinaturas do código,<br/>4byte, dado cru"]
     DEC --> DIAG["3. Diagnóstico<br/>só se falhou: motivo do revert,<br/>leituras eth_call, regras"]
     DEC --> BUN
@@ -52,7 +54,7 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,BUN,WRI,REN,OUT,CLI done
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI done
     class REPO,CAS,DIAG,VAL next
     class API,DB later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
@@ -119,6 +121,7 @@ flowchart LR
 
     subgraph core["Núcleo"]
         config["config.py<br/>carrega e valida o YAML"]
+        chains["chains.py<br/>um perfil por tipo de rede"]
         bundle["bundle.py<br/>monta as evidências"]
         decoder["decoder.py<br/>decodificação pela ABI"]
         models["models.py<br/>Evidência, Lacuna, Pacote"]
@@ -145,6 +148,7 @@ flowchart LR
     bundle --> rpc
     bundle --> decoder
     bundle --> models
+    bundle --> chains
     explorer --> http
     rpc --> http
     writer --> prompts
@@ -182,3 +186,4 @@ flowchart TD
 - **07/10/2026, fim da Fase 1:** primeira versão. Linha de montagem, sequência de um `explain`, mapa do código, classificação das lacunas.
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
+- **07/10/2026, perfis por tipo de rede (D20):** a configuração declara o CHAIN_TYPE do Blockscout; perfis para seis tipos de rede; rótulos de endereços na configuração.
