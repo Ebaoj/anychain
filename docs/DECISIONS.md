@@ -77,3 +77,40 @@ Each entry: decision, alternatives, reason, trade-off.
 - **The time budget is soft:** each attempt's timeout is capped by the time left, so the total can overshoot only by one slow read.
 - **Recorded failures:** the recorder now stores real timeouts, so `eth_contract_creation` replays the actual `/internal-transactions` timeout instead of a missing record.
 - **Third review:** an explorer 404 for a tx the node already mined is index lag (retryable), not "unknown hash"; "dropped" on the explorer but mined on the node is flagged and the receipt wins; when the explorer answers but lags, the RPC path still decodes the call with the explorer's ABI; a lookup that failed for a non-network reason is not retryable anywhere; `eth_chainId` accepts hex or plain numbers; a non-object receipt is a gap, not "no receipt".
+
+## D17. Transaction types found by a bug hunt on real mainnet data
+A bug hunt with varied real transactions found facts that were well formatted, sourced, and wrong. Each fix has a real recorded fixture.
+- **Internal value only moves on `call` and `create`/`create2`.** `delegatecall` and `callcode` run another contract's code inside the caller, so their `value` is the caller's own context and nothing moves (Lido `submit`, `eth_lido_submit`, used to show a phantom ETH transfer to the Lido implementation). `callcode` is grouped with `delegatecall` on purpose: in the EVM its value goes from the caller to itself. A failed `call` with value moves nothing. Each internal fact carries `moves_value` (true / false / null when not known).
+- **`selfdestruct` is not interpreted yet:** no real recording exists, so its value is reported neutrally ("the explorer records a value of X") instead of guessing who received it.
+- **EIP-7702 (type 4):** each `authorization_list` entry becomes a fact ("delegation set" / "cleared" for address 0x0), with its status when not `ok`. A type-4 tx with no data and no value is described as a delegation change, not a "plain transfer". Limitation: we state the delegation; we do not explain what the delegated code did.
+- **Data sent to an account with no code** is not a function call and needs no ABI. We rely on the explorer's `is_contract`, skipping accounts with listed implementations (a 7702-delegated account runs code). Limitation: `is_contract` is today's state, not the state at the transaction's block.
+- **Internal `create`** names the deployed contract from `created_contract`.
+- **Anonymous events** (no signature topic, e.g. MakerDAO `LogNote`) are decoded only when exactly one anonymous event of the ABI fits the log; otherwise the gap says so, instead of claiming the ABI is missing.
+- **RPC sources** now show the exact call (method + params), and the LLM receives each fact's sources, with the rule that it may repeat but never invent links.
+- **Review of D17 (fifth review):** the explorer's `is_contract` is today's state, so a 7702 account that delegated, acted and later revoked looked like "no code" (real tx 0xf5199e66…). Now:
+  - "Did the target run code in this tx?" is answered in this order: a valid delegation set or cleared by this very tx; a precompile (0x…01 to 0x…ff); the node's `eth_getCode` just before the block. If none can answer, we say so ("may or may not have been a function call") with a non-retryable gap asking for an archive RPC. Public nodes refuse old state (verified: a block ~1.5h old already needs "a personal token"), so this honest "unknown" is the common case.
+  - Without the explorer (RPC-only path) there is no `is_contract` flag; when old state is refused we fall back to today's code, the same criterion the explorer uses: code today = a contract.
+  - A delegation set in the same tx is used as an ABI source, so the call still decodes (`execute(bytes32,bytes)` on 0xf5199e66…).
+  - Authorizations are stated as applied only when the explorer marks them `ok`; `invalid_*` ones say "was not applied", and a missing status says "validity not reported" (real tx 0x26118f7f…).
+  - A type-4 tx with no data is described by what it carries ("N authorizations"), not by a claim that it "only changes delegation".
+  - Anonymous events must consume the log data exactly (a trailing unpadded `bytes` is allowed), so a log with leftover data is not forced into an anonymous event.
+  - Only explorer page URLs are sent to the LLM; API and RPC URLs may be internal on a private network. RPC sources keep the method and params as `detail`.
+  - An internal call with value whose success is not reported is "attached, outcome unknown" (`moves_value: null`), not a transfer.
+
+## D18. We do not assert "this account had no code" (sixth review)
+- **Decision:** "data sent to an account without code is not a function call" is asserted only when this very transaction cleared the account's EIP-7702 delegation (valid authorizations are applied before execution; the last valid one per account wins). In every other case we state what is known ("the explorer lists it as having no code today") and declare a non-retryable gap asking for an execution trace.
+- **Alternatives tried:** reading the code with `eth_getCode` just before the block, plus a precompile range. Rejected after review: code can appear earlier in the same block (another tx's delegation, a contract created and destroyed in the block), and precompiles differ per chain and fork (OP's P256 at 0x…0100 executes with no stored code: real tx 0x0032185d…, fixture `op_p256_precompile`). Each rule produced a false fact in some real case.
+- **Trade-off:** fewer assertive answers. The definitive answer needs an execution trace, which phase 2 adds when `supports_debug_trace` is on.
+- **RPC-only path:** with no explorer flag, today's code from the node decides "contract or not" (code today = contract), the same criterion as the explorer; no code today gives the same honest "unknown".
+- **Known limitation (not fixed):** the mirror case. An account that delegated *after* a transaction is listed by the explorer today as a contract (`proxy_type: eip7702`), so an older data transaction to it is decoded against today's delegate. Only a trace or historical code can settle it.
+- **Several authorizations for one account:** only the last valid one is stated as in effect; earlier valid ones are "replaced by a later authorization".
+- **No endpoint addresses reach the LLM:** gap texts sent to the model have URLs and the RPC host replaced by "[endpoint]"; the user still sees them in the evidence list.
+- **Anonymous events:** decoded in lenient mode so an unpadded trailing `bytes` is accepted, then the exact-reuse check rejects any leftover data.
+
+## D19. Seventh review (Fable model), before the phase 1 commit
+- **Anonymous wording only when it can apply:** a log is described as "matched none of the anonymous events" only if its first topic is not a known signature and some anonymous event has that many indexed fields. A normal event missing from the ABI keeps its topic0 and the "no ABI matches" gap (real DeFi Saver tx 0x92f208d3…, where the DSProxy ABI has an anonymous `LogNote` but the logs are `ActionEvent`s from delegatecalled actions).
+- **EIP-7702 delegate field:** read from `address_hash` or, on older Blockscout versions, `address`. A missing delegate is "target not reported", never "cleared".
+- **RPC-only path:** a failed `eth_getCode` keeps the selector fact and adds a retryable "Contract check" gap; only "no code today" leads to the "cannot confirm" wording.
+- **Undecoded call on a delegated account:** the gap names the delegate whose code ran (real OP tx 0x86aec918…), not the account, which can never be "verified".
+- **JSON consistency:** superseded authorizations have `applied: false, superseded: true`; an internal `create` without a success flag is "not reported", like `call`.
+- **Known limitation:** an explorer can return zero internal transactions while other facts prove some ran (seen on explorer.optimism.io for 0x86aec918…). We never state "no internal calls", but cannot tell "none" from "not indexed".
