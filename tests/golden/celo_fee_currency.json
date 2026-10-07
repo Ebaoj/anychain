@@ -66,7 +66,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x4ca38efad66cf866bbadc1c91ecd3d61c524c747de68eb196d28b882b4b86aca"
     }
    ],
-   "text": "Fee paid: 0.003604051072171875 USD₮; paid in USD₮, a Celo fee currency, instead of the native currency."
+   "text": "Fee paid: 0.003604051072171875 USD₮, paid in USD₮ instead of CELO as a Celo fee currency, through the USD₮ fee adapter (token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e)."
   },
   {
    "data": {

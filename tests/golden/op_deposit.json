@@ -56,7 +56,7 @@
   },
   {
    "data": {
-    "deposit_type": true
+    "deposit_type": "l1_attributes"
    },
    "id": "E3",
    "kind": "chain",
@@ -68,7 +68,7 @@
      "url": "https://explorer.optimism.io/api/v2/transactions/0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"
     }
    ],
-   "text": "Deposit-type transaction (OP Stack type 126): not signed by an L2 account. It is either a deposit from L1 or a system transaction the sequencer adds to every block (such as the L1 attributes update)."
+   "text": "L1 attributes transaction: the system transaction the sequencer puts first in every block to record L1 data (OP Stack type 126, classified by the explorer). Not a user deposit."
   },
   {
    "data": {

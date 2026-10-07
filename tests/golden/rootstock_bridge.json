@@ -1,0 +1,129 @@
+{
+ "abi_sources": {
+  "0x0000000000000000000000000000000001000006": "none"
+ },
+ "gaps": [
+  {
+   "needed": "The network's documentation of this native contract",
+   "retryable": false,
+   "what": "Event decoding",
+   "why": "0x0000000000000000000000000000000001000006 is a native contract built into the node; no ABI exists for its events"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "block": 9305464,
+    "from": "0x98ecdc9Eeb0AF551Cbd317A3b43Ed2c7B5f311dd",
+    "gas_limit": "66000",
+    "gas_used": "44000",
+    "status": "success",
+    "timestamp": "2026-10-07T19:45:56.000000Z",
+    "to": "0x0000000000000000000000000000000001000006",
+    "tx_type": 0,
+    "value": "0.0041"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://rootstock.blockscout.com/tx/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    }
+   ],
+   "text": "Transaction succeeded in block 9305464 at 2026-10-07T19:45:56.000000Z. From 0x98ecdc9Eeb0AF551Cbd317A3b43Ed2c7B5f311dd to 0x0000000000000000000000000000000001000006 (Rootstock Bridge (BTC peg), native contract). Native value sent: 0.0041 RBTC. Gas used 44000 of limit 66000."
+  },
+  {
+   "data": {
+    "fee": "0.00000130328",
+    "parts": {
+     "fee": "0.00000130328"
+    },
+    "token": "RBTC"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    }
+   ],
+   "text": "Fee paid: 0.00000130328 RBTC."
+  },
+  {
+   "data": {
+    "bridge": true
+   },
+   "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    }
+   ],
+   "text": "The explorer classifies this as a Rootstock bridge transaction (the native BTC peg contract)."
+  },
+  {
+   "data": {},
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    }
+   ],
+   "text": "Plain RBTC transfer (no call data) to 0x0000000000000000000000000000000001000006 (Rootstock Bridge (BTC peg), native contract)."
+  },
+  {
+   "data": {},
+   "id": "E5",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556/logs"
+    }
+   ],
+   "text": "Event with topic0 0x1a4457a4460d48b40c5280955faf8e4685fa73f0866f7d8f573bdd8e64aca5b1 emitted by 0x0000000000000000000000000000000001000006 (Rootstock Bridge (BTC peg), native contract); could not decode."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E6",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "rootstock-mainnet",
+ "status": "success",
+ "tx_hash": "0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+}

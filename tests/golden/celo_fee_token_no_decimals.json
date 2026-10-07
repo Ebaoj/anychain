@@ -6,14 +6,7 @@
   "0xbb469A28f64C72aECC7d05Ca6e45B2FB1a63B4F9": "explorer: verified contract UniswapV3Pool",
   "0xce16F69375520ab01377ce7B88f5BA8C48F8D666": "explorer: verified contract SquidRouterProxy proxy -> SquidRouter"
  },
- "gaps": [
-  {
-   "needed": "The token's decimals (its contract or the explorer's token page)",
-   "retryable": false,
-   "what": "Fee",
-   "why": "the explorer does not report the decimals of the fee token 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B, so the fee is shown in raw units"
-  }
- ],
+ "gaps": [],
  "items": [
   {
    "data": {
@@ -47,11 +40,11 @@
   },
   {
    "data": {
-    "fee": "7822697203928125",
+    "fee": "0.007822697203928125",
     "parts": {
-     "fee": "7822697203928125"
+     "fee": "0.007822697203928125"
     },
-    "token": "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B"
+    "token": "USDC"
    },
    "id": "E2",
    "kind": "fee",
@@ -63,7 +56,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
     }
    ],
-   "text": "Fee paid: 7822697203928125 raw units of 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B; paid in 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B, a Celo fee currency, instead of the native currency."
+   "text": "Fee paid: 0.007822697203928125 USDC, paid in USDC instead of CELO as a Celo fee currency, through Circle's USDC fee adapter (token 0xcebA9300f2b948710d2653dD7B07f33A8B32118C)."
   },
   {
    "data": {

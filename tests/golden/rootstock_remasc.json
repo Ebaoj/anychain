@@ -30,7 +30,7 @@
      "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
     }
    ],
-   "text": "Transaction succeeded in block 9305355 at 2026-10-07T18:48:07.000000Z. From 0x0000000000000000000000000000000000000000 to 0x0000000000000000000000000000000001000008 (Rootstock REMASC native contract (block rewards)). Native value sent: 0 RBTC. Gas used 0 of limit 0."
+   "text": "Transaction succeeded in block 9305355 at 2026-10-07T18:48:07.000000Z. From 0x0000000000000000000000000000000000000000 to 0x0000000000000000000000000000000001000008 (Rootstock REMASC (block rewards), native contract). Native value sent: 0 RBTC. Gas used 0 of limit 0."
   },
   {
    "data": {
@@ -54,9 +54,25 @@
   },
   {
    "data": {
-    "system": true
+    "remasc": true
    },
    "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
+    }
+   ],
+   "text": "The explorer classifies this as Rootstock's REMASC transaction: the per-block distribution of mining rewards, a system transaction."
+  },
+  {
+   "data": {
+    "system": true
+   },
+   "id": "E4",
    "kind": "call",
    "sources": [
     {
@@ -66,14 +82,14 @@
      "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
     }
    ],
-   "text": "System transaction: sent from the zero address, which no one can sign for, to 0x0000000000000000000000000000000001000008 (Rootstock REMASC native contract (block rewards)). It carries no call data."
+   "text": "System transaction: sent from the zero address, which no one can sign for, to 0x0000000000000000000000000000000001000008 (Rootstock REMASC (block rewards), native contract). It carries no call data."
   },
   {
    "data": {
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "cross_check",
    "sources": [
     {

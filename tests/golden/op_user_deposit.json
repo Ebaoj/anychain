@@ -1,0 +1,234 @@
+{
+ "abi_sources": {
+  "0x4200000000000000000000000000000000000007": "explorer: verified contract Proxy proxy -> L2CrossDomainMessenger",
+  "0xB3E7771a6e2d7DD8C0666042B7a07C39b938eb7d": "explorer: verified contract OpWorldID"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "data": {
+    "block": 157901824,
+    "from": "0x36BDE71C97B33Cc4729cf772aE268934f7AB70B2",
+    "gas_limit": "1326609",
+    "gas_used": "96917",
+    "status": "success",
+    "timestamp": "2026-10-07T19:47:05.000000Z",
+    "to": "0x4200000000000000000000000000000000000007",
+    "tx_type": 126,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://explorer.optimism.io/tx/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+    }
+   ],
+   "text": "Transaction succeeded in block 157901824 at 2026-10-07T19:47:05.000000Z. From 0x36BDE71C97B33Cc4729cf772aE268934f7AB70B2 to 0x4200000000000000000000000000000000000007 (Proxy). Native value sent: 0 ETH. Gas used 96917 of limit 1326609."
+  },
+  {
+   "data": {
+    "fee": "0",
+    "parts": {
+     "fee": "0"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+    }
+   ],
+   "text": "Fee paid: 0 ETH."
+  },
+  {
+   "data": {
+    "deposit_type": "deposit"
+   },
+   "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+    }
+   ],
+   "text": "Deposit transaction (OP Stack type 126): created from L1, not signed on L2; its gas was paid on L1. Usually a user deposit through the bridge; network-upgrade deposits use the same type."
+  },
+  {
+   "data": {
+    "args": {
+     "_message": "0xfbde929b02b957705f4591c529d6b5bf4c02d6cba4f16bc18cfde01e5d67938747a11b0c",
+     "_minGasLimit": "1000000",
+     "_nonce": "1766847064778384329583297500742918515827483896875618958121606201292883138",
+     "_sender": "0xa6d85F3b3bE6Ff6DC52C3aaBe9A35d0ce252b79F",
+     "_target": "0xB3E7771a6e2d7DD8C0666042B7a07C39b938eb7d",
+     "_value": "0"
+    },
+    "function": "relayMessage"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x4200000000000000000000000000000000000007"
+    }
+   ],
+   "text": "Called relayMessage(uint256,address,address,uint256,uint256,bytes) on 0x4200000000000000000000000000000000000007 (Proxy) with _nonce=1766847064778384329583297500742918515827483896875618958121606201292883138, _sender=0xa6d85F3b3bE6Ff6DC52C3aaBe9A35d0ce252b79F, _target=0xB3E7771a6e2d7DD8C0666042B7a07C39b938eb7d, _value=0, _minGasLimit=1000000, _message=0xfbde929b02b957705f4591c529d6b5bf4c02d6cba4f16bc18cfde01e5d67938747a11b0c. ABI source: explorer: verified contract Proxy proxy -> L2CrossDomainMessenger."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x4200000000000000000000000000000000000007 (Proxy) to 0x250AF3f400cf8Aac8D410c90f1ba3968dD87DF96 (L2CrossDomainMessenger)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x4200000000000000000000000000000000000007 (Proxy) to 0xB3E7771a6e2d7DD8C0666042B7a07C39b938eb7d (OpWorldID)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x4200000000000000000000000000000000000007 (Proxy) to 0x250AF3f400cf8Aac8D410c90f1ba3968dD87DF96 (L2CrossDomainMessenger)."
+  },
+  {
+   "data": {
+    "staticcalls": 1
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb/internal-transactions"
+    }
+   ],
+   "text": "1 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "data": {
+    "args": {
+     "root": "1232095885630018283398787352166703022328925648235069847905250663601117666060",
+     "timestamp": "1791402425"
+    },
+    "event": "RootAdded"
+   },
+   "id": "E9",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb/logs"
+    }
+   ],
+   "text": "Event RootAdded(uint256,uint128) emitted by 0xB3E7771a6e2d7DD8C0666042B7a07C39b938eb7d (OpWorldID): root=1232095885630018283398787352166703022328925648235069847905250663601117666060, timestamp=1791402425."
+  },
+  {
+   "data": {
+    "args": {
+     "msgHash": "0x546b5caa0a613fe943ee888b34a3ee63799fe3808e36eb2b166389e16ac80ab7"
+    },
+    "event": "RelayedMessage"
+   },
+   "id": "E10",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb/logs"
+    }
+   ],
+   "text": "Event RelayedMessage(bytes32) emitted by 0x4200000000000000000000000000000000000007 (Proxy): msgHash=0x546b5caa0a613fe943ee888b34a3ee63799fe3808e36eb2b166389e16ac80ab7."
+  },
+  {
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E11",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.optimism.io"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "optimism-mainnet",
+ "status": "success",
+ "tx_hash": "0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+}

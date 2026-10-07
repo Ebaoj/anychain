@@ -15,7 +15,7 @@ import pytest
 
 from anychain.chains import ChainProfile, audit_fields
 from anychain.config import load_config
-from tests.conftest import ROOT, USDC_TX, replay_bundle
+from tests.conftest import ROOT, USDC_TX, mutated, replay_bundle
 
 # config, fixture, tx hash: one real recorded transaction per network
 NETWORK_CASES = [
@@ -78,8 +78,7 @@ def test_no_network_specific_values_in_code():
 def test_celo_fee_paid_in_token_is_not_called_celo():
     b = replay_bundle(_cfg("celo-mainnet"), NETWORK_CASES[4][2], "celo_fee_currency")
     fee = next(e for e in b.items if e.kind == "fee")
-    assert fee.text.startswith("Fee paid: 0.003604051072171875 USD₮")
-    assert "CELO" not in fee.text.split(";")[0]
+    assert fee.text.startswith("Fee paid: 0.003604051072171875 USD₮, paid in USD₮ instead of CELO")
 
 
 def test_optimism_fee_is_split_and_sums_to_the_total():
@@ -99,8 +98,8 @@ def test_optimism_withdrawal_and_system_transaction_are_stated():
     # This fixture is the sequencer's L1 attributes transaction, not a user deposit: the
     # text must not claim it came from L1 through the bridge.
     d = replay_bundle(cfg, "0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5", "op_deposit")
-    assert "Deposit-type transaction (OP Stack type 126): not signed by an L2 account" in _texts(d)
-    assert "created on L1" not in _texts(d)
+    assert "L1 attributes transaction: the system transaction the sequencer puts first in every block" in _texts(d)
+    assert "user deposit through the bridge" not in _texts(d)
     assert "(OP Stack depositor system account (sequencer, not a user))" in _texts(d)
 
 
@@ -152,9 +151,20 @@ def test_unknown_structured_fields_are_declared():
 
 # ---- eighth review (Fable): real cases on the new networks -------------------------
 
-def test_celo_fee_token_without_decimals_stays_raw_and_says_so():
+def test_celo_adapter_fee_is_read_through_the_configured_adapter():
+    # Circle's USDC fee adapter has no decimals() on-chain; config says its units (adapterDecimals = 18).
     tx = "0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
     b = replay_bundle(_cfg("celo-mainnet"), tx, "celo_fee_token_no_decimals")
+    fee = next(e for e in b.items if e.kind == "fee")
+    assert fee.text.startswith("Fee paid: 0.007822697203928125 USDC, paid in USDC instead of CELO")
+    assert "Circle's USDC fee adapter" in fee.text and not _gaps(b, "Fee")
+
+
+def test_unknown_fee_token_without_decimals_stays_raw_and_says_so():
+    cfg = _cfg("celo-mainnet")
+    cfg.fee_tokens = {}
+    tx = "0x6470963dc7a47fffeb6dee28d9ad31f6e78208be15c9919a8b193c589996404d"
+    b = replay_bundle(cfg, tx, "celo_fee_token_no_decimals")
     fee = next(e for e in b.items if e.kind == "fee")
     assert fee.text.startswith("Fee paid: 7822697203928125 raw units of 0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B")
     assert any("decimals" in g.why for g in _gaps(b, "Fee"))
@@ -172,7 +182,7 @@ def test_rootstock_reward_transaction_is_a_system_transaction():
     b = replay_bundle(_cfg("rootstock-mainnet"), tx, "rootstock_remasc")
     assert "System transaction: sent from the zero address" in _texts(b)
     assert "Plain RBTC transfer" not in _texts(b)
-    assert "(Rootstock REMASC native contract (block rewards))" in _texts(b)
+    assert "(Rootstock REMASC (block rewards), native contract)" in _texts(b)
 
 
 def test_unknown_chain_type_value_degrades_instead_of_refusing_to_load(tmp_path):
@@ -181,3 +191,95 @@ def test_unknown_chain_type_value_degrades_instead_of_refusing_to_load(tmp_path)
     b = replay_bundle(cfg, NETWORK_CASES[2][2], "gnosis_transfer")
     assert b.status == "success"
     assert "not a Blockscout CHAIN_TYPE value this tool knows" in _gaps(b, "Chain type")[0].why
+
+
+# ---- the seven gaps from docs/CHAINS.md (real recordings unless stated) ------------
+
+def test_gap1_native_currency_is_not_counted_twice_on_zksync():
+    tx = "0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4"
+    b = replay_bundle(_cfg("zksync-era"), tx, "zksync_native_eth_send")
+    assert not any(e.kind == "token_transfer" and " ETH from " in e.text for e in b.items)
+    moves = [e for e in b.items if e.kind == "native_transfer"]
+    assert len(moves) == 1 and "0.000073403258318442 ETH" in moves[0].text and "not a second asset" in moves[0].text
+
+
+def test_gap1_native_currency_is_not_counted_twice_on_celo():
+    tx = "0x64f5270ef3b298a6d2ddefdba4f2c83faab12123020136915b173aef0c5526f3"
+    b = replay_bundle(_cfg("celo-mainnet"), tx, "celo_native_transfer")
+    assert not any(e.kind == "token_transfer" for e in b.items)
+    assert "Native CELO movement of 0.01278614 CELO" in _texts(b)
+
+
+def test_gap5_zksync_fee_flow_nets_to_the_explorer_fee():
+    tx = "0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4"
+    b = replay_bundle(_cfg("zksync-era"), tx, "zksync_native_eth_send")
+    flow = next(e for e in b.items if e.kind == "fee_flow")
+    assert flow.data["matches_explorer_fee"] and not flow.data["paymaster"]
+    assert flow.data["prepaid"] - flow.data["refunded"] == flow.data["net"]
+
+
+def test_gap5_zksync_paymaster_is_named():
+    tx = "0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af"
+    b = replay_bundle(_cfg("zksync-era"), tx, "zksync_paymaster")
+    flow = next(e for e in b.items if e.kind == "fee_flow")
+    assert flow.data["paymaster"] and flow.data["matches_explorer_fee"]
+    assert "paid by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359, not by the sender (a paymaster)" in flow.text
+
+
+def test_gap2_operator_fee_is_its_own_part():
+    # Not seen live (OP Mainnet and Celo charge no operator fee today; Blockscout then omits the
+    # field), so a real recording gets an operator_fee added.
+    def with_operator_fee(body):
+        body["operator_fee"] = "1000"
+    cfg = _cfg("optimism-mainnet")
+    overrides = mutated("op_usdc_transfer", NETWORK_CASES[1][2], with_operator_fee)
+    b = replay_bundle(cfg, NETWORK_CASES[1][2], "op_usdc_transfer", overrides=overrides)
+    fee = next(e for e in b.items if e.kind == "fee")
+    assert set(fee.data["parts"]) == {"L2 execution", "L1 data", "operator fee"}
+    from decimal import Decimal
+    assert sum(Decimal(v) for v in fee.data["parts"].values()) == Decimal(fee.data["fee"])
+
+
+def test_gap3_explorer_classification_separates_l1_attributes_from_user_deposits():
+    cfg = _cfg("optimism-mainnet")
+    user = replay_bundle(cfg, "0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb", "op_user_deposit")
+    assert "Usually a user deposit through the bridge" in _texts(user) and "L1 attributes" not in _texts(user)
+    system = replay_bundle(cfg, "0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5", "op_deposit")
+    assert "L1 attributes transaction" in _texts(system) and "user deposit through" not in _texts(system)
+
+
+def test_gap3_rootstock_classification_and_gap6_native_contract():
+    tx = "0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    b = replay_bundle(_cfg("rootstock-mainnet"), tx, "rootstock_bridge")
+    assert "classifies this as a Rootstock bridge transaction" in _texts(b)
+    assert not any("verified contract" in g.needed or "verified on the explorer" in g.needed for g in b.gaps)
+    assert any("native contract built into the node" in g.why for g in b.gaps)
+
+
+def test_gap6_call_to_native_contract_is_not_asked_to_be_verified():
+    to = "0x0000000000000000000000000000000001000006"
+    def call_bridge(body):
+        body["raw_input"] = "0x12345678"
+    tx = "0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
+    b = replay_bundle(_cfg("rootstock-mainnet"), tx, "rootstock_bridge", overrides=mutated("rootstock_bridge", tx, call_bridge))
+    call = next(e for e in b.items if e.kind == "call")
+    assert "built into the network's node, so it has no source code or ABI" in call.text and to in call.text
+    assert not _gaps(b, "Call decoding") and not _gaps(b, "Code at execution time")
+
+
+def test_gap7_zksync_priority_type_is_stated():
+    tx = "0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4"
+    b = replay_bundle(_cfg("zksync-era"), tx, "zksync_priority_l1")
+    assert "Priority transaction (zkSync type 255): submitted through L1" in _texts(b)
+
+
+def test_gap7_post_exec_and_interop_are_declared():
+    # Not seen live: real recording with the two fields Blockscout would add.
+    def future(body):
+        body["transaction_types"] = list(body.get("transaction_types") or []) + ["op_stack_post_exec_transaction"]
+        body["op_interop_messages"] = [{"nonce": 1}, {"nonce": 2}]
+    cfg = _cfg("optimism-mainnet")
+    b = replay_bundle(cfg, NETWORK_CASES[1][2], "op_usdc_transfer", overrides=mutated("op_usdc_transfer", NETWORK_CASES[1][2], future))
+    assert "post-execution transaction (type 0x7D)" in _texts(b)
+    assert "2 cross-chain interop message(s)" in _texts(b)
+    assert not _gaps(b, "Network-specific details")  # op_interop_messages is a known OP field now

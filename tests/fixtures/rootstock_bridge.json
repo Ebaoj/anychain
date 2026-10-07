@@ -1,0 +1,34 @@
+{
+ "GET https://rootstock.blockscout.com/api/v2/smart-contracts/0x0000000000000000000000000000000001000006": {
+  "body": "{\"message\":\"Not found\"}",
+  "status": 404
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556": {
+  "body": "{\"priority_fee\":null,\"raw_input\":\"0x\",\"is_pending_update\":false,\"result\":\"success\",\"hash\":\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\",\"max_fee_per_gas\":null,\"revert_reason\":null,\"confirmation_duration\":[0,32056.0],\"transaction_burnt_fee\":null,\"type\":0,\"token_transfers_overflow\":false,\"confirmations\":7,\"position\":0,\"max_priority_fee_per_gas\":null,\"transaction_tag\":null,\"created_contract\":null,\"value\":\"4100000000000000\",\"from\":{\"ens_domain_name\":null,\"hash\":\"0x98ecdc9Eeb0AF551Cbd317A3b43Ed2c7B5f311dd\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"gas_used\":\"44000\",\"status\":\"ok\",\"to\":{\"ens_domain_name\":null,\"hash\":\"0x0000000000000000000000000000000001000006\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"authorization_list\":[],\"method\":null,\"fee\":{\"type\":\"actual\",\"value\":\"1303280000000\"},\"gas_limit\":\"66000\",\"gas_price\":\"29620000\",\"decoded_input\":null,\"fhe_operations_count\":0,\"token_transfers\":[],\"base_fee_per_gas\":null,\"timestamp\":\"2026-10-07T19:45:56.000000Z\",\"nonce\":1,\"historic_exchange_rate\":null,\"transaction_types\":[\"rootstock_bridge\",\"coin_transfer\"],\"exchange_rate\":\"83323\",\"block_number\":9305464,\"has_error_in_internal_transactions\":false}",
+  "status": 200
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556/internal-transactions": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556/logs": {
+  "body": "{\"items\":[{\"address\":{\"ens_domain_name\":null,\"hash\":\"0x0000000000000000000000000000000001000006\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"block_hash\":\"0x052c61f5509f1db6235a754db2eff36549deb7a0310f1e599281bfa5023399ea\",\"block_number\":9305464,\"block_timestamp\":\"2026-10-07T19:45:56.000000Z\",\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000e90eda394400000000000000000000000000000000000000000000000000000000000000000223145574131665769456d7835645573544a3275644465774573653444583554683270000000000000000000000000000000000000000000000000000000000000\",\"decoded\":null,\"index\":0,\"smart_contract\":null,\"topics\":[\"0x1a4457a4460d48b40c5280955faf8e4685fa73f0866f7d8f573bdd8e64aca5b1\",\"0x00000000000000000000000098ecdc9eeb0af551cbd317a3b43ed2c7b5f311dd\",null,null],\"transaction_hash\":\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\"}],\"next_page_params\":null}",
+  "status": 200
+ },
+ "GET https://rootstock.blockscout.com/api/v2/transactions/0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556/token-transfers": {
+  "body": "{\"items\":[],\"next_page_params\":null}",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_chainId []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x1e\"}\n",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_getTransactionByHash [\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"hash\":\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\",\"nonce\":\"0x1\",\"blockHash\":\"0x052c61f5509f1db6235a754db2eff36549deb7a0310f1e599281bfa5023399ea\",\"blockNumber\":\"0x8dfd78\",\"transactionIndex\":\"0x0\",\"from\":\"0x98ecdc9eeb0af551cbd317a3b43ed2c7b5f311dd\",\"to\":\"0x0000000000000000000000000000000001000006\",\"gas\":\"0x101d0\",\"gasPrice\":\"0x1c3f720\",\"value\":\"0xe90eda3944000\",\"input\":\"0x\",\"v\":\"0x5f\",\"r\":\"0x9bb721af77fb6a41db13fa9da0ca0cdce2a95e8ff84184f724b8814271504591\",\"s\":\"0x623802590bca94921ab6b6abbe1947c19d59b6bc57728321e64979f23106d78d\",\"type\":\"0x0\"}}\n",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_getTransactionReceipt [\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"transactionHash\":\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\",\"transactionIndex\":\"0x0\",\"blockHash\":\"0x052c61f5509f1db6235a754db2eff36549deb7a0310f1e599281bfa5023399ea\",\"blockNumber\":\"0x8dfd78\",\"cumulativeGasUsed\":\"0xabe0\",\"gasUsed\":\"0xabe0\",\"contractAddress\":null,\"logs\":[{\"logIndex\":\"0x0\",\"blockNumber\":\"0x8dfd78\",\"blockHash\":\"0x052c61f5509f1db6235a754db2eff36549deb7a0310f1e599281bfa5023399ea\",\"transactionHash\":\"0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556\",\"transactionIndex\":\"0x0\",\"address\":\"0x0000000000000000000000000000000001000006\",\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000e90eda394400000000000000000000000000000000000000000000000000000000000000000223145574131665769456d7835645573544a3275644465774573653444583554683270000000000000000000000000000000000000000000000000000000000000\",\"topics\":[\"0x1a4457a4460d48b40c5280955faf8e4685fa73f0866f7d8f573bdd8e64aca5b1\",\"0x00000000000000000000000098ecdc9eeb0af551cbd317a3b43ed2c7b5f311dd\"]}],\"from\":\"0x98ecdc9eeb0af551cbd317a3b43ed2c7b5f311dd\",\"to\":\"0x0000000000000000000000000000000001000006\",\"status\":\"0x1\",\"logsBloom\":\"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000400004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000004000000000000000100000000000000000000800000000000000\",\"type\":\"0x0\",\"effectiveGasPrice\":\"0x1c3f720\"}}\n",
+  "status": 200
+ }
+}
