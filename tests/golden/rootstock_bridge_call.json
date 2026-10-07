@@ -1,0 +1,85 @@
+{
+ "abi_sources": {
+  "0x0000000000000000000000000000000001000006": "none"
+ },
+ "gaps": [
+  {
+   "needed": "Ask again in a minute for full details",
+   "retryable": true,
+   "what": "Explorer index",
+   "why": "the explorer shows this transaction as pending, but the RPC node already has its receipt"
+  },
+  {
+   "needed": "Try again in a few minutes",
+   "retryable": true,
+   "what": "ABI lookup",
+   "why": "the ABI lookup for 0x0000000000000000000000000000000001000006 failed: https://rootstock.blockscout.com/api/v2/smart-contracts/0x0000000000000000000000000000000001000006 failed after 3 attempts: ConnectError: no fixture for GET https://rootstock.blockscout.com/api/v2/smart-contracts/0x0000000000000000000000000000000001000006"
+  },
+  {
+   "needed": "Its published ABI (e.g. from the network node's source) in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "0x0000000000000000000000000000000001000006 is a native contract built into the node and the explorer has no verified ABI for it, so selector 0x0c5a9990 cannot be decoded"
+  },
+  {
+   "needed": "Ask again in a minute",
+   "retryable": true,
+   "what": "Event decoding",
+   "why": "the explorer has not indexed this transaction's events yet"
+  }
+ ],
+ "items": [
+  {
+   "data": {
+    "from": "0x23a7ae069a7bebbece1403d318c4118218e9c121",
+    "status": "success",
+    "to": "0x0000000000000000000000000000000001000006"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0xba720ce62d1c04f596705100ea806a32f84a79501ea70024d35a343c574708b2]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "(From RPC only) Transaction succeeded in block 9305514. From 0x23a7ae069a7bebbece1403d318c4118218e9c121 to 0x0000000000000000000000000000000001000006. Native value: 0 RBTC. Gas used 69072 of limit 69072."
+  },
+  {
+   "data": {
+    "native_contract": true,
+    "selector": "0x0c5a9990"
+   },
+   "id": "E2",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0xba720ce62d1c04f596705100ea806a32f84a79501ea70024d35a343c574708b2]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "Called 0x0000000000000000000000000000000001000006 (Rootstock Bridge (BTC peg), native contract), a contract built into the network's node, with selector 0x0c5a9990; not decoded."
+  },
+  {
+   "data": {},
+   "id": "E3",
+   "kind": "receipt",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0xba720ce62d1c04f596705100ea806a32f84a79501ea70024d35a343c574708b2]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "Receipt has 1 log(s)."
+  }
+ ],
+ "network": "rootstock-mainnet",
+ "status": "success",
+ "tx_hash": "0xba720ce62d1c04f596705100ea806a32f84a79501ea70024d35a343c574708b2"
+}

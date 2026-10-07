@@ -141,7 +141,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/token-transfers"
     }
    ],
-   "text": "Fee flow: 0.000049775 ETH prepaid to the fee collector by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359, 0.000042315809 ETH refunded; net fee 0.000007459191 ETH. The fee was paid by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359, not by the sender (a paymaster). This matches the explorer's fee."
+   "text": "Fee flow: 0.000049775 ETH prepaid to the fee collector by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359, 0.000042315809 ETH refunded; net fee 0.000007459191 ETH. The ETH fee was prepaid by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 (a paymaster), not by the sender. In this transaction the sender paid the paymaster 85.783676209796661425 NODL (net of what it returned). This matches the explorer's fee."
   },
   {
    "data": {
@@ -200,478 +200,11 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
    "id": "E9",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E10",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E11",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E12",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E13",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E14",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E15",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E16",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E17",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E18",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E19",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E20",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E21",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E22",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800c (zkSync BootloaderUtilities system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E23",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E24",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E25",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E26",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E27",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E28",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x0000000000000000000000000000000000008006 (zkSync ContractDeployer system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E29",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008006 (zkSync ContractDeployer system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E30",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008006 (zkSync ContractDeployer system contract) to 0x0000000000000000000000000000000000008002."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E31",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E32",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E33",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E34",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E35",
    "kind": "internal_call",
    "sources": [
     {
@@ -686,10 +219,11 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
-   "id": "E36",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -704,6 +238,501 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x000000000000000000000000000000000000800A (Ether)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000000001."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E16",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E18",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E19",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E20",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E21",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E22",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E23",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E24",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E25",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E26",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E27",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E28",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E29",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E30",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E31",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E32",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000000001."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E33",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E34",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E35",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E36",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+  },
+  {
+   "data": {
+    "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
@@ -717,11 +746,12 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
@@ -735,21 +765,24 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
-   "data": {},
+   "data": {
+    "system_calls": 61,
+    "value": "0"
+   },
    "id": "E39",
-   "kind": "event",
+   "kind": "internal_call",
    "sources": [
     {
      "detail": null,
      "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
+   "text": "61 internal call(s) between the network's system contracts not listed (no value carried)."
   },
   {
    "data": {},
@@ -777,11 +810,25 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
     }
    ],
-   "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
+   "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
   },
   {
    "data": {},
    "id": "E42",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
+    }
+   ],
+   "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
+  },
+  {
+   "data": {},
+   "id": "E43",
    "kind": "event",
    "sources": [
     {
@@ -798,7 +845,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E43",
+   "id": "E44",
    "kind": "cross_check",
    "sources": [
     {

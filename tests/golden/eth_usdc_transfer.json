@@ -101,6 +101,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },

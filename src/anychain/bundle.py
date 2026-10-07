@@ -16,7 +16,7 @@ from anychain.collectors.explorer import MAX_PAGES, ExplorerClient
 from anychain.collectors.http import Budget, CollectorError, NotFoundError
 from anychain.collectors.rpc import RpcClient
 from anychain.collectors.types import (
-    AddressRef, Authorization, InternalCall, Log, RpcReceipt, RpcTransaction, TokenTransfer, Transaction,
+    AddressRef, Authorization, InternalCall, Log, RpcReceipt, RpcTransaction, TokenTransfer, Transaction, to_int,
 )
 from anychain.config import AppConfig
 from anychain.decoder import AbiDecoder
@@ -99,6 +99,9 @@ class BundleBuilder:
         self.explorer_answered = False  # True when the explorer responded at all (even with 404)
         self.undecoded_events: set[str] = set()
         self.anonymous_unmatched: set[str] = set()
+        # (from, to, value) of native movements already stated -> the fact id that states them,
+        # so an internal call carrying the same value points to it instead of counting it again
+        self.native_movement_facts: dict[tuple[str, str, int], str] = {}
         self.bundle = EvidenceBundle(network=cfg.network.name, tx_hash="", status="unknown")
         self.profile, self.dedicated_profile = profile_for(cfg.network.chain_type)
 
@@ -497,9 +500,7 @@ class BundleBuilder:
                 b.add("call", f"Plain {sym} transfer (no call data) to {self._party(to)}.", [source])
             return
         if self._is_native_contract(to.address):
-            b.add("call", f"Called {self._party(to)}: built into the network's node, so it has no source code or "
-                  f"ABI; the call (selector {data[:10]}) is not decoded.", [source],
-                  {"selector": data[:10], "native_contract": True})
+            self._add_native_contract_call(self._party(to), to.address, data, source)
             return
         delegate_here = self._delegations_applied(tx).get(to.address.lower())
         if delegate_here == ZERO_ADDRESS or (
@@ -522,6 +523,21 @@ class BundleBuilder:
               f"ABI source: {self.abi_notes[to.address.lower()]}.",
               [source, abi_source],
               {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
+
+    def _add_native_contract_call(self, to_text: str, address: str, data: str, source: Source) -> None:
+        """A call to a contract built into the node: it runs without bytecode, but it can have a
+        published ABI (e.g. Rootstock's Bridge), so the normal ABI lookup still applies."""
+        decoder = self._decoder_for(address) if self.explorer_answered else None
+        decoded = decoder.decode_call(data) if decoder else None
+        if decoded:
+            self.bundle.add("call", f"Called {decoded.signature} on {to_text}{with_args(decoded.args)}. "
+                            f"ABI source: {self.abi_notes[address.lower()]}.", [source],
+                            {"function": decoded.name, "args": {a.name: a.value for a in decoded.args},
+                             "native_contract": True})
+            return
+        self.bundle.add("call", f"Called {to_text}, a contract built into the network's node, with selector "
+                        f"{data[:10]}; not decoded.", [source], {"selector": data[:10], "native_contract": True})
+        self._declare_undecoded("Call decoding", address, f"selector {data[:10]}")
 
     def _decoder_for(self, address: str, implementations: list[str] | None = None) -> AbiDecoder | None:
         """ABI decoder for a contract, cached per run. Records where the ABI came from."""
@@ -547,8 +563,9 @@ class BundleBuilder:
     def _declare_undecoded(self, topic: str, address: str, what: str, code_owner: str | None = None) -> None:
         """Gap for something we could not decode, saying whether the ABI is missing or just unreachable."""
         if self._is_native_contract(address):
-            self._gap(topic, f"{address} is a native contract built into the node; no ABI exists for {what}",
-                      "The network's documentation of this native contract", retryable=False)
+            self._gap(topic, f"{address} is a native contract built into the node and the explorer has no verified "
+                      f"ABI for it, so {what} cannot be decoded", "Its published ABI (e.g. from the network node's "
+                      "source) in a configured repo", retryable=False)
             return
         if address.lower() in self.abi_lookup_failed:
             retryable = self.abi_lookup_failed[address.lower()]
@@ -571,8 +588,9 @@ class BundleBuilder:
         native = self.cfg.network.native_token_contract
         native_moves = [t for t in transfers if native and (t.token.address or "").lower() == native]
         explorer_fee = self.profile.fee(tx.raw)
+        others = [t for t in transfers if t not in native_moves]
         self._add_native_movements(native_moves, address_of(tx.sender),
-                                   explorer_fee.total_raw if explorer_fee else None, source)
+                                   explorer_fee.total_raw if explorer_fee else None, others, source)
         for t in [t for t in transfers if t not in native_moves]:
             text = f"Token transfer: {self._transfer_what(t)} " \
                    f"from {self._party(t.sender)} to {self._party(t.recipient)}."
@@ -583,8 +601,12 @@ class BundleBuilder:
                       "Open the explorer page for the full list", retryable=False)
         return covered
 
+    def _remember_movement(self, t: TokenTransfer, fact_id: str) -> None:
+        key = ((address_of(t.sender) or "").lower(), (address_of(t.recipient) or "").lower(), t.value or 0)
+        self.native_movement_facts.setdefault(key, fact_id)
+
     def _add_native_movements(self, moves: list[TokenTransfer], sender: str | None, explorer_fee: int | None,
-                              source: Source) -> None:
+                              other_transfers: list[TokenTransfer], source: Source) -> None:
         """Transfers of the native-token contract are the native currency moving, not a second asset.
         When the network collects fees through a visible address, those moves are the fee flow."""
         if not moves:
@@ -597,15 +619,19 @@ class BundleBuilder:
         for t in moves:
             if t in to_collector or t in from_collector:
                 continue
-            self.bundle.add("native_transfer", f"Native {sym} movement of {self._native_amount(t.value)} from "
-                            f"{self._party(t.sender)} to {self._party(t.recipient)} (the explorer also lists it as a "
-                            f"token transfer of the native-token contract; it is not a second asset).", [source],
-                            {"from": address_of(t.sender), "to": address_of(t.recipient), "value": t.value})
+            fact = self.bundle.add("native_transfer", f"Native {sym} movement of {self._native_amount(t.value)} from "
+                                   f"{self._party(t.sender)} to {self._party(t.recipient)} (the explorer also lists it "
+                                   f"as a token transfer of the native-token contract; it is not a second asset).",
+                                   [source], {"from": address_of(t.sender), "to": address_of(t.recipient),
+                                              "value": t.value})
+            self._remember_movement(t, fact.id)
         if to_collector:
-            self._add_fee_flow(to_collector, from_collector, sender, explorer_fee, source)
+            flow = self._add_fee_flow(to_collector, from_collector, sender, explorer_fee, other_transfers, source)
+            for t in to_collector + from_collector:
+                self._remember_movement(t, flow)
 
     def _add_fee_flow(self, prepaid: list[TokenTransfer], refunded: list[TokenTransfer], sender: str | None,
-                      explorer_fee: int | None, source: Source) -> None:
+                      explorer_fee: int | None, other_transfers: list[TokenTransfer], source: Source) -> str:
         """zkSync-style fees: a prepay to the fee collector minus refunds. Says who paid."""
         sym = self.cfg.network.native_symbol
         paid_in = sum(t.value or 0 for t in prepaid)
@@ -616,18 +642,38 @@ class BundleBuilder:
                 f"{self._native_amount(paid_in - paid_out)}.")
         others = [p for p in payers if not sender or p.lower() != sender.lower()]
         if others:
-            text += f" The fee was paid by {', '.join(others)}, not by the sender (a paymaster)."
+            text += f" The {sym} fee was prepaid by {', '.join(others)} (a paymaster), not by the sender."
+            text += self._paid_to_paymaster(sender, others, other_transfers)
         net = paid_in - paid_out
         matches = explorer_fee is not None and net == explorer_fee
         if explorer_fee is not None:
             text += " This matches the explorer's fee." if matches else \
                     f" The explorer's fee is {self._native_amount(explorer_fee)}, which does not match."
-        self.bundle.add("fee_flow", text, [source], {"prepaid": paid_in, "refunded": paid_out, "net": net,
-                                                    "payers": payers, "paymaster": bool(others),
-                                                    "matches_explorer_fee": matches})
+        fact = self.bundle.add("fee_flow", text, [source], {"prepaid": paid_in, "refunded": paid_out, "net": net,
+                                                           "payers": payers, "paymaster": bool(others),
+                                                           "matches_explorer_fee": matches})
         if explorer_fee is not None and not matches:
             self._gap("Fee", "the fee flow seen in transfers does not match the explorer's fee",
                       "Check the fee on the explorer page", retryable=False)
+        return fact.id
+
+    def _paid_to_paymaster(self, sender: str | None, paymasters: list[str], transfers: list[TokenTransfer]) -> str:
+        """What the sender sent to the paymaster in tokens in this tx (net of what came back)."""
+        if not sender:
+            return ""
+        lowered = {p.lower() for p in paymasters}
+        net: dict[str, tuple[TokenTransfer, int]] = {}
+        for t in transfers:
+            frm, to = (address_of(t.sender) or "").lower(), (address_of(t.recipient) or "").lower()
+            sign = 1 if (frm == sender.lower() and to in lowered) else -1 if (to == sender.lower() and frm in lowered) else 0
+            if sign and t.value is not None and t.token_id is None:
+                key = (t.token.address or "").lower()
+                net[key] = (t, net.get(key, (t, 0))[1] + sign * t.value)
+        paid = [(t, v) for t, v in net.values() if v > 0]
+        if not paid:
+            return " No token payment from the sender to the paymaster appears in this transaction."
+        parts = ", ".join(f"{amount(v, t.decimals) if t.decimals is not None else v} {t.token.label}" for t, v in paid)
+        return f" In this transaction the sender paid the paymaster {parts} (net of what it returned)."
 
     def _native_amount(self, raw: int | None) -> str:
         if raw is None:
@@ -655,17 +701,41 @@ class BundleBuilder:
         items, truncated = self.explorer.internal_transactions(tx_hash)
         source = self._api_source(f"/transactions/{tx_hash}/internal-transactions", "Explorer API: internal transactions")
         reads = [it for it in items if it.type == "staticcall"]
-        calls = [it for it in items if it.type != "staticcall"]
+        system = [it for it in items if it.type != "staticcall" and self._between_system_contracts(it)]
+        calls = [it for it in items if it.type != "staticcall" and it not in system]
         for it in calls[:MAX_INTERNAL]:
             text, moves_value = self._internal_text(it)
+            same_as = self._same_native_movement(it)
+            if same_as:
+                text = text.rstrip(".") + f": the same movement as {same_as}, not an additional one."
             self.bundle.add("internal_call", text, [source],
-                            {"type": it.type, "value": str(it.value), "moves_value": moves_value})
+                            {"type": it.type, "value": str(it.value), "moves_value": moves_value, "same_as": same_as})
         if reads:
             self.bundle.add("internal_call", f"{len(reads)} read-only staticcall(s) (no state change) not listed.",
                             [source], {"staticcalls": len(reads)})
+        if system:
+            moved = sum(it.value for it in system)
+            text = f"{len(system)} internal call(s) between the network's system contracts not listed"
+            text += f" (they carry {self._native_amount(moved)} in total)." if moved else " (no value carried)."
+            self.bundle.add("internal_call", text, [source], {"system_calls": len(system), "value": str(moved)})
         if truncated or len(calls) > MAX_INTERNAL:
             self._gap("Internal calls", f"showing the first {MAX_INTERNAL}",
                       "Open the explorer page for the full list", retryable=False)
+
+    def _same_native_movement(self, it: InternalCall) -> str | None:
+        """Fact id of a native movement already stated with the same sender, recipient and value."""
+        if it.type != "call" or it.value <= 0 or it.success is False:
+            return None
+        key = ((address_of(it.sender) or "").lower(), (address_of(it.recipient) or "").lower(), it.value)
+        return self.native_movement_facts.get(key)
+
+    def _between_system_contracts(self, it: InternalCall) -> bool:
+        """Both ends are system contracts (addresses up to network.system_address_max, e.g. zkSync's)."""
+        limit = self.cfg.network.system_address_max
+        if limit is None:
+            return False
+        ends = [to_int(address_of(it.sender)), to_int(address_of(it.recipient))]
+        return all(n is not None and 0 < n <= limit for n in ends)
 
     def _internal_text(self, it: InternalCall) -> tuple[str, bool | None]:
         """Describe one internal call, and say whether native value really moved (None: not known)."""
@@ -807,6 +877,9 @@ class BundleBuilder:
 
     def _add_rpc_call(self, to: str, data: str, source: Source) -> None:
         """Decode the call from RPC data, using the explorer's ABI when the explorer answers."""
+        if self._is_native_contract(to):
+            self._add_native_contract_call(self._party(to), to, data, source)
+            return
         # Without the explorer there is no "is it a contract?" flag: use the node's code today,
         # the same criterion the explorer applies. Code today = a contract.
         try:

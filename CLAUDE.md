@@ -31,9 +31,15 @@ atualizar as duas ao fim de cada fase).
 7. **Contar e citar números certos.** Quantidades (testes, fixtures, achados) vêm de um comando
    rodado na hora, não de memória.
 
-## Critério de aceitação
+## Critério de aceitação (aprovado pelo Joabe em 07/10/2026; detalhes em docs/ACCEPTANCE.md)
 
-(Proposto em 07/10/2026; ver a seção abaixo quando aprovado pelo Joabe.)
+- **Nível A** (status, quem enviou/recebeu, valores movidos, taxa total, chamada decodificada,
+  motivo da falha) e **nível B** (estado na L1, paymaster, fluxo de taxa, delegações,
+  classificações): **zero fatos falsos**. Achado A/B é corrigido com teste que falha no código antigo.
+- **Nível C** (rótulo, redação, agrupamento, detalhe que daria para dizer melhor): **não decido
+  sozinho**. Cada achado vai para o Joabe, que escolhe corrigir agora ou mandar para a pendência.
+- Uma fase fecha quando a amostra de **300 transações por rede**, sorteadas e checadas contra o nó
+  (fonte independente), não tem fato falso de nível A ou B. Uma rodada de revisão por mudança.
 
 ## Ambiente
 

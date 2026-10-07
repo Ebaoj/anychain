@@ -161,3 +161,10 @@ A bug hunt with varied real transactions found facts that were well formatted, s
 - **Native contracts:** `native_contracts` in config (Rootstock Bridge and REMASC). Calls and events of those contracts say "built into the node, no source code or ABI" instead of asking for a verified contract.
 - **Declared, not interpreted:** `op_interop_messages` (the profile had listed a non-existent `op_interop`), OP type 0x7D, zkSync priority transactions (type 255).
 - Network knowledge stays in YAML (addresses, symbols, decimals with their on-chain sources in comments); the code only knows the concepts.
+
+## D23. Tenth review fixes and the acceptance criterion
+- **Native value counted once across all fact kinds:** an internal call carrying the same (from, to, value) as a native movement already stated (Celo CELO token transfers synthesized from internal sends; zkSync fee prepay and refunds) now says "the same movement as E#" and carries `same_as` in its data (real Celo tx 0x6be4971d…).
+- **zkSync user calls visible:** `network.system_address_max` (0xffff, `MAX_SYSTEM_CONTRACT_ADDRESS` in era-contracts) groups calls between two system contracts into one line; before, the 30-call limit hid every user-level internal call on zkSync, which also made a test pass for the wrong reason.
+- **Native contracts have published ABIs:** "no source code or ABI" was false (the Rootstock Bridge's ABI is in rskj). Native contracts now go through the normal ABI lookup; when none is found the gap asks for the published ABI in a configured repo. The RPC-only path also recognises native contracts.
+- **Paymaster wording:** "the ETH fee was prepaid by X (a paymaster)", plus what the sender paid the paymaster in tokens in the same tx, net of returns (85.78 NODL on the real fixture).
+- **Acceptance criterion (docs/ACCEPTANCE.md):** levels A/B must have zero false facts, measured on 300 random transactions per network checked against the node; level C findings go to Joabe. Rules from real mistakes are in the project `CLAUDE.md`, enforced by hooks that run the suite after every edit and block a commit unless it passes.

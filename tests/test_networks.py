@@ -223,7 +223,9 @@ def test_gap5_zksync_paymaster_is_named():
     b = replay_bundle(_cfg("zksync-era"), tx, "zksync_paymaster")
     flow = next(e for e in b.items if e.kind == "fee_flow")
     assert flow.data["paymaster"] and flow.data["matches_explorer_fee"]
-    assert "paid by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359, not by the sender (a paymaster)" in flow.text
+    assert "prepaid by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 (a paymaster), not by the sender" in flow.text
+    # Real numbers: the sender sent 598.42 NODL to the paymaster and got 512.64 back.
+    assert "the sender paid the paymaster 85.783676209796661425 NODL (net of what it returned)" in flow.text
 
 
 def test_gap2_operator_fee_is_its_own_part():
@@ -253,7 +255,7 @@ def test_gap3_rootstock_classification_and_gap6_native_contract():
     b = replay_bundle(_cfg("rootstock-mainnet"), tx, "rootstock_bridge")
     assert "classifies this as a Rootstock bridge transaction" in _texts(b)
     assert not any("verified contract" in g.needed or "verified on the explorer" in g.needed for g in b.gaps)
-    assert any("native contract built into the node" in g.why for g in b.gaps)
+    assert any("native contract built into the node" in g.why and "published ABI" in g.needed for g in b.gaps)
 
 
 def test_gap6_call_to_native_contract_is_not_asked_to_be_verified():
@@ -263,8 +265,11 @@ def test_gap6_call_to_native_contract_is_not_asked_to_be_verified():
     tx = "0x156c82cc49e90e374b87d7080f7866c4fe273ce74f99c9d5713c1023a6f0f556"
     b = replay_bundle(_cfg("rootstock-mainnet"), tx, "rootstock_bridge", overrides=mutated("rootstock_bridge", tx, call_bridge))
     call = next(e for e in b.items if e.kind == "call")
-    assert "built into the network's node, so it has no source code or ABI" in call.text and to in call.text
-    assert not _gaps(b, "Call decoding") and not _gaps(b, "Code at execution time")
+    assert "a contract built into the network's node" in call.text and to in call.text
+    assert "no source code or ABI" not in call.text  # false: the Bridge's ABI is published
+    gap = _gaps(b, "Call decoding")[0]
+    assert "published ABI" in gap.needed and "verified contract" not in gap.needed
+    assert not _gaps(b, "Code at execution time")
 
 
 def test_gap7_zksync_priority_type_is_stated():
@@ -283,3 +288,23 @@ def test_gap7_post_exec_and_interop_are_declared():
     assert "post-execution transaction (type 0x7D)" in _texts(b)
     assert "2 cross-chain interop message(s)" in _texts(b)
     assert not _gaps(b, "Network-specific details")  # op_interop_messages is a known OP field now
+
+
+# ---- review r10: native value counted once across all fact kinds -------------------
+
+def test_internal_native_send_points_to_the_native_movement_on_celo():
+    tx = "0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429"
+    b = replay_bundle(_cfg("celo-mainnet"), tx, "celo_faucet_internal_celo")
+    moves = {e.data["value"]: e.id for e in b.items if e.kind == "native_transfer"}
+    internal = [e for e in b.items if e.kind == "internal_call" and e.data.get("moves_value")]
+    assert len(internal) == 2 and all(e.data["same_as"] == moves[int(e.data["value"])] for e in internal)
+    assert all("the same movement as E" in e.text for e in internal)
+
+
+def test_zksync_user_calls_are_not_hidden_behind_system_calls():
+    tx = "0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4"
+    b = replay_bundle(_cfg("zksync-era"), tx, "zksync_native_eth_send")
+    assert "between the network's system contracts not listed" in _texts(b)
+    send = [e for e in b.items if e.kind == "internal_call" and e.data.get("value") == "73403258318442"]
+    assert send and send[0].data["same_as"]  # the user's ETH send, visible and linked to its native movement
+    assert not _gaps(b, "Internal calls")  # nothing cut by the 30-call limit any more

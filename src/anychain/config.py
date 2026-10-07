@@ -37,6 +37,14 @@ class NetworkConfig(BaseModel):
     native_token_contract: str | None = None
     # Address that collects fees through visible transfers (zkSync's bootloader).
     fee_collector: str | None = None
+    # Highest system-contract address (zkSync: 0xffff, its kernel space). Internal calls between
+    # two system contracts are grouped into one line so the user's own calls stay visible.
+    system_address_max: int | None = None
+
+    @field_validator("system_address_max", mode="before")
+    @classmethod
+    def _hex_or_int(cls, v: object) -> object:
+        return int(v, 16) if isinstance(v, str) and v.startswith("0x") else v
 
     @field_validator("native_token_contract", "fee_collector")
     @classmethod

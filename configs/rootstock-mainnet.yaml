@@ -29,8 +29,9 @@ repos:
 
 address_map: {}
 
-# Rootstock native contracts (rsksmart/rskj, PrecompiledContracts.java): built into the node,
-# no bytecode or ABI. Every block ends with a system transaction from the zero address to REMASC.
+# Rootstock native contracts (rsksmart/rskj, PrecompiledContracts.java): built into the node, so
+# they have no bytecode, but the Bridge's ABI is published (rskj Bridge.java) and can be added
+# through a configured repo. Every block ends with a system transaction from the zero address to REMASC.
 native_contracts:
   "0x0000000000000000000000000000000001000006": "Rootstock Bridge (BTC peg)"
   "0x0000000000000000000000000000000001000008": "Rootstock REMASC (block rewards)"

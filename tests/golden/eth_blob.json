@@ -103,6 +103,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },
@@ -121,6 +122,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
@@ -139,6 +141,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },
@@ -157,6 +160,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },
@@ -175,6 +179,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },

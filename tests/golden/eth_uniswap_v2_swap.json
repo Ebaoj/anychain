@@ -140,6 +140,7 @@
   {
    "data": {
     "moves_value": true,
+    "same_as": null,
     "type": "call",
     "value": "200000000000000000"
    },
@@ -158,6 +159,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
@@ -176,6 +178,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },
@@ -194,6 +197,7 @@
   {
    "data": {
     "moves_value": false,
+    "same_as": null,
     "type": "call",
     "value": "0"
    },

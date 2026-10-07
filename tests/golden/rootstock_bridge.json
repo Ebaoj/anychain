@@ -4,10 +4,10 @@
  },
  "gaps": [
   {
-   "needed": "The network's documentation of this native contract",
+   "needed": "Its published ABI (e.g. from the network node's source) in a configured repo",
    "retryable": false,
    "what": "Event decoding",
-   "why": "0x0000000000000000000000000000000001000006 is a native contract built into the node; no ABI exists for its events"
+   "why": "0x0000000000000000000000000000000001000006 is a native contract built into the node and the explorer has no verified ABI for it, so its events cannot be decoded"
   }
  ],
  "items": [

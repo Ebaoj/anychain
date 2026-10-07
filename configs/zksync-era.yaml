@@ -6,7 +6,8 @@ network:
   chain_type: zksync
   # L2BaseToken emits Transfer for every ETH movement, fees and refunds included (era-contracts L2BaseToken.sol)
   native_token_contract: "0x000000000000000000000000000000000000800a"
-  fee_collector: "0x0000000000000000000000000000000000008001"   # the bootloader        # Blockscout CHAIN_TYPE of this explorer
+  fee_collector: "0x0000000000000000000000000000000000008001"   # the bootloader
+  system_address_max: "0xffff"   # MAX_SYSTEM_CONTRACT_ADDRESS in era-contracts Constants.sol (kernel space)        # Blockscout CHAIN_TYPE of this explorer
 
 explorer:
   type: blockscout
