@@ -3,7 +3,9 @@ network:
   chain_id: 42220
   native_symbol: CELO
   native_decimals: 18
-  chain_type: optimism-celo # Blockscout CHAIN_TYPE of this explorer
+  chain_type: optimism-celo
+  # CELO is also an ERC-20: a native send appears as a CELO token transfer too (verified on tx 0x64f5270e...)
+  native_token_contract: "0x471EcE3750Da237f93B8E339c536989b8978a438" # Blockscout CHAIN_TYPE of this explorer
 
 explorer:
   type: blockscout
@@ -28,6 +30,14 @@ repos:
     source_globs: ["contracts/**/*.sol"]
 
 address_map: {}
+
+# Fee adapters for 6-decimal tokens (docs.celo.org fee-currencies list). The fee is in the
+# adapter's units: expectedDecimals()/adapterDecimals() read on-chain = 18 for all four.
+fee_tokens:
+  "0x0E2A3e05bc9A16F5292A6170456A710cb89C6f72": {symbol: "USD₮", decimals: 18, note: "through the USD₮ fee adapter (token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e)"}
+  "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B": {symbol: "USDC", decimals: 18, note: "through Circle's USDC fee adapter (token 0xcebA9300f2b948710d2653dD7B07f33A8B32118C)"}
+  "0x0357EE22278c922e1D36cFe6b899269b161880C4": {symbol: "USA₮", decimals: 18, note: "through the USA₮ fee adapter (token 0xD2ab3C9A02DBBAB236BfEC45D1d755DF4267F771)"}
+  "0x857BF24e29da0773687E804a743c2E421a394C16": {symbol: "XAUt0", decimals: 18, note: "through the XAUt0 fee adapter (token 0xaf37E8B6C9ED7f6318979f56Fc287d76c30847ff)"}
 
 # OP Stack predeploys (ethereum-optimism/optimism, contracts-bedrock/src/libraries/Predeploys.sol)
 # and the depositor system account (L1Block.DEPOSITOR_ACCOUNT, seen live as the sender of the

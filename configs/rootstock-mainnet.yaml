@@ -29,11 +29,11 @@ repos:
 
 address_map: {}
 
-# Rootstock native contracts (rsksmart/rskj, PrecompiledContracts.java). Every block ends with a
-# system transaction from the zero address to REMASC, which distributes the block rewards.
-address_labels:
-  "0x0000000000000000000000000000000001000006": "Rootstock Bridge native contract (BTC peg)"
-  "0x0000000000000000000000000000000001000008": "Rootstock REMASC native contract (block rewards)"
+# Rootstock native contracts (rsksmart/rskj, PrecompiledContracts.java): built into the node,
+# no bytecode or ABI. Every block ends with a system transaction from the zero address to REMASC.
+native_contracts:
+  "0x0000000000000000000000000000000001000006": "Rootstock Bridge (BTC peg)"
+  "0x0000000000000000000000000000000001000008": "Rootstock REMASC (block rewards)"
 
 abi_strategy:
   order: [explorer, repo_artifacts, repo_source_signatures, signature_db]
