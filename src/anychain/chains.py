@@ -10,6 +10,8 @@ what it could not interpret. Field shapes were checked on live explorers (DECISI
 """
 from dataclasses import dataclass, field
 
+from anychain.collectors.types import to_int as _int
+
 # Every CHAIN_TYPE value Blockscout accepts (blockscout/config/config_helper.exs).
 BLOCKSCOUT_CHAIN_TYPES = frozenset({
     "default", "arbitrum", "arc", "blackfort", "eden", "ethereum", "filecoin", "optimism", "rsk",
@@ -70,17 +72,6 @@ class ChainFact:
     kind: str
     text: str
     data: dict = field(default_factory=dict)
-
-
-def _int(value: object) -> int | None:
-    if isinstance(value, int):
-        return value
-    if isinstance(value, str):
-        try:
-            return int(value, 16) if value.startswith("0x") else int(value)
-        except ValueError:
-            return None
-    return None
 
 
 class ChainProfile:

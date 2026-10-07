@@ -2,19 +2,24 @@
 
 Reading order: `build()` runs the steps; each `_add_*` method adds facts for one topic.
 Each step is wrapped by `_safely()`, so an unexpected payload costs one topic
-(declared as a gap), never the whole answer.
+(declared as a gap), never the whole answer. Explorer and RPC answers arrive as typed
+objects (collectors/types.py); network-type specifics come from a profile (chains.py).
 """
 import re
 from collections.abc import Callable
+from dataclasses import dataclass
 
 from eth_utils import to_checksum_address
 
+from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, Fee, TokenRef, audit_fields, profile_for
 from anychain.collectors.explorer import MAX_PAGES, ExplorerClient
 from anychain.collectors.http import Budget, CollectorError, NotFoundError
 from anychain.collectors.rpc import RpcClient
+from anychain.collectors.types import (
+    AddressRef, Authorization, InternalCall, Log, RpcReceipt, RpcTransaction, TokenTransfer, Transaction,
+)
 from anychain.config import AppConfig
 from anychain.decoder import AbiDecoder
-from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, Fee, audit_fields, profile_for
 from anychain.models import EvidenceBundle, Source
 
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
@@ -27,10 +32,6 @@ ZERO_ADDRESS = "0x" + "0" * 40
 # value stays with the caller; staticcall cannot carry value. (See DECISIONS D17.)
 VALUE_IS_CONTEXT = {"delegatecall", "callcode", "staticcall"}
 
-class InvalidHashError(ValueError):
-    """The input is not a transaction hash."""
-
-
 # Blockscout `status` -> our status. `status` is null while pending.
 EXPLORER_STATUS = {"ok": "success", "error": "failed"}
 # Blockscout `result` values that describe state, not a failure reason.
@@ -39,19 +40,19 @@ RESULT_WITHOUT_REASON = {
 }
 
 
+class InvalidHashError(ValueError):
+    """The input is not a transaction hash."""
+
+
+@dataclass(frozen=True)
+class RpcView:
+    """What the RPC node told us about the transaction."""
+
+    tx: RpcTransaction
+    receipt: RpcReceipt | None  # None while pending
+
+
 # ---- small pure helpers ------------------------------------------------------
-
-def to_int(value: object) -> int | None:
-    """Parse an int from a decimal string, a 0x-hex string or an int. None if impossible."""
-    if isinstance(value, int):
-        return value
-    if isinstance(value, str):
-        try:
-            return int(value, 16) if value.startswith("0x") else int(value)
-        except ValueError:
-            return None
-    return None
-
 
 def amount(raw: int, decimals: int) -> str:
     """Exact decimal string for an integer amount (no float rounding)."""
@@ -63,47 +64,25 @@ def amount(raw: int, decimals: int) -> str:
     return f"{whole}.{str(frac).rjust(decimals, '0').rstrip('0')}"
 
 
-def party(value: dict | str | None, labels: dict[str, str] | None = None) -> str:
+def party(ref: AddressRef | str | None, labels: dict[str, str] | None = None) -> str:
     """An address with its explorer name, or else the config's label for it (address_labels)."""
-    if not value:
+    if ref is None or ref == "":
         return "(none)"
-    address = value if isinstance(value, str) else value.get("hash", "(unknown address)")
-    name = None if isinstance(value, str) else (value.get("name") or value.get("ens_domain_name"))
-    name = name or (labels or {}).get(str(address).lower())
-    return f"{address} ({name})" if name else address
+    if isinstance(ref, str):
+        ref = AddressRef(ref)
+    if ref.address is None:
+        return "(unknown address)"
+    name = ref.name or (labels or {}).get(ref.address.lower())
+    return f"{ref.address} ({name})" if name else ref.address
 
 
-def implementation_addresses(value: dict) -> list[str]:
-    """Proxy implementations the explorer lists next to an address."""
-    impls = value.get("implementations") or []
-    return [i["address_hash"] for i in impls if isinstance(i, dict) and isinstance(i.get("address_hash"), str)]
+def address_of(ref: AddressRef | None) -> str | None:
+    return ref.address if ref else None
 
 
-def delegate_of(auth: dict) -> str | None:
-    """Delegate address of an EIP-7702 authorization. Blockscout calls it `address_hash`
-    (older versions: `address`). None when absent: never read a missing value as "cleared"."""
-    target = auth.get("address_hash") or auth.get("address")
-    return target if isinstance(target, str) else None
-
-
-def address_of(value: dict | None) -> str | None:
-    return value.get("hash") if isinstance(value, dict) else None
-
-
-def receipt_status(receipt: dict) -> str:
-    """'success' / 'failed' from a receipt, or 'unknown' for pre-Byzantium receipts (no status field)."""
-    return {"0x1": "success", "0x0": "failed"}.get(receipt.get("status"), "unknown")
-
-
-def describe_revert(reason: object) -> str:
-    """Blockscout gives the revert reason decoded (dict), raw ({'raw': '0x..'}) or as text."""
-    if isinstance(reason, dict):
-        if reason.get("method_call"):
-            params = ", ".join(f"{p.get('name')}={p.get('value')!r}" for p in reason.get("parameters") or [])
-            return f"{reason['method_call']} with {params}" if params else reason["method_call"]
-        if reason.get("raw"):
-            return f"undecoded revert data {reason['raw']}"
-    return repr(reason)
+def with_args(args: list) -> str:
+    """' with a=1, b=2' for decoded arguments, or '' when there are none."""
+    return " with " + ", ".join(f"{a.name}={a.value}" for a in args) if args else ""
 
 
 # ---- the builder -------------------------------------------------------------
@@ -129,7 +108,7 @@ class BundleBuilder:
         explorer_status = self._status_from_explorer(tx) if tx is not None else None
         rpc_view = self._fetch_rpc(tx_hash, explorer_status)
 
-        has_receipt = rpc_view is not None and bool(rpc_view["receipt"])
+        has_receipt = rpc_view is not None and rpc_view.receipt is not None
         explorer_lagging = explorer_status in ("pending", "dropped") and has_receipt
         if explorer_lagging:
             self._gap("Explorer index", f"the explorer shows this transaction as {explorer_status}, "
@@ -168,8 +147,8 @@ class BundleBuilder:
             self._gap(topic, f"could not process the data ({type(exc).__name__}: {exc})",
                       "Check this part on the explorer page", retryable=False)
 
-    def _party(self, value: dict | str | None) -> str:
-        return party(value, self.cfg.address_labels)
+    def _party(self, ref: AddressRef | str | None) -> str:
+        return party(ref, self.cfg.address_labels)
 
     def _gap(self, what: str, why: str, needed: str, retryable: bool) -> None:
         self.bundle.add_gap(what, why, needed, retryable)
@@ -177,12 +156,15 @@ class BundleBuilder:
     def _api_source(self, path: str, label: str) -> Source:
         return Source(kind="explorer_api", label=label, url=self.explorer.url(path))
 
+    def _tx_source(self, tx_hash: str) -> Source:
+        return self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
+
     def _rpc_source(self, detail: str) -> Source:
         return Source(kind="rpc", label="JSON-RPC", url=self.cfg.rpc.url, detail=detail)
 
     # ---- fetching ----------------------------------------------------------
 
-    def _fetch_explorer_tx(self, tx_hash: str) -> dict | None:
+    def _fetch_explorer_tx(self, tx_hash: str) -> Transaction | None:
         try:
             tx = self.explorer.transaction(tx_hash)
             self.explorer_answered = True
@@ -196,7 +178,7 @@ class BundleBuilder:
                       "Explorer API reachable and indexing this transaction", exc.retryable)
             return None
 
-    def _fetch_rpc(self, tx_hash: str, explorer_status: str | None) -> dict | None:
+    def _fetch_rpc(self, tx_hash: str, explorer_status: str | None) -> RpcView | None:
         """Transaction + receipt from the RPC node, after checking it is on the right chain."""
         try:
             chain_id = self.rpc.chain_id()
@@ -218,7 +200,7 @@ class BundleBuilder:
         if tx is None:
             self._explain_rpc_miss(explorer_status)
             return None
-        return {"tx": tx, "receipt": receipt}
+        return RpcView(tx, receipt)
 
     def _explain_rpc_miss(self, explorer_status: str | None) -> None:
         """The node returned null. Why depends on what the explorer knows."""
@@ -234,7 +216,7 @@ class BundleBuilder:
 
     # ---- explorer path -----------------------------------------------------
 
-    def _describe_from_explorer(self, tx_hash: str, tx: dict, status: str) -> None:
+    def _describe_from_explorer(self, tx_hash: str, tx: Transaction, status: str) -> None:
         self.bundle.status = status
         self._safely("Transaction summary", lambda: self._add_overview(tx_hash, tx))
         if self.bundle.status in ("pending", "dropped"):
@@ -250,27 +232,25 @@ class BundleBuilder:
         self._safely("Events", lambda: self._add_events(tx_hash, covered_logs))
         self._declare_undecoded_events()
 
-    def _status_from_explorer(self, tx: dict) -> str:
+    def _status_from_explorer(self, tx: Transaction) -> str:
         # Blockscout stores dropped transactions with status "error", so check `result` first.
-        if tx.get("result") == "dropped/replaced":
+        if tx.result == "dropped/replaced":
             return "dropped"
-        raw_status = tx.get("status")
-        if isinstance(raw_status, str) and raw_status in EXPLORER_STATUS:
-            return EXPLORER_STATUS[raw_status]
-        if tx.get("result") == "pending":
+        if tx.status in EXPLORER_STATUS:
+            return EXPLORER_STATUS[tx.status]
+        if tx.result == "pending":
             return "pending"
         return "unknown"
 
-    def _add_overview(self, tx_hash: str, tx: dict) -> None:
+    def _add_overview(self, tx_hash: str, tx: Transaction) -> None:
         b, cfg = self.bundle, self.cfg
         sources = [Source(kind="explorer_ui", label="Explorer page", url=cfg.explorer.tx_url(tx_hash)),
-                   self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")]
+                   self._tx_source(tx_hash)]
         sym = cfg.network.native_symbol
-        value_raw = to_int(tx.get("value"))
-        value = amount(value_raw, cfg.network.native_decimals) if value_raw is not None else "unknown"
-        sender, target = self._party(tx.get("from")), self._target_text(tx)
-        data = {"status": b.status, "from": address_of(tx.get("from")), "to": address_of(tx.get("to")),
-                "value": value, "tx_type": tx.get("type")}
+        value = amount(tx.value, cfg.network.native_decimals) if tx.value is not None else "unknown"
+        sender, target = self._party(tx.sender), self._target_text(tx)
+        data = {"status": b.status, "from": address_of(tx.sender), "to": address_of(tx.to),
+                "value": value, "tx_type": tx.raw.get("type")}
 
         if b.status == "pending":
             b.add("overview", f"Transaction is pending: not yet included in a block. From {sender} to {target}. "
@@ -288,42 +268,41 @@ class BundleBuilder:
             value_text = f"Native value attached: {value} {sym}, not transferred because the transaction reverted."
         else:
             value_text = f"Native value sent: {value} {sym}."
-        data |= {"block": tx.get("block_number"), "timestamp": tx.get("timestamp"),
-                 "gas_used": tx.get("gas_used"), "gas_limit": tx.get("gas_limit")}
+        # The data keeps these values exactly as the explorer sent them (gas comes as text).
+        data |= {"block": tx.raw.get("block_number"), "timestamp": tx.raw.get("timestamp"),
+                 "gas_used": tx.raw.get("gas_used"), "gas_limit": tx.raw.get("gas_limit")}
         b.add("overview",
-              f"Transaction {verb} in block {tx.get('block_number')} at {tx.get('timestamp')}. "
+              f"Transaction {verb} in block {tx.block_number} at {tx.timestamp}. "
               f"From {sender} to {target}. {value_text} "
-              f"Gas used {tx.get('gas_used')} of limit {tx.get('gas_limit')}.",
+              f"Gas used {tx.gas_used} of limit {tx.gas_limit}.",
               sources, data)
 
-    def _target_text(self, tx: dict) -> str:
-        if tx.get("to"):
-            return self._party(tx["to"])
-        created = tx.get("created_contract")
+    def _target_text(self, tx: Transaction) -> str:
+        if tx.to:
+            return self._party(tx.to)
+        created = tx.created_contract
         return f"(contract creation of {self._party(created)})" if created else "(contract creation)"
 
-    def _add_fee(self, tx_hash: str, tx: dict) -> None:
-        fee = self.profile.fee(tx)
+    def _add_fee(self, tx_hash: str, tx: Transaction) -> None:
+        fee = self.profile.fee(tx.raw)
         if fee is None:
             return
         text = f"Fee paid: {self._fee_text(fee)}."
         for warning in fee.warnings:
             self._gap("Fee", warning, "Check the fee on the explorer page", retryable=False)
-        unknown_decimals = [p.token for p in fee.parts if p.token and p.token.decimals is None]
-        for token in unknown_decimals:
+        for token in [p.token for p in fee.parts if p.token and p.token.decimals is None]:
             self._gap("Fee", f"the explorer does not report the decimals of the fee token {token.address}, so the "
                       "fee is shown in raw units", "The token's decimals (its contract or the explorer's token page)",
                       retryable=False)
         if self.bundle.status == "failed":
             text += " The fee is charged even though the transaction failed."
-        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
-        self.bundle.add("fee", text, [source], {
+        self.bundle.add("fee", text, [self._tx_source(tx_hash)], {
             "fee": self._fee_amount(fee.total_raw, fee.single_token),
             "token": fee.single_token.symbol if fee.single_token else self.cfg.network.native_symbol,
             "parts": {p.label: self._fee_amount(p.raw, p.token) for p in fee.parts},
         })
 
-    def _fee_amount(self, raw: int, token) -> str:
+    def _fee_amount(self, raw: int, token: TokenRef | None) -> str:
         """Decimal amount; raw integer units when the token's decimals are unknown."""
         if token is not None and token.decimals is None:
             return str(raw)
@@ -331,7 +310,7 @@ class BundleBuilder:
 
     def _fee_text(self, fee: Fee) -> str:
         """'0.0001 ETH', '0.0001 ETH in total: 0.00008 ETH L2 execution + 0.00002 ETH L1 data', or a token fee."""
-        def money(raw, token):
+        def money(raw: int, token: TokenRef | None) -> str:
             if token is not None and token.decimals is None:
                 return f"{raw} raw units of {token.symbol}"
             return f"{self._fee_amount(raw, token)} {token.symbol if token else self.cfg.network.native_symbol}"
@@ -345,10 +324,10 @@ class BundleBuilder:
             text = " + ".join(f"{money(p.raw, p.token)} {p.label}" for p in fee.parts)
         return f"{text}; {fee.note}" if fee.note else text
 
-    def _add_chain_facts(self, tx_hash: str, tx: dict) -> None:
+    def _add_chain_facts(self, tx_hash: str, tx: Transaction) -> None:
         """Facts only this network type has, plus a check that the config's chain_type fits the payload."""
-        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
-        for fact in self.profile.facts(tx):
+        source = self._tx_source(tx_hash)
+        for fact in self.profile.facts(tx.raw):
             self.bundle.add(fact.kind, fact.text, [source], fact.data)
         configured = self.cfg.network.chain_type
         if configured not in BLOCKSCOUT_CHAIN_TYPES:
@@ -360,7 +339,7 @@ class BundleBuilder:
             self._gap("Network-specific details", f"chain_type {configured!r} has no dedicated profile yet, so only "
                       "the details common to every EVM network are interpreted",
                       "A profile for this chain type in chains.py", retryable=False)
-        audit = audit_fields(tx, self.profile)
+        audit = audit_fields(tx.raw, self.profile)
         for other_type, names in audit.other_types.items():
             self._gap("Chain type", f"the config says chain_type {configured!r}, but the explorer reports "
                       f"fields typical of {other_type!r} ({', '.join(names)})",
@@ -371,73 +350,79 @@ class BundleBuilder:
                       f"{', '.join(audit.unknown)}", "A chain type profile that covers these fields",
                       retryable=False)
 
-    def _add_revert(self, tx_hash: str, tx: dict) -> None:
+    def _add_revert(self, tx_hash: str, tx: Transaction) -> None:
         if self.bundle.status != "failed":
             return
-        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
-        reason = tx.get("revert_reason")
-        result = tx.get("result")
-        if isinstance(reason, dict) and not reason.get("method_call") and reason.get("raw") in ("0x", ""):
+        source = self._tx_source(tx_hash)
+        reason, result = tx.revert_reason, tx.result
+        if reason and reason.carried_no_data:
             self.bundle.add("revert", "The transaction reverted without any revert data: no reason text and no "
                             "custom error (e.g. a bare revert(), a failed assert in old Solidity, or a call to "
-                            "code that does not exist).", [source], {"revert_reason": reason})
+                            "code that does not exist).", [source], {"revert_reason": reason.original})
             return
-        if isinstance(reason, dict) and not reason.get("method_call") and not reason.get("raw"):
-            reason = None  # e.g. {"raw": null}: nothing reported
-        if reason:
-            self.bundle.add("revert", f"Explorer reports the revert reason: {describe_revert(reason)}.",
-                            [source], {"revert_reason": reason})
+        if reason and reason.reported:
+            self.bundle.add("revert", f"Explorer reports the revert reason: {reason.describe()}.",
+                            [source], {"revert_reason": reason.original})
         elif isinstance(result, str) and result not in RESULT_WITHOUT_REASON:
             self.bundle.add("revert", f"Explorer reports the failure as: {result!r}.", [source], {"result": result})
         else:
             self._gap("Revert reason", "the explorer did not report why the transaction failed",
                       "A node that can re-execute or trace the call (debug/trace RPC)", retryable=False)
 
-    def _add_authorizations(self, tx_hash: str, tx: dict) -> None:
+    def _add_authorizations(self, tx_hash: str, tx: Transaction) -> None:
         """EIP-7702 (type 4): accounts that set or cleared the contract code they run.
 
         Only an authorization the explorer marks "ok" took effect, and when one account
         has several valid ones in the same tx, the last one wins (EIP-7702 order).
         """
-        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
-        auths = [a for a in tx.get("authorization_list") or [] if isinstance(a, dict)]
-        last_valid = {str(a.get("authority")).lower(): n for n, a in enumerate(auths) if a.get("status") == "ok"}
+        source = self._tx_source(tx_hash)
+        if not tx.authorizations_readable:
+            self._gap("Code delegations", "the explorer's EIP-7702 authorization list is not readable",
+                      "Check the authorizations on the explorer page", retryable=False)
+        auths = tx.authorizations
+        last_valid = {str(a.authority).lower(): n for n, a in enumerate(auths) if a.status == "ok"}
         for n, auth in enumerate(auths):
-            authority = auth.get("authority") or "an account the explorer does not name"
-            target, status = delegate_of(auth), auth.get("status")
-            clears = target == ZERO_ADDRESS
-            what = ("clear its code delegation" if clears else
-                    f"run the code of {target}" if target else "change its code delegation (target not reported)")
-            if status == "ok" and target is None:
-                text = f"Code delegation of {authority} changed by this transaction (EIP-7702); the explorer does " \
-                       "not report the new target."
-            elif status == "ok" and last_valid.get(str(auth.get("authority")).lower()) != n:
-                text = f"EIP-7702 authorization for {authority} to {what} was valid but replaced by a later " \
-                       "authorization for the same account in this transaction."
-            elif status == "ok" and clears:
-                text = f"Code delegation cleared by this transaction: {authority} stops running delegated code (EIP-7702)."
-            elif status == "ok":
-                text = f"Code delegation set by this transaction: from here on, {authority} runs the code of {target} (EIP-7702)."
-            else:
-                verdict = (f"was not applied: the explorer marks it {status!r}" if status
-                           else "has no validity reported by the explorer")
-                text = f"EIP-7702 authorization for {authority} to {what} {verdict}."
-            superseded = status == "ok" and last_valid.get(str(auth.get("authority")).lower()) != n
-            applied = (False if superseded else True) if status == "ok" else (False if status else None)
+            text, applied, superseded = self._authorization_text(auth, last_valid.get(str(auth.authority).lower()) != n)
             self.bundle.add("delegation", text, [source],
-                            {"authority": auth.get("authority"), "delegate": target, "status": status,
+                            {"authority": auth.authority, "delegate": auth.delegate, "status": auth.status,
                              "applied": applied, "superseded": superseded})
 
-    def _delegations_applied(self, tx: dict) -> dict[str, str]:
+    def _authorization_text(self, auth: Authorization, not_last_valid: bool) -> tuple[str, bool | None, bool]:
+        """(fact text, applied?, superseded?) for one authorization."""
+        authority = auth.authority or "an account the explorer does not name"
+        target, status = auth.delegate, auth.status
+        clears = target == ZERO_ADDRESS
+        what = ("clear its code delegation" if clears else
+                f"run the code of {target}" if target else "change its code delegation (target not reported)")
+        superseded = status == "ok" and not_last_valid
+        applied = (not superseded) if status == "ok" else (False if status else None)
+        if status == "ok" and target is None:
+            text = f"Code delegation of {authority} changed by this transaction (EIP-7702); the explorer does " \
+                   "not report the new target."
+        elif superseded:
+            text = f"EIP-7702 authorization for {authority} to {what} was valid but replaced by a later " \
+                   "authorization for the same account in this transaction."
+        elif status == "ok" and clears:
+            text = f"Code delegation cleared by this transaction: {authority} stops running delegated code (EIP-7702)."
+        elif status == "ok":
+            text = f"Code delegation set by this transaction: from here on, {authority} runs the code of {target} (EIP-7702)."
+        else:
+            verdict = (f"was not applied: the explorer marks it {status!r}" if status
+                       else "has no validity reported by the explorer")
+            text = f"EIP-7702 authorization for {authority} to {what} {verdict}."
+        return text, applied, superseded
+
+    def _delegations_applied(self, tx: Transaction) -> dict[str, str]:
         """Lowercase authority -> delegate address in effect after this tx's valid authorizations
         (ZERO_ADDRESS when cleared). Authorizations are applied before execution; the last valid one wins."""
-        result = {}
-        for auth in tx.get("authorization_list") or []:
-            if isinstance(auth, dict) and auth.get("status") == "ok" and isinstance(auth.get("authority"), str):
-                if delegate_of(auth) is None:
-                    result.pop(auth["authority"].lower(), None)  # target unknown: claim nothing
-                else:
-                    result[auth["authority"].lower()] = delegate_of(auth)
+        result: dict[str, str] = {}
+        for auth in tx.authorizations:
+            if auth.status != "ok" or auth.authority is None:
+                continue
+            if auth.delegate is None:
+                result.pop(auth.authority.lower(), None)  # target unknown: claim nothing
+            else:
+                result[auth.authority.lower()] = auth.delegate
         return result
 
     def _add_data_to_codeless(self, to_text: str, size: int, cleared_here: bool, today_basis: str,
@@ -460,18 +445,24 @@ class BundleBuilder:
                   "explorer or a plain state read (code can change within a block, and built-in precompiles run "
                   "without stored code)", "An execution trace of the transaction (debug/trace RPC)", retryable=False)
 
-    def _add_call(self, tx_hash: str, tx: dict) -> None:
+    def _add_call(self, tx_hash: str, tx: Transaction) -> None:
         b, sym = self.bundle, self.cfg.network.native_symbol
-        source = self._api_source(f"/transactions/{tx_hash}", "Explorer API: transaction")
-        data = tx.get("raw_input") or "0x"
-        to = tx.get("to")
-        if not to:
-            created = tx.get("created_contract")
+        source = self._tx_source(tx_hash)
+        data, to = tx.raw_input, tx.to
+        if data is None:
+            self._gap("Call decoding", "the explorer's call data is not readable", "Check the input on the explorer page",
+                      retryable=False)
+            return
+        if to is not None and to.address is None:
+            self._gap("Call decoding", "the explorer did not report the target address of the call",
+                      "Check the transaction on the explorer page", retryable=False)
+            return
+        if to is None:
+            created = tx.created_contract
             text = f"Contract creation: deployed {self._party(created)}." if created else "Contract creation transaction."
             b.add("call", text, [source], {"created": address_of(created)})
             return
-        authorizations = tx.get("authorization_list") or []
-        if address_of(tx.get("from")) == ZERO_ADDRESS:
+        if address_of(tx.sender) == ZERO_ADDRESS:
             text = f"System transaction: sent from the zero address, which no one can sign for, to {self._party(to)}."
             if data == "0x":
                 text += " It carries no call data."
@@ -479,34 +470,31 @@ class BundleBuilder:
             if data == "0x":
                 return
         if data == "0x":
-            if authorizations and not to_int(tx.get("value")):
-                b.add("call", f"No call data and no value were sent; the transaction carries {len(authorizations)} "
+            if tx.authorizations and not tx.value:
+                b.add("call", f"No call data and no value were sent; the transaction carries {len(tx.authorizations)} "
                       "EIP-7702 authorization(s), listed as delegation facts.", [source])
             else:
                 b.add("call", f"Plain {sym} transfer (no call data) to {self._party(to)}.", [source])
             return
-        delegations = self._delegations_applied(tx)
-        delegate_here = delegations.get(to["hash"].lower())
+        delegate_here = self._delegations_applied(tx).get(to.address.lower())
         if delegate_here == ZERO_ADDRESS or (
-                delegate_here is None and to.get("is_contract") is False and not implementation_addresses(to)):
+                delegate_here is None and to.is_contract is False and not to.implementations):
             self._add_data_to_codeless(self._party(to), (len(data) - 2) // 2, delegate_here == ZERO_ADDRESS,
                                        "The explorer lists it as having no contract code today", source)
             return
 
-        address = to["hash"]
         # Code the account ran: a delegation set by this very tx first, then today's listed implementations.
-        decoder = self._decoder_for(address, ([delegate_here] if delegate_here else []) + implementation_addresses(to))
+        decoder = self._decoder_for(to.address, ([delegate_here] if delegate_here else []) + list(to.implementations))
         decoded = decoder.decode_call(data) if decoder else None
         if decoded is None:
             b.add("call", f"Called function with selector {data[:10]} on {self._party(to)}; not decoded.",
                   [source], {"selector": data[:10]})
-            self._declare_undecoded("Call decoding", address, f"selector {data[:10]}", code_owner=delegate_here)
+            self._declare_undecoded("Call decoding", to.address, f"selector {data[:10]}", code_owner=delegate_here)
             return
-        args = ", ".join(f"{a.name}={a.value}" for a in decoded.args)
-        abi_source = self._api_source(f"/smart-contracts/{address}", "Explorer API: contract ABI")
+        abi_source = self._api_source(f"/smart-contracts/{to.address}", "Explorer API: contract ABI")
         b.add("call",
-              f"Called {decoded.signature} on {self._party(to)} with {args}. "
-              f"ABI source: {self.abi_notes[address.lower()]}.",
+              f"Called {decoded.signature} on {self._party(to)}{with_args(decoded.args)}. "
+              f"ABI source: {self.abi_notes[to.address.lower()]}.",
               [source, abi_source],
               {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
 
@@ -548,55 +536,47 @@ class BundleBuilder:
 
     def _add_transfers(self, tx_hash: str) -> set[int]:
         """Token transfers. Returns the log indexes they cover, so events skip them."""
-        items, truncated = self.explorer.token_transfers(tx_hash)
+        transfers, truncated = self.explorer.token_transfers(tx_hash)
         source = self._api_source(f"/transactions/{tx_hash}/token-transfers", "Explorer API: token transfers")
         covered: set[int] = set()
-        for t in items:
-            if to_int(t.get("log_index")) is not None:
-                covered.add(to_int(t.get("log_index")))  # type: ignore[arg-type]
-            token = t.get("token") or {}
-            text = f"Token transfer: {self._transfer_what(token, t.get('total') or {})} " \
-                   f"from {self._party(t.get('from'))} to {self._party(t.get('to'))}."
+        for t in transfers:
+            if t.log_index is not None:
+                covered.add(t.log_index)
+            text = f"Token transfer: {self._transfer_what(t)} " \
+                   f"from {self._party(t.sender)} to {self._party(t.recipient)}."
             self.bundle.add("token_transfer", text, [source],
-                            {"token": token.get("address_hash"), "from": address_of(t.get("from")),
-                             "to": address_of(t.get("to"))})
+                            {"token": t.token.address, "from": address_of(t.sender), "to": address_of(t.recipient)})
         if truncated:
             self._gap("Token transfers", f"more than {MAX_PAGES} pages of transfers",
                       "Open the explorer page for the full list", retryable=False)
         return covered
 
-    def _transfer_what(self, token: dict, total: dict) -> str:
+    def _transfer_what(self, t: TokenTransfer) -> str:
         """'69.3484 USDC', '50 x NAME token #7', 'NAME token #443098', or the raw amount."""
-        symbol = token.get("symbol") or token.get("name") or token.get("address_hash") or "unknown token"
-        value = to_int(total.get("value"))
-        decimals = to_int(total.get("decimals") if total.get("decimals") is not None else token.get("decimals"))
-        token_id = total.get("token_id")
-        if token_id is not None and value is not None:
-            return f"{value} x {symbol} token #{token_id}"  # ERC-1155: an id and a quantity
-        if token_id is not None:
-            return f"{symbol} token #{token_id}"  # ERC-721: one NFT
-        if value is not None and decimals is not None:
-            return f"{amount(value, decimals)} {symbol}"
-        if value is not None:
-            return f"{value} raw units of {symbol} (decimals unknown)"
+        symbol = t.token.label
+        if t.token_id is not None and t.value is not None:
+            return f"{t.value} x {symbol} token #{t.token_id}"  # ERC-1155: an id and a quantity
+        if t.token_id is not None:
+            return f"{symbol} token #{t.token_id}"  # ERC-721: one NFT
+        if t.value is not None and t.decimals is not None:
+            return f"{amount(t.value, t.decimals)} {symbol}"
+        if t.value is not None:
+            return f"{t.value} raw units of {symbol} (decimals unknown)"
         return f"{symbol} (amount not reported by the explorer)"
 
-    def _add_internal(self, tx_hash: str, tx: dict) -> None:
-        if tx.get("result") == "awaiting_internal_transactions":
+    def _add_internal(self, tx_hash: str, tx: Transaction) -> None:
+        if tx.result == "awaiting_internal_transactions":
             self._gap("Internal calls", "the explorer is still indexing this transaction's internal calls",
                       "Ask again in a few minutes", retryable=True)
             return
         items, truncated = self.explorer.internal_transactions(tx_hash)
-        path = f"/transactions/{tx_hash}/internal-transactions"
-        source = self._api_source(path, "Explorer API: internal transactions")
-        sym, dec = self.cfg.network.native_symbol, self.cfg.network.native_decimals
-        reads = [it for it in items if it.get("type") == "staticcall"]
-        calls = [it for it in items if it.get("type") != "staticcall"]
+        source = self._api_source(f"/transactions/{tx_hash}/internal-transactions", "Explorer API: internal transactions")
+        reads = [it for it in items if it.type == "staticcall"]
+        calls = [it for it in items if it.type != "staticcall"]
         for it in calls[:MAX_INTERNAL]:
-            text, moves_value = self._internal_text(it, sym, dec)
+            text, moves_value = self._internal_text(it)
             self.bundle.add("internal_call", text, [source],
-                            {"type": it.get("type"), "value": str(to_int(it.get("value")) or 0),
-                             "moves_value": moves_value})
+                            {"type": it.type, "value": str(it.value), "moves_value": moves_value})
         if reads:
             self.bundle.add("internal_call", f"{len(reads)} read-only staticcall(s) (no state change) not listed.",
                             [source], {"staticcalls": len(reads)})
@@ -604,28 +584,26 @@ class BundleBuilder:
             self._gap("Internal calls", f"showing the first {MAX_INTERNAL}",
                       "Open the explorer page for the full list", retryable=False)
 
-    def _internal_text(self, it: dict, sym: str, dec: int) -> tuple[str, bool | None]:
+    def _internal_text(self, it: InternalCall) -> tuple[str, bool | None]:
         """Describe one internal call, and say whether native value really moved (None: not known)."""
-        kind = it.get("type")
-        value = to_int(it.get("value")) or 0
-        shown = f"{amount(value, dec)} {sym}"
-        success = it.get("success")  # True, False, or None when the explorer does not say
-        ok = success is not False
+        sym, kind, value = self.cfg.network.native_symbol, it.type, it.value
+        shown = f"{amount(value, self.cfg.network.native_decimals)} {sym}"
+        ok = it.success is not False
 
         if kind in ("create", "create2"):
-            creator = self._party(it.get("from"))
-            if success is None:
+            creator = self._party(it.sender)
+            if it.success is None:
                 return f"Internal {kind} by {creator}; the explorer does not say if the deployment succeeded.", None
             if not ok:
                 return f"Internal {kind} by {creator} failed: nothing was deployed or transferred.", False
-            created = it.get("created_contract")
-            deployed = self._party(created) if created else "a contract whose address the explorer does not report"
+            deployed = (self._party(it.created_contract) if it.created_contract
+                        else "a contract whose address the explorer does not report")
             text = f"Internal {kind} by {creator}: deployed {deployed}"
             return (f"{text} with {shown}." if value > 0 else f"{text}."), value > 0
 
-        route = f"from {self._party(it.get('from'))} to {self._party(it.get('to'))}"
+        route = f"from {self._party(it.sender)} to {self._party(it.recipient)}"
         if kind == "call" and value > 0:
-            if success is None:
+            if it.success is None:
                 return f"Internal call {route} with {shown} attached; the explorer does not say if it succeeded.", None
             if ok:
                 return f"Internal {sym} transfer of {shown} {route}.", True
@@ -641,7 +619,7 @@ class BundleBuilder:
     def _add_events(self, tx_hash: str, covered_logs: set[int]) -> None:
         items, truncated = self.explorer.logs(tx_hash)
         source = self._api_source(f"/transactions/{tx_hash}/logs", "Explorer API: logs")
-        logs = [log for log in items if to_int(log.get("index")) not in covered_logs]
+        logs = [log for log in items if log.index not in covered_logs]
         if len(logs) > MAX_EVENTS:
             logs, truncated = logs[:MAX_EVENTS], True
         broken = 0
@@ -657,15 +635,17 @@ class BundleBuilder:
             self._gap("Events", f"showing the first {MAX_EVENTS}", "Open the explorer page for the full list",
                       retryable=False)
 
-    def _add_one_event(self, log: dict, source: Source) -> None:
-        emitter = log.get("address") or {}
-        address = emitter.get("hash", "(unknown)")
-        topics = [t for t in log.get("topics") or [] if t]
-        decoder = self._decoder_for(address, implementation_addresses(emitter))
-        event = decoder.decode_log(topics, log.get("data") or "0x") if decoder else None
+    def _add_one_event(self, log: Log, source: Source) -> None:
+        emitter = log.emitter
+        if emitter is None or emitter.address is None:
+            raise ValueError("log without a readable emitter address")  # counted as an odd log by _add_events
+        address = emitter.address
+        topics = list(log.topics)
+        decoder = self._decoder_for(address, list(emitter.implementations))
+        event = decoder.decode_log(topics, log.data) if decoder else None
         if event:
-            args = ", ".join(f"{a.name}={a.value}" for a in event.args)
-            self.bundle.add("event", f"Event {event.signature} emitted by {self._party(emitter)}: {args}.", [source],
+            args = ": " + ", ".join(f"{a.name}={a.value}" for a in event.args) if event.args else ""
+            self.bundle.add("event", f"Event {event.signature} emitted by {self._party(emitter)}{args}.", [source],
                             {"event": event.name, "args": {a.name: a.value for a in event.args}})
             return
         if decoder and decoder.could_be_anonymous(topics):
@@ -688,23 +668,23 @@ class BundleBuilder:
 
     # ---- rpc path ----------------------------------------------------------
 
-    def _add_rpc_only(self, tx_hash: str, view: dict) -> None:
-        b, tx, receipt = self.bundle, view["tx"], view["receipt"]
+    def _add_rpc_only(self, tx_hash: str, view: RpcView) -> None:
+        b, tx, receipt = self.bundle, view.tx, view.receipt
         source = self._rpc_source(f"eth_getTransactionByHash + eth_getTransactionReceipt [{tx_hash}]")
         sym, dec = self.cfg.network.native_symbol, self.cfg.network.native_decimals
-        value = amount(to_int(tx.get("value")) or 0, dec)
+        value = amount(tx.value or 0, dec)
 
-        if not receipt:
+        if receipt is None:
             b.status = "pending"
-            b.add("overview", f"(From RPC only) Transaction is pending. From {tx.get('from')} to "
-                  f"{tx.get('to') or '(contract creation)'}. Native value offered: {value} {sym}.", [source])
+            b.add("overview", f"(From RPC only) Transaction is pending. From {tx.sender} to "
+                  f"{tx.to or '(contract creation)'}. Native value offered: {value} {sym}.", [source])
             self._gap("Final outcome", "the transaction is still pending", "Wait for it to be mined, then ask again",
                       retryable=True)
             return
 
-        b.status = receipt_status(receipt)
+        b.status = receipt.status
         verb = {"success": "succeeded", "failed": "failed (reverted)"}.get(b.status, "was mined (outcome not recorded)")
-        target = tx.get("to") or f"(contract creation of {receipt.get('contractAddress')})"
+        target = tx.to or f"(contract creation of {receipt.contract_address})"
         if b.status == "failed":
             value_text = f"Native value attached: {value} {sym}, not transferred because the transaction reverted."
         else:
@@ -713,31 +693,32 @@ class BundleBuilder:
             self._gap("Outcome", "this receipt has no status field (the node's receipt format predates it)",
                       "The explorer, which infers the outcome from execution traces", retryable=False)
         b.add("overview",
-              f"(From RPC only) Transaction {verb} in block {to_int(tx.get('blockNumber'))}. "
-              f"From {tx.get('from')} to {target}. {value_text} "
-              f"Gas used {to_int(receipt.get('gasUsed'))} of limit {to_int(tx.get('gas'))}.",
-              [source], {"status": b.status, "from": tx.get("from"), "to": tx.get("to")})
+              f"(From RPC only) Transaction {verb} in block {tx.block_number}. "
+              f"From {tx.sender} to {target}. {value_text} "
+              f"Gas used {receipt.gas_used} of limit {tx.gas}.",
+              [source], {"status": b.status, "from": tx.sender, "to": tx.to})
 
-        data = tx.get("input") or "0x"
-        authorizations = tx.get("authorizationList") or []
+        data, authorizations = tx.input, tx.delegates
+        if data is None:
+            self._gap("Call decoding", "the node's call data is not readable", "Check the RPC endpoint", retryable=False)
+            data = ""  # neither "no data" nor a call: no call fact below
         if authorizations:
-            delegates = ", ".join(sorted({str(a.get("address")) for a in authorizations if isinstance(a, dict)}))
+            delegates = ", ".join(sorted(set(authorizations)))
             b.add("delegation", f"Transaction carries {len(authorizations)} EIP-7702 authorization(s) naming "
                   f"{delegates}; who signed them and whether they were valid is not checked without the explorer.",
                   [source], {"applied": None})
             self._gap("Code delegations", "signers and validity of EIP-7702 authorizations need the explorer",
                       "Explorer API reachable", retryable=True)
-        if tx.get("to") and data == "0x" and authorizations and not to_int(tx.get("value")):
+        if tx.to and data == "0x" and authorizations and not tx.value:
             b.add("call", f"No call data and no value were sent; the transaction carries {len(authorizations)} "
                   "EIP-7702 authorization(s).", [source])
-        elif tx.get("to") and data != "0x":
-            self._add_rpc_call(to_checksum_address(tx["to"]), data, source)
-        logs = receipt.get("logs") or []
-        b.add("receipt", f"Receipt has {len(logs)} log(s).", [source])
-        if logs and self.explorer_answered:
+        elif tx.to and data not in ("0x", ""):
+            self._add_rpc_call(to_checksum_address(tx.to), data, source)
+        b.add("receipt", f"Receipt has {receipt.log_count} log(s).", [source])
+        if receipt.log_count and self.explorer_answered:
             self._gap("Event decoding", "the explorer has not indexed this transaction's events yet",
                       "Ask again in a minute", retryable=True)
-        elif logs:
+        elif receipt.log_count:
             self._gap("Event decoding", "explorer unavailable, so events stay undecoded", "Explorer API reachable",
                       retryable=True)
 
@@ -758,8 +739,7 @@ class BundleBuilder:
         decoder = self._decoder_for(to) if self.explorer_answered else None
         decoded = decoder.decode_call(data) if decoder else None
         if decoded:
-            args = ", ".join(f"{a.name}={a.value}" for a in decoded.args)
-            self.bundle.add("call", f"Called {decoded.signature} on {to} with {args}. "
+            self.bundle.add("call", f"Called {decoded.signature} on {to}{with_args(decoded.args)}. "
                             f"ABI source: {self.abi_notes[to.lower()]}.", [source],
                             {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
             return
@@ -771,18 +751,17 @@ class BundleBuilder:
             self._gap("Call decoding", "explorer unavailable, so no ABI could be fetched",
                       "Explorer API reachable, or the contract ABI in a configured repo", retryable=True)
 
-    def _add_cross_check(self, view: dict) -> None:
-        receipt = view["receipt"]
-        if not receipt or self.bundle.status not in ("success", "failed"):
+    def _add_cross_check(self, view: RpcView) -> None:
+        receipt = view.receipt
+        if receipt is None or self.bundle.status not in ("success", "failed"):
             return
-        rpc_status = receipt_status(receipt)
-        if rpc_status == "unknown":
-            return  # pre-Byzantium receipt: nothing to compare
-        agree = rpc_status == self.bundle.status
-        text = f"RPC receipt independently reports status {rpc_status}"
+        if receipt.status == "unknown":
+            return  # receipt without a status field: nothing to compare
+        agree = receipt.status == self.bundle.status
+        text = f"RPC receipt independently reports status {receipt.status}"
         text += ", matching the explorer." if agree else f", but the explorer says {self.bundle.status}."
         source = self._rpc_source(f"eth_getTransactionReceipt [{self.bundle.tx_hash}]")
-        self.bundle.add("cross_check", text, [source], {"rpc_status": rpc_status, "agrees": agree})
+        self.bundle.add("cross_check", text, [source], {"rpc_status": receipt.status, "agrees": agree})
         if not agree:
             self._gap("Status disagreement", "explorer and RPC report different statuses",
                       "Treat the RPC receipt as authoritative and re-check the explorer index", retryable=True)
