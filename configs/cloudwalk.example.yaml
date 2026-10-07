@@ -1,0 +1,53 @@
+# Template for retargeting AnyChain to the CloudWalk network.
+# Copy to configs/cloudwalk.yaml, fill every <PLACEHOLDER>, run with --config.
+# No code changes are needed: everything network-specific lives in this file.
+network:
+  name: cloudwalk-private          # free-text label shown in the UI and in logs
+  chain_id: 0                      # <CHAIN_ID>: ask the network team, or call eth_chainId on the RPC
+  native_symbol: "<SYMBOL>"        # native currency ticker used to display fees and value
+  native_decimals: 18
+
+explorer:
+  type: blockscout                 # any Blockscout-compatible API (v2)
+  base_url: "<EXPLORER_BASE_URL>"  # e.g. https://explorer.internal.example
+  api_path: /api/v2
+  tx_url_template: "{base_url}/tx/{hash}"
+  address_url_template: "{base_url}/address/{address}"
+  timeout_s: 15
+
+rpc:
+  url: "<RPC_URL>"                 # read-only JSON-RPC endpoint
+  timeout_s: 10
+  supports_debug_trace: false      # set true if the node serves debug_traceTransaction
+
+repos:
+  # CloudWalk publishes the Stratus EVM ledger (Rust) at github.com/cloudwalk/stratus,
+  # but no public Solidity contract repo was found (checked 2026-10-07).
+  # Point this at the repo with the network's contracts (e.g. the BRLC token):
+  - url: "<GITHUB_REPO_URL>"
+    ref: main
+    source_globs: ["contracts/**/*.sol"]
+    artifact_globs: ["**/artifacts/**/*.json", "**/abi/**/*.json"]
+
+address_map: {}                    # optional: "0x...": { repo: "<url>", contract: "<Name>" }
+
+abi_strategy:
+  order: [explorer, repo_artifacts, repo_source_signatures, signature_db]
+  signature_db:
+    enabled: false                 # keep off on a private network if policy requires it
+    url: https://www.4byte.directory/api/v1
+
+llm:
+  provider: anthropic
+  model: claude-sonnet-5-5
+  max_tokens: 2000
+  temperature: 0
+
+assistant:
+  default_mode: support
+  language: pt-BR
+  max_clarifying_questions: 2
+
+storage:
+  sqlite_path: data/runs.db
+  cache_dir: data/cache

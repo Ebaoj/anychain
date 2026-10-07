@@ -1,0 +1,50 @@
+network:
+  name: optimism-mainnet
+  chain_id: 10
+  native_symbol: ETH
+  native_decimals: 18
+
+explorer:
+  type: blockscout
+  base_url: https://explorer.optimism.io
+  api_path: /api/v2
+  tx_url_template: "{base_url}/tx/{hash}"
+  address_url_template: "{base_url}/address/{address}"
+  timeout_s: 15
+
+rpc:
+  url: https://mainnet.optimism.io
+  timeout_s: 10
+  supports_debug_trace: false
+
+repos:
+  - url: https://github.com/Uniswap/v2-periphery
+    ref: master
+    source_globs: ["contracts/**/*.sol"]
+    artifact_globs: ["**/artifacts/**/*.json", "**/out/**/*.json", "**/abi/**/*.json", "build/**/*.json"]
+  - url: https://github.com/circlefin/stablecoin-evm
+    ref: master
+    source_globs: ["contracts/**/*.sol"]
+
+address_map: {}
+
+abi_strategy:
+  order: [explorer, repo_artifacts, repo_source_signatures, signature_db]
+  signature_db:
+    enabled: true
+    url: https://www.4byte.directory/api/v1
+
+llm:
+  provider: anthropic
+  model: claude-sonnet-5-5
+  max_tokens: 2000
+  temperature: 0
+
+assistant:
+  default_mode: support
+  language: pt-BR
+  max_clarifying_questions: 2
+
+storage:
+  sqlite_path: data/runs.db
+  cache_dir: data/cache
