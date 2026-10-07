@@ -151,3 +151,13 @@ A bug hunt with varied real transactions found facts that were well formatted, s
   - The golden test approved a missing golden file by writing it; it now fails unless regeneration is requested.
   - `tests/test_types.py` tests the parsers directly with the odd shapes the harness found. Dead fields and a duplicate int parser were removed.
   - Rerun of the same harness after the fixes: zero invented addresses, zero placeholder requests, zero crashes.
+
+## D22. The seven gaps from the chain research (docs/CHAINS.md)
+- **Native currency counted once:** `network.native_token_contract` names the contract that also records native movements as token transfers (zkSync `L2BaseToken` 0x…800a, which emits `Transfer` for every ETH move per its source; Celo's CELO token 0x471E…, verified on a live native send). Its transfers become "native movement" facts, never a second asset.
+- **Fee flow:** with `network.fee_collector` (zkSync's bootloader), prepay minus refunds is stated as the net fee and **checked against the explorer's fee** (a mismatch raises a gap). When the prepay comes from someone other than the sender, the fee payer is named as a paymaster (real tx 0x092a7ba3…).
+- **OP operator fee:** Blockscout's total is execution + L1 data + operator fee (`fee_calc`); the operator fee is now its own part. Not seen live (zero on OP Mainnet and Celo today), tested on a real recording with the field added.
+- **Blockscout's classification (`transaction_types`) is read:** the OP L1 attributes transaction is stated exactly (no longer "either a deposit or a system tx"); a user deposit is stated as a deposit; OP type 0x7D and Rootstock bridge/REMASC are named from the explorer's own classification.
+- **Celo fee adapters:** `fee_tokens` in config maps each adapter to a symbol and the decimals of its fee units. Each value was read on-chain: `expectedDecimals()` = 18 for the standard Celo adapters, `adapterDecimals()` = 18 for Circle's `FiatTokenFeeAdapter` (USDC), which has no `decimals()` and is why the explorer sends `decimals: null`. Without a config entry the fee stays in raw units with a gap.
+- **Native contracts:** `native_contracts` in config (Rootstock Bridge and REMASC). Calls and events of those contracts say "built into the node, no source code or ABI" instead of asking for a verified contract.
+- **Declared, not interpreted:** `op_interop_messages` (the profile had listed a non-existent `op_interop`), OP type 0x7D, zkSync priority transactions (type 255).
+- Network knowledge stays in YAML (addresses, symbols, decimals with their on-chain sources in comments); the code only knows the concepts.

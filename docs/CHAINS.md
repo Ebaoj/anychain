@@ -22,7 +22,7 @@ Status legend for the last column of each table: **done** (interpreted), **decla
 | Field / concept | Meaning | AnyChain |
 |---|---|---|
 | `fee.value` | Blockscout's total fee. `fee_calc`: **l2 fee + l1 fee + operator fee** (the last two are zero outside OP chains) | done |
-| `transaction_types` | Blockscout's own classification of the tx: `coin_transfer`, `contract_call`, `contract_creation`, `token_transfer`, `token_creation`, `blob_transaction`, `set_code_transaction` (EIP-7702), `op_stack_l1_attributes_transaction`, `op_stack_post_exec_transaction`, `rootstock_bridge`, `rootstock_remasc`, `sponsored_transaction` | **missing**: it already tells us what we guess from other fields |
+| `transaction_types` | Blockscout's own classification of the tx: `coin_transfer`, `contract_call`, `contract_creation`, `token_transfer`, `token_creation`, `blob_transaction`, `set_code_transaction` (EIP-7702), `op_stack_l1_attributes_transaction`, `op_stack_post_exec_transaction`, `rootstock_bridge`, `rootstock_remasc`, `sponsored_transaction` | done (D22): used for OP L1 attributes, OP 0x7D, Rootstock bridge/REMASC |
 | `authorization_list` | EIP-7702 authorizations | done (D17, D18) |
 | `revert_reason` | decoded object, `{"raw": ...}`, or text | done (D13, D20) |
 
@@ -42,14 +42,14 @@ Sources: `optimism_view.ex`; [OP fees](https://docs.optimism.io/stack/transactio
 
 | Item | Detail | AnyChain |
 |---|---|---|
-| Fee parts | **execution** (`gas_used × (base + priority)`), **L1 data fee** (`l1_fee`), **operator fee** (since Isthmus: `operatorFeeConstant + gasUsed × operatorFeeScalar × 100`; Blockscout adds `operator_fee` only when > 0). All three are in `fee.value` | **partial**: L1 split done; the operator fee is folded into "L2 execution" today (wrong label when present) |
+| Fee parts | **execution** (`gas_used × (base + priority)`), **L1 data fee** (`l1_fee`), **operator fee** (since Isthmus: `operatorFeeConstant + gasUsed × operatorFeeScalar × 100`; Blockscout adds `operator_fee` only when > 0). All three are in `fee.value` | done (D22): three parts; not seen live yet (zero today on OP Mainnet and Celo) |
 | Deposit type 126 (0x7E) | not signed on L2, gas prepaid on L1, no refund; **deposits pay no operator fee** | done (hedged wording) |
-| L1 attributes tx | the first tx of every block, from `0xdead…0001` to `0x42…15`, source-hash domain 1. Blockscout flags it as `op_stack_l1_attributes_transaction` | **missing**: we could say exactly "sequencer system transaction" instead of "either a deposit or a system tx" |
-| User deposits | from L1 `TransactionDeposited` events, sender possibly aliased, domain 0, `mint` = ETH brought from L1 | partial (same hedged wording) |
+| L1 attributes tx | the first tx of every block, from `0xdead…0001` to `0x42…15`, source-hash domain 1. Blockscout flags it as `op_stack_l1_attributes_transaction` | done (D22) |
+| User deposits | from L1 `TransactionDeposited` events, sender possibly aliased, domain 0, `mint` = ETH brought from L1 | done (D22): stated as a deposit, hedged only about upgrade deposits that share the type |
 | Upgrade deposits | domain 2 (network upgrades); domains 3 and 4 for interop | declared only through the hedged wording |
-| Type 0x7D | `op_stack_post_exec_transaction` (new Blockscout classification) | **missing** |
+| Type 0x7D | `op_stack_post_exec_transaction` (new Blockscout classification) | declared (D22): contents not interpreted |
 | Withdrawals | `op_withdrawals[]`: nonce, status (e.g. "Ready to prove"), `l1_transaction_hash` only when finalized | done |
-| Interop messages | `op_interop_messages` (cross-chain messages) | **missing**: our profile listed a non-existent `op_interop` field |
+| Interop messages | `op_interop_messages` (cross-chain messages) | declared (D22): count stated, contents not interpreted; field name fixed |
 
 ## Celo (`optimism-celo`): an OP Stack L2
 
@@ -61,8 +61,8 @@ Sources: `celo_view.ex`; [fee abstraction](https://docs.celo.org/developer/fee-a
 | Everything from OP Stack | Celo's identity in Blockscout is `{:optimism, :celo}` | done (inherits) |
 | Fee currency (CIP-64, type 123 / 0x7B) | `celo.gas_token`: the fee is paid in that token, debited before and credited after execution (`debitGasFees`/`creditGasFees`) | done (D20) |
 | Adapters for 6-decimal tokens | USDC, USDT, USA₮, XAUt0 pay through an **adapter** address; the fee is in **adapter units**. The USDT adapter `0x0E2A…` reports `decimals() = 18`; the USDC adapter `0x2F25…` has **no `decimals()`** (call reverts), which is why the explorer sends `decimals: null` | done: raw units + gap (D20) |
-| Fee-currency allowlist | official list maps each adapter to its token (e.g. `0x2F25…` → USDC `0xcebA…`, 6 decimals) | **missing**: naming the real token would turn "raw units of 0x2F25…" into a readable fee |
-| CELO is also an ERC-20 | token `0x471E…` (Celo native asset, ERC-20). **A native CELO send also appears as a CELO token transfer** (verified live: tx 0x64f5270e…, same amount) | **missing**: the movement is shown twice |
+| Fee-currency allowlist | official list maps each adapter to its token (e.g. `0x2F25…` → USDC `0xcebA…`, 6 decimals) | done (D22): `fee_tokens` in config, decimals read on-chain (`expectedDecimals`/`adapterDecimals` = 18) |
+| CELO is also an ERC-20 | token `0x471E…` (Celo native asset, ERC-20). **A native CELO send also appears as a CELO token transfer** (verified live: tx 0x64f5270e…, same amount) | done (D22): `native_token_contract` in config |
 | Fee flows | token transfers to/from the zero address and to `FeeHandler` (`0xcD43…`) and `SequencerFeeVault` (`0x42…11`) | partial: labels only (D20) |
 
 ## zkSync Era (`zksync`): a zkEVM rollup
@@ -73,10 +73,10 @@ Sources: `zksync_view.ex`; [tx lifecycle](https://docs.zksync.io/zksync-protocol
 | Item | Detail | AnyChain |
 |---|---|---|
 | L1 status | `zksync.status` is one of: Processed on L2, Sealed on L2, **Sent to L1**, Validated on L1, Executed on L1; plus batch number and commit/prove/execute L1 hashes | done (quoted as reported) |
-| Native ETH is a system contract | `L2BaseToken` (`0x…800a`) emits `Transfer` for **every** ETH movement, including the fee prepay to the bootloader and the refunds ("might be removed later on", per its source). Blockscout shows them as token transfers | **missing**: ETH shown twice; fee and refunds look like unrelated transfers |
-| Fees | bootloader (`0x…8001`) takes a prepay and refunds the unused part; the net is the fee | **missing**: derivable from those transfers, not said |
-| Paymasters | type 113 (0x71, EIP-712) can name a paymaster that pays the fee; Blockscout exposes no paymaster field | **missing**: detectable when the prepay to the bootloader comes from an address other than the sender |
-| Type 255 (0xFF) | priority (L1→L2) transactions | **missing** |
+| Native ETH is a system contract | `L2BaseToken` (`0x…800a`) emits `Transfer` for **every** ETH movement, including the fee prepay to the bootloader and the refunds ("might be removed later on", per its source). Blockscout shows them as token transfers | done (D22): native movements and the fee flow |
+| Fees | bootloader (`0x…8001`) takes a prepay and refunds the unused part; the net is the fee | done (D22): net fee checked against the explorer's fee |
+| Paymasters | type 113 (0x71, EIP-712) can name a paymaster that pays the fee; Blockscout exposes no paymaster field | done (D22) |
+| Type 255 (0xFF) | priority (L1→L2) transactions | done (D22) |
 | System contracts | `0x8001`… `0x8012` | done: labels in config (D20) |
 
 ## Rootstock (`rsk`)
@@ -85,8 +85,8 @@ Sources: `transaction_view.ex` classifier; `rsksmart/rskj` `PrecompiledContracts
 
 | Item | Detail | AnyChain |
 |---|---|---|
-| Native contracts | Bridge `0x…01000006` (BTC peg), REMASC `0x…01000008` (block rewards, a system tx from the zero address in every block). Blockscout flags them as `rootstock_bridge` / `rootstock_remasc` | partial: labels + zero-address rule (D20); the classification is not read |
-| Native contracts have no code or ABI | asking for "a verified contract" for them can never be satisfied | **missing** (review r9 finding 9) |
+| Native contracts | Bridge `0x…01000006` (BTC peg), REMASC `0x…01000008` (block rewards, a system tx from the zero address in every block). Blockscout flags them as `rootstock_bridge` / `rootstock_remasc` | done (D22): classification read; `native_contracts` in config |
+| Native contracts have no code or ABI | asking for "a verified contract" for them can never be satisfied | done (D22) |
 | Tx types | legacy only (type 0) in the samples | done |
 
 ## Gnosis (`default`)
@@ -99,7 +99,7 @@ Sources: `transaction_view.ex` classifier; `rsksmart/rskj` `PrecompiledContracts
 
 ---
 
-## Gaps found, by priority
+## Gaps found, by priority (all seven done in D22)
 
 Ordered by the harm of the current behaviour: a wrong or double-counted fact first, then a
 vaguer answer than the data allows, then missing context.
