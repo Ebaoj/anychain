@@ -1,5 +1,16 @@
 """Deterministic markdown output of an evidence bundle (works with no LLM)."""
-from anychain.models import EvidenceBundle
+from anychain.models import EvidenceBundle, Source
+
+MAX_DETAIL = 160
+
+
+def _source_text(source: Source) -> str:
+    """A clickable link when there is a URL, plus the exact call made (e.g. RPC method and params)."""
+    text = f"[{source.label}]({source.url})" if source.url else source.label
+    if source.detail:
+        detail = source.detail if len(source.detail) <= MAX_DETAIL else source.detail[:MAX_DETAIL] + "..."
+        text += f" `{detail}`"
+    return text
 
 
 def render_markdown(bundle: EvidenceBundle) -> str:
@@ -10,7 +21,7 @@ def render_markdown(bundle: EvidenceBundle) -> str:
         "## Evidence",
     ]
     for ev in bundle.items:
-        links = " ".join(f"[{s.label}]({s.url})" if s.url else f"{s.label} ({s.detail})" for s in ev.sources)
+        links = " ".join(_source_text(s) for s in ev.sources)
         lines.append(f"- **[{ev.id}]** {ev.text}  \n  _Sources:_ {links}")
     if bundle.abi_sources:
         lines += ["", "## ABI sources"] + [f"- `{a}`: {s}" for a, s in bundle.abi_sources.items()]
