@@ -8,6 +8,22 @@ from pydantic import BaseModel, Field, field_validator
 DEFAULT_CONFIG_ENV = "ANYCHAIN_CONFIG"
 
 
+def _http_url(value: str) -> str:
+    """Accept only http(s) URLs, so an unfilled '<PLACEHOLDER>' fails at load time."""
+    if not value.startswith(("http://", "https://")):
+        raise ValueError(f"must be an http(s) URL, got {value!r}")
+    return value.rstrip("/")
+
+
+def _template(value: str, **fields: str) -> str:
+    """Check a link template only uses the placeholders we fill in."""
+    try:
+        value.format(**fields)
+    except (KeyError, IndexError, ValueError) as exc:
+        raise ValueError(f"template {value!r} may only use {{{'}, {'.join(fields)}}}: {exc}") from None
+    return value
+
+
 class NetworkConfig(BaseModel):
     name: str
     chain_id: int = Field(ge=0)
@@ -18,15 +34,25 @@ class NetworkConfig(BaseModel):
 class ExplorerConfig(BaseModel):
     type: str = "blockscout"
     base_url: str
-    api_path: str = "/api/v2"
-    tx_url_template: str = "{base_url}/tx/{hash}"
-    address_url_template: str = "{base_url}/address/{address}"
+    api_path: str
+    tx_url_template: str
+    address_url_template: str
     timeout_s: float = 15
 
     @field_validator("base_url")
     @classmethod
-    def _strip_slash(cls, v: str) -> str:
-        return v.rstrip("/")
+    def _url(cls, v: str) -> str:
+        return _http_url(v)
+
+    @field_validator("tx_url_template")
+    @classmethod
+    def _tx_template(cls, v: str) -> str:
+        return _template(v, base_url="https://x", hash="0x1")
+
+    @field_validator("address_url_template")
+    @classmethod
+    def _address_template(cls, v: str) -> str:
+        return _template(v, base_url="https://x", address="0x1")
 
     @field_validator("type")
     @classmethod
@@ -42,14 +68,16 @@ class ExplorerConfig(BaseModel):
     def tx_url(self, tx_hash: str) -> str:
         return self.tx_url_template.format(base_url=self.base_url, hash=tx_hash)
 
-    def address_url(self, address: str) -> str:
-        return self.address_url_template.format(base_url=self.base_url, address=address)
-
 
 class RpcConfig(BaseModel):
     url: str
     timeout_s: float = 10
-    supports_debug_trace: bool = False
+    supports_debug_trace: bool = False  # used from phase 2
+
+    @field_validator("url")
+    @classmethod
+    def _url(cls, v: str) -> str:
+        return _http_url(v)
 
 
 class RepoConfig(BaseModel):
@@ -60,8 +88,8 @@ class RepoConfig(BaseModel):
 
 
 class SignatureDbConfig(BaseModel):
-    enabled: bool = True
-    url: str = "https://www.4byte.directory/api/v1"
+    enabled: bool = False
+    url: str | None = None
 
 
 class AbiStrategyConfig(BaseModel):
@@ -89,6 +117,7 @@ class AssistantConfig(BaseModel):
     default_mode: str = "support"
     language: str = "en"
     max_clarifying_questions: int = 2
+    time_budget_s: float = Field(default=30, gt=0)  # max total wait for one explanation
 
     @field_validator("default_mode")
     @classmethod
@@ -110,6 +139,9 @@ class StorageConfig(BaseModel):
     cache_dir: str = "data/cache"
 
 
+# Sections accepted now and used from phase 2 on: repos, address_map,
+# abi_strategy (beyond "explorer"), storage. They are validated already, so a
+# typo is caught today rather than when the feature arrives.
 class AppConfig(BaseModel):
     network: NetworkConfig
     explorer: ExplorerConfig

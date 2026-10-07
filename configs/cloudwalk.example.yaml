@@ -55,6 +55,7 @@ assistant:
   default_mode: support
   language: pt-BR
   max_clarifying_questions: 2
+  time_budget_s: 30             # total wait for one explanation; then answer with what we have
 
 storage:
   sqlite_path: data/runs.db
