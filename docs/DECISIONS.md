@@ -39,3 +39,10 @@ Each entry: decision, alternatives, reason, trade-off.
 
 ## D9. No agent framework
 - **Reason:** spec section 2. A plain call to the Anthropic SDK is easier to read and debug. Tool use for chat comes in phase 3, as a simple loop.
+
+## D10. CloudWalk network and the BRLC contracts repo
+- **Finding (2026-10-07):** the official `github.com/cloudwalk` org has no public Solidity repo today, but the BRLC token contracts were public there until ~May 2024. A full copy lives at `github.com/cloudwallk/brlc-token`: commits by CloudWalk engineers (`@cloudwalk.io`), PR numbers from the original repo, last commit 2024-05-06. The copying org is unverified, was created 2024-01-03, and pushed all 17 repos on 2024-05-09, so it is a mirror, not an official account.
+- The repo's `.openzeppelin/` manifests show deployments on chain ids 2008 and 2009, which `chainid.network` lists as CloudWalk Testnet and CloudWalk Mainnet (currency CWN). Their explorers are not publicly reachable (mainnet redirects to cloudwalk.io; testnet resolves to a private 10.x IP). This matches the case's wording: "CloudWalk private".
+- The same contracts are also on **Ethereum mainnet**: BRLC proxy `0xAC176d9e75384F7d71275bb9D5265281CC0Dd284`, verified, implementation `BRLCTokenBridgeable` (`0xbEA441d7cf3f79b57cc5ae33251a084A063825dc`), with real transactions from 2023 (transfer, approve, setPauser, transferOwnership).
+- **Decision:** `cloudwalk.example.yaml` now has the real chain id, currency and repo (pinned to commit `74a5498`), with only the internal URLs left as placeholders. The mirror is used because it is the only public source of this code; the pin prevents silent changes by an unknown owner.
+- **Trade-off:** we depend on an unofficial host. If it disappears, the repo-grounding step degrades and says so.

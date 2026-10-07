@@ -1,15 +1,21 @@
 # Template for retargeting AnyChain to the CloudWalk network.
 # Copy to configs/cloudwalk.yaml, fill every <PLACEHOLDER>, run with --config.
 # No code changes are needed: everything network-specific lives in this file.
+# Public facts (checked 2026-10-07):
+#   - chainid.network lists CloudWalk Mainnet = 2009 and CloudWalk Testnet = 2008,
+#     native currency CWN, explorers explorer.mainnet.cloudwalk.io / explorer.testnet.cloudwalk.io.
+#   - Neither explorer is publicly reachable: mainnet redirects to cloudwalk.io and
+#     testnet resolves to a private IP (10.x). The network is private, so the URLs
+#     below must be the internal ones.
 network:
-  name: cloudwalk-private          # free-text label shown in the UI and in logs
-  chain_id: 0                      # <CHAIN_ID>: ask the network team, or call eth_chainId on the RPC
-  native_symbol: "<SYMBOL>"        # native currency ticker used to display fees and value
-  native_decimals: 18
+  name: cloudwalk-mainnet          # free-text label shown in the UI and in logs
+  chain_id: 2009                   # 2008 for CloudWalk Testnet; confirm with eth_chainId on the RPC
+  native_symbol: CWN
+  native_decimals: 18              # confirm with the network team
 
 explorer:
   type: blockscout                 # any Blockscout-compatible API (v2)
-  base_url: "<EXPLORER_BASE_URL>"  # e.g. https://explorer.internal.example
+  base_url: "<EXPLORER_BASE_URL>"  # internal URL; public name is https://explorer.mainnet.cloudwalk.io
   api_path: /api/v2
   tx_url_template: "{base_url}/tx/{hash}"
   address_url_template: "{base_url}/address/{address}"
@@ -21,11 +27,13 @@ rpc:
   supports_debug_trace: false      # set true if the node serves debug_traceTransaction
 
 repos:
-  # CloudWalk publishes the Stratus EVM ledger (Rust) at github.com/cloudwalk/stratus,
-  # but no public Solidity contract repo was found (checked 2026-10-07).
-  # Point this at the repo with the network's contracts (e.g. the BRLC token):
-  - url: "<GITHUB_REPO_URL>"
-    ref: main
+  # The BRLC contracts were public at github.com/cloudwalk/brlc-token until ~May 2024
+  # (commits by @cloudwalk.io engineers; its .openzeppelin/ folder has deployments on
+  # chains 2008 and 2009). The official repo now returns 404. A copy exists at
+  # github.com/cloudwallk/brlc-token (unverified org, all repos pushed 2024-05-09),
+  # pinned below to an exact commit. Prefer the internal official repo when available.
+  - url: https://github.com/cloudwallk/brlc-token
+    ref: 74a5498d04b10dc882e48273a38b98b4275463bd
     source_globs: ["contracts/**/*.sol"]
     artifact_globs: ["**/artifacts/**/*.json", "**/abi/**/*.json"]
 
