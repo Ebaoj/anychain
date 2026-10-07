@@ -5,7 +5,7 @@ signatures, 4byte, raw) is added in phase 2 behind the same interface.
 """
 from dataclasses import dataclass, field
 
-from eth_abi import decode
+from eth_abi import decode, encode
 from eth_utils import (
     event_signature_to_log_topic,
     function_signature_to_4byte_selector,
@@ -78,11 +78,14 @@ def _plain(value: object) -> str:
 class AbiDecoder:
     def __init__(self, abi: list[dict]):
         self.functions = {}
-        self.events = {}
+        self.events = {}  # topic0 -> event entry
+        self.anonymous_events = []  # events without a signature topic
         for entry in abi:
             if entry.get("type") == "function":
                 sel = function_signature_to_4byte_selector(signature_of(entry))
                 self.functions[sel] = entry
+            elif entry.get("type") == "event" and entry.get("anonymous"):
+                self.anonymous_events.append(entry)
             elif entry.get("type") == "event":
                 topic = event_signature_to_log_topic(signature_of(entry))
                 self.events[topic] = entry
@@ -105,39 +108,78 @@ class AbiDecoder:
         ]
         return DecodedCall(entry["name"], signature_of(entry), args)
 
+    def could_be_anonymous(self, topics: list[str]) -> bool:
+        """True when the log might come from one of the ABI's anonymous events: its first topic is
+        not a known event signature, and some anonymous event has exactly that many indexed fields."""
+        topic0 = _hex_bytes(topics[0]) if topics else None
+        if topic0 is not None and topic0 in self.events:
+            return False
+        return any(sum(1 for i in e.get("inputs", []) if i.get("indexed")) == len(topics)
+                   for e in self.anonymous_events)
+
     def decode_log(self, topics: list[str], data: str) -> DecodedEvent | None:
+        """Decode a log. Normal events are found by their signature topic (topic0).
+
+        Anonymous events have no signature topic: every topic is an argument. We
+        accept one only when exactly one anonymous event of the ABI fits the log,
+        so we never pick between candidates by guessing.
+        """
         topic0, payload = (_hex_bytes(topics[0]) if topics else None), _hex_bytes(data)
-        if topic0 is None or payload is None:
+        if payload is None:
             return None
-        entry = self.events.get(topic0)
-        if entry is None:
-            return None
-        inputs = entry.get("inputs", [])
-        indexed = [i for i in inputs if i.get("indexed")]
-        plain = [i for i in inputs if not i.get("indexed")]
-        if len(topics) - 1 != len(indexed):
-            return None  # same name, different shape (e.g. ERC-20 vs ERC-721 Transfer)
+        entry = self.events.get(topic0) if topic0 is not None else None
+        if entry is not None:
+            return _decode_event(entry, topics[1:], payload, anonymous=False)
+        matches = [m for e in self.anonymous_events if (m := _decode_event(e, topics, payload, anonymous=True))]
+        return matches[0] if len(matches) == 1 else None
+
+
+def _uses_all_data(types: list[str], values: tuple, payload: bytes) -> bool:
+    """True when re-encoding the decoded values gives back the log data.
+
+    A trailing `bytes` value may be left unpadded by the contract (MakerDAO does
+    this), so the re-encoded data may be up to 31 zero bytes longer, never shorter.
+    """
+    try:
+        expected = encode(types, values)
+    except Exception:
+        return False
+    return expected[: len(payload)] == payload and 0 <= len(expected) - len(payload) < 32
+
+
+def _decode_event(entry: dict, arg_topics: list[str], payload: bytes, anonymous: bool) -> DecodedEvent | None:
+    """Decode one event entry against the log's argument topics and data, or None if it does not fit."""
+    inputs = entry.get("inputs", [])
+    indexed = [i for i in inputs if i.get("indexed")]
+    plain = [i for i in inputs if not i.get("indexed")]
+    if len(arg_topics) != len(indexed):
+        return None  # same name, different shape (e.g. ERC-20 vs ERC-721 Transfer)
+    try:
+        # Anonymous events are matched by shape, so a trailing `bytes` left unpadded by the
+        # contract is tolerated here (strict=False) and checked by _uses_all_data below.
+        plain_vals = decode([_type_of(i) for i in plain], payload, strict=not anonymous)
+    except Exception:
+        return None
+    if anonymous and not _uses_all_data([_type_of(i) for i in plain], plain_vals, payload):
+        return None  # leftover bytes: this log was not produced by this anonymous event
+    topic_values = iter(arg_topics)
+    plain_values = iter(plain_vals)
+    args = []
+    for n, item in enumerate(inputs):
+        t = _type_of(item)
+        name = item.get("name") or f"arg{n}"
+        if not item.get("indexed"):
+            args.append(DecodedArg(name, t, format_value(t, next(plain_values))))
+            continue
+        topic = next(topic_values)
+        if t in ("string", "bytes") or t.endswith("]") or t.startswith("("):
+            # Dynamic indexed values are stored only as their hash: show it as is.
+            args.append(DecodedArg(name, t, f"{topic} (hash of the {t} value)"))
+            continue
         try:
-            plain_vals = decode([_type_of(i) for i in plain], payload)
+            value = decode([t], _hex_bytes(topic) or b"")[0]
         except Exception:
-            return None
-        topic_values = iter(topics[1:])
-        plain_values = iter(plain_vals)
-        args = []
-        for n, item in enumerate(inputs):
-            t = _type_of(item)
-            name = item.get("name") or f"arg{n}"
-            if not item.get("indexed"):
-                args.append(DecodedArg(name, t, format_value(t, next(plain_values))))
-                continue
-            topic = next(topic_values)
-            if t in ("string", "bytes") or t.endswith("]") or t.startswith("("):
-                # Dynamic indexed values are stored only as their hash: show it as is.
-                args.append(DecodedArg(name, t, f"{topic} (hash of the {t} value)"))
-                continue
-            try:
-                value = decode([t], _hex_bytes(topic) or b"")[0]
-            except Exception:
-                return None  # topic does not fit the ABI: same name, different contract
-            args.append(DecodedArg(name, t, format_value(t, value)))
-        return DecodedEvent(entry["name"], signature_of(entry), args)
+            return None  # topic does not fit the ABI: same name, different contract
+        args.append(DecodedArg(name, t, format_value(t, value)))
+    signature = signature_of(entry) + (" (anonymous event)" if anonymous else "")
+    return DecodedEvent(entry["name"], signature, args)
