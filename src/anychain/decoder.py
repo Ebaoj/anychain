@@ -47,14 +47,31 @@ def signature_of(entry: dict) -> str:
     return f"{entry['name']}({','.join(_type_of(i) for i in entry.get('inputs', []))})"
 
 
-def format_value(value: object) -> str:
-    """Human-safe string for a decoded ABI value."""
+def format_value(abi_type: str, value: object) -> str:
+    """Human-safe string for a decoded value, chosen by its ABI type (never by its shape)."""
+    if abi_type.endswith("]"):  # array, e.g. address[] or uint256[2]
+        inner = abi_type[: abi_type.rindex("[")]
+        return "[" + ", ".join(format_value(inner, v) for v in value) + "]"  # type: ignore[union-attr]
+    if abi_type.startswith("("):  # tuple: show its parts without guessing their types
+        return "(" + ", ".join(_plain(v) for v in value) + ")"  # type: ignore[union-attr]
+    if abi_type == "address":
+        return to_checksum_address(value)  # type: ignore[arg-type]
+    return _plain(value)
+
+
+def _hex_bytes(text: str) -> bytes | None:
+    """'0xabcd' -> bytes, or None when the text is not valid hex."""
+    try:
+        return bytes.fromhex(text.removeprefix("0x"))
+    except (ValueError, AttributeError):
+        return None
+
+
+def _plain(value: object) -> str:
     if isinstance(value, bytes):
         return "0x" + value.hex()
     if isinstance(value, (tuple, list)):
-        return "[" + ", ".join(format_value(v) for v in value) + "]"
-    if isinstance(value, str) and value.startswith("0x") and len(value) == 42:
-        return to_checksum_address(value)
+        return "(" + ", ".join(_plain(v) for v in value) + ")"
     return str(value)
 
 
@@ -71,7 +88,9 @@ class AbiDecoder:
                 self.events[topic] = entry
 
     def decode_call(self, data: str) -> DecodedCall | None:
-        raw = bytes.fromhex(data.removeprefix("0x"))
+        raw = _hex_bytes(data)
+        if raw is None or len(raw) < 4:
+            return None
         entry = self.functions.get(raw[:4])
         if entry is None:
             return None
@@ -80,13 +99,17 @@ class AbiDecoder:
             values = decode([_type_of(i) for i in inputs], raw[4:])
         except Exception:
             return None
-        args = [DecodedArg(i.get("name") or f"arg{n}", _type_of(i), format_value(v)) for n, (i, v) in enumerate(zip(inputs, values))]
+        args = [
+            DecodedArg(i.get("name") or f"arg{n}", _type_of(i), format_value(_type_of(i), v))
+            for n, (i, v) in enumerate(zip(inputs, values))
+        ]
         return DecodedCall(entry["name"], signature_of(entry), args)
 
     def decode_log(self, topics: list[str], data: str) -> DecodedEvent | None:
-        if not topics:
+        topic0, payload = (_hex_bytes(topics[0]) if topics else None), _hex_bytes(data)
+        if topic0 is None or payload is None:
             return None
-        entry = self.events.get(bytes.fromhex(topics[0].removeprefix("0x")))
+        entry = self.events.get(topic0)
         if entry is None:
             return None
         inputs = entry.get("inputs", [])
@@ -95,7 +118,7 @@ class AbiDecoder:
         if len(topics) - 1 != len(indexed):
             return None  # same name, different shape (e.g. ERC-20 vs ERC-721 Transfer)
         try:
-            plain_vals = decode([_type_of(i) for i in plain], bytes.fromhex(data.removeprefix("0x")))
+            plain_vals = decode([_type_of(i) for i in plain], payload)
         except Exception:
             return None
         topic_values = iter(topics[1:])
@@ -103,11 +126,18 @@ class AbiDecoder:
         args = []
         for n, item in enumerate(inputs):
             t = _type_of(item)
-            if item.get("indexed"):
-                topic = next(topic_values)
-                dynamic = t in ("string", "bytes") or t.endswith("]") or t.startswith("(")
-                value = topic if dynamic else decode([t], bytes.fromhex(topic.removeprefix("0x")))[0]
-            else:
-                value = next(plain_values)
-            args.append(DecodedArg(item.get("name") or f"arg{n}", t, format_value(value)))
+            name = item.get("name") or f"arg{n}"
+            if not item.get("indexed"):
+                args.append(DecodedArg(name, t, format_value(t, next(plain_values))))
+                continue
+            topic = next(topic_values)
+            if t in ("string", "bytes") or t.endswith("]") or t.startswith("("):
+                # Dynamic indexed values are stored only as their hash: show it as is.
+                args.append(DecodedArg(name, t, f"{topic} (hash of the {t} value)"))
+                continue
+            try:
+                value = decode([t], _hex_bytes(topic) or b"")[0]
+            except Exception:
+                return None  # topic does not fit the ABI: same name, different contract
+            args.append(DecodedArg(name, t, format_value(t, value)))
         return DecodedEvent(entry["name"], signature_of(entry), args)

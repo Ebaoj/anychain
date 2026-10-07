@@ -27,12 +27,13 @@ class Gap(BaseModel):
     what: str
     why: str
     needed: str
+    retryable: bool = False  # True: network trouble, trying again later may fill it
 
 
 class EvidenceBundle(BaseModel):
     network: str
     tx_hash: str
-    status: str  # success | failed | pending | unknown
+    status: str  # success | failed | pending | dropped | unknown
     items: list[Evidence] = []
     gaps: list[Gap] = []
     abi_sources: dict[str, str] = {}  # address -> where its ABI came from
@@ -41,6 +42,9 @@ class EvidenceBundle(BaseModel):
         ev = Evidence(id=f"E{len(self.items) + 1}", kind=kind, text=text, data=data or {}, sources=sources)
         self.items.append(ev)
         return ev
+
+    def add_gap(self, what: str, why: str, needed: str, retryable: bool) -> None:
+        self.gaps.append(Gap(what=what, why=why, needed=needed, retryable=retryable))
 
     def ids(self) -> set[str]:
         return {e.id for e in self.items}
