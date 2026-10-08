@@ -224,9 +224,11 @@ async function loadNetwork() {
 
 function renderAnswer(a) {
   state.evidence = new Map(a.evidence.map((e) => [e.id, e]));
-  const statusWord = {success: "succeeded", failed: "failed", pending: "is pending", dropped: "was dropped"}[a.status] || a.status;
+  const statusWord = {success: "succeeded", failed: "failed", pending: "is pending", dropped: "was dropped",
+                      unknown: "has an outcome that is not known yet"}[a.status] || a.status;
   const basis = {node_and_explorer_agree: "the node and the explorer agree", node_only: "from the node",
-                 explorer_only: "from the explorer only", node_and_explorer_disagree: "the node and the explorer DISAGREE"};
+                 explorer_only: "from the explorer only", node_and_explorer_disagree: "the node and the explorer DISAGREE",
+                 outcome_unknown: "no source gave the outcome (see missing data)"};
   $("statusLine").innerHTML = `<p class="status">The transaction ${esc(statusWord)}.</p>` +
     `<p class="muted wrap">${esc(a.tx_hash)} · status ${esc(basis[a.confidence.status_basis] || a.confidence.status || "")}</p>`;
   if (a.summary) {

@@ -11,7 +11,7 @@ from anychain.answer import structured_answer
 from anychain.cache import answer_key, cached_bundle
 from anychain.events import CheckEvent, RunEvent
 from anychain.models import EvidenceBundle
-from anychain.writer import CheckedAnswer, WriterError
+from anychain.writer import CheckedAnswer, WriterError, clean_question
 
 WRITE, SKIP, NONE = "write", "skip", "none"  # write the answer; skip it (asked not to); not asked (evidence only)
 
@@ -51,7 +51,7 @@ def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool,
     except Exception as exc:  # last line of defence: never a stack trace for the user
         record(log, RunEvent.crash(cfg.network.name, tx_hash, source, _ms(started), f"{type(exc).__name__}: {exc}"))
         raise Crash(f"{type(exc).__name__}: {exc}") from exc
-    question = " ".join((question or "").split()) or None
+    question = clean_question(question)  # the same text is keyed, echoed and sent to the model
     result = Answered(bundle, mode, cache_state, question=question)
 
     def event(**kw) -> RunEvent:

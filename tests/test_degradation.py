@@ -195,7 +195,6 @@ def test_a_slow_explorer_does_not_take_the_nodes_time(monkeypatch):
 def test_a_mined_transaction_without_a_receipt_is_never_called_pending():
     # Real (acceptance 2026-10-08): ethereum-rpc.publicnode.com returns tx 0xe40d5210… with its block (25947205)
     # but a null receipt; with the explorer down the tool said "Transaction is pending" (a level A false fact).
-    from tests.test_golden import _case  # noqa: F401
     cfg = load_config(str(ROOT / "configs" / "ethereum-mainnet.yaml"))
     tx = "0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
     b = replay_bundle(cfg, tx, "eth_receipt_missing", offline_hosts={"eth.blockscout.com"})
@@ -203,4 +202,8 @@ def test_a_mined_transaction_without_a_receipt_is_never_called_pending():
     overview = next(e for e in b.items if e.kind == "overview")
     assert "pending" not in overview.text.lower() and "25947205" in overview.text
     assert not any(g.cause == "pending" for g in b.gaps)
-    assert any(g.what == "Final outcome" and g.cause == "source_error" and g.retryable for g in b.gaps)
+    assert any(g.what == "Final outcome" and g.cause == "source_error" and g.retryable
+               and "explorer did not answer" in g.why for g in b.gaps)
+    from anychain.answer import structured_answer
+    confidence = structured_answer(b, None, "skipped", "support")["confidence"]
+    assert (confidence["status"], confidence["status_basis"]) == (None, "outcome_unknown")  # never "confirmed"

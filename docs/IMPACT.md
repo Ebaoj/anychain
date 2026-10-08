@@ -23,7 +23,7 @@ Assumed starting point, to be measured in the baseline weeks before rollout: the
 | Primary | Time to diagnosis | from ticket open to the first message that states the cause (support tool timestamps) |
 | Guard | Answers corrected by humans | answers where the agent edited the cause, gave 👎, or the ticket was reopened for the same transaction |
 | Guard | Reported hallucinations | answers flagged by an agent or engineer as stating something not true of the transaction; target zero, every one reviewed and turned into a test |
-| Guard | Answers withheld or without a model | share of `withheld` and `unavailable` outcomes (`anychain metrics`); a rise means the check or the model provider is failing |
+| Guard | Answers withheld or without a model | share of `withheld` and `unavailable` outcomes (`runs.writer` in the event log; a query to add to `anychain metrics`); a rise means the check or the model provider is failing |
 | Health | Source availability | gaps by cause per network (`anychain log`): explorer or node down, explorer behind |
 | Health | Cost and latency per answer | tokens and cost per run (`runs.cost_usd`, `runs.input_tokens`…), p50 and p95 duration; cache hit rate |
 

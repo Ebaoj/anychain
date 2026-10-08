@@ -90,6 +90,8 @@ def _status_confidence(bundle: EvidenceBundle) -> dict:
         agrees = check.data["agrees"]
         return {"status": "confirmed" if agrees else "disputed",
                 "status_basis": "node_and_explorer_agree" if agrees else "node_and_explorer_disagree"}
+    if bundle.status == "unknown":  # no source gave the outcome (D53): nothing about it is confirmed
+        return {"status": None, "status_basis": "outcome_unknown"}
     overview = next((e for e in bundle.items if e.kind == "overview"), None)
     if overview is None:
         return {"status": None, "status_basis": None}

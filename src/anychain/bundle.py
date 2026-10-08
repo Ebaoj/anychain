@@ -1608,8 +1608,10 @@ class BundleBuilder:
             b.add("overview", f"(From RPC only) Transaction was included in block {tx.block_number}. From {tx.sender} "
                   f"to {tx.to or '(contract creation)'}. Native value sent: {value} {sym}. Its outcome is not known: "
                   "the node returned no receipt for it.", [source])
+            explorer = ("the explorer does not know this hash" if self.explorer_not_found
+                         else "the explorer did not answer")
             self._gap("Final outcome", f"the node knows the transaction (block {tx.block_number}) but returned no "
-                      "receipt for it, and the explorer did not answer", "Ask again in a few minutes, or use a node "
+                      f"receipt for it, and {explorer}", "Ask again in a few minutes, or use a node "
                       "that keeps receipts for older blocks", retryable=True, cause="source_error")
             return
 

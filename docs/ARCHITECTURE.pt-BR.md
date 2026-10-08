@@ -9,7 +9,7 @@ As cores mostram o que já existe:
 - **Cinza**: fases seguintes
 - Caixas brancas são só agrupamentos.
 
-Estado atual: **Fase 3 em andamento** (08/10/2026): T0 a T5 prontas (cache, métricas, API, chat, página, avaliação); faltam a página de impacto, a pergunta do usuário, a aceitação de 1.800 transações e a demonstração gravada.
+Estado atual: **fim da Fase 3** (08/10/2026): cache, métricas, API, chat, página, avaliação, página de impacto (`docs/IMPACT.md`), a pergunta do usuário junto com o hash, a demonstração gravada (`docs/demo/`) e a aceitação de 1.800 transações.
 
 ---
 
@@ -87,7 +87,7 @@ flowchart TD
 | 1 (pronta) | configuração, coletores do explorador e do nó, decodificador, pacote de evidências, redator com IA, terminal |
 | 2 (pronta) | diagnóstico de falhas, leituras de estado, repositórios, cascata de ABI, confiança de cada fato, checagem da resposta |
 | 2.5 (pronta) | código da função, notas de segurança, ABIs de artefatos, controle de acesso, prazo pelo parâmetro, rótulos, passos por leitor, resposta estruturada |
-| 3 (em andamento) | **pronto:** cache e lote, métricas, API, chat com ferramentas, página, conversão para a unidade do token, avaliação, diagnóstico pela origem da falha. **Falta:** página de impacto, pergunta do usuário, aceitação de 1.800 transações, demonstração gravada |
+| 3 (pronta) | cache e lote, métricas, API, chat com ferramentas, página, conversão para a unidade do token, avaliação, diagnóstico pela origem da falha, pergunta do usuário, página de impacto, demonstração gravada |
 | 4 | triagem (começar pelo problema, sem hash), linha do tempo entre transações, notas de gás, trace do nó, rede privada de demonstração, Dockerfile, README final |
 
 ---
