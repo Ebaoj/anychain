@@ -35,3 +35,13 @@ True but imprecise answers, found by the reviews and the acceptance run (docs/AC
 | C14 | Data sent to an account without code: an archive `eth_getCode` at the block could prove it had no code then (today: "cannot confirm") | Ethereum tx 0x6692980f… |
 | C15 | Rootstock native contracts: the published ABIs (`@rsksmart/rsk-precompiled-abis`) as a configured repo source | Rootstock tx 0xf6009eb2… |
 | C16 | zkSync node status "failed" is quoted as is; a reader may take it for an L1 failure (unconfirmed what it means; check the zkSync source first) | review of D25 |
+
+Added at the close of Phase 2 (2026-10-08), sent to the backlog by Joabe:
+
+| # | Finding | Where it was seen |
+|---|---|---|
+| C17 | 0.8 % of answers came out incomplete while explorers were slow (time budget used up, declared as gaps): a longer budget, shorter per-request timeouts, or fewer retries on the main request | Phase 2 acceptance run (D37) |
+| C18 | The allowance rule has no real recorded case (only a fake reader in tests) | T4 review (D31) |
+| C19 | A proven event signature does not name the contract or log it belongs to (topics are looked up once per answer) | T7 review (D35) |
+| C20 | Pinning an implementation address in `address_map` has no effect on calls to its proxy, and nothing warns | T6 part 2 review (D34) |
+| C21 | Claude Code adds the logged-in user's email to the model's context whatever the flags | D27 review |
