@@ -87,13 +87,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "Trinkets",
+    "function": "airdrop(address[],uint256,uint256)",
+    "lines": [
+     107,
+     114
+    ],
+    "path": "contracts/Trinkets.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8"
+    }
+   ],
+   "text": "Code of airdrop(address[],uint256,uint256) in Trinkets (contracts/Trinkets.sol, lines 107-114), from the verified source of the contract 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8, as the explorer lists it:\n107 |     function airdrop(address[] calldata recipients, uint256 id, uint256 amount) \n108 |         external \n109 |         onlyOwner \n110 |     {\n111 |         for (uint256 i = 0; i < recipients.length; i++) {\n112 |             _mint(recipients[i], id, amount, \"\");\n113 |         }\n114 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF",
     "token": "0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8",
     "token_id": "16",
     "value": 1
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -113,7 +138,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -131,7 +156,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "cross_check",
    "sources": [
     {

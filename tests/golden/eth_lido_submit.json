@@ -85,13 +85,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "Lido",
+    "function": "submit(address)",
+    "lines": [
+     508,
+     510
+    ],
+    "path": "contracts/0.4.24/Lido.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x028271E30a695c0527A0C50cA30603feD004cDb0"
+    }
+   ],
+   "text": "Code of submit(address) in Lido (contracts/0.4.24/Lido.sol, lines 508-510), from the verified source of the implementation the explorer lists today for 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (it may have been upgraded since this transaction), as the explorer lists it:\n508 |     function submit(address _referral) external payable returns (uint256) {\n509 |         return _submit(_referral);\n510 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE",
     "token": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
     "token_id": null,
     "value": 46651189999999999
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -111,7 +136,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -131,7 +156,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -151,7 +176,7 @@
     "type": "delegatecall",
     "value": "46651190000000000"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "internal_call",
    "sources": [
     {
@@ -173,7 +198,7 @@
     },
     "event": "Submitted"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "event",
    "sources": [
     {
@@ -195,7 +220,7 @@
     },
     "event": "TransferShares"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "event",
    "sources": [
     {
@@ -213,7 +238,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "cross_check",
    "sources": [
     {

@@ -91,13 +91,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "SquidRouter",
+    "function": "fundAndRunMulticall(address,uint256,(uint8,address,uint256,bytes,bytes)[])",
+    "lines": [
+     88,
+     99
+    ],
+    "path": "contracts/router/SquidRouter.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://celo.blockscout.com/api/v2/smart-contracts/0xf6B9D3C6F5C5e5A3a63b2A15b5362F99a51cf76d"
+    }
+   ],
+   "text": "Code of fundAndRunMulticall(address,uint256,(uint8,address,uint256,bytes,bytes)[]) in SquidRouter (contracts/router/SquidRouter.sol, lines 88-99), from the verified source of the implementation the explorer lists today for 0xce16F69375520ab01377ce7B88f5BA8C48F8D666 (it may have been upgraded since this transaction), as the explorer lists it:\n88 |     function fundAndRunMulticall(\n89 |         address token,\n90 |         uint256 amount,\n91 |         ISquidMulticall.Call[] calldata calls\n92 |     ) public payable whenNotPaused {\n93 |         // No transfer done if native token is selected as token\n94 |         if (token != Utils.nativeToken) {\n95 |             _transferFrom2(token, msg.sender, address(squidMulticall), amount);\n96 |         }\n97 | \n98 |         ISquidMulticall(squidMulticall).run{value: msg.value}(calls);\n99 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0xFcBf70A6ed5E856BB388cEb622514C80726Efbb6",
     "to": "0x0000000000000000000000000000000000000000",
     "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
     "token_id": null,
     "value": 15772
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -118,7 +143,7 @@
     "token_id": null,
     "value": 29
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {
@@ -139,7 +164,7 @@
     "token_id": null,
     "value": 115060
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "token_transfer",
    "sources": [
     {
@@ -160,7 +185,7 @@
     "token_id": null,
     "value": 29
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "token_transfer",
    "sources": [
     {
@@ -181,7 +206,7 @@
     "token_id": null,
     "value": 575
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "token_transfer",
    "sources": [
     {
@@ -202,7 +227,7 @@
     "token_id": null,
     "value": 114446
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "token_transfer",
    "sources": [
     {
@@ -223,7 +248,7 @@
     "token_id": null,
     "value": 114485
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "token_transfer",
    "sources": [
     {
@@ -244,7 +269,7 @@
     "token_id": null,
     "value": 15772
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "token_transfer",
    "sources": [
     {
@@ -265,7 +290,7 @@
     "token_id": null,
     "value": 0
    },
-   "id": "E12",
+   "id": "E13",
    "kind": "token_transfer",
    "sources": [
     {
@@ -286,7 +311,7 @@
     "token_id": null,
     "value": 7823
    },
-   "id": "E13",
+   "id": "E14",
    "kind": "token_transfer",
    "sources": [
     {
@@ -308,7 +333,7 @@
     },
     "event": "Approval"
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "event",
    "sources": [
     {
@@ -330,7 +355,7 @@
     },
     "event": "Approval"
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "event",
    "sources": [
     {
@@ -352,7 +377,7 @@
     },
     "event": "Approval"
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "event",
    "sources": [
     {
@@ -378,7 +403,7 @@
     },
     "event": "Swap"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "event",
    "sources": [
     {
@@ -400,7 +425,7 @@
     },
     "event": "Approval"
    },
-   "id": "E18",
+   "id": "E19",
    "kind": "event",
    "sources": [
     {
@@ -422,7 +447,7 @@
     },
     "event": "Approval"
    },
-   "id": "E19",
+   "id": "E20",
    "kind": "event",
    "sources": [
     {
@@ -448,7 +473,7 @@
     },
     "event": "Swap"
    },
-   "id": "E20",
+   "id": "E21",
    "kind": "event",
    "sources": [
     {
@@ -466,7 +491,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E21",
+   "id": "E22",
    "kind": "cross_check",
    "sources": [
     {

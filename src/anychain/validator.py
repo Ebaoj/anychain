@@ -14,7 +14,13 @@ what the model may have added:
     digits ("5,65 milhões"), a dropped minus sign. Not accepted: an added minus sign.
 Integers under 4 digits without decimals (counts like "30 of 93") are not checked: too common to
 judge. That is a known limit (D28).
+
+Contract code (facts of kind "code", D38) is the author's text, not data of the transaction: its
+numbers and hex values never count as evidence values, so a constant in the code cannot let an
+invented amount or address through. Only the line numbers shown are accepted from it, and a
+quote in backticks that is exactly part of one shown code line (constants included).
 """
+import json
 import re
 from decimal import Decimal, InvalidOperation, localcontext
 
@@ -50,8 +56,39 @@ def check_answer(answer: str, evidence: str, allowed_urls: set[str], ids: set[st
         return _check(answer, evidence, allowed_urls, ids)
 
 
+CODE_LINE = re.compile(r"^(\d+) \| ", re.MULTILINE)
+
+
+CODE_QUOTE = re.compile(r"`([^`\n]{8,})`")
+
+
+def _squeeze(text: str) -> str:
+    return " ".join(text.split())
+
+
+def _without_code(evidence: str) -> tuple[str, list[Decimal], list[str]]:
+    """The evidence with code lines removed from code facts, the line numbers those facts show, and the
+    code lines themselves (an answer may quote one exactly, constants included)."""
+    try:
+        payload = json.loads(evidence)
+    except ValueError:
+        return evidence, [], []
+    items = payload.get("evidence") if isinstance(payload, dict) else None
+    if not isinstance(items, list):
+        return evidence, [], []
+    numbers: list[Decimal] = []
+    code: list[str] = []
+    for item in items:
+        if isinstance(item, dict) and item.get("kind") == "code" and isinstance(item.get("fact"), str):
+            numbers += [Decimal(n) for n in CODE_LINE.findall(item["fact"])]
+            code += [_squeeze(CODE_LINE.sub("", line)) for line in item["fact"].split("\n") if CODE_LINE.match(line)]
+            item["fact"] = "\n".join(line for line in item["fact"].split("\n") if not CODE_LINE.match(line))
+    return json.dumps(payload, ensure_ascii=False), numbers, code
+
+
 def _check(answer: str, evidence: str, allowed_urls: set[str], ids: set[str]) -> list[str]:
     problems: list[str] = []
+    evidence, code_lines, code = _without_code(evidence)
     lower = evidence.lower()
 
     cited, rest = _citations(answer)
@@ -64,6 +101,10 @@ def _check(answer: str, evidence: str, allowed_urls: set[str], ids: set[str]) ->
         if _bare_url(url) not in allowed:
             problems.append(f"link {url.rstrip(URL_TRAILING)[:120]} is not one of the sources")
     rest = URL.sub(" ", rest)
+
+    def quoted_code(m: re.Match) -> str:  # a code line quoted exactly: its constants are the code's
+        return " " if any(_squeeze(m.group(1)) in line for line in code) else m.group(0)
+    rest = CODE_QUOTE.sub(quoted_code, rest)
 
     hex_values = [h.lower() for h in re.findall(r"0x[0-9a-fA-F]+", evidence)]
     for m in HEX.finditer(rest):
@@ -78,7 +119,7 @@ def _check(answer: str, evidence: str, allowed_urls: set[str], ids: set[str]) ->
             problems.append(f"the date {m.group(0)} is not in the evidence")
     rest = DATE.sub(" ", rest)
 
-    known = _numbers(evidence)
+    known = _numbers(evidence) + code_lines
     for m in NUMBER.finditer(rest):
         sign, token, scale = m.group(1), m.group(2), (m.group(3) or "").lower()
         digits = sum(c.isdigit() for c in token)

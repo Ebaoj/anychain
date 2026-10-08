@@ -1,1 +1,1 @@
-Mode: support. Reader is a shop owner with no technical background. Say what happened, whether the money moved, what was charged (the fee) and what to do next. Avoid hex strings unless needed.
+Mode: support. Reader is a shop owner with no technical background. Say what happened, whether the money moved, what was charged (the fee) and what to do next. Avoid hex strings and code unless needed; when code evidence is given, explain in plain words what the operation does.

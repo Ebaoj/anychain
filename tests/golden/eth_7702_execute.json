@@ -110,13 +110,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "EIP7702DeleGatorCore",
+    "function": "execute(bytes32,bytes)",
+    "lines": [
+     208,
+     236
+    ],
+    "path": "src/EIP7702/EIP7702DeleGatorCore.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B"
+    }
+   ],
+   "text": "Code of execute(bytes32,bytes) in EIP7702DeleGatorCore (src/EIP7702/EIP7702DeleGatorCore.sol, lines 208-236), from the verified source of the delegate 0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B this transaction set for 0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e, as the explorer lists it:\n208 |     function execute(ModeCode _mode, bytes calldata _executionCalldata) external payable onlyEntryPointOrSelf {\n209 |         (CallType callType_, ExecType execType_,,) = _mode.decode();\n210 | \n211 |         // Check if calltype is batch or single\n212 |         if (callType_ == CALLTYPE_BATCH) {\n213 |             // destructure executionCallData according to batched exec\n214 |             Execution[] calldata executions_ = _executionCalldata.decodeBatch();\n215 |             // Check if execType is revert or try\n216 |             if (execType_ == EXECTYPE_DEFAULT) _execute(executions_);\n217 |             else if (execType_ == EXECTYPE_TRY) _tryExecute(executions_);\n218 |             else revert UnsupportedExecType(execType_);\n219 |         } else if (callType_ == CALLTYPE_SINGLE) {\n220 |             // Destructure executionCallData according to single exec\n221 |             (address target_, uint256 value_, bytes calldata callData_) = _executionCalldata.decodeSingle();\n222 |             // Check if execType is revert or try\n223 |             if (execType_ == EXECTYPE_DEFAULT) {\n224 |                 _execute(target_, value_, callData_);\n225 |             } else if (execType_ == EXECTYPE_TRY) {\n226 |                 bytes[] memory returnData_ = new bytes[](1);\n227 |                 bool success_;\n228 |                 (success_, returnData_[0]) = _tryExecute(target_, value_, callData_);\n229 |                 if (!success_) emit TryExecuteUnsuccessful(0, returnData_[0]);\n230 |             } else {\n231 |                 revert UnsupportedExecType(execType_);\n232 |             }\n233 |         } else {\n234 |             revert UnsupportedCallType(callType_);\n235 |         }\n236 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e",
     "to": "0x000000000004444c5dc75cB358380D2e3dE08A90",
     "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "token_id": null,
     "value": 399874205
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {
@@ -136,7 +161,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -156,26 +181,6 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E7",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
-    }
-   ],
-   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E8",
    "kind": "internal_call",
    "sources": [
@@ -186,7 +191,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
    "confidence": "single_source",
@@ -206,7 +211,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e to 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter)."
+   "text": "Internal call from 0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
   },
   {
    "confidence": "single_source",
@@ -226,7 +231,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
+   "text": "Internal call from 0xee9B891BFF654dbcd24a8DC57019eF21d4A6181e to 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter)."
   },
   {
    "confidence": "single_source",
@@ -246,7 +251,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter)."
+   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
    "confidence": "single_source",
@@ -266,14 +271,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter)."
   },
   {
    "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
-    "type": "delegatecall",
+    "type": "call",
     "value": "0"
    },
    "id": "E13",
@@ -286,14 +291,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
+   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
    "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
-    "type": "call",
+    "type": "delegatecall",
     "value": "0"
    },
    "id": "E14",
@@ -306,7 +311,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
    "confidence": "single_source",
@@ -326,14 +331,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
+   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
   },
   {
    "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
-    "type": "delegatecall",
+    "type": "call",
     "value": "0"
    },
    "id": "E16",
@@ -346,6 +351,26 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
+   "text": "Internal call from 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
+    }
+   ],
    "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
@@ -356,7 +381,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "internal_call",
    "sources": [
     {
@@ -376,26 +401,6 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E18",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
-    }
-   ],
-   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E19",
    "kind": "internal_call",
    "sources": [
@@ -406,7 +411,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
    "confidence": "single_source",
@@ -431,12 +436,32 @@
   {
    "confidence": "single_source",
    "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E21",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xeaf8e978ba0ea10789ff298ad88e830528321ea0cabbce9755de3fd4c04c1305/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x23617e59A5925b2A4Bf75d73ff6711cD0b29De85 (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "moves_value": true,
     "same_as": null,
     "type": "call",
     "value": "155650593971761739"
    },
-   "id": "E21",
+   "id": "E22",
    "kind": "internal_call",
    "sources": [
     {
@@ -453,7 +478,7 @@
    "data": {
     "staticcalls": 3
    },
-   "id": "E22",
+   "id": "E23",
    "kind": "internal_call",
    "sources": [
     {
@@ -475,7 +500,7 @@
     },
     "event": "Approval"
    },
-   "id": "E23",
+   "id": "E24",
    "kind": "event",
    "sources": [
     {
@@ -499,7 +524,7 @@
     },
     "event": "Approval"
    },
-   "id": "E24",
+   "id": "E25",
    "kind": "event",
    "sources": [
     {
@@ -526,7 +551,7 @@
     },
     "event": "Swap"
    },
-   "id": "E25",
+   "id": "E26",
    "kind": "event",
    "sources": [
     {
@@ -544,7 +569,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E26",
+   "id": "E27",
    "kind": "cross_check",
    "sources": [
     {

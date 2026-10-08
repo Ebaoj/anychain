@@ -120,13 +120,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "BRLCTokenBase",
+    "function": "transfer(address,uint256)",
+    "lines": [
+     66,
+     76
+    ],
+    "path": "contracts/BRLCTokenBase.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xbEA441d7cf3f79b57cc5ae33251a084A063825dc"
+    }
+   ],
+   "text": "Code of transfer(address,uint256) in BRLCTokenBase (contracts/BRLCTokenBase.sol, lines 66-76), from the verified source of the implementation the explorer lists today for 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (it may have been upgraded since this transaction), as the explorer lists it:\n66 |     function transfer(address recipient, uint256 amount)\r\n67 |         public\r\n68 |         virtual\r\n69 |         override\r\n70 |         whenNotPaused\r\n71 |         notBlacklisted(_msgSender())\r\n72 |         notBlacklisted(recipient)\r\n73 |         returns (bool)\r\n74 |     {\r\n75 |         return super.transfer(recipient, amount);\r\n76 |     }\r"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x3b995d0B4247CF47058D54E8947038dc11f6Aac9",
     "to": "0x78DAd017134019d5e9d4aF3045180B898955934c",
     "token": "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284",
     "token_id": null,
     "value": 10000000
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {

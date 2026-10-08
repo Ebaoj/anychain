@@ -106,12 +106,37 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "L2ToL1MessagePasser",
+    "function": "initiateWithdrawal(address,uint256,bytes)",
+    "lines": [
+     78,
+     97
+    ],
+    "path": "src/L2/L2ToL1MessagePasser.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x27E51B2254433A3284D9ba73Ea551C397DB2a124"
+    }
+   ],
+   "text": "Code of initiateWithdrawal(address,uint256,bytes) in L2ToL1MessagePasser (src/L2/L2ToL1MessagePasser.sol, lines 78-97), from the verified source of the implementation the explorer lists today for 0x4200000000000000000000000000000000000016 (it may have been upgraded since this transaction), as the explorer lists it:\n78 |     function initiateWithdrawal(address _target, uint256 _gasLimit, bytes memory _data) public payable virtual {\n79 |         bytes32 withdrawalHash = Hashing.hashWithdrawal(\n80 |             Types.WithdrawalTransaction({\n81 |                 nonce: messageNonce(),\n82 |                 sender: msg.sender,\n83 |                 target: _target,\n84 |                 value: msg.value,\n85 |                 gasLimit: _gasLimit,\n86 |                 data: _data\n87 |             })\n88 |         );\n89 | \n90 |         sentMessages[withdrawalHash] = true;\n91 | \n92 |         emit MessagePassed(messageNonce(), msg.sender, _target, msg.value, _gasLimit, _data, withdrawalHash);\n93 | \n94 |         unchecked {\n95 |             ++msgNonce;\n96 |         }\n97 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "moves_value": false,
     "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -137,7 +162,7 @@
     },
     "event": "MessagePassed"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "event",
    "sources": [
     {
@@ -155,7 +180,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "cross_check",
    "sources": [
     {

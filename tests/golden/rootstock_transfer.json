@@ -86,13 +86,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "RIFToken",
+    "function": "transfer(address,uint256)",
+    "lines": [
+     769,
+     780
+    ],
+    "path": "RIFToken.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://rootstock.blockscout.com/api/v2/smart-contracts/0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5"
+    }
+   ],
+   "text": "Code of transfer(address,uint256) in RIFToken (RIFToken.sol, lines 769-780), from the verified source of the contract 0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5, as the explorer lists it:\n769 |     function transfer(address _to, uint256 _value) public onlyAfterDistribution onlyIfAddressUsable(msg.sender) returns (bool) {\r\n770 |         // cannot transfer to a redirected account\r\n771 |         if (wasRedirected(_to)) return false;\r\n772 | \r\n773 |         bool result = super.transfer(_to, _value);\r\n774 | \r\n775 |         if (!result) return false;\r\n776 | \r\n777 |         doTrackMinimums(msg.sender);\r\n778 | \r\n779 |         return true;\r\n780 |     }\r"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x1A9bDCd4f23051dD5376484579672675831871a5",
     "to": "0x859E409b84a79bf8B1e6d012eB6940483C3496de",
     "token": "0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5",
     "token_id": null,
     "value": 24013533870382100514296
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -110,7 +135,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "cross_check",
    "sources": [
     {

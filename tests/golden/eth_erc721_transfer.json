@@ -87,13 +87,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "PositionManager",
+    "function": "modifyLiquidities(bytes,uint256)",
+    "lines": [
+     171,
+     178
+    ],
+    "path": "src/pkgs/v4-periphery/src/PositionManager.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e"
+    }
+   ],
+   "text": "Code of modifyLiquidities(bytes,uint256) in PositionManager (src/pkgs/v4-periphery/src/PositionManager.sol, lines 171-178), from the verified source of the contract 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e, as the explorer lists it:\n171 |     function modifyLiquidities(bytes calldata unlockData, uint256 deadline)\n172 |         external\n173 |         payable\n174 |         isNotLocked\n175 |         checkDeadline(deadline)\n176 |     {\n177 |         _executeActions(unlockData);\n178 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x0882Ad7Dc61dFFCC312A9Aa8b30Ee11a10f42006",
     "token": "0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e",
     "token_id": "443098",
     "value": null
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -114,7 +139,7 @@
     "token_id": null,
     "value": 15886956381
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {
@@ -134,26 +159,6 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E6",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E7",
    "kind": "internal_call",
    "sources": [
@@ -164,7 +169,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT)."
+   "text": "Internal call from 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
    "confidence": "single_source",
@@ -184,7 +189,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT)."
   },
   {
    "confidence": "single_source",
@@ -211,90 +216,10 @@
    "data": {
     "moves_value": false,
     "same_as": null,
-    "type": "delegatecall",
+    "type": "call",
     "value": "0"
    },
    "id": "E10",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
-    }
-   ],
-   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E11",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT) to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E12",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "delegatecall",
-    "value": "0"
-   },
-   "id": "E13",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
-    }
-   ],
-   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
-   "id": "E14",
    "kind": "internal_call",
    "sources": [
     {
@@ -314,7 +239,107 @@
     "type": "delegatecall",
     "value": "0"
    },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT) to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
    "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x5111a725276204966e7476adc1cebc04f6dbdb79dbf34c0e82994bbe7277c7ab/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e (Uniswap v4 Positions NFT) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E16",
    "kind": "internal_call",
    "sources": [
     {
@@ -331,7 +356,7 @@
    "data": {
     "staticcalls": 4
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "internal_call",
    "sources": [
     {
@@ -356,7 +381,7 @@
     },
     "event": "ModifyLiquidity"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "event",
    "sources": [
     {
@@ -374,7 +399,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E18",
+   "id": "E19",
    "kind": "cross_check",
    "sources": [
     {

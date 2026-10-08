@@ -87,13 +87,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "ERC20",
+    "function": "transferFrom(address,address,uint256)",
+    "lines": [
+     285,
+     299
+    ],
+    "path": ".sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://gnosisscan.io/api/v2/smart-contracts/0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd"
+    }
+   ],
+   "text": "Code of transferFrom(address,address,uint256) in ERC20 (.sol, lines 285-299), from the verified source of the contract 0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd, as the explorer lists it:\n285 |     function transferFrom(\r\n286 |         address sender,\r\n287 |         address recipient,\r\n288 |         uint256 amount\r\n289 |     ) public virtual override returns (bool) {\r\n290 |         _transfer(sender, recipient, amount);\r\n291 | \r\n292 |         uint256 currentAllowance = _allowances[sender][_msgSender()];\r\n293 |         require(currentAllowance >= amount, \"ERC20: transfer amount exceeds allowance\");\r\n294 |         unchecked {\r\n295 |             _approve(sender, _msgSender(), currentAllowance - amount);\r\n296 |         }\r\n297 | \r\n298 |         return true;\r\n299 |     }\r"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0xa49bE9f2a3335Dc480E0681D290A364e7b6f3312",
     "to": "0x7F782E0198D43e9192D134451Cff1caD849575C3",
     "token": "0x536dd2E72686d3d7d6A1d4A6FEbD69Ec1B7C05Bd",
     "token_id": null,
     "value": 1
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -115,7 +140,7 @@
     },
     "event": "Approval"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "event",
    "sources": [
     {
@@ -133,7 +158,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "cross_check",
    "sources": [
     {

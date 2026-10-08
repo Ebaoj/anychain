@@ -88,12 +88,37 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "SafeProxyFactory",
+    "function": "createProxyWithNonce(address,bytes,uint256)",
+    "lines": [
+     52,
+     57
+    ],
+    "path": "contracts/proxies/SafeProxyFactory.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67"
+    }
+   ],
+   "text": "Code of createProxyWithNonce(address,bytes,uint256) in SafeProxyFactory (contracts/proxies/SafeProxyFactory.sol, lines 52-57), from the verified source of the contract 0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67, as the explorer lists it:\n52 |     function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) public returns (SafeProxy proxy) {\n53 |         // If the initializer changes the proxy address should change too. Hashing the initializer data is cheaper than just concatinating it\n54 |         bytes32 salt = keccak256(abi.encodePacked(keccak256(initializer), saltNonce));\n55 |         proxy = deployProxy(_singleton, initializer, salt);\n56 |         emit ProxyCreation(proxy, _singleton);\n57 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "moves_value": false,
     "same_as": null,
     "type": "create",
     "value": "0"
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "internal_call",
    "sources": [
     {
@@ -113,7 +138,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -133,7 +158,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -153,7 +178,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "internal_call",
    "sources": [
     {
@@ -177,7 +202,7 @@
     },
     "event": "SafeSetup"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "event",
    "sources": [
     {
@@ -198,7 +223,7 @@
     },
     "event": "ProxyCreation"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "event",
    "sources": [
     {
@@ -216,7 +241,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "cross_check",
    "sources": [
     {

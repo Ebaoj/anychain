@@ -100,12 +100,37 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "L1Block",
+    "function": "setL1BlockValuesJovian()",
+    "lines": [
+     211,
+     228
+    ],
+    "path": "src/L2/L1Block.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0x6a97C5D55A21265326150Efe12FC30Fb21cbff56"
+    }
+   ],
+   "text": "Code of setL1BlockValuesJovian() in L1Block (src/L2/L1Block.sol, lines 211-228), from the verified source of the implementation the explorer lists today for 0x4200000000000000000000000000000000000015 (it may have been upgraded since this transaction), as the explorer lists it:\n211 |     function setL1BlockValuesJovian() public {\n212 |         setL1BlockValuesEcotone();\n213 |         assembly {\n214 |             // Calldata layout: operatorFeeScalar (uint32), operatorFeeConstant (uint64), daFootprintGasScalar (uint16)\n215 |             // Slot layout: daFootprintGasScalar (uint16),  operatorFeeScalar (uint32), operatorFeeConstant (uint64)\n216 | \n217 |             // Load operatorFeeScalar+operatorFeeConstant from calldata\n218 |             let opFeeParams := shr(160, calldataload(164)) // 160 = 256 - (32 + 64)\n219 | \n220 |             // Load daFootprintGasScalar from calldata\n221 |             let daScalar := shr(240, calldataload(176)) // 240 = 256 - 16\n222 | \n223 |             // Combine full slot value, shifting daFootprintGasScalar left of operator fee params\n224 |             let slotVal := or(shl(96, daScalar), opFeeParams) // 96 = 32 + 64\n225 | \n226 |             sstore(operatorFeeConstant.slot, slotVal)\n227 |         }\n228 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "moves_value": false,
     "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -123,7 +148,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "cross_check",
    "sources": [
     {

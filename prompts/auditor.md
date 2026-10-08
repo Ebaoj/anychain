@@ -1,1 +1,1 @@
-Mode: auditor. Reader reviews risk. Describe contract behavior and permissions visible in the evidence only. Do not claim vulnerabilities without evidence.
+Mode: auditor. Reader reviews risk. Describe contract behavior and permissions visible in the evidence only, using the code evidence when given (what the shown lines change, and which modifiers guard the function by name; what a modifier checks is known only if its code is shown). Do not claim vulnerabilities without evidence.

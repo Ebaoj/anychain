@@ -107,12 +107,37 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "ValidatorTimelock",
+    "function": "commitBatchesSharedBridge(address,uint256,uint256,bytes)",
+    "lines": [
+     197,
+     212
+    ],
+    "path": "contracts/state-transition/ValidatorTimelock.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x6CB28384f21B18924FA312AA2E10D4E813e66263"
+    }
+   ],
+   "text": "Code of commitBatchesSharedBridge(address,uint256,uint256,bytes) in ValidatorTimelock (contracts/state-transition/ValidatorTimelock.sol, lines 197-212), from the verified source of the implementation the explorer lists today for 0xE28cAc160C2a79dFA1fbd2169AC5fa5d061cf186 (it may have been upgraded since this transaction), as the explorer lists it:\n197 |     function commitBatchesSharedBridge(\n198 |         address _chainAddress,\n199 |         uint256 _processBatchFrom,\n200 |         uint256 _processBatchTo,\n201 |         bytes calldata // _batchData (unused in this specific implementation)\n202 |     ) external onlyRole(_chainAddress, COMMITTER_ROLE) {\n203 |         unchecked {\n204 |             // This contract is only a temporary solution, that hopefully will be disabled until 2106 year, so...\n205 |             // It is safe to cast.\n206 |             uint32 timestamp = uint32(block.timestamp);\n207 |             for (uint256 i = _processBatchFrom; i <= _processBatchTo; ++i) {\n208 |                 committedBatchTimestamp[_chainAddress].set(i, timestamp);\n209 |             }\n210 |         }\n211 |         _propagateToZKChain(_chainAddress);\n212 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "moves_value": false,
     "same_as": null,
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -132,7 +157,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -152,7 +177,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "internal_call",
    "sources": [
     {
@@ -172,7 +197,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "internal_call",
    "sources": [
     {
@@ -192,7 +217,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -209,7 +234,7 @@
    "data": {
     "staticcalls": 1
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "internal_call",
    "sources": [
     {
@@ -231,7 +256,7 @@
     },
     "event": "ReportCommittedBatchRangeZKsyncOS"
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "event",
    "sources": [
     {
@@ -253,7 +278,7 @@
     },
     "event": "BlockCommit"
    },
-   "id": "E12",
+   "id": "E13",
    "kind": "event",
    "sources": [
     {
@@ -271,7 +296,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E13",
+   "id": "E14",
    "kind": "cross_check",
    "sources": [
     {

@@ -37,6 +37,41 @@ HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
 MAX_EVENTS = 40
 REPLAY_WHEN = {"no_reason", "generic_failure", "possibly_out_of_gas"}  # findings without the explorer's reason
 MAX_EVENT_LOOKUPS = 10  # distinct undecoded event topics looked up per answer
+MAX_CODE_LINES = 80  # lines of one function given as a code fact; the rest is counted (D38)
+MAX_CODE_CHARS = 200  # characters of one code line given to the model
+
+
+def render_code(lines: list[str], start: int, raise_line: int | None = None) -> str:
+    """Numbered source lines; a long function keeps its first lines and the lines around `raise_line`,
+    saying how many are not shown (review of D38: the raising line is always shown)."""
+    n = len(lines)
+    if n <= MAX_CODE_LINES:
+        keep = set(range(n))
+    elif raise_line is None or raise_line - start < MAX_CODE_LINES:
+        keep = set(range(MAX_CODE_LINES))
+    else:
+        r, half = raise_line - start, MAX_CODE_LINES // 4
+        keep = set(range(MAX_CODE_LINES // 2)) | set(range(max(0, r - half), min(n, r + half)))
+    out, last = [], -1
+    for i in sorted(keep):
+        if i != last + 1:
+            out.append(f"({_lines(i - last - 1)} not shown)")
+        text = lines[i] if len(lines[i]) <= MAX_CODE_CHARS else lines[i][:MAX_CODE_CHARS] + " …"
+        out.append(f"{start + i} | {text}")
+        last = i
+    if last < n - 1:
+        more = n - 1 - last
+        out.append(f"({more} more {'line' if more == 1 else 'lines'} not shown)")
+    return "\n".join(out)
+
+
+def _lines(n: int) -> str:
+    return f"{n} line" if n == 1 else f"{n} lines"
+
+
+def _raises_note(line: int | None, text: str | None) -> str:
+    return (f"\nIn this function the reason {text!r} is written only at line {line}, so the failure was most "
+            f"likely raised there (unless it was passed on from another function or contract this one called).")
 MAX_PLACES = 3  # places a reason text is listed at, per source; the rest are counted
 DEPOSIT_TX_TYPES = {0x7E, 0xFF}  # OP Stack deposits and zkSync L1->L2 priority txs: funds minted as they run
 # What a replayed reason means, per diagnosis rule, worded about the replay (D32).
@@ -356,6 +391,7 @@ class BundleBuilder:
         self._safely("Code delegations", lambda: self._add_authorizations(tx_hash, tx))
         self._safely("Call decoding", lambda: self._add_call(tx_hash, tx))
         self._safely("Source code", lambda: self._add_source_code(tx))
+        self._safely("Function code", lambda: self._add_function_code(tx))
         covered_logs: set[int] = set()
         self._safely("Token transfers", lambda: covered_logs.update(self._add_transfers(tx_hash, tx)))
         self._safely("Internal calls", lambda: self._add_internal(tx_hash, tx))
@@ -499,6 +535,60 @@ class BundleBuilder:
                          "lines": [f.start, f.end], "selector": selector, "in_repo": True, "same_as_verified": same},
                         confidence=confidence)
 
+    def _code_addresses(self, tx: Transaction) -> list[tuple[str, str]]:
+        """(address whose verified source to read, what it is) for the code the call ran: a delegation this
+        transaction set comes first; a cleared one means no code; otherwise the explorer's current
+        implementations, then the address itself (review of D38)."""
+        to = tx.to
+        if to is None or not to.address:
+            return []
+        delegate = self._delegations_applied(tx).get(to.address.lower())
+        last = [a for a in tx.authorizations if a.status == "ok" and (a.authority or "").lower() == to.address.lower()]
+        if delegate == ZERO_ADDRESS or (last and last[-1].delegate is None):
+            return []  # cleared, or changed by this transaction to code we cannot name
+        if delegate:
+            return [(delegate, f"the delegate {delegate} this transaction set for {to.address}")]
+        return [(a, f"the implementation the explorer lists today for {to.address} (it may have been upgraded "
+                    f"since this transaction)" if a.lower() != to.address.lower() else f"the contract {a}")
+                for a in self._contracts_behind(to)]
+
+    def _code_fact(self, index: SolidityIndex, found, address: str, origin: str, raises: str | None = None,
+                   line: int | None = None):
+        """The code of one function as a fact: numbered lines, cut at MAX_CODE_LINES around the raising line
+        (D38)."""
+        f, c = found.function, found.contract
+        lines = index.lines(c.path, f.start, f.end)
+        what = f.signature or f"{f.name}(…)"
+        head = (f"Code of {what} in {c.name} ({c.path}, lines {f.start}-{f.end}), from the verified source of "
+                f"{origin}, as the explorer lists it:\n")
+        for e in self.bundle.items:  # the same function already shown: add the raising line to it
+            if e.kind == "code" and e.data.get("path") == c.path and e.data.get("lines") == [f.start, f.end]:
+                if raises and not e.data.get("raises"):
+                    e.data["raises"], e.data["raise_line"] = raises, line
+                    e.text = head + render_code(lines, f.start, line) + _raises_note(line, raises)
+                return e
+        text = head + render_code(lines, f.start, line) + (_raises_note(line, raises) if raises else "")
+        api = self._api_source(f"/smart-contracts/{address}", "Explorer API: verified source")
+        return self.bundle.add("code", text, [api], {"function": what, "contract": c.name, "path": c.path,
+                                                      "lines": [f.start, f.end], "raises": raises, "raise_line": line})
+
+    def _add_function_code(self, tx: Transaction) -> None:
+        """The called function's code, from the verified source of the code it ran (PHASE2_5 T1, R1)."""
+        if (not self.explorer_answered or "explorer" not in self.cfg.abi_strategy.order or tx.to is None
+                or len(tx.raw_input or "") < 10):
+            return
+        selector = tx.raw_input[:10].lower()
+        for address, origin in self._code_addresses(tx):
+            try:
+                name = self._contract_name(address)
+            except CollectorError:
+                continue
+            _name, verified = self._verified(address) if name else (None, None)
+            found = verified.find(name, selector) if verified else None
+            if found:
+                self._code_fact(verified, found, address, origin)
+                return
+
     def _add_reason_in_source(self, tx: Transaction) -> None:
         """Where the failure's reason text is written: in the verified source of the contract called, and in
         the configured repo matched to that contract (not in unrelated repos)."""
@@ -517,16 +607,20 @@ class BundleBuilder:
                                Source(kind="repo", label=f"Repository {self.source_repo.label}",
                                       url=self.source_repo.permalink(path, line, line))))
         if tx.to is not None and self.explorer_answered and "explorer" in self.cfg.abi_strategy.order:
-            for address in self._contracts_behind(tx.to)[:1]:
+            for address, origin in self._code_addresses(tx)[:1]:
                 try:
-                    _name, verified = self._verified(address)
+                    name, verified = self._verified(address)
                 except CollectorError:
-                    verified = None
+                    name, verified = None, None
                 hits = verified.literal(text) if verified else []
                 found_total += len(hits)
                 for path, line in hits[:MAX_PLACES]:
                     places.append((f"the verified source {path}, line {line}",
                                    self._api_source(f"/smart-contracts/{address}", "Explorer API: verified source")))
+                selector = (tx.raw_input or "")[:10].lower() if len(tx.raw_input or "") >= 10 else None
+                raising = verified.raising_function(name, text, selector) if verified and name else None
+                if raising:
+                    self._code_fact(verified, raising[0], address, origin, raises=text, line=raising[1])
         if places:
             more = found_total - len(places)
             sources = list({(s.kind, s.url): s for _, s in places}.values())  # one source per page

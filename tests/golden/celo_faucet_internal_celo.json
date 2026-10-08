@@ -85,11 +85,36 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "Faucet",
+    "function": "topWallet(address)",
+    "lines": [
+     191,
+     195
+    ],
+    "path": "contracts/fuseFaucet/Faucet.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://celo.blockscout.com/api/v2/smart-contracts/0x08fdf766694C353401350c225cAEB9C631dC3288"
+    }
+   ],
+   "text": "Code of topWallet(address) in Faucet (contracts/fuseFaucet/Faucet.sol, lines 191-195), from the verified source of the implementation the explorer lists today for 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (it may have been upgraded since this transaction), as the explorer lists it:\n191 | \tfunction topWallet(\n192 | \t\taddress payable _user\n193 | \t) public reimburseGas toppingLimit(_user) onlyAuthorized(_user) {\n194 | \t\t_topWallet(_user);\n195 | \t}"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84",
     "to": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483",
     "value": 26577600000000000
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "native_transfer",
    "sources": [
     {
@@ -108,7 +133,7 @@
     "to": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483",
     "value": 189223000000000000
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "native_transfer",
    "sources": [
     {
@@ -128,7 +153,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -148,26 +173,6 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E7",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
-    }
-   ],
-   "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "delegatecall",
-    "value": "0"
-   },
    "id": "E8",
    "kind": "internal_call",
    "sources": [
@@ -178,7 +183,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
+   "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
   },
   {
    "confidence": "single_source",
@@ -198,7 +203,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
+   "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
   },
   {
    "confidence": "single_source",
@@ -218,7 +223,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
+   "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
   },
   {
    "confidence": "single_source",
@@ -238,7 +243,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
+   "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
   },
   {
    "confidence": "single_source",
@@ -258,15 +263,15 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
+   "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
   },
   {
    "confidence": "single_source",
    "data": {
-    "moves_value": true,
-    "same_as": "E5",
-    "type": "call",
-    "value": "189223000000000000"
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
    },
    "id": "E13",
    "kind": "internal_call",
@@ -278,15 +283,15 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal CELO transfer of 0.189223 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483: the same movement as E5, not an additional one."
+   "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
   },
   {
    "confidence": "single_source",
    "data": {
     "moves_value": true,
-    "same_as": "E4",
+    "same_as": "E6",
     "type": "call",
-    "value": "26577600000000000"
+    "value": "189223000000000000"
    },
    "id": "E14",
    "kind": "internal_call",
@@ -298,14 +303,34 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
     }
    ],
-   "text": "Internal CELO transfer of 0.0265776 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483: the same movement as E4, not an additional one."
+   "text": "Internal CELO transfer of 0.189223 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483: the same movement as E6, not an additional one."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": true,
+    "same_as": "E5",
+    "type": "call",
+    "value": "26577600000000000"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429/internal-transactions"
+    }
+   ],
+   "text": "Internal CELO transfer of 0.0265776 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483: the same movement as E5, not an additional one."
   },
   {
    "confidence": "single_source",
    "data": {
     "staticcalls": 7
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "internal_call",
    "sources": [
     {
@@ -328,7 +353,7 @@
     },
     "event": "WalletTopped"
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "event",
    "sources": [
     {
@@ -346,7 +371,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "cross_check",
    "sources": [
     {

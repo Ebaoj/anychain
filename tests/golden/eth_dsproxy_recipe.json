@@ -116,13 +116,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "DSProxy",
+    "function": "execute(address,bytes)",
+    "lines": [
+     131,
+     150
+    ],
+    "path": "DSProxy.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E"
+    }
+   ],
+   "text": "Code of execute(address,bytes) in DSProxy (DSProxy.sol, lines 131-150), from the verified source of the contract 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E, as the explorer lists it:\n131 |     function execute(address _target, bytes _data)\r\n132 |         public\r\n133 |         auth\r\n134 |         note\r\n135 |         payable\r\n136 |         returns (bytes32 response)\r\n137 |     {\r\n138 |         require(_target != 0x0);\r\n139 | \r\n140 |         // call contract in current context\r\n141 |         assembly {\r\n142 |             let succeeded := delegatecall(sub(gas, 5000), _target, add(_data, 0x20), mload(_data), 0, 32)\r\n143 |             response := mload(0)      // load delegatecall output\r\n144 |             switch iszero(succeeded)\r\n145 |             case 1 {\r\n146 |                 // throw if delegatecall failed\r\n147 |                 revert(0, 0)\r\n148 |             }\r\n149 |         }\r\n150 |     }\r"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
     "to": "0xE78C05c508405207ecc256781B9415e6De1c8336",
     "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "token_id": null,
     "value": 175489683526176713114
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -143,7 +168,7 @@
     "token_id": null,
     "value": 175489683526176713114
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {
@@ -164,7 +189,7 @@
     "token_id": null,
     "value": 9990000000000000000
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "token_transfer",
    "sources": [
     {
@@ -185,7 +210,7 @@
     "token_id": null,
     "value": 9990000000000000000
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "token_transfer",
    "sources": [
     {
@@ -206,7 +231,7 @@
     "token_id": null,
     "value": 9989999999999999999
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "token_transfer",
    "sources": [
     {
@@ -227,7 +252,7 @@
     "token_id": null,
     "value": 8031389848001760924
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "token_transfer",
    "sources": [
     {
@@ -248,7 +273,7 @@
     "token_id": null,
     "value": 8031389848001760924
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "token_transfer",
    "sources": [
     {
@@ -269,7 +294,7 @@
     "token_id": null,
     "value": 175489683526176713114
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "token_transfer",
    "sources": [
     {
@@ -290,7 +315,7 @@
     "token_id": null,
     "value": 175489683526176713113
    },
-   "id": "E12",
+   "id": "E13",
    "kind": "token_transfer",
    "sources": [
     {
@@ -311,7 +336,7 @@
     "token_id": null,
     "value": 141083689960077829828
    },
-   "id": "E13",
+   "id": "E14",
    "kind": "token_transfer",
    "sources": [
     {
@@ -332,7 +357,7 @@
     "token_id": null,
     "value": 141083689960077829828
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "token_transfer",
    "sources": [
     {
@@ -353,7 +378,7 @@
     "token_id": null,
     "value": 175489683526176713114
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "token_transfer",
    "sources": [
     {
@@ -374,7 +399,7 @@
     "token_id": null,
     "value": 175489683526176713114
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "token_transfer",
    "sources": [
     {
@@ -395,7 +420,7 @@
     "token_id": null,
     "value": 175489683526176713114
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "token_transfer",
    "sources": [
     {
@@ -415,7 +440,7 @@
     "type": "delegatecall",
     "value": "9990000000000000000"
    },
-   "id": "E18",
+   "id": "E19",
    "kind": "internal_call",
    "sources": [
     {
@@ -435,26 +460,6 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E19",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x64E9EFBe7E3555dFB9c608701ea83869431dE305 (DSGuard)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E20",
    "kind": "internal_call",
    "sources": [
@@ -465,7 +470,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction)."
+   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x64E9EFBe7E3555dFB9c608701ea83869431dE305 (DSGuard)."
   },
   {
    "confidence": "single_source",
@@ -485,7 +490,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction) to 0xBA12222222228d8Ba445958a75a0704d566BF2C8 (Vault)."
+   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction)."
   },
   {
    "confidence": "single_source",
@@ -505,7 +510,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBA12222222228d8Ba445958a75a0704d566BF2C8 (Vault) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
+   "text": "Internal call from 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction) to 0xBA12222222228d8Ba445958a75a0704d566BF2C8 (Vault)."
   },
   {
    "confidence": "single_source",
@@ -525,7 +530,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBA12222222228d8Ba445958a75a0704d566BF2C8 (Vault) to 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction)."
+   "text": "Internal call from 0xBA12222222228d8Ba445958a75a0704d566BF2C8 (Vault) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
   },
   {
    "confidence": "single_source",
@@ -545,7 +550,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
+   "text": "Internal call from 0xBA12222222228d8Ba445958a75a0704d566BF2C8 (Vault) to 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction)."
   },
   {
    "confidence": "single_source",
@@ -565,7 +570,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction) to 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy)."
+   "text": "Internal call from 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
   },
   {
    "confidence": "single_source",
@@ -585,14 +590,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x64E9EFBe7E3555dFB9c608701ea83869431dE305 (DSGuard)."
+   "text": "Internal call from 0xE78C05c508405207ecc256781B9415e6De1c8336 (FLAction) to 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy)."
   },
   {
    "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
-    "type": "delegatecall",
+    "type": "call",
     "value": "0"
    },
    "id": "E27",
@@ -605,7 +610,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xbc3Fc959FeF3F12a41738f406c02198cdeE7481F (RecipeExecutor)."
+   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x64E9EFBe7E3555dFB9c608701ea83869431dE305 (DSGuard)."
   },
   {
    "confidence": "single_source",
@@ -625,6 +630,26 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
+   "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xbc3Fc959FeF3F12a41738f406c02198cdeE7481F (RecipeExecutor)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E29",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
+    }
+   ],
    "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x8EbBd35f84D7f0DFCBEf08fD30CD09176133251A (WrapEth)."
   },
   {
@@ -635,7 +660,7 @@
     "type": "call",
     "value": "9990000000000000000"
    },
-   "id": "E29",
+   "id": "E30",
    "kind": "internal_call",
    "sources": [
     {
@@ -655,7 +680,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E30",
+   "id": "E31",
    "kind": "internal_call",
    "sources": [
     {
@@ -675,7 +700,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E31",
+   "id": "E32",
    "kind": "internal_call",
    "sources": [
     {
@@ -695,7 +720,7 @@
     "type": "call",
     "value": "9990000000000000000"
    },
-   "id": "E32",
+   "id": "E33",
    "kind": "internal_call",
    "sources": [
     {
@@ -715,7 +740,7 @@
     "type": "call",
     "value": "9990000000000000000"
    },
-   "id": "E33",
+   "id": "E34",
    "kind": "internal_call",
    "sources": [
     {
@@ -735,7 +760,7 @@
     "type": "call",
     "value": "9990000000000000000"
    },
-   "id": "E34",
+   "id": "E35",
    "kind": "internal_call",
    "sources": [
     {
@@ -755,7 +780,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E35",
+   "id": "E36",
    "kind": "internal_call",
    "sources": [
     {
@@ -775,7 +800,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E36",
+   "id": "E37",
    "kind": "internal_call",
    "sources": [
     {
@@ -795,7 +820,7 @@
     "type": "delegatecall",
     "value": "9990000000000000000"
    },
-   "id": "E37",
+   "id": "E38",
    "kind": "internal_call",
    "sources": [
     {
@@ -815,26 +840,6 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E38",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
-    }
-   ],
-   "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x1cdAC5D4b207e8DBd308504BbedD5D1BD19D26ac (MorphoBlueSupplyCollateral)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E39",
    "kind": "internal_call",
    "sources": [
@@ -845,7 +850,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH)."
+   "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x1cdAC5D4b207e8DBd308504BbedD5D1BD19D26ac (MorphoBlueSupplyCollateral)."
   },
   {
    "confidence": "single_source",
@@ -885,7 +890,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb (Morpho)."
+   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH)."
   },
   {
    "confidence": "single_source",
@@ -905,6 +910,26 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
+   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb (Morpho)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E43",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
+    }
+   ],
    "text": "Internal call from 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb (Morpho) to 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH)."
   },
   {
@@ -915,7 +940,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E43",
+   "id": "E44",
    "kind": "internal_call",
    "sources": [
     {
@@ -935,7 +960,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E44",
+   "id": "E45",
    "kind": "internal_call",
    "sources": [
     {
@@ -955,7 +980,7 @@
     "type": "call",
     "value": "175489683526176713114"
    },
-   "id": "E45",
+   "id": "E46",
    "kind": "internal_call",
    "sources": [
     {
@@ -975,7 +1000,7 @@
     "type": "call",
     "value": "175489683526176713114"
    },
-   "id": "E46",
+   "id": "E47",
    "kind": "internal_call",
    "sources": [
     {
@@ -995,7 +1020,7 @@
     "type": "call",
     "value": "175489683526176713114"
    },
-   "id": "E47",
+   "id": "E48",
    "kind": "internal_call",
    "sources": [
     {
@@ -1012,7 +1037,7 @@
    "data": {
     "staticcalls": 36
    },
-   "id": "E48",
+   "id": "E49",
    "kind": "internal_call",
    "sources": [
     {
@@ -1037,7 +1062,7 @@
     },
     "event": "LogNote"
    },
-   "id": "E49",
+   "id": "E50",
    "kind": "event",
    "sources": [
     {
@@ -1059,7 +1084,7 @@
     },
     "event": "LogPermit"
    },
-   "id": "E50",
+   "id": "E51",
    "kind": "event",
    "sources": [
     {
@@ -1084,7 +1109,7 @@
     },
     "event": "LogNote"
    },
-   "id": "E51",
+   "id": "E52",
    "kind": "event",
    "sources": [
     {
@@ -1106,7 +1131,7 @@
     },
     "event": "Submitted"
    },
-   "id": "E52",
+   "id": "E53",
    "kind": "event",
    "sources": [
     {
@@ -1128,7 +1153,7 @@
     },
     "event": "TransferShares"
    },
-   "id": "E53",
+   "id": "E54",
    "kind": "event",
    "sources": [
     {
@@ -1143,7 +1168,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E54",
+   "id": "E55",
    "kind": "event",
    "sources": [
     {
@@ -1161,7 +1186,7 @@
     "signature": "ActionEvent(string,bytes)",
     "topic": "0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3"
    },
-   "id": "E55",
+   "id": "E56",
    "kind": "event_signature",
    "sources": [
     {
@@ -1183,7 +1208,7 @@
     },
     "event": "Approval"
    },
-   "id": "E56",
+   "id": "E57",
    "kind": "event",
    "sources": [
     {
@@ -1205,7 +1230,7 @@
     },
     "event": "Approval"
    },
-   "id": "E57",
+   "id": "E58",
    "kind": "event",
    "sources": [
     {
@@ -1220,7 +1245,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E58",
+   "id": "E59",
    "kind": "event",
    "sources": [
     {
@@ -1238,7 +1263,7 @@
     "signature": "SupplyCollateral(bytes32,address,address,uint256)",
     "topic": "0xa3b9472a1399e17e123f3c2e6586c23e504184d504de59cdaa2b375e880c6184"
    },
-   "id": "E59",
+   "id": "E60",
    "kind": "event_signature",
    "sources": [
     {
@@ -1260,21 +1285,6 @@
     },
     "event": "Approval"
    },
-   "id": "E60",
-   "kind": "event",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
-    }
-   ],
-   "text": "Event Approval(address,address,uint256) emitted by 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH): owner=0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E, spender=0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb, value=0."
-  },
-  {
-   "confidence": "single_source",
-   "data": {},
    "id": "E61",
    "kind": "event",
    "sources": [
@@ -1285,7 +1295,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
     }
    ],
-   "text": "Event with topic0 0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3 emitted by 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy); could not decode."
+   "text": "Event Approval(address,address,uint256) emitted by 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH): owner=0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E, spender=0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb, value=0."
   },
   {
    "confidence": "single_source",
@@ -1319,6 +1329,21 @@
   },
   {
    "confidence": "single_source",
+   "data": {},
+   "id": "E64",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
+    }
+   ],
+   "text": "Event with topic0 0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3 emitted by 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy); could not decode."
+  },
+  {
+   "confidence": "single_source",
    "data": {
     "args": {
      "amount": "175489683526176713114",
@@ -1327,7 +1352,7 @@
     },
     "event": "Submitted"
    },
-   "id": "E64",
+   "id": "E65",
    "kind": "event",
    "sources": [
     {
@@ -1349,7 +1374,7 @@
     },
     "event": "TransferShares"
    },
-   "id": "E65",
+   "id": "E66",
    "kind": "event",
    "sources": [
     {
@@ -1364,7 +1389,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E66",
+   "id": "E67",
    "kind": "event",
    "sources": [
     {
@@ -1386,7 +1411,7 @@
     },
     "event": "Approval"
    },
-   "id": "E67",
+   "id": "E68",
    "kind": "event",
    "sources": [
     {
@@ -1408,7 +1433,7 @@
     },
     "event": "Approval"
    },
-   "id": "E68",
+   "id": "E69",
    "kind": "event",
    "sources": [
     {
@@ -1423,7 +1448,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E69",
+   "id": "E70",
    "kind": "event",
    "sources": [
     {
@@ -1445,7 +1470,7 @@
     },
     "event": "Approval"
    },
-   "id": "E70",
+   "id": "E71",
    "kind": "event",
    "sources": [
     {
@@ -1460,7 +1485,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E71",
+   "id": "E72",
    "kind": "event",
    "sources": [
     {
@@ -1482,7 +1507,7 @@
     },
     "event": "BorrowRateUpdate"
    },
-   "id": "E72",
+   "id": "E73",
    "kind": "event",
    "sources": [
     {
@@ -1497,7 +1522,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E73",
+   "id": "E74",
    "kind": "event",
    "sources": [
     {
@@ -1515,7 +1540,7 @@
     "signature": "AccrueInterest(bytes32,uint256,uint256,uint256)",
     "topic": "0x9d9bd501d0657d7dfe415f779a620a62b78bc508ddc0891fbbd8b7ac0f8fce87"
    },
-   "id": "E74",
+   "id": "E75",
    "kind": "event_signature",
    "sources": [
     {
@@ -1530,7 +1555,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E75",
+   "id": "E76",
    "kind": "event",
    "sources": [
     {
@@ -1548,7 +1573,7 @@
     "signature": "Borrow(bytes32,address,address,address,uint256,uint256)",
     "topic": "0x570954540bed6b1304a87dfe815a5eda4a648f7097a16240dcd85c9b5fd42a43"
    },
-   "id": "E76",
+   "id": "E77",
    "kind": "event_signature",
    "sources": [
     {
@@ -1563,7 +1588,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E77",
+   "id": "E78",
    "kind": "event",
    "sources": [
     {
@@ -1578,7 +1603,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E78",
+   "id": "E79",
    "kind": "event",
    "sources": [
     {
@@ -1601,7 +1626,7 @@
     },
     "event": "FlashLoan"
    },
-   "id": "E79",
+   "id": "E80",
    "kind": "event",
    "sources": [
     {
@@ -1622,7 +1647,7 @@
     },
     "event": "ActionEvent"
    },
-   "id": "E80",
+   "id": "E81",
    "kind": "event",
    "sources": [
     {
@@ -1644,7 +1669,7 @@
     },
     "event": "LogForbid"
    },
-   "id": "E81",
+   "id": "E82",
    "kind": "event",
    "sources": [
     {
@@ -1665,7 +1690,7 @@
     },
     "event": "RecipeEvent"
    },
-   "id": "E82",
+   "id": "E83",
    "kind": "event",
    "sources": [
     {

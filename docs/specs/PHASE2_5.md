@@ -1,6 +1,6 @@
 # PHASE2_5: the gaps between Phase 2 and the case (before the interface of Phase 3)
 
-- **Status:** DRAFT (waiting for Joabe's approval)
+- **Status:** IN PROGRESS (approved by Joabe on 2026-10-08 with the proposed defaults D1 to D4)
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)

@@ -89,13 +89,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "UniswapV2Router02",
+    "function": "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)",
+    "lines": [
+     356,
+     378
+    ],
+    "path": "contracts/UniswapV2Router02.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "Code of swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256) in UniswapV2Router02 (contracts/UniswapV2Router02.sol, lines 356-378), from the verified source of the contract 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, as the explorer lists it:\n356 |     function swapExactETHForTokensSupportingFeeOnTransferTokens(\n357 |         uint amountOutMin,\n358 |         address[] calldata path,\n359 |         address to,\n360 |         uint deadline\n361 |     )\n362 |         external\n363 |         virtual\n364 |         override\n365 |         payable\n366 |         ensure(deadline)\n367 |     {\n368 |         require(path[0] == WETH, 'UniswapV2Router: INVALID_PATH');\n369 |         uint amountIn = msg.value;\n370 |         IWETH(WETH).deposit{value: amountIn}();\n371 |         assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amountIn));\n372 |         uint balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);\n373 |         _swapSupportingFeeOnTransferTokens(path, to);\n374 |         require(\n375 |             IERC20(path[path.length - 1]).balanceOf(to).sub(balanceBefore) >= amountOutMin,\n376 |             'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'\n377 |         );\n378 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "token_id": null,
     "value": 200000000000000000
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -116,7 +141,7 @@
     "token_id": null,
     "value": 200000000000000000
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {
@@ -137,7 +162,7 @@
     "token_id": null,
     "value": 12118418517751063
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "token_transfer",
    "sources": [
     {
@@ -157,7 +182,7 @@
     "type": "call",
     "value": "200000000000000000"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "internal_call",
    "sources": [
     {
@@ -177,7 +202,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "internal_call",
    "sources": [
     {
@@ -197,7 +222,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -217,7 +242,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "internal_call",
    "sources": [
     {
@@ -234,7 +259,7 @@
    "data": {
     "staticcalls": 7
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "internal_call",
    "sources": [
     {
@@ -255,7 +280,7 @@
     },
     "event": "Sync"
    },
-   "id": "E12",
+   "id": "E13",
    "kind": "event",
    "sources": [
     {
@@ -280,7 +305,7 @@
     },
     "event": "Swap"
    },
-   "id": "E13",
+   "id": "E14",
    "kind": "event",
    "sources": [
     {
@@ -298,7 +323,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "cross_check",
    "sources": [
     {

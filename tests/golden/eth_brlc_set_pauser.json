@@ -126,12 +126,37 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "PausableExtUpgradeable",
+    "function": "setPauser(address)",
+    "lines": [
+     97,
+     105
+    ],
+    "path": "contracts/base/PausableExtUpgradeable.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xbEA441d7cf3f79b57cc5ae33251a084A063825dc"
+    }
+   ],
+   "text": "Code of setPauser(address) in PausableExtUpgradeable (contracts/base/PausableExtUpgradeable.sol, lines 97-105), from the verified source of the implementation the explorer lists today for 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (it may have been upgraded since this transaction), as the explorer lists it:\n97 |     function setPauser(address newPauser) external onlyOwner {\r\n98 |         if (_pauser == newPauser) {\r\n99 |             return;\r\n100 |         }\r\n101 | \r\n102 |         _pauser = newPauser;\r\n103 | \r\n104 |         emit PauserChanged(newPauser);\r\n105 |     }\r"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "args": {
      "pauser": "0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520"
     },
     "event": "PauserChanged"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "event",
    "sources": [
     {

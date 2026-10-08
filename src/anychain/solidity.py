@@ -248,11 +248,58 @@ class SolidityIndex:
         """Bases in the inheritance chain whose source is not in this index (e.g. an imported library)."""
         return sorted(n for n in (self.linearization(contract) or []) if n not in self.contracts and n != contract)
 
+    def lines(self, path: str, start: int, end: int) -> list[str]:
+        """The original source lines start..end (1-based, comments kept), as written."""
+        return self.texts.get(path, "").split("\n")[start - 1:end]  # line numbers count "\n" only
+
+    def function_at(self, path: str, line: int) -> Found | None:
+        """The function whose lines contain `line` in `path` (None when the line is outside every function,
+        e.g. in a modifier)."""
+        best = None
+        for c in self._all_contracts():
+            if c.path != path:
+                continue
+            for f in c.functions:
+                if f.start <= line <= f.end and (best is None or f.start > best.function.start):
+                    best = Found(f, c)
+        return best
+
+    def raising_function(self, contract: str, text: str, selector: str | None = None) -> tuple[Found, int] | None:
+        """(function, line) of `contract` that writes the reason `text`, only when the source pins it down:
+        the function called (`selector`) writes it exactly once; or the whole source writes it exactly once,
+        inside a function of `contract`'s inheritance chain that `contract` runs (not overridden by a more
+        derived one). Otherwise None (review of D38)."""
+        hits = self.literal(text)
+        if any(self.function_at(*h) is None for h in hits):
+            return None  # written in a modifier (or outside any function): it may run first
+        called = self.find(contract, selector) if selector else None
+        if called:
+            inside = [(p, n) for p, n in hits if p == called.contract.path
+                      and called.function.start <= n <= called.function.end]
+            if len(inside) == 1:
+                return called, inside[0][1]
+        if len(hits) != 1:
+            return None
+        found = self.function_at(*hits[0])
+        order = self.linearization(contract)
+        if found is None or not order or found.contract.name not in order:
+            return None
+        f = found.function
+        for name in order:  # most derived first: the first body with this signature (or name) is what runs
+            c = self.contracts.get(name)
+            for g in c.functions if c else []:
+                if g.has_body and (g.signature == f.signature if f.signature else g.name == f.name):
+                    return (found, hits[0][1]) if g is f else None
+        return None
+
+    def _all_contracts(self) -> list[Contract]:
+        return [c for found in self._all.values() for c in found]
+
     def literal(self, text: str) -> list[tuple[str, int]]:
         """(path, line) of every string literal exactly equal to `text`, outside comments."""
         quoted = (f'"{text}"', f"'{text}'")
         return [(path, n) for path, source in self.uncommented.items()
-                for n, line in enumerate(source.splitlines(), 1) if any(q in line for q in quoted)]
+                for n, line in enumerate(source.split("\n"), 1) if any(q in line for q in quoted)]
 
 
 def _plain(d: "EventOrError") -> bool:

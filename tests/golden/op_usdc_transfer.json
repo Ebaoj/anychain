@@ -87,13 +87,38 @@
   {
    "confidence": "single_source",
    "data": {
+    "contract": "FiatTokenV1",
+    "function": "transfer(address,uint256)",
+    "lines": [
+     285,
+     295
+    ],
+    "path": "/Users/default-admin/Documents/circle/stablecoin-evm-private-usdc-mainnet-op/contracts/v1/FiatTokenV1.sol",
+    "raise_line": null,
+    "raises": null
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://explorer.optimism.io/api/v2/smart-contracts/0xdEd3b9a8DBeDC2F9CB725B55d0E686A81E6d06dC"
+    }
+   ],
+   "text": "Code of transfer(address,uint256) in FiatTokenV1 (/Users/default-admin/Documents/circle/stablecoin-evm-private-usdc-mainnet-op/contracts/v1/FiatTokenV1.sol, lines 285-295), from the verified source of the implementation the explorer lists today for 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85 (it may have been upgraded since this transaction), as the explorer lists it:\n285 |     function transfer(address to, uint256 value)\n286 |         external\n287 |         override\n288 |         whenNotPaused\n289 |         notBlacklisted(msg.sender)\n290 |         notBlacklisted(to)\n291 |         returns (bool)\n292 |     {\n293 |         _transfer(msg.sender, to, value);\n294 |         return true;\n295 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "from": "0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a",
     "to": "0xe0F95c9180a137C826478cD4827CC53bAB8a6C89",
     "token": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
     "token_id": null,
     "value": 199820981
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "token_transfer",
    "sources": [
     {
@@ -113,7 +138,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -131,7 +156,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "cross_check",
    "sources": [
     {
