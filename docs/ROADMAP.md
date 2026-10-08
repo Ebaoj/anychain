@@ -11,6 +11,12 @@ Agreed items for later phases, so they are not lost between sessions. Each item 
 - **Risk:** Blockscout needs Postgres; `home server` has 4 GB RAM. Check memory before starting; fall back to the backend without the frontend.
 - **Decided:** 2026-10-07, by Joabe.
 
+### Dockerfile
+- **Why:** the original plan (section 11) welcomes a simple Dockerfile "if it costs little", and the case asks for "lightweight and deployable, runs locally".
+- **What:** one image that runs `anychain` and the API with a config mounted from outside; no secrets inside. Built and run on `home server`, never on the Mac (CLAUDE.md).
+- **Done when:** the README quickstart, tested from a clean clone, also works with `docker run`.
+- **Decided:** 2026-10-08, by Joabe (moved here from Phase 3's gaps).
+
 ## Open questions
 - ~~Anthropic API key for the LLM writer~~ Resolved 2026-10-08: the writer runs on Claude Code (D27); a key is needed only for a deployed service.
 - ~~Using the unofficial mirror `cloudwallk/brlc-token` in the demo~~ Approved by Joabe on 2026-10-08, with a README note that it is an unofficial mirror (pinned commit 74a5498).

@@ -38,24 +38,25 @@ A local API and web page with a chat whose every answer is grounded and checked,
 
 ## 5. Requirements
 
-- **R1. API.** THE SYSTEM SHALL serve `POST /explain` (hash, mode, optional question), `POST /chat` (session id, message) and `GET /health` (active network; status of explorer, node and LLM), locally, with FastAPI. `/explain` returns the structured answer of D43 (`anychain.answer/1`). **Accept:** `/health` on the Ethereum config reports the network and each source's state from a real probe; `/explain` returns the same answer as `explain --json` for the same hash.
-- **R2. Web page.** THE SYSTEM SHALL serve one static page (no frontend build) with: the active network at the top, hash field, mode selector, chat area, clickable sources, a badge per conclusion with its label (CONFIRMED, LIKELY, UNKNOWN; D42), the next steps of the selected mode's reader, security notes marked as heuristics (D39), and a "missing data" panel when there are gaps. **Accept:** the full demo runs in a browser (R9).
+- **R1. API.** THE SYSTEM SHALL serve `POST /explain` (hash, mode, optional question), `POST /chat` (session id, message) and `GET /health` (active network; status of explorer, node and LLM), locally, with FastAPI. `/explain` returns the structured answer of D43 (`anychain.answer/1`); the optional question works as in R12. **Accept:** `/health` on the Ethereum config reports the network and each source's state from a real probe; `/explain` returns the same answer as `explain --json` for the same hash.
+- **R2. Web page.** THE SYSTEM SHALL serve one static page (no frontend build) with: the active network at the top, hash field, mode selector, chat area, clickable sources, a badge per conclusion with its label (CONFIRMED, LIKELY, UNKNOWN; D42), the next steps of the selected mode's reader, security notes marked as heuristics (D39), a "missing data" panel when there are gaps, and thumbs up and down buttons on each answer, saved with that answer's run (R6). **Accept:** the full demo runs in a browser (R9).
 - **R3. Chat with tools.** WHEN the user asks a follow-up question, THE SYSTEM SHALL let the model request a tool from a fixed list (read contract state with `eth_call` at a block, show a function's verified code or a file from a configured repo, explain another transaction hash), run it, add each result to the session's evidence as a numbered, sourced fact, and answer citing it. Tools are read-only and limited per turn. **Accept:** on a real failed transaction, "what was the sender's balance before?" makes the model ask for the read, the read becomes a new fact, and the answer cites it.
 - **R4. Every chat answer is checked** by the validator (D28) against the session's evidence, with the same retry and withhold rules.
 - **R5. Modes** in API and UI (support, developer, auditor), using the existing prompts.
 - **R6. Metrics.** THE SYSTEM SHALL record per answer (the diagnosis label is already recorded, D42): mode, diagnosis rule, ABI source of the main call, latency, tokens (when the backend reports them), and optional user feedback (thumbs up or down from the page); `anychain metrics` SHALL print 3 to 4 SQL queries with their SQL (failure causes, diagnosis levels, ABI source share, satisfaction by mode).
-- **R7. Eval.** `eval/cases.yaml` SHALL hold at least 8 real Ethereum cases and 2 of a second network, each recorded as a fixture, covering: ERC-20 transfer, DEX swap, explicit revert reason, allowance revert, out of gas, unverified contract, Solidity custom error, node unavailable. Each case states the expected status, diagnosis rule and label, ABI source and entities that must appear; a category with no real case after the search is reported as missing, never filled with made-up data (PHASE2_5 D2). `anychain eval` SHALL run them offline (recorded data) through the whole pipeline including the LLM, and report: status and category accuracy, citation coverage (share of factual sentences citing evidence), hallucination rate (validator problems; target zero), share of degradation declared correctly, latency and tokens per case.
-- **R8. Production impact page** (`docs/IMPACT.md`, for the README in Phase 4): hypothesis, primary and guard metrics, experiment design, criteria to scale or roll back. One page.
+- **R7. Eval.** `eval/cases.yaml` SHALL hold at least 8 real Ethereum cases and 2 of a second network, each recorded as a fixture, covering: ERC-20 transfer, DEX swap, explicit revert reason, allowance revert, out of gas, unverified contract, Solidity custom error, node unavailable. Each case states the expected status, diagnosis rule and label, ABI source and entities that must appear; a category with no real case after the search is reported as missing, never filled with made-up data (PHASE2_5 D2). `anychain eval` SHALL run them offline (recorded data) through the whole pipeline including the LLM, and report: status and category accuracy, citation coverage (share of factual sentences citing evidence), hallucination rate (validator problems; target zero), share of degradation declared correctly, latency and tokens per case. The report is saved (`eval/report.md` plus JSON) with its date and commit, so the README's results table (Phase 4) is copied from a real run.
+- **R8. Production impact page** (`docs/IMPACT.md`, the README's "Measuring impact in production" in Phase 4), one page, with the original plan's parts: how the tool would be put in front of support; a hypothesis (for example "the assistant resolves X% of transaction tickets without escalating to engineering"); primary and guard metrics: resolution without escalation, time to diagnosis, share of answers corrected by humans, reported hallucinations; the experiment: gradual rollout with a control group; and the criteria to scale or roll back.
 - **R9. Demo.** The full demo (explain a success, a diagnosed failure, a follow-up question with a tool call, an unverified contract with degradation) SHALL run in the browser and be recorded.
 
 - **R10. Cache by (network, hash).** THE SYSTEM SHALL keep each evidence bundle in the local SQLite, keyed by chain id and transaction hash plus a bundle format version (so a code change that alters facts invalidates old entries), and answer a repeated request from it. A bundle is kept only when its facts cannot change: the block is final for the network (the node's `finalized` block where supported, otherwise a configured number of confirmations) and it has no retryable gap (source unavailable, source behind, pending). A bundle with such gaps is not kept, so a later request tries the sources again. Written answers are kept apart, keyed by the bundle's digest, mode, language, prompt version and model. `--fresh` (and a field in the API) skips the cache. **Accept:** the second explain of a recorded hash makes no network request and gives the same evidence; a bundle with an unavailable source is not kept; a zkSync transaction not yet executed on L1 is not kept.
+- **R12. The user's question.** The original plan's input is "hash + optional question + mode". WHEN a question comes with the hash (`explain --question "…"`, `POST /explain`), THE SYSTEM SHALL give it to the writer as the reader's question, so the answer addresses it first, from the same evidence and through the same answer check (D28); the question is the reader's text, never an instruction about the rules, and a question the evidence cannot answer is said to be unanswered with what is missing. The structured answer keeps it (`question`). **Accept:** on the real Celo balance failure, "why didn't my payment go through?" gets an answer that starts with the cause, cites the read, and passes the check.
 - **R11. Batch.** `anychain batch <file>` SHALL explain a list of hashes with bounded parallelism, write one result per line (JSONL), resume from where it stopped, use the cache, and log every run in the event log. **Accept:** a list of recorded hashes, interrupted and resumed, gives each hash once.
 
 ## 6. Non-functional
 
 - **Local only:** binds to 127.0.0.1; no authentication (out of scope in the case).
 - **Latency:** the page shows the evidence first and the written answer when ready.
-- **Cost:** the chat is limited in tool calls per turn (proposed: 3) and turns per session; the eval reports tokens.
+- **Cost:** the chat is limited in tool calls per turn (proposed: 3) and turns per session; the eval reports tokens. Whether the Claude Code backend reports the tokens it used is checked in T1, not assumed; if it does not, the report says so for that backend.
 - **Privacy:** sessions in memory, logged in the local SQLite only.
 - **Cache size:** bounded (proposed: oldest entries removed past a configured size); production would move it to PostgreSQL next to the event log (design only, D24).
 
@@ -67,14 +68,14 @@ A local API and web page with a chat whose every answer is grounded and checked,
 
 ## 8. Out of scope
 
-No `git push`, no deploy, no auth, no cloud. The production queue and worker stay design only (D24). Triage questions, multi-transaction analysis, gas suggestions and `debug_traceTransaction` are Phase 4 (security notes moved into Phase 2.5, D39).
+No `git push`, no deploy, no auth, no cloud. The production queue and worker stay design only (D24). Triage questions, multi-transaction analysis, gas suggestions, `debug_traceTransaction`, the final README and the Dockerfile are Phase 4 (security notes moved into Phase 2.5, D39).
 
 ## 9. Approach
 
 - `api.py` (FastAPI): routes over the same `build_bundle` and writer; sessions in memory; the page served as a static file.
 - `chat.py`: the session (evidence bundle that grows), the tool list, the loop. Tool requests use a small JSON protocol the model writes in its answer, run by our code, so it works the same on Claude Code, Anthropic and OpenAI backends (decision D1 below).
 - `web/index.html`: one page, plain JavaScript.
-- `events.py`: new columns (mode, category, level, ABI source, tokens, feedback), migrated on open as in D28.
+- `events.py`: new columns (mode, diagnosis rule, ABI source, tokens, cache hit, feedback), migrated on open as in D28.
 - `eval/cases.yaml`, `eval.py`, `anychain eval` and `anychain metrics`.
 - `cache.py`: bundle and answer cache in SQLite; finality from the node (`eth_getBlockByNumber("finalized")`) or confirmations from config; `anychain batch` built on the acceptance script's resume logic.
 
@@ -87,7 +88,9 @@ No `git push`, no deploy, no auth, no cloud. The production queue and worker sta
 4. T4 (R2): the web page.
 5. T5 (R7): find and record the missing real cases (allowance, out of gas, custom error), `eval/cases.yaml`, `anychain eval` and its report.
 6. T6 (R8): `docs/IMPACT.md`.
-7. T7 (R9): the browser demo, recorded; architecture docs; Phase 3 report to Joabe.
+7. T7 (R12): the user's question in `explain`, the API and the structured answer.
+8. T8: the 1,800-transaction acceptance run (300 per network, seven checks against the node; docs/ACCEPTANCE.md) on the final code, as PHASE2_5 D3 decided; any level A or B false fact is fixed with a test before the phase closes.
+9. T9 (R9): the browser demo, recorded; architecture docs; Phase 3 report to Joabe.
 
 ## 11. Rollout and reversal
 
@@ -116,6 +119,8 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 | R9 | demo recording | link |
 | R10 | second explain with no network request; not kept with retryable gaps, before finality, or zkSync not executed; format version change invalidates | pasted |
 | R11 | batch interrupted and resumed on recorded hashes | pasted |
+| R12 | a question on a real failure: answered first, cited, checked; a question the evidence cannot answer is said unanswered | pasted |
+| T8 | acceptance run on 1,800 transactions: zero level A or B false facts | acceptance report |
 
 ## 14. How to verify
 
@@ -124,6 +129,7 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 ## 15. Definition of done
 
 - [ ] D1 to D5 decided.
-- [ ] T0 to T7 committed, each with tests and a clean-context review.
+- [ ] T0 to T9 committed, each with tests and a clean-context review.
+- [ ] The acceptance run (T8) has no level A or B false fact.
 - [ ] `anychain eval` runs and the UI does the full demo (the original plan's criterion).
 - [ ] Architecture docs updated; Phase 3 explained to Joabe in plain Portuguese.
