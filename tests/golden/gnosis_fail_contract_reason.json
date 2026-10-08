@@ -171,6 +171,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "computed": {},
     "level": "single_source",
     "next_steps": [
      "Read the contract's source where this reason is raised, or ask its developers.",

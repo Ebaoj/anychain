@@ -824,6 +824,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "computed": {},
     "level": "single_source",
     "next_steps": [
      "Find the reason with a node that can trace the transaction, or ask the contract's developers."

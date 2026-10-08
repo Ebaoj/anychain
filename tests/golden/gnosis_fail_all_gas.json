@@ -260,6 +260,7 @@
   {
    "confidence": "candidate",
    "data": {
+    "computed": {},
     "level": "candidate",
     "next_steps": [
      "Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."

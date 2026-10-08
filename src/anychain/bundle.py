@@ -81,6 +81,15 @@ def _lines(n: int) -> str:
     return f"{n} line" if n == 1 else f"{n} lines"
 
 
+def _unix(timestamp: str | None) -> int | None:
+    """An explorer timestamp ("2026-10-08T17:11:47.000000Z") as seconds since 1970-01-01 UTC."""
+    from datetime import datetime
+    try:
+        return int(datetime.fromisoformat(timestamp.replace("Z", "+00:00")).timestamp()) if timestamp else None
+    except ValueError:
+        return None
+
+
 def _raises_note(line: int | None, text: str | None) -> str:
     return (f"\nIn this function the reason {text!r} is written only at line {line}, so the failure was most "
             f"likely raised there (unless it was passed on from another function or contract this one called).")
@@ -669,7 +678,7 @@ class BundleBuilder:
                       to_text=self._party(tx.to), block=tx.block_number, gas_used=tx.gas_used, gas_limit=tx.gas_limit,
                       reader=StateReader(self.rpc) if self.rpc_verified else None,
                       generic_failure=generic[0] if generic else None,
-                      explorer_text=None if generic else explorer_text)
+                      explorer_text=None if generic else explorer_text, block_time=_unix(tx.timestamp))
         finding = diagnose(ctx)
         read_ids = []
         for read in finding.reads:
@@ -684,7 +693,7 @@ class BundleBuilder:
         steps = " ".join(f"Next step: {s}" for s in finding.next_steps)
         self.bundle.add("diagnosis", f"{finding.text} {steps}", sources,
                         {"rule": finding.rule, "level": finding.level, "reads": read_ids,
-                         "next_steps": finding.next_steps},
+                         "next_steps": finding.next_steps, "computed": finding.data},
                         confidence="confirmed" if finding.level == "confirmed" else finding.level)
         for missing in finding.missing:
             self._gap("Diagnosis", missing.why, missing.needed, retryable=missing.retryable, cause=missing.cause)

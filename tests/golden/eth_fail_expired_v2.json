@@ -1,0 +1,225 @@
+{
+ "abi_sources": {
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": "explorer: verified contract UniswapV2Router02"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 26149091,
+    "from": "0x79D6C25dE86bC4A858d7e383A474667aB109FeD0",
+    "gas_limit": "300000",
+    "gas_used": "25320",
+    "status": "failed",
+    "timestamp": "2026-10-08T17:11:47.000000Z",
+    "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "tx_type": 2,
+    "value": "0.045"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 26149091 at 2026-10-08T17:11:47.000000Z. From 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0 to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02). Native value attached: 0.045 ETH, not transferred because the transaction reverted. Gas used 25320 of limit 300000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.00011683874115936",
+    "parts": {
+     "fee": "0.00011683874115936"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    }
+   ],
+   "text": "Fee paid: 0.00011683874115936 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "UniswapV2Router: EXPIRED"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='UniswapV2Router: EXPIRED'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "amountOutMin": "0",
+     "deadline": "2400",
+     "path": "[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48]",
+     "to": "0x79D6C25dE86bC4A858d7e383A474667aB109FeD0"
+    },
+    "function": "swapExactETHForTokens"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "Called swapExactETHForTokens(uint256,address[],address,uint256) on 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) with amountOutMin=0, path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48], to=0x79D6C25dE86bC4A858d7e383A474667aB109FeD0, deadline=2400. ABI source: explorer: verified contract UniswapV2Router02."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "UniswapV2Router02",
+    "function": "swapExactETHForTokens(uint256,address[],address,uint256)",
+    "lines": [
+     252,
+     266
+    ],
+    "path": "contracts/UniswapV2Router02.sol",
+    "raise_line": null,
+    "raises": null,
+    "show": []
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "Code of swapExactETHForTokens(uint256,address[],address,uint256) in UniswapV2Router02 (contracts/UniswapV2Router02.sol, lines 252-266), from the verified source of the contract 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, as the explorer lists it:\n252 |     function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)\n253 |         external\n254 |         virtual\n255 |         override\n256 |         payable\n257 |         ensure(deadline)\n258 |         returns (uint[] memory amounts)\n259 |     {\n260 |         require(path[0] == WETH, 'UniswapV2Router: INVALID_PATH');\n261 |         amounts = UniswapV2Library.getAmountsOut(factory, msg.value, path);\n262 |         require(amounts[amounts.length - 1] >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');\n263 |         IWETH(WETH).deposit{value: amounts[0]}();\n264 |         assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]));\n265 |         _swap(amounts, path, to);\n266 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "computed": {
+     "deadline_check": {
+      "block_time": 1791479507,
+      "deadline": 2400,
+      "deadline_passed": true,
+      "text": "The call's deadline parameter is 2400 (1970-01-01T00:40:00Z) and the block's time is 1791479507 (2026-10-08T17:11:47Z)"
+     }
+    },
+    "level": "single_source",
+    "next_steps": [
+     "Check the current price, then send it again with a new deadline (and a fee high enough to be included in time)."
+    ],
+    "reads": [],
+    "rule": "deadline"
+   },
+   "id": "E6",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Source of the rule's meaning",
+     "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L19"
+    }
+   ],
+   "text": "The call's deadline parameter is 2400 (1970-01-01T00:40:00Z) and the block's time is 1791479507 (2026-10-08T17:11:47Z): the deadline had passed when the transaction was included, and the reason 'UniswapV2Router: EXPIRED' is Uniswap's deadline check. Next step: Check the current price, then send it again with a new deadline (and a fee high enough to be included in time)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "places": [
+     "the verified source contracts/UniswapV2Router02.sol, line 19"
+    ],
+    "reason": "UniswapV2Router: EXPIRED"
+   },
+   "id": "E7",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "The reason 'UniswapV2Router: EXPIRED' is written in the verified source contracts/UniswapV2Router02.sol, line 19."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E8",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "failed",
+ "tx_hash": "0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+}

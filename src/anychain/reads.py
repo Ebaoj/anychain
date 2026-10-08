@@ -84,6 +84,17 @@ class StateReader:
         return self._read(token, "allowance(address,address)", (owner, spender), ["address", "address"], "uint256",
                           block)
 
+    def owner(self, contract: str, block: int) -> Read:
+        return self._read(contract, "owner()", (), [], "address", block)
+
+    def pending_owner(self, contract: str, block: int) -> Read:
+        return self._read(contract, "pendingOwner()", (), [], "address", block)
+
+    def has_role(self, contract: str, role: str, account: str, block: int) -> Read:
+        read = self._read(contract, "hasRole(bytes32,address)", (bytes.fromhex(role[2:]), account),
+                          ["bytes32", "address"], "bool", block)
+        return Read(read.signature, read.contract, (role, account), read.block, read.value)  # the role as hex
+
     def paused(self, contract: str, block: int) -> Read:
         return self._read(contract, "paused()", (), [], "bool", block)
 

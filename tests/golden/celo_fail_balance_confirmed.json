@@ -177,6 +177,7 @@
   {
    "confidence": "confirmed",
    "data": {
+    "computed": {},
     "level": "confirmed",
     "next_steps": [
      "Check the balance of the account the tokens are moved from before sending, and move at most that.",

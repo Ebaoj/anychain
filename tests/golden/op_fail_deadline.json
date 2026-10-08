@@ -135,6 +135,7 @@
   {
    "confidence": "candidate",
    "data": {
+    "computed": {},
     "level": "candidate",
     "next_steps": [
      "Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."

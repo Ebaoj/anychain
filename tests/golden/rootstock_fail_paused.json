@@ -169,6 +169,7 @@
   {
    "confidence": "confirmed",
    "data": {
+    "computed": {},
     "level": "confirmed",
     "next_steps": [
      "Wait until the contract's operator unpauses it; calls to it fail while it is paused.",

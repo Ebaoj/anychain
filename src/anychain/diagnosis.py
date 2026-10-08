@@ -9,6 +9,7 @@ Every finding comes with next steps that cannot make things worse when followed.
 made are stated as their own facts, so the finding can cite them. Nothing here guesses a token,
 holder or amount the call data does not give.
 """
+import re
 from dataclasses import dataclass, field
 
 from anychain.collectors.http import CollectorError
@@ -34,6 +35,7 @@ class Context:
     reader: StateReader | None  # None when the node cannot be used
     generic_failure: str | None = None  # the network type's note when `result` is a text that carries no reason
     explorer_text: str | None = None  # the explorer's failure text when it says more than "Reverted"
+    block_time: int | None = None  # the block's timestamp (seconds since 1970-01-01 UTC)
 
 
 @dataclass
@@ -55,6 +57,7 @@ class Finding:
     reads: list[Read] = field(default_factory=list)
     missing: list[Missing] = field(default_factory=list)
     source_urls: list[str] = field(default_factory=list)  # where the rule's meaning comes from
+    data: dict = field(default_factory=dict)  # values the finding computed, kept in the fact's data
 
 
 def reason_text(reason: RevertReason | None) -> str | None:
@@ -72,7 +75,7 @@ def diagnose(ctx: Context) -> Finding:
     for rule in RULES:
         finding = rule(ctx)
         if finding:
-            return finding
+            return _with_passed_deadline(finding, ctx)
     raise AssertionError("the last rule always matches")
 
 
@@ -120,6 +123,88 @@ def _allowance(ctx: Context) -> Finding | None:
     token, owner, amount = token_call  # direct transferFrom: the spender is whoever called it
     return _compare_read(ctx, "insufficient_allowance", text, steps, amount,
                          lambda r, b: r.erc20_allowance(token, owner, ctx.sender, b), "allowance", owner, token)
+
+
+# OpenZeppelin's access checks, read in their source on 2026-10-08: v4.9.6 (commit dc44c9f) Ownable.sol L51
+# "Ownable: caller is not the owner", AccessControl.sol L113-115 "AccessControl: account <0x…40> is missing role
+# <0x…64>"; v5.0.2 (commit dbb6104) Ownable.sol L26 error OwnableUnauthorizedAccount, raised at L65 with _msgSender(), and
+# Ownable2Step.sol L55 by acceptOwnership for a caller that is not the pending owner; AccessControl.sol L96
+# AccessControlUnauthorizedAccount(account, role). The v5 errors and the v4 role message name the refused account.
+OZ_V4 = "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/dc44c9f1a4c3b10af99492eed84f83ed244203f6/contracts/access"
+OZ_V5 = "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/dbb6104ce834628e473d2173bbc9d47f81a9eec3/contracts/access"
+ROLE_MESSAGE = re.compile(r"^AccessControl: account (0x[0-9a-fA-F]{40}) is missing role (0x[0-9a-fA-F]{64})$")
+ACCESS_STEPS = ["Only the contract's owner, or an account holding the role, can make this call: sending it again from "
+                "the same account fails the same way and costs the fee again.",
+                "If this account should have the permission, ask the contract's operators to grant it."]
+
+
+def _access(ctx: Context) -> Finding | None:
+    """An access-control refusal (OpenZeppelin Ownable or AccessControl), confirmed by reading the permission at
+    the block before (PHASE2_5 T4, R5, D41). Confirmed only when the error names the refused account and it is the
+    sender: then the check ran where msg.sender was the sender. The bare v4 owner text names no account, so the
+    read on the contract called is stated, never taken as proof."""
+    text = reason_text(ctx.reason) or ""
+    call = (ctx.reason.method_call or "") if ctx.reason else ""
+    params = dict(ctx.reason.parameters) if ctx.reason else {}
+    role_text = ROLE_MESSAGE.match(text)
+    if text == "Ownable: caller is not the owner":
+        kind, account, role, named, url = "owner", None, None, False, f"{OZ_V4}/Ownable.sol#L51"
+    elif role_text:
+        kind, account, role, named, url = "role", role_text.group(1), role_text.group(2), True, f"{OZ_V4}/AccessControl.sol#L105-L119"
+    elif call.startswith("OwnableUnauthorizedAccount("):
+        kind, account, role, named, url = "owner", params.get("account"), None, True, f"{OZ_V5}/Ownable.sol#L26"
+    elif call.startswith("AccessControlUnauthorizedAccount("):
+        kind, account, role, named, url = "role", params.get("account"), params.get("neededRole"), True, f"{OZ_V5}/AccessControl.sol#L96"
+    else:
+        return None
+    pending = kind == "owner" and named and (ctx.call or {}).get("function") == "acceptOwnership"
+    what = ("the pending owner (Ownable2Step's acceptOwnership refuses with the same error)" if pending else
+            "the owner" if kind == "owner" else f"an account with the role {role}" if role else "an account with the role")
+    shown = text or call
+    said = f"The reason {shown!r} is OpenZeppelin's access check: the call was refused because its caller is not {what}."
+
+    def stated(extra: str = "", missing=None, reads=None) -> Finding:
+        return Finding("access_control", "single_source", said + extra, ACCESS_STEPS, list(reads or []),
+                       missing=list(missing or []), source_urls=[url])
+    if named and not account:
+        return stated(missing=[Missing("The refused account was not read: the explorer did not give the error's "
+                                       "account parameter", "The error's parameters decoded with its ABI",
+                                       "not_interpretable")])
+    if account and ctx.sender and str(account).lower() != ctx.sender.lower():
+        return stated(f" The refused account is {account}, not the sender {ctx.sender}: the check ran on a call made by "
+                      "a contract in between, so no read of the contract called proves it.")
+    if kind == "role" and not (isinstance(role, str) and re.fullmatch(r"0x[0-9a-fA-F]{64}", role)):
+        return stated(missing=[Missing(f"hasRole was not read: the role the error gives ({role!r}) is not 32 bytes of hex",
+                                       "The error's neededRole decoded with its ABI", "not_interpretable")])
+    signature = "pendingOwner()" if pending else "owner()" if kind == "owner" else "hasRole(bytes32,address)"
+    if ctx.reader is None or ctx.to is None or ctx.block is None or not ctx.sender:
+        return stated(missing=[_unavailable(signature, ctx)])
+    try:
+        read = (ctx.reader.pending_owner(ctx.to, ctx.block - 1) if pending else
+                ctx.reader.owner(ctx.to, ctx.block - 1) if kind == "owner" else
+                ctx.reader.has_role(ctx.to, role, ctx.sender, ctx.block - 1))
+    except (CollectorError, UnreadableState) as exc:
+        return stated(missing=[_failed_read(signature, exc)])
+    if kind == "owner" and not isinstance(read.value, str):
+        return stated(missing=[Missing(f"{signature} on {ctx.to} answered {read.value!r}, not an address",
+                                       "Nothing: the contract does not answer this standard read", "not_interpretable")],
+                      reads=[read])
+    lacks = (read.value.lower() != ctx.sender.lower()) if kind == "owner" else read.value is False
+    if lacks and not named:
+        return stated(f" At block {read.block}, {signature} of {ctx.to_text} returned {read.value}, not the sender; but "
+                      "this text names no account, so the check may have run in a contract further down the call, "
+                      "where the caller was not the sender.", reads=[read])
+    if lacks:
+        what_read = (f"{signature} of {ctx.to_text} returned {read.value}, not the sender {ctx.sender}" if kind == "owner"
+                     else f"hasRole({role}, {ctx.sender}) on {ctx.to_text} returned false")
+        return Finding("access_control", "confirmed",
+                       f"Cause confirmed: the error names the sender as the refused account, and at block {read.block}, "
+                       f"the block before, {what_read}, matching the reason {shown!r}"
+                       + (" (the caller is not the pending owner)." if pending else "."),
+                       ACCESS_STEPS, [read], source_urls=[url])
+    return stated(f" But at block {read.block} the sender held that permission on the contract it called "
+                  f"({signature} answered {read.value}): the check that failed is in another contract further down "
+                  "the call, or the permission changed earlier in this transaction's own block.", reads=[read])
 
 
 def _paused(ctx: Context) -> Finding | None:
@@ -194,22 +279,83 @@ def _slippage(ctx: Context) -> Finding | None:
     return None
 
 
+DEADLINE_ARGS = ("deadline", "_deadline", "deadline_")
+DEADLINE_STEP = ("Check the current price, then send it again with a new deadline (and a fee high enough to be "
+                 "included in time).")
+
+
 def _deadline(ctx: Context) -> Finding | None:
+    """A deadline reason, with the call's own deadline parameter compared with the block's time when it has one
+    (PHASE2_5 T4, R6, D41). With no reason at all, the comparison is added to the finding that explains the
+    missing reason instead (`diagnose`), so the out-of-gas candidate and the replay still run."""
     text = reason_text(ctx.reason) or ""
+    timed_text = any(w in text.lower() for w in ("deadline", "expired", "too old"))
+    if text not in DEADLINES and not timed_text:
+        return None
+    compared = _deadline_compared(ctx)
+    data = {"deadline_check": compared} if compared else {}
     if text in DEADLINES:
+        if compared and compared["deadline_passed"]:
+            return Finding("deadline", "single_source",
+                           f"{compared['text']}: the deadline had passed when the transaction was included, and the "
+                           f"reason {text!r} is Uniswap's deadline check.", [DEADLINE_STEP],
+                           source_urls=DEADLINES[text], data=data)
+        if compared:
+            return Finding("deadline", "single_source",
+                           f"The reason {text!r} is Uniswap's deadline check. {compared['text']}, so the deadline "
+                           "is not before the block's time: the deadline that was checked is not this call's "
+                           "deadline parameter.", [DEADLINE_STEP], source_urls=DEADLINES[text], data=data)
         return Finding("deadline", "single_source",
                        f"The reason {text!r} is Uniswap's deadline check: the transaction was included after the "
-                       "deadline the sender set in it.",
-                       ["Check the current price, then send it again with a new deadline (and a fee high enough to "
-                        "be included in time)."], source_urls=DEADLINES[text])
-    if any(word in text.lower() for word in ("deadline", "expired", "too old")):
-        return Finding("deadline", "candidate",
-                       f"Possible cause: the reason {text!r} mentions a time limit. Which limit (one set in the "
-                       "transaction, a signature's, an order's, a price's freshness) and in which direction is "
-                       "defined in the contract's code.",
-                       ["Read the contract's code for this reason before sending again: resending may fail the "
-                        "same way and cost the fee again."])
-    return None
+                       "deadline the sender set in it.", [DEADLINE_STEP], source_urls=DEADLINES[text])
+    after = ""
+    if compared:
+        after = (f" {compared['text']}: this call's deadline had passed when the transaction was included."
+                 if compared["deadline_passed"] else
+                 f" {compared['text']}, so this call's deadline is not before the block's time.")
+    return Finding("deadline", "candidate",
+                   f"Possible cause: the reason {text!r} mentions a time limit. Which limit (one set in the "
+                   "transaction, a signature's, an order's, a price's freshness) and in which direction is "
+                   f"defined in the contract's code.{after}",
+                   ["Read the contract's code for this reason before sending again: resending may fail the "
+                    "same way and cost the fee again."], data=data)
+
+
+def _deadline_compared(ctx: Context) -> dict | None:
+    """The call's deadline parameter against the block's time, when the decoded call has one."""
+    args = (ctx.call or {}).get("args") or {}
+    value = next((args[k] for k in DEADLINE_ARGS if k in args), None)
+    if isinstance(value, str) and value.isdigit():
+        value = int(value)
+    if not isinstance(value, int) or isinstance(value, bool) or ctx.block_time is None:
+        return None
+    return {"deadline": value, "block_time": ctx.block_time, "deadline_passed": value < ctx.block_time,
+            "text": f"The call's deadline parameter is {value} ({_utc(value)}) and the block's time is "
+                    f"{ctx.block_time} ({_utc(ctx.block_time)})"}
+
+
+NO_REASON_RULES = ("no_reason", "possibly_out_of_gas")
+
+
+def _with_passed_deadline(finding: Finding, ctx: Context) -> Finding:
+    """A finding for a failure with no reason, plus the call's deadline compared with the block's time when the
+    deadline had passed: a possible cause next to the others, never in their place."""
+    compared = _deadline_compared(ctx)
+    if finding.rule not in NO_REASON_RULES or not compared or not compared["deadline_passed"]:
+        return finding
+    finding.text += (f" Also: {compared['text'][0].lower()}{compared['text'][1:]}: this call's deadline had passed when "
+                     "it was included, and a contract that takes a deadline usually rejects such a call; with no "
+                     "reason, this is a possibility, not a confirmed cause.")
+    finding.data["deadline_check"] = compared
+    return finding
+
+
+def _utc(seconds: int) -> str:
+    from datetime import datetime, timezone
+    try:
+        return datetime.fromtimestamp(seconds, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    except (OverflowError, OSError, ValueError):
+        return "beyond any calendar date"
 
 
 def _all_gas_no_reason(ctx: Context) -> Finding | None:
@@ -245,7 +391,8 @@ def _no_reason(ctx: Context) -> Finding | None:
                     "developers."])
 
 
-RULES = [_generic_failure, _balance, _allowance, _paused, _slippage, _deadline, _all_gas_no_reason, _contract_reason,
+RULES = [_generic_failure, _balance, _allowance, _access, _paused, _slippage, _deadline, _all_gas_no_reason,
+         _contract_reason,
          _no_reason]
 
 
