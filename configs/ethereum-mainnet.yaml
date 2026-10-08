@@ -18,13 +18,15 @@ rpc:
   timeout_s: 10
   supports_debug_trace: false
 
+# Contract repositories cited as source (PHASE2 T6). Run `anychain repos sync --config <this file>`
+# once to download them into storage.cache_dir; `explain` only reads that cache.
+# BRLC (CloudWalk's token, also deployed on Ethereum: proxy 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284,
+# implementation BRLCTokenBridgeable). The official repo returns 404 since ~May 2024; this is an
+# unofficial mirror, approved for the demo by Joabe on 2026-10-08, pinned to an exact commit. It is a
+# later version than the deployed code (compiler 0.8.24 in the repo, 0.8.16 in the verified source).
 repos:
-  - url: https://github.com/Uniswap/v2-periphery
-    ref: master
-    source_globs: ["contracts/**/*.sol"]
-    artifact_globs: ["**/artifacts/**/*.json", "**/out/**/*.json", "**/abi/**/*.json", "build/**/*.json"]
-  - url: https://github.com/circlefin/stablecoin-evm
-    ref: master
+  - url: https://github.com/cloudwallk/brlc-token
+    ref: 74a5498d04b10dc882e48273a38b98b4275463bd
     source_globs: ["contracts/**/*.sol"]
 
 address_map: {}

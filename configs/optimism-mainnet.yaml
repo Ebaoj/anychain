@@ -18,14 +18,9 @@ rpc:
   timeout_s: 10
   supports_debug_trace: false
 
-repos:
-  - url: https://github.com/Uniswap/v2-periphery
-    ref: master
-    source_globs: ["contracts/**/*.sol"]
-    artifact_globs: ["**/artifacts/**/*.json", "**/out/**/*.json", "**/abi/**/*.json", "build/**/*.json"]
-  - url: https://github.com/circlefin/stablecoin-evm
-    ref: master
-    source_globs: ["contracts/**/*.sol"]
+# Contract repositories cited as source (PHASE2 T6): each entry needs url, ref (a commit, or a
+# branch resolved at sync time) and source_globs; run `anychain repos sync --config <this file>`.
+repos: []
 
 address_map: {}
 

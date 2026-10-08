@@ -68,9 +68,10 @@ def test_no_network_specific_values_in_code():
     # source links for chain-type behaviour, which live in chain profiles only (D31).
     allowed = {"docs.blockscout.com", "api.openai.com"}
     domains = set(re.findall(r"https?://([a-z0-9.-]+\.[a-z]{2,})", src)) - allowed
-    # Source links (github.com) for behaviour a rule relies on are allowed only where rules live.
-    rule_files = {"chains.py", "diagnosis.py"}
-    domains -= {"github.com"}
+    # Source links (github.com) for behaviour a rule relies on are allowed only where rules live, and
+    # repo.py downloads configured GitHub repositories (the host, not a network value).
+    rule_files = {"chains.py", "diagnosis.py", "repo.py"}
+    domains -= {"github.com", "codeload.github.com"}
     elsewhere = "\n".join(p.read_text() for p in (ROOT / "src" / "anychain").rglob("*.py") if p.name not in rule_files)
     assert "github.com" not in elsewhere, "source links only in chains.py and diagnosis.py"
     assert not domains, f"hardcoded hosts: {domains}"

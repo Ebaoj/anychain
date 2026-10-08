@@ -302,12 +302,34 @@
    "text": "The reason 'Too much requested' is the slippage check of Uniswap's routers: when the transaction ran, the swap would have needed more than the maximum input the sender had set, so it was refused. The price moved, or the limit was too tight. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
   },
   {
+   "confidence": "single_source",
+   "data": {
+    "places": [
+     "the verified source src/pkgs/swap-router-contracts/contracts/V3SwapRouter.sol, line 220",
+     "the verified source src/pkgs/swap-router-contracts/contracts/V3SwapRouter.sol, line 235",
+     "the verified source src/pkgs/swap-router-contracts/contracts/V2SwapRouter.sol, line 84"
+    ],
+    "reason": "Too much requested"
+   },
+   "id": "E14",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://rootstock.blockscout.com/api/v2/smart-contracts/0x0B14ff67F0014046b4b99057Aec4509640b3947A"
+    }
+   ],
+   "text": "The reason 'Too much requested' is written in the verified source src/pkgs/swap-router-contracts/contracts/V3SwapRouter.sol, line 220; the verified source src/pkgs/swap-router-contracts/contracts/V3SwapRouter.sol, line 235; the verified source src/pkgs/swap-router-contracts/contracts/V2SwapRouter.sol, line 84."
+  },
+  {
    "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "cross_check",
    "sources": [
     {

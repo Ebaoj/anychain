@@ -13,7 +13,7 @@ def _source_text(source: Source) -> str:
     return text
 
 
-CONFIDENCE_TEXT = {"confirmed": "confirmed by the node", "single_source": "explorer only",
+CONFIDENCE_TEXT = {"confirmed": "confirmed by the node", "single_source": "not cross-checked with the node",
                    "candidate": "candidate: inferred, not confirmed"}
 
 

@@ -39,7 +39,7 @@ def test_candidate_is_only_set_on_purpose():
 def test_reader_and_model_see_the_confidence(eth_cfg):
     bundle = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer")
     md = render_markdown(bundle)
-    assert "_(explorer only)_" in md and "_(confirmed by the node)_" in md
+    assert "_(not cross-checked with the node)_" in md and "_(confirmed by the node)_" in md
     payload = json.loads(evidence_payload(bundle, eth_cfg))
     assert {e["confidence"] for e in payload["evidence"]} == {"confirmed", "single_source"}
     prompt = load_prompt("support", "pt-BR")

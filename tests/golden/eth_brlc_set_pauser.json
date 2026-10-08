@@ -1,0 +1,150 @@
+{
+ "abi_sources": {
+  "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284": "explorer: verified contract TransparentUpgradeableProxy proxy -> BRLCTokenBridgeable"
+ },
+ "gaps": [
+  {
+   "cause": "source_unavailable",
+   "needed": "Try again in a few minutes",
+   "retryable": true,
+   "what": "Internal calls",
+   "why": "https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef/internal-transactions failed after 3 attempts: ReadTimeout: recorded timeout for GET https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef/internal-transactions"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 17627279,
+    "from": "0xf1fD86D6FA7769cc884FA0d1b20f8Edaa6f00001",
+    "gas_limit": "82722",
+    "gas_used": "54774",
+    "status": "success",
+    "timestamp": "2023-07-05T11:07:35.000000Z",
+    "to": "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef"
+    }
+   ],
+   "text": "Transaction succeeded in block 17627279 at 2023-07-05T11:07:35.000000Z. From 0xf1fD86D6FA7769cc884FA0d1b20f8Edaa6f00001 to 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (TransparentUpgradeableProxy). Native value sent: 0 ETH. Gas used 54774 of limit 82722."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.002990817483396804",
+    "parts": {
+     "fee": "0.002990817483396804"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef"
+    }
+   ],
+   "text": "Fee paid: 0.002990817483396804 ETH."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "newPauser": "0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520"
+    },
+    "function": "setPauser"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xAC176d9e75384F7d71275bb9D5265281CC0Dd284"
+    }
+   ],
+   "text": "Called setPauser(address) on 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (TransparentUpgradeableProxy) with newPauser=0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520. ABI source: explorer: verified contract TransparentUpgradeableProxy proxy -> BRLCTokenBridgeable."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "BRLCTokenBridgeable",
+    "defined_in": "PausableExtUpgradeable",
+    "in_repo": true,
+    "lines": [
+     103,
+     111
+    ],
+    "path": "contracts/base/common/PausableExtUpgradeable.sol",
+    "repo": "cloudwallk/brlc-token@74a5498",
+    "same_as_verified": true,
+    "selector": "0x2d88af4a"
+   },
+   "id": "E4",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository cloudwallk/brlc-token@74a5498",
+     "url": "https://github.com/cloudwallk/brlc-token/blob/74a5498d04b10dc882e48273a38b98b4275463bd/contracts/base/common/PausableExtUpgradeable.sol#L103-L111"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xbEA441d7cf3f79b57cc5ae33251a084A063825dc"
+    }
+   ],
+   "text": "In the configured repository cloudwallk/brlc-token@74a5498, setPauser(address) of BRLCTokenBridgeable is defined in PausableExtUpgradeable (contracts/base/common/PausableExtUpgradeable.sol, lines 103-111). Its text is the same in the contract's verified source on the explorer (comments and spacing aside)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "pauser": "0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520"
+    },
+    "event": "PauserChanged"
+   },
+   "id": "E5",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef/logs"
+    }
+   ],
+   "text": "Event PauserChanged(address) emitted by 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (TransparentUpgradeableProxy): pauser=0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef"
+}

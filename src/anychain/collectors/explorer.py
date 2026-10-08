@@ -1,5 +1,6 @@
 """Blockscout API v2 collector. Endpoints: https://docs.blockscout.com/devs/apis/rest"""
 import threading
+from concurrent.futures import Future
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -27,24 +28,23 @@ class ExplorerClient:
         self.client = client or make_client(cfg.timeout_s)
         self.budget = budget
         # Each list and each contract is fetched once per client (one explanation), also when
-        # prefetched in parallel; a failure is kept too, so it is not paid for twice.
-        self._memo: dict[tuple, tuple[bool, object]] = {}
+        # prefetched in parallel: a second caller waits for the request in flight instead of making
+        # its own. A failure is kept too, so it is not paid for twice.
+        self._memo: dict[tuple, Future] = {}
         self._lock = threading.Lock()
 
     def _once(self, key: tuple, fetch: Callable[[], object]):
         with self._lock:
-            hit = self._memo.get(key)
-        if hit is None:
+            future, owner = self._memo.get(key), False
+            if future is None:
+                future, owner = Future(), True
+                self._memo[key] = future
+        if owner:
             try:
-                hit = (True, fetch())
-            except Exception as exc:
-                hit = (False, exc)
-            with self._lock:
-                self._memo.setdefault(key, hit)
-        ok, value = hit
-        if not ok:
-            raise value
-        return value
+                future.set_result(fetch())
+            except BaseException as exc:  # also KeyboardInterrupt: waiters must never hang
+                future.set_exception(exc)
+        return future.result()
 
     def url(self, path: str) -> str:
         return f"{self.cfg.api_base}{path}"
@@ -96,8 +96,9 @@ class ExplorerClient:
     def implementations_of(self, address: str) -> list[str]:
         """Implementations named in already-fetched contract metadata (no request)."""
         with self._lock:
-            hit = self._memo.get(("smart-contract", address.lower()))
-        meta = hit[1] if hit and hit[0] and isinstance(hit[1], dict) else {}
+            future = self._memo.get(("smart-contract", address.lower()))
+        done_ok = future is not None and future.done() and future.exception() is None
+        meta = future.result() if done_ok and isinstance(future.result(), dict) else {}
         found = []
         for impl in meta.get("implementations") or []:
             impl_address = impl.get("address_hash") or impl.get("address") if isinstance(impl, dict) else None

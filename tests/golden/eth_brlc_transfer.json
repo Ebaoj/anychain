@@ -1,0 +1,145 @@
+{
+ "abi_sources": {
+  "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284": "explorer: verified contract TransparentUpgradeableProxy proxy -> BRLCTokenBridgeable"
+ },
+ "gaps": [
+  {
+   "cause": "source_unavailable",
+   "needed": "Try again in a few minutes",
+   "retryable": true,
+   "what": "Internal calls",
+   "why": "https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39/internal-transactions failed after 3 attempts: ReadTimeout: recorded timeout for GET https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39/internal-transactions"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 17485184,
+    "from": "0x3b995d0B4247CF47058D54E8947038dc11f6Aac9",
+    "gas_limit": "76702",
+    "gas_used": "50829",
+    "status": "success",
+    "timestamp": "2023-06-15T12:08:47.000000Z",
+    "to": "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39"
+    }
+   ],
+   "text": "Transaction succeeded in block 17485184 at 2023-06-15T12:08:47.000000Z. From 0x3b995d0B4247CF47058D54E8947038dc11f6Aac9 to 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (TransparentUpgradeableProxy). Native value sent: 0 ETH. Gas used 50829 of limit 76702."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.001072977622127316",
+    "parts": {
+     "fee": "0.001072977622127316"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39"
+    }
+   ],
+   "text": "Fee paid: 0.001072977622127316 ETH."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "amount": "10000000",
+     "recipient": "0x78DAd017134019d5e9d4aF3045180B898955934c"
+    },
+    "function": "transfer"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xAC176d9e75384F7d71275bb9D5265281CC0Dd284"
+    }
+   ],
+   "text": "Called transfer(address,uint256) on 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (TransparentUpgradeableProxy) with recipient=0x78DAd017134019d5e9d4aF3045180B898955934c, amount=10000000. ABI source: explorer: verified contract TransparentUpgradeableProxy proxy -> BRLCTokenBridgeable."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "BRLCTokenBridgeable",
+    "in_repo": false,
+    "repo": "cloudwallk/brlc-token@74a5498",
+    "selector": "0xa9059cbb"
+   },
+   "id": "E4",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository cloudwallk/brlc-token@74a5498",
+     "url": "https://github.com/cloudwallk/brlc-token/blob/74a5498d04b10dc882e48273a38b98b4275463bd/contracts/BRLCTokenBridgeable.sol#L14-L105"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xbEA441d7cf3f79b57cc5ae33251a084A063825dc"
+    }
+   ],
+   "text": "BRLCTokenBridgeable is in the configured repository cloudwallk/brlc-token@74a5498, but no implemented external or public function with selector 0xa9059cbb was found in its files for BRLCTokenBridgeable or its bases there (its bases outside the repository: ERC20Upgradeable, OwnableUpgradeable, PausableUpgradeable). The deployed code's verified source on the explorer defines transfer(address,uint256) in BRLCTokenBase (contracts/BRLCTokenBase.sol, lines 66-76), a contract this repository does not have, so its code is not the deployed code."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0x3b995d0B4247CF47058D54E8947038dc11f6Aac9",
+    "to": "0x78DAd017134019d5e9d4aF3045180B898955934c",
+    "token": "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284",
+    "token_id": null,
+    "value": 10000000
+   },
+   "id": "E5",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 10 BRLC from 0x3b995d0B4247CF47058D54E8947038dc11f6Aac9 to 0x78DAd017134019d5e9d4aF3045180B898955934c."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39"
+}

@@ -99,3 +99,13 @@ def mutated(fixture: str, key_suffix: str, change) -> dict:
     body = recorded_body(fixture, key_suffix)
     change(body)
     return {key_suffix: {"status": 200, "body": json.dumps(body)}}
+
+
+REPO_CACHE = ROOT / "tests" / "fixtures_repos" / "repos"
+
+
+@pytest.fixture(autouse=True)
+def repo_cache(monkeypatch):
+    """Tests read configured repos from real snapshots in tests/fixtures_repos, never the local cache."""
+    from anychain.collectors import repo as repo_module
+    monkeypatch.setattr(repo_module.RepoCache, "__init__", lambda self, _cache_dir: setattr(self, "root", REPO_CACHE))

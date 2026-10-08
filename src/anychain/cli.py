@@ -165,5 +165,33 @@ def show_log(
             print(f"    check failed       {f['name']:<28} {f['n']:>5}")
 
 
+repos_app = typer.Typer(help="Contract repositories cited as source (PHASE2 T6).")
+app.add_typer(repos_app, name="repos")
+
+
+@repos_app.command("sync")
+def repos_sync(config: str = typer.Option(None, "--config", help="Network YAML whose repos to download")) -> None:
+    """Download each configured repo at its commit into storage.cache_dir (explain only reads that cache)."""
+    from anychain.collectors.http import CollectorError
+    from anychain.collectors.repo import RepoCache
+    try:
+        cfg = load_config(config)
+    except ConfigError as exc:
+        _fail(str(exc))
+    if not cfg.repos:
+        print("No repos configured for this network.")
+        return
+    cache, failed = RepoCache(cfg.storage.cache_dir), False
+    for repo_cfg in cfg.repos:
+        try:
+            commit = cache.sync(repo_cfg)
+            print(f"{repo_cfg.url} @ {commit}: ok")
+        except CollectorError as exc:
+            failed = True
+            typer.secho(f"{repo_cfg.url}: {exc}", fg=typer.colors.RED, err=True)
+    if failed:
+        raise typer.Exit(1)
+
+
 if __name__ == "__main__":
     app()
