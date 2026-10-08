@@ -1,6 +1,6 @@
 # PHASE2: failures and degradation (diagnosis, eth_call, repo grounding, ABI cascade, validator)
 
-- **Status:** IN PROGRESS (approved by Joabe on 2026-10-08 with the proposed defaults: spec in the repo, order T1 to T9, signature database on as candidates only)
+- **Status:** DONE 2026-10-08 (approved by Joabe on 2026-10-08 with the proposed defaults: spec in the repo, order T1 to T9, signature database on as candidates only). Closing acceptance: D37.
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)
@@ -117,5 +117,6 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 ## 15. Definition of done
 
 - [x] D1 to D3 decided (2026-10-08).
-- [ ] T1 to T9 committed, each with its tests and a clean-context review.
-- [ ] Architecture docs (en and pt-BR) updated; Phase 2 explained to Joabe in plain Portuguese.
+- [x] T1 to T9 committed, each with its tests and a clean-context review.
+- [x] Architecture docs (en and pt-BR) updated; Phase 2 explained to Joabe in plain Portuguese.
+- [x] Acceptance on the final code: 1,800 transactions, 0 tool errors, no level A or B false fact (D37).
