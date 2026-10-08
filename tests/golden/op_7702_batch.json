@@ -125,6 +125,29 @@
    "text": "Called function with selector 0x3f707e6b on 0x90502666e33D71483302F81c8349A6185572Db42; not decoded."
   },
   {
+   "confidence": "candidate",
+   "data": {
+    "fitting": [
+     "execute((address,uint256,bytes)[])"
+    ],
+    "selector": "0x3f707e6b",
+    "signatures": [
+     "execute((address,uint256,bytes)[])"
+    ]
+   },
+   "id": "E6",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0x3f707e6b"
+    }
+   ],
+   "text": "The call's selector 0x3f707e6b matches execute((address,uint256,bytes)[]) in the public signature database www.4byte.directory, and the data fits its types exactly; decoded with it: arg0=[(0xd58c92d715363fe8fc697f68c0a9c1e90723a737, 0, 0x6171d1c9000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000001600000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000001bff41798a0bcf287b996046ca68b395dbc1071000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000000bca65bf4b4c8803d2f0b49353ed57caaf3d66dc0000000000000000000000000000000000000000000000000000000000989680000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041d0b177db359875283aec9dea6fee5ee2d9edbff09254be3d252367626bd527fb7b6c1d62f97941f2a8a355b744f0caf66c9c850beacd04023c0a0775283b7ccd1b00000000000000000000000000000000000000000000000000000000000000)]. Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
+  },
+  {
    "confidence": "single_source",
    "data": {
     "from": "0xd58c92d715363FE8fc697f68C0A9c1E90723A737",
@@ -133,7 +156,7 @@
     "token_id": null,
     "value": 10000000
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "token_transfer",
    "sources": [
     {
@@ -151,7 +174,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "cross_check",
    "sources": [
     {

@@ -876,18 +876,21 @@
   },
   {
    "confidence": "single_source",
-   "data": {},
+   "data": {
+    "signature": "Approval(address,address,uint256)",
+    "topic": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+   },
    "id": "E42",
-   "kind": "event",
+   "kind": "event_signature",
    "sources": [
     {
      "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
     }
    ],
-   "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
+   "text": "The event's topic 0x8c5be1e5… is the hash of Approval(address,address,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
   },
   {
    "confidence": "single_source",
@@ -902,12 +905,45 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
     }
    ],
-   "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
+   "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
   },
   {
    "confidence": "single_source",
    "data": {},
    "id": "E44",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
+    }
+   ],
+   "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "signature": "Minted(address,uint256,uint256)",
+    "topic": "0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff"
+   },
+   "id": "E45",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff"
+    }
+   ],
+   "text": "The event's topic 0x25b428df… is the hash of Minted(address,uint256,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
+   "data": {},
+   "id": "E46",
    "kind": "event",
    "sources": [
     {
@@ -925,7 +961,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E45",
+   "id": "E47",
    "kind": "cross_check",
    "sources": [
     {

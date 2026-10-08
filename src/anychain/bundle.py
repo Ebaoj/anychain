@@ -6,6 +6,8 @@ Each step is wrapped by `_safely()`, so an unexpected payload costs one topic
 objects (collectors/types.py); network-type specifics come from a profile (chains.py).
 """
 import re
+
+import httpx
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
@@ -21,7 +23,10 @@ from anychain.collectors.types import (
     to_int,
 )
 from anychain.config import AppConfig
-from anychain.decoder import AbiDecoder, decode_revert
+from eth_utils import keccak
+
+from anychain.collectors.signatures import SignatureDb
+from anychain.decoder import AbiDecoder, decode_revert, fit_signature
 from anychain.collectors.repo import Repo, RepoCache
 from anychain.diagnosis import Context, diagnose, reason_text
 from anychain.solidity import SolidityIndex, filter_abi
@@ -31,6 +36,7 @@ from anychain.models import EvidenceBundle, GapCause, Source
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
 MAX_EVENTS = 40
 REPLAY_WHEN = {"no_reason", "generic_failure", "possibly_out_of_gas"}  # findings without the explorer's reason
+MAX_EVENT_LOOKUPS = 10  # distinct undecoded event topics looked up per answer
 MAX_PLACES = 3  # places a reason text is listed at, per source; the rest are counted
 DEPOSIT_TX_TYPES = {0x7E, 0xFF}  # OP Stack deposits and zkSync L1->L2 priority txs: funds minted as they run
 # What a replayed reason means, per diagnosis rule, worded about the replay (D32).
@@ -126,6 +132,10 @@ class BundleBuilder:
         self.source_repo: Repo | None = None  # the repo matched to the called contract, if any
         self.abi_origin: dict[str, tuple] = {}  # address -> (repo_pinned | repo_match, repo, contract) when not the explorer
         self.repo_notes: dict[str, str] = {}  # address -> how the repo ABI was chosen
+        self.event_topics_asked: set[str] = set()
+        self.signatures = (SignatureDb(cfg.abi_strategy.signature_db, cfg.storage.cache_dir, explorer.client,
+                                       explorer.budget, cfg.explorer.timeout_s)
+                           if "signature_db" in cfg.abi_strategy.order else None)
         self.verified_cache: dict[str, tuple] = {}
         self.undecoded_events: set[str] = set()
         self.anonymous_unmatched: set[str] = set()
@@ -376,6 +386,11 @@ class BundleBuilder:
             self.verified_cache[key] = self._read_verified(address)
         return self.verified_cache[key]
 
+    def _contract_name(self, address: str) -> str | None:
+        """The name the explorer gives a contract's verified code (no source indexing)."""
+        name = self.explorer.smart_contract(address).get("name")
+        return name if isinstance(name, str) else None
+
     def _read_verified(self, address: str) -> tuple[str | None, SolidityIndex | None]:
         meta = self.explorer.smart_contract(address)  # fetched once per explanation (memoized)
         files = {}
@@ -405,9 +420,12 @@ class BundleBuilder:
         selector = data[:10].lower()
         for address in self._contracts_behind(tx.to):
             try:
-                name, verified = self._verified(address)
+                name = self._contract_name(address)
             except CollectorError:
                 continue
+            if not name or not any(name in r.index.contracts or name in r.index.ambiguous for r in repos):
+                continue
+            _name, verified = self._verified(address)  # its source is indexed only now that a repo has the name
             for repo in repos:
                 if name and name in repo.index.ambiguous:
                     self._gap("Source code", f"{name} is declared in more than one file of {repo.label}, so which one "
@@ -597,6 +615,8 @@ class BundleBuilder:
                       "does not declare, or no ABI for it is available",
                       "The contract's ABI: a verified contract on the explorer, or a configured repo",
                       retryable=False, cause="not_interpretable")
+            self._safely("Signature database", lambda: self._add_signature_candidates(
+                "error", decoded.selector, replay.revert_data))
         if decoded.kind not in ("error_string", "custom", "panic"):
             return  # nothing more to say than the replay fact
         self._add_replay_finding(ctx, decoded, fact, sources)
@@ -926,6 +946,7 @@ class BundleBuilder:
             b.add("call", f"Called function with selector {data[:10]} on {self._party(to)}; not decoded.",
                   [source], {"selector": data[:10]})
             self._declare_undecoded("Call decoding", to.address, f"selector {data[:10]}", code_owner=delegate_here)
+            self._safely("Signature database", lambda: self._add_signature_candidates("call", data[:10], data))
             return
         abi_source, confidence = self._abi_provenance(to.address)
         b.add("call", self._call_text(to.address, decoded, self._party(to)), [source, abi_source],
@@ -992,6 +1013,63 @@ class BundleBuilder:
         self.abi_notes[key] = note
         self.bundle.abi_sources[address] = note
         return decoder
+
+    def _add_signature_candidates(self, what: str, key: str, data: str | None) -> None:
+        """Public signature database candidates for a selector or event topic no ABI decodes (PHASE2 T7, D35).
+        Always a candidate: anyone can add entries and different signatures share selectors. A function or
+        error signature is offered only when the data fits its types exactly."""
+        db = self.signatures
+        if db is None or not db.enabled or db.failed:  # after one failure: no more lookups, no more gaps
+            return
+        try:
+            names = db.events(key) if what == "event" else db.functions(key)
+        except CollectorError as exc:
+            self._gap("Signature database", f"the lookup of {key} failed: {exc}",
+                      "Try again in a few minutes" if exc.retryable else "Check the signature database URL in the config",
+                      retryable=exc.retryable, cause=_source_cause(exc.retryable))
+            return
+        if not names:
+            return
+        host = httpx.URL(db.cfg.url).host
+        source = Source(kind="signature_db", label=f"Signature database {host}",
+                        url=f"{db.cfg.url.rstrip('/')}/{'event-signatures' if what == 'event' else 'signatures'}/"
+                            f"?hex_signature={key}")
+        caveat = ("Anyone can add entries there and different signatures can share a selector, so this is not "
+                  "confirmed.")
+        thing = {"call": "The call's selector", "error": "The replay's custom error selector",
+                 "event": "The event's topic"}[what]
+        if what == "event":
+            # An event topic is the 32-byte hash of its signature: a text whose hash equals the topic is proven to
+            # be that signature (finding another text with the same hash is not feasible). Others are discarded.
+            proven = [n for n in names if "0x" + keccak(text=n).hex() == key.lower()]
+            if proven:
+                self.bundle.add("event_signature",
+                                f"The event's topic {key[:10]}… is the hash of {proven[0]}: that text comes from the "
+                                f"public signature database {host}, and its hash was checked to equal the topic. Its "
+                                "arguments are not decoded: which of them are indexed is not known.",
+                                [source], {"topic": key, "signature": proven[0]}, confidence="single_source")
+            return
+        fitting = [(n, args) for n in names if (args := fit_signature(n, data or "")) is not None]
+        if not fitting:
+            text = (f"{thing} {key} has entries in the public signature database {host} ({self._and_list(names)}), "
+                    "but the data does not fit their types exactly, so none of them is offered.")
+            self.bundle.add("candidate", text, [source], {"selector": key, "signatures": names, "fitting": []},
+                            confidence="candidate")
+            return
+        if len(fitting) == 1:
+            name, args = fitting[0]
+            shown = ", ".join(f"{a.name}={a.value}" for a in args) or "no arguments"
+            text = (f"{thing} {key} matches {name} in the public signature database {host}, and the data fits its "
+                    f"types exactly; decoded with it: {shown}. {caveat}")
+        else:
+            text = (f"{thing} {key} matches several signatures in the public signature database {host} that all fit "
+                    f"the data: {self._and_list([n for n, _ in fitting])}. Which one, if any, is not known. {caveat}")
+        self.bundle.add("candidate", text, [source],
+                        {"selector": key, "signatures": names, "fitting": [n for n, _ in fitting]}, confidence="candidate")
+
+    @staticmethod
+    def _and_list(items: list[str]) -> str:
+        return items[0] if len(items) == 1 else "; ".join(items[:-1]) + "; or " + items[-1]
 
     def _repo_decoder(self, address: str) -> tuple[AbiDecoder, str] | None:
         """No ABI from the explorer: decode with the configured repos' source (PHASE2 T6, D34).
@@ -1308,6 +1386,9 @@ class BundleBuilder:
         topic0 = topics[0] if topics else "(none)"
         self.bundle.add("event", f"Event with topic0 {topic0} emitted by {self._party(emitter)}; could not decode.", [source])
         self.undecoded_events.add(address)
+        if topics and len(self.event_topics_asked) < MAX_EVENT_LOOKUPS and topic0.lower() not in self.event_topics_asked:
+            self.event_topics_asked.add(topic0.lower())
+            self._safely("Signature database", lambda: self._add_signature_candidates("event", topic0, None))
 
     def _declare_undecoded_events(self) -> None:
         """One gap per contract with undecoded events, not one per event."""
@@ -1401,6 +1482,7 @@ class BundleBuilder:
             return
         self.bundle.add("call", f"Called function with selector {data[:10]} on {to}; not decoded.", [source],
                         {"selector": data[:10]})
+        self._safely("Signature database", lambda: self._add_signature_candidates("call", data[:10], data))
         if self.explorer_answered:
             self._declare_undecoded("Call decoding", to, f"selector {data[:10]}")
         else:

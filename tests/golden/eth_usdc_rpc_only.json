@@ -63,9 +63,38 @@
    "text": "Called function with selector 0xa9059cbb on 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48; not decoded."
   },
   {
+   "confidence": "candidate",
+   "data": {
+    "fitting": [
+     "transfer(address,uint256)",
+     "workMyDirefulOwner(uint256,uint256)"
+    ],
+    "selector": "0xa9059cbb",
+    "signatures": [
+     "transfer(address,uint256)",
+     "many_msg_babbage(bytes1)",
+     "transfer(bytes4[9],bytes5[6],int48[11])",
+     "func_2093253501(bytes)",
+     "join_tg_invmru_haha_fd06787(address,bool)",
+     "workMyDirefulOwner(uint256,uint256)"
+    ]
+   },
+   "id": "E3",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0xa9059cbb"
+    }
+   ],
+   "text": "The call's selector 0xa9059cbb matches several signatures in the public signature database www.4byte.directory that all fit the data: transfer(address,uint256); or workMyDirefulOwner(uint256,uint256). Which one, if any, is not known. Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
+  },
+  {
    "confidence": "confirmed",
    "data": {},
-   "id": "E3",
+   "id": "E4",
    "kind": "receipt",
    "sources": [
     {

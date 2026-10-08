@@ -250,7 +250,8 @@ def _check_no_double_native(bundle: EvidenceBundle) -> Check:
 def _check_addresses_exist(bundle: EvidenceBundle, cfg: AppConfig, raw_corpus: str) -> Check:
     corpus = raw_corpus.lower()
     known = {a.lower() for a in list(cfg.address_labels) + list(cfg.native_contracts) + list(cfg.fee_tokens)}
+    # an address decoded from call data appears in the raw data as a 32-byte word (24 zeros, then the address)
     invented = sorted({a for e in bundle.items for a in ADDRESS_RE.findall(e.text)
-                       if a.lower() not in corpus and a.lower() not in known})
+                       if a.lower() not in corpus and "0" * 24 + a.lower()[2:] not in corpus and a.lower() not in known})
     return Check("addresses_exist", "fail", f"addresses not in any source: {invented[:5]}") if invented \
         else Check("addresses_exist", "pass")

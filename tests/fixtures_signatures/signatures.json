@@ -1,0 +1,159 @@
+{
+ "event:0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885": {
+  "at": 1791469357.2096078,
+  "signatures": [
+   "Mint(address,uint256)"
+  ]
+ },
+ "event:0x1a4457a4460d48b40c5280955faf8e4685fa73f0866f7d8f573bdd8e64aca5b1": {
+  "at": 1791469350.2334552,
+  "signatures": []
+ },
+ "event:0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff": {
+  "at": 1791469355.6421492,
+  "signatures": [
+   "Minted(address,uint256,uint256)"
+  ]
+ },
+ "event:0x27fe8c0b49f49507b9d4fe5968c9f49edfe5c9df277d433a07a0717ede97638d": {
+  "at": 1791469357.789173,
+  "signatures": []
+ },
+ "event:0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3": {
+  "at": 1791469339.4018712,
+  "signatures": [
+   "ActionEvent(string,bytes)"
+  ]
+ },
+ "event:0x4acf5d8d7f0254fa3f2f19b5d844b24556c150559170a0de5c250ae8e8b9e4ac": {
+  "at": 1791469330.137316,
+  "signatures": []
+ },
+ "event:0x55cd20b9d3ed641e3f18b6cf6b94daba95f3caae9907ece81cac745021af4610": {
+  "at": 1791469355.939677,
+  "signatures": []
+ },
+ "event:0x570954540bed6b1304a87dfe815a5eda4a648f7097a16240dcd85c9b5fd42a43": {
+  "at": 1791469340.984761,
+  "signatures": [
+   "Borrow(bytes32,address,address,address,uint256,uint256)"
+  ]
+ },
+ "event:0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+  "at": 1791469355.33073,
+  "signatures": [
+   "Approval(address,address,uint256)"
+  ]
+ },
+ "event:0x9d9bd501d0657d7dfe415f779a620a62b78bc508ddc0891fbbd8b7ac0f8fce87": {
+  "at": 1791469340.47321,
+  "signatures": [
+   "AccrueInterest(bytes32,uint256,uint256,uint256)"
+  ]
+ },
+ "event:0xa3b9472a1399e17e123f3c2e6586c23e504184d504de59cdaa2b375e880c6184": {
+  "at": 1791469339.943509,
+  "signatures": [
+   "SupplyCollateral(bytes32,address,address,uint256)"
+  ]
+ },
+ "event:0xa6fee24309b1d83d9ec7b9e4dbb73c6f882746efbfb26db7b7d9e9f2fb6dc95a": {
+  "at": 1791469342.502718,
+  "signatures": [
+   "Exchange(address,address,address,uint256,uint256)"
+  ]
+ },
+ "event:0xc035da294269ae5afe93a15344a19d8e2fbba752ad3af2502c2e486edb9a6ff8": {
+  "at": 1791469343.0018828,
+  "signatures": []
+ },
+ "event:0xc86ba04c55bc5eb2f2876b91c438849a296dbec7b08751c3074d92e04f0a77af": {
+  "at": 1791469356.933842,
+  "signatures": [
+   "RelayedRootBundle(uint32,bytes32,bytes32)"
+  ]
+ },
+ "function:0x085c8c5e": {
+  "at": 1791469344.2585878,
+  "signatures": []
+ },
+ "function:0x25629ec0": {
+  "at": 1791469352.360045,
+  "signatures": []
+ },
+ "function:0x3f707e6b": {
+  "at": 1791469348.9696379,
+  "signatures": [
+   "execute((address,uint256,bytes)[])"
+  ]
+ },
+ "function:0x40206e43": {
+  "at": 1791469353.7618592,
+  "signatures": []
+ },
+ "function:0x457094cc": {
+  "at": 1791469347.963148,
+  "signatures": [
+   "fire()"
+  ]
+ },
+ "function:0x493a4f84": {
+  "at": 1791469356.572948,
+  "signatures": [
+   "relayRootBundle(bytes32,bytes32)"
+  ]
+ },
+ "function:0x4ba77e21": {
+  "at": 1791469348.588904,
+  "signatures": []
+ },
+ "function:0x58893201": {
+  "at": 1791469354.9502468,
+  "signatures": []
+ },
+ "function:0x61461954": {
+  "at": 1791469329.3108869,
+  "signatures": [
+   "execute()"
+  ]
+ },
+ "function:0x70521ae9": {
+  "at": 1791469341.815284,
+  "signatures": []
+ },
+ "function:0x83730cc3": {
+  "at": 1791469349.559573,
+  "signatures": [
+   "createPosition(uint256)"
+  ]
+ },
+ "function:0x8412a3b9": {
+  "at": 1791469353.466053,
+  "signatures": []
+ },
+ "function:0xa9059cbb": {
+  "at": 1791469346.8303082,
+  "signatures": [
+   "transfer(address,uint256)",
+   "many_msg_babbage(bytes1)",
+   "transfer(bytes4[9],bytes5[6],int48[11])",
+   "func_2093253501(bytes)",
+   "join_tg_invmru_haha_fd06787(address,bool)",
+   "workMyDirefulOwner(uint256,uint256)"
+  ]
+ },
+ "function:0xb5b27b7e": {
+  "at": 1791469329.8203678,
+  "signatures": []
+ },
+ "function:0xc04b8d59": {
+  "at": 1791469354.166048,
+  "signatures": [
+   "exactInput((bytes,address,uint256,uint256,uint256))"
+  ]
+ },
+ "function:0xfc40415e": {
+  "at": 1791469347.233519,
+  "signatures": []
+ }
+}

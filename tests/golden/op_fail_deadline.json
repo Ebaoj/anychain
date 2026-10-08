@@ -112,6 +112,29 @@
   {
    "confidence": "candidate",
    "data": {
+    "fitting": [
+     "createPosition(uint256)"
+    ],
+    "selector": "0x83730cc3",
+    "signatures": [
+     "createPosition(uint256)"
+    ]
+   },
+   "id": "E5",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0x83730cc3"
+    }
+   ],
+   "text": "The call's selector 0x83730cc3 matches createPosition(uint256) in the public signature database www.4byte.directory, and the data fits its types exactly; decoded with it: arg0=157785199. Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
     "level": "candidate",
     "next_steps": [
      "Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
@@ -119,7 +142,7 @@
     "reads": [],
     "rule": "deadline"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "diagnosis",
    "sources": [
     {
@@ -137,7 +160,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "cross_check",
    "sources": [
     {

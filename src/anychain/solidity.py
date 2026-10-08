@@ -86,20 +86,21 @@ class SolidityIndex:
         self._enums: set[str] = set()
         self._values: dict[str, str] = {}
         self._types: set[str] = set()  # contract, interface and library names
-        for text in masked.values():
+        spans = {p: _spans(t) for p, t in masked.items()}  # (start, end, name) of each contract, computed once
+        for path, text in masked.items():
             self._enums |= {m.group(1) for m in ENUM.finditer(text)}
             self._values.update({m.group(1): m.group(2) for m in VALUE_TYPE.finditer(text)})
-            self._types |= {m.group(2) for m in DECLARATION.finditer(text)}
+            self._types |= {name for _s, _e, name in spans[path]}
             for m in STRUCT.finditer(text):
-                self._structs.setdefault(m.group(1), []).append((_enclosing(text, m.start()), m.group(2)))
+                inside = [(s, name) for s, e, name in spans[path] if s <= m.start() <= e]
+                self._structs.setdefault(m.group(1), []).append((max(inside)[1] if inside else None, m.group(2)))
         self._all: dict[str, list[Contract]] = {}
         self.file_level: dict[str, list[EventOrError]] = {}  # errors and events declared outside contracts
         for path, text in masked.items():
             self._read_contracts(path, text, self.uncommented[path])
-            spans = [(m.start(), _matching(text, m.end() - 1, "{", "}") or len(text)) for m in DECLARATION.finditer(text)]
             for pattern, what in ((EVENT, "event"), (ERROR, "error")):
                 for e in pattern.finditer(text):
-                    if not any(a <= e.start() <= b for a, b in spans):
+                    if not any(a <= e.start() <= b for a, b, _n in spans[path]):
                         self.file_level.setdefault(path, []).append(self._declared(text, e, what))
         self.ambiguous = {name for name, found in self._all.items() if len(found) > 1}
         self.contracts = {name: found[0] for name, found in self._all.items() if len(found) == 1}
@@ -354,14 +355,13 @@ def _string_end(text: str, start: int) -> int:
     return min(j, len(text) - 1)
 
 
-def _enclosing(text: str, offset: int) -> str | None:
-    """Name of the contract or library whose body contains `offset` (None at file level)."""
-    for m in DECLARATION.finditer(text, 0, offset):
+def _spans(text: str) -> list[tuple[int, int, str]]:
+    """(start, end, name) of every contract, interface and library declaration in a file."""
+    out = []
+    for m in DECLARATION.finditer(text):
         close_at = _matching(text, m.end() - 1, "{", "}")
-        if close_at is not None and close_at > offset:
-            inner = _enclosing(text[m.end():close_at], offset - m.end())
-            return inner or m.group(2)
-    return None
+        out.append((m.start(), close_at if close_at is not None else len(text), m.group(2)))
+    return out
 
 
 def _matching(text: str, at: int, open_c: str, close_c: str) -> int | None:

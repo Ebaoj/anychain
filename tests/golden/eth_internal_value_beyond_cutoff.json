@@ -1135,6 +1135,24 @@
   {
    "confidence": "single_source",
    "data": {
+    "signature": "Exchange(address,address,address,uint256,uint256)",
+    "topic": "0xa6fee24309b1d83d9ec7b9e4dbb73c6f882746efbfb26db7b7d9e9f2fb6dc95a"
+   },
+   "id": "E54",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0xa6fee24309b1d83d9ec7b9e4dbb73c6f882746efbfb26db7b7d9e9f2fb6dc95a"
+    }
+   ],
+   "text": "The event's topic 0xa6fee243… is the hash of Exchange(address,address,address,uint256,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "args": {
      "amount0": "794929588",
      "amount1": "-297543350753776472",
@@ -1146,7 +1164,7 @@
     },
     "event": "Swap"
    },
-   "id": "E54",
+   "id": "E55",
    "kind": "event",
    "sources": [
     {
@@ -1161,7 +1179,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E55",
+   "id": "E56",
    "kind": "event",
    "sources": [
     {
@@ -1176,7 +1194,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E56",
+   "id": "E57",
    "kind": "event",
    "sources": [
     {
@@ -1203,7 +1221,7 @@
     },
     "event": "Swap"
    },
-   "id": "E57",
+   "id": "E58",
    "kind": "event",
    "sources": [
     {
@@ -1218,7 +1236,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E58",
+   "id": "E59",
    "kind": "event",
    "sources": [
     {
@@ -1233,7 +1251,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E59",
+   "id": "E60",
    "kind": "event",
    "sources": [
     {
@@ -1257,7 +1275,7 @@
     },
     "event": "Transfer"
    },
-   "id": "E60",
+   "id": "E61",
    "kind": "event",
    "sources": [
     {
@@ -1279,7 +1297,7 @@
     },
     "event": "Credited"
    },
-   "id": "E61",
+   "id": "E62",
    "kind": "event",
    "sources": [
     {
@@ -1301,7 +1319,7 @@
     },
     "event": "Credited"
    },
-   "id": "E62",
+   "id": "E63",
    "kind": "event",
    "sources": [
     {
@@ -1328,7 +1346,7 @@
     },
     "event": "Swap"
    },
-   "id": "E63",
+   "id": "E64",
    "kind": "event",
    "sources": [
     {
@@ -1355,7 +1373,7 @@
     },
     "event": "Trade"
    },
-   "id": "E64",
+   "id": "E65",
    "kind": "event",
    "sources": [
     {
@@ -1370,7 +1388,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E65",
+   "id": "E66",
    "kind": "event",
    "sources": [
     {
@@ -1395,7 +1413,7 @@
     },
     "event": "Swapped"
    },
-   "id": "E66",
+   "id": "E67",
    "kind": "event",
    "sources": [
     {
@@ -1417,7 +1435,7 @@
     },
     "event": "Exchange"
    },
-   "id": "E67",
+   "id": "E68",
    "kind": "event",
    "sources": [
     {
@@ -1437,7 +1455,7 @@
     },
     "event": "ClientData"
    },
-   "id": "E68",
+   "id": "E69",
    "kind": "event",
    "sources": [
     {
@@ -1459,7 +1477,7 @@
     },
     "event": "SolverCallExecuted"
    },
-   "id": "E69",
+   "id": "E70",
    "kind": "event",
    "sources": [
     {
@@ -1483,7 +1501,7 @@
     },
     "event": "FundsMovement"
    },
-   "id": "E70",
+   "id": "E71",
    "kind": "event",
    "sources": [
     {
@@ -1505,7 +1523,7 @@
     },
     "event": "SolverCallExecuted"
    },
-   "id": "E71",
+   "id": "E72",
    "kind": "event",
    "sources": [
     {

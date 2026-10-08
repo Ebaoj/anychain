@@ -109,3 +109,17 @@ def repo_cache(monkeypatch):
     """Tests read configured repos from real snapshots in tests/fixtures_repos, never the local cache."""
     from anychain.collectors import repo as repo_module
     monkeypatch.setattr(repo_module.RepoCache, "__init__", lambda self, _cache_dir: setattr(self, "root", REPO_CACHE))
+
+SIGNATURES = ROOT / "tests" / "fixtures_signatures"
+
+
+@pytest.fixture(autouse=True)
+def signature_db(monkeypatch):
+    """Tests read the public signature database from real recorded answers only (offline)."""
+    from anychain.collectors import signatures as sig_module
+    real_init = sig_module.SignatureDb.__init__
+
+    def offline(self, cfg, _cache_dir, *args, **kwargs):
+        kwargs["offline"] = True  # the config's own enabled flag still decides
+        real_init(self, cfg, SIGNATURES, *args, **kwargs)
+    monkeypatch.setattr(sig_module.SignatureDb, "__init__", offline)

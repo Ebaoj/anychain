@@ -101,6 +101,27 @@
    "text": "Called function with selector 0x61461954 on 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A; not decoded."
   },
   {
+   "confidence": "candidate",
+   "data": {
+    "fitting": [],
+    "selector": "0x61461954",
+    "signatures": [
+     "execute()"
+    ]
+   },
+   "id": "E5",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0x61461954"
+    }
+   ],
+   "text": "The call's selector 0x61461954 has entries in the public signature database www.4byte.directory (execute()), but the data does not fit their types exactly, so none of them is offered."
+  },
+  {
    "confidence": "single_source",
    "data": {
     "moves_value": false,
@@ -108,7 +129,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -125,7 +146,7 @@
    "data": {
     "staticcalls": 2
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -147,7 +168,7 @@
     "reads": [],
     "rule": "no_reason"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "diagnosis",
    "sources": [
     {
@@ -165,7 +186,7 @@
     "block": 78962840,
     "reverted": false
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "replay",
    "sources": [
     {
@@ -183,7 +204,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "cross_check",
    "sources": [
     {

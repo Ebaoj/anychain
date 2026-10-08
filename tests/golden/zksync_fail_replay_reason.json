@@ -157,6 +157,29 @@
    "text": "Called function with selector 0xc04b8d59 on 0xC8A3d1d834617796cdd8c68709e9719f41cb472E; not decoded."
   },
   {
+   "confidence": "candidate",
+   "data": {
+    "fitting": [
+     "exactInput((bytes,address,uint256,uint256,uint256))"
+    ],
+    "selector": "0xc04b8d59",
+    "signatures": [
+     "exactInput((bytes,address,uint256,uint256,uint256))"
+    ]
+   },
+   "id": "E7",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0xc04b8d59"
+    }
+   ],
+   "text": "The call's selector 0xc04b8d59 matches exactInput((bytes,address,uint256,uint256,uint256)) in the public signature database www.4byte.directory, and the data fits its types exactly; decoded with it: arg0=(0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e0000645aea5775959fbc2557cc8789bc1bf90a239d9a910000641d17cbcf0d6d143135ae902365d2e5e2a16538d4, 0x464fc339add314932920d3e060745bd7ea3e92ad, 1790869554, 2800000000000000000000, 33573049). Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
+  },
+  {
    "confidence": "single_source",
    "data": {
     "matches_explorer_fee": true,
@@ -168,7 +191,7 @@
     "prepaid": 260187495000000,
     "refunded": 248937123250000
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "fee_flow",
    "sources": [
     {
@@ -188,26 +211,6 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E8",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x464fC339aDD314932920d3e060745bd7Ea3e92AD (undone because a call above it reverted)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E9",
    "kind": "internal_call",
    "sources": [
@@ -218,7 +221,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) (undone because a call above it reverted)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x464fC339aDD314932920d3e060745bd7Ea3e92AD (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -238,7 +241,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x000000000000000000000000000000000000800A (Ether) (undone because a call above it reverted)."
+   "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -258,7 +261,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x0000000000000000000000000000000000000001 (undone because a call above it reverted)."
+   "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x000000000000000000000000000000000000800A (Ether) (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -278,7 +281,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x464fC339aDD314932920d3e060745bd7Ea3e92AD (undone because a call above it reverted)."
+   "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x0000000000000000000000000000000000000001 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -298,6 +301,26 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x464fC339aDD314932920d3e060745bd7Ea3e92AD (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
+    }
+   ],
    "text": "Internal call from 0x464fC339aDD314932920d3e060745bd7Ea3e92AD to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract) (undone because a call above it reverted)."
   },
   {
@@ -308,7 +331,7 @@
     "type": "call",
     "value": "260187495000000"
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "internal_call",
    "sources": [
     {
@@ -328,7 +351,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "internal_call",
    "sources": [
     {
@@ -348,7 +371,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "internal_call",
    "sources": [
     {
@@ -368,7 +391,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "internal_call",
    "sources": [
     {
@@ -388,7 +411,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E18",
+   "id": "E19",
    "kind": "internal_call",
    "sources": [
     {
@@ -408,7 +431,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E19",
+   "id": "E20",
    "kind": "internal_call",
    "sources": [
     {
@@ -428,26 +451,6 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E20",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0xC8A3d1d834617796cdd8c68709e9719f41cb472E to 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 (undone because a call above it reverted)."
-  },
-  {
-   "confidence": "single_source",
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E21",
    "kind": "internal_call",
    "sources": [
@@ -458,7 +461,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
+   "text": "Internal call from 0xC8A3d1d834617796cdd8c68709e9719f41cb472E to 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -518,7 +521,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xC8A3d1d834617796cdd8c68709e9719f41cb472E to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
+   "text": "Internal call from 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -538,7 +541,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xC8A3d1d834617796cdd8c68709e9719f41cb472E to 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 (undone because a call above it reverted)."
+   "text": "Internal call from 0xC8A3d1d834617796cdd8c68709e9719f41cb472E to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -558,7 +561,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract) (undone because a call above it reverted)."
+   "text": "Internal call from 0xC8A3d1d834617796cdd8c68709e9719f41cb472E to 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -578,7 +581,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
+   "text": "Internal call from 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract) (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -598,7 +601,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 to 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 (undone because a call above it reverted)."
+   "text": "Internal call from 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -618,7 +621,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
+   "text": "Internal call from 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 to 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -638,7 +641,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 to 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 (undone because a call above it reverted)."
+   "text": "Internal call from 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -658,7 +661,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
+   "text": "Internal call from 0x9D63d318143cF14FF05f8AAA7491904A494e6f13 to 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -678,7 +681,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 (undone because a call above it reverted)."
+   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -698,7 +701,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
+   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x01e00F0064Fa11Bb35D1251DF35376d60AF7D435 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -738,7 +741,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
+   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -758,7 +761,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x6B0AEf0D281DCB3f869651c4B60c534C45FB7515 (undone because a call above it reverted)."
+   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x0000000000000000000000000000000000008002 (undone because a call above it reverted)."
   },
   {
    "confidence": "single_source",
@@ -778,6 +781,26 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
     }
    ],
+   "text": "Internal call from 0xECdD1c3dDA6253208a0bA9CAB373d802B2AF58B2 to 0x6B0AEf0D281DCB3f869651c4B60c534C45FB7515 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E38",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147/internal-transactions"
+    }
+   ],
    "text": "Internal call from 0x6B0AEf0D281DCB3f869651c4B60c534C45FB7515 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract) (undone because a call above it reverted)."
   },
   {
@@ -786,7 +809,7 @@
     "system_calls": 63,
     "value": "0"
    },
-   "id": "E38",
+   "id": "E39",
    "kind": "internal_call",
    "sources": [
     {
@@ -808,7 +831,7 @@
     "reads": [],
     "rule": "generic_failure"
    },
-   "id": "E39",
+   "id": "E40",
    "kind": "diagnosis",
    "sources": [
     {
@@ -835,7 +858,7 @@
     "revert_kind": "error_string",
     "reverted": true
    },
-   "id": "E40",
+   "id": "E41",
    "kind": "replay",
    "sources": [
     {
@@ -857,10 +880,10 @@
      "For large swaps, split them or use a deeper pool."
     ],
     "reads": [],
-    "replay": "E40",
+    "replay": "E41",
     "rule": "replay"
    },
-   "id": "E41",
+   "id": "E42",
    "kind": "diagnosis",
    "sources": [
     {
@@ -882,7 +905,7 @@
      "url": "https://github.com/Uniswap/swap-router-contracts/blob/70bc2e40dfca294c1cea9bf67a4036732ee54303/contracts/V3SwapRouter.sol#L128"
     }
    ],
-   "text": "Possible cause, from the replay (E40): the replay reverted with the reason 'Too little received', the words of the slippage check of Uniswap's routers; this contract's code decides what they mean. If the original transaction failed the same way, that is its cause. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
+   "text": "Possible cause, from the replay (E41): the replay reverted with the reason 'Too little received', the words of the slippage check of Uniswap's routers; this contract's code decides what they mean. If the original transaction failed the same way, that is its cause. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
   },
   {
    "confidence": "confirmed",
@@ -890,7 +913,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E42",
+   "id": "E43",
    "kind": "cross_check",
    "sources": [
     {

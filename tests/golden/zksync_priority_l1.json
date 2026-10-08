@@ -165,24 +165,27 @@
    "text": "Called function with selector 0x493a4f84 on 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF; not decoded."
   },
   {
-   "confidence": "single_source",
+   "confidence": "candidate",
    "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
+    "fitting": [
+     "relayRootBundle(bytes32,bytes32)"
+    ],
+    "selector": "0x493a4f84",
+    "signatures": [
+     "relayRootBundle(bytes32,bytes32)"
+    ]
    },
    "id": "E7",
-   "kind": "internal_call",
+   "kind": "candidate",
    "sources": [
     {
      "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/internal-transactions"
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0x493a4f84"
     }
    ],
-   "text": "Internal call from 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
+   "text": "The call's selector 0x493a4f84 matches relayRootBundle(bytes32,bytes32) in the public signature database www.4byte.directory, and the data fits its types exactly; decoded with it: arg0=0x506fde82836f725bbeb51b1a9d291a2b8614fd4ba90898099cb408f49cfb939f, arg1=0x0000000000000000000000000000000000000000000000000000000000000000. Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
   },
   {
    "confidence": "single_source",
@@ -202,6 +205,26 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/internal-transactions"
     }
    ],
+   "text": "Internal call from 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/internal-transactions"
+    }
+   ],
    "text": "Internal call from 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF."
   },
   {
@@ -212,7 +235,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -232,7 +255,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "internal_call",
    "sources": [
     {
@@ -250,7 +273,7 @@
     "system_calls": 24,
     "value": "0"
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "internal_call",
    "sources": [
     {
@@ -265,7 +288,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E12",
+   "id": "E13",
    "kind": "event",
    "sources": [
     {
@@ -279,38 +302,74 @@
   },
   {
    "confidence": "single_source",
-   "data": {},
-   "id": "E13",
-   "kind": "event",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
-    }
-   ],
-   "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
-  },
-  {
-   "confidence": "single_source",
-   "data": {},
+   "data": {
+    "signature": "RelayedRootBundle(uint32,bytes32,bytes32)",
+    "topic": "0xc86ba04c55bc5eb2f2876b91c438849a296dbec7b08751c3074d92e04f0a77af"
+   },
    "id": "E14",
-   "kind": "event",
+   "kind": "event_signature",
    "sources": [
     {
      "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0xc86ba04c55bc5eb2f2876b91c438849a296dbec7b08751c3074d92e04f0a77af"
     }
    ],
-   "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
+   "text": "The event's topic 0xc86ba04c… is the hash of RelayedRootBundle(uint32,bytes32,bytes32): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
   },
   {
    "confidence": "single_source",
    "data": {},
    "id": "E15",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
+    }
+   ],
+   "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "signature": "Mint(address,uint256)",
+    "topic": "0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885"
+   },
+   "id": "E16",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885"
+    }
+   ],
+   "text": "The event's topic 0x0f6798a5… is the hash of Mint(address,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
+   "data": {},
+   "id": "E17",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
+    }
+   ],
+   "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
+  },
+  {
+   "confidence": "single_source",
+   "data": {},
+   "id": "E18",
    "kind": "event",
    "sources": [
     {
@@ -328,7 +387,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E16",
+   "id": "E19",
    "kind": "cross_check",
    "sources": [
     {

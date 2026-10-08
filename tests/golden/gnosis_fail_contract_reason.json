@@ -109,6 +109,29 @@
    "text": "Called function with selector 0x457094cc on 0xa89eee597C69fFc0F83d7CF69793250f73d1D190; not decoded."
   },
   {
+   "confidence": "candidate",
+   "data": {
+    "fitting": [
+     "fire()"
+    ],
+    "selector": "0x457094cc",
+    "signatures": [
+     "fire()"
+    ]
+   },
+   "id": "E5",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0x457094cc"
+    }
+   ],
+   "text": "The call's selector 0x457094cc matches fire() in the public signature database www.4byte.directory, and the data fits its types exactly; decoded with it: no arguments. Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
+  },
+  {
    "confidence": "single_source",
    "data": {
     "moves_value": false,
@@ -116,7 +139,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "internal_call",
    "sources": [
     {
@@ -133,7 +156,7 @@
    "data": {
     "staticcalls": 1
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -156,7 +179,7 @@
     "reads": [],
     "rule": "contract_reason"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "diagnosis",
    "sources": [
     {
@@ -174,7 +197,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "cross_check",
    "sources": [
     {

@@ -26,6 +26,8 @@ def test_every_fact_has_a_confidence_that_follows_its_sources(fixture):
         expected = "confirmed" if only_node or comparison else "single_source"
         if e.kind == "diagnosis":  # a finding's level is its own: confirmed by a read, the explorer's reason, or a pattern
             expected = e.data["level"]
+        if e.kind == "candidate":  # a signature database match: always a candidate (D35)
+            expected = "candidate"
         assert e.confidence == expected, (e.id, e.text[:80])
 
 

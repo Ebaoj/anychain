@@ -1158,6 +1158,24 @@
   {
    "confidence": "single_source",
    "data": {
+    "signature": "ActionEvent(string,bytes)",
+    "topic": "0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3"
+   },
+   "id": "E55",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3"
+    }
+   ],
+   "text": "The event's topic 0x2b6d22f4… is the hash of ActionEvent(string,bytes): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "args": {
      "owner": "0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E",
      "spender": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
@@ -1165,7 +1183,7 @@
     },
     "event": "Approval"
    },
-   "id": "E55",
+   "id": "E56",
    "kind": "event",
    "sources": [
     {
@@ -1187,7 +1205,7 @@
     },
     "event": "Approval"
    },
-   "id": "E56",
+   "id": "E57",
    "kind": "event",
    "sources": [
     {
@@ -1202,7 +1220,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E57",
+   "id": "E58",
    "kind": "event",
    "sources": [
     {
@@ -1217,6 +1235,24 @@
   {
    "confidence": "single_source",
    "data": {
+    "signature": "SupplyCollateral(bytes32,address,address,uint256)",
+    "topic": "0xa3b9472a1399e17e123f3c2e6586c23e504184d504de59cdaa2b375e880c6184"
+   },
+   "id": "E59",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0xa3b9472a1399e17e123f3c2e6586c23e504184d504de59cdaa2b375e880c6184"
+    }
+   ],
+   "text": "The event's topic 0xa3b9472a… is the hash of SupplyCollateral(bytes32,address,address,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
     "args": {
      "owner": "0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E",
      "spender": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
@@ -1224,7 +1260,7 @@
     },
     "event": "Approval"
    },
-   "id": "E58",
+   "id": "E60",
    "kind": "event",
    "sources": [
     {
@@ -1239,37 +1275,37 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E59",
-   "kind": "event",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
-    }
-   ],
-   "text": "Event with topic0 0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3 emitted by 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy); could not decode."
-  },
-  {
-   "confidence": "single_source",
-   "data": {},
-   "id": "E60",
-   "kind": "event",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
-    }
-   ],
-   "text": "Event with topic0 0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3 emitted by 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy); could not decode."
-  },
-  {
-   "confidence": "single_source",
-   "data": {},
    "id": "E61",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
+    }
+   ],
+   "text": "Event with topic0 0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3 emitted by 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy); could not decode."
+  },
+  {
+   "confidence": "single_source",
+   "data": {},
+   "id": "E62",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/logs"
+    }
+   ],
+   "text": "Event with topic0 0x2b6d22f419271bcc89bbac8deec947c664365d6e24d06fef0ca7c325c704dce3 emitted by 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy); could not decode."
+  },
+  {
+   "confidence": "single_source",
+   "data": {},
+   "id": "E63",
    "kind": "event",
    "sources": [
     {
@@ -1291,7 +1327,7 @@
     },
     "event": "Submitted"
    },
-   "id": "E62",
+   "id": "E64",
    "kind": "event",
    "sources": [
     {
@@ -1313,7 +1349,7 @@
     },
     "event": "TransferShares"
    },
-   "id": "E63",
+   "id": "E65",
    "kind": "event",
    "sources": [
     {
@@ -1328,7 +1364,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E64",
+   "id": "E66",
    "kind": "event",
    "sources": [
     {
@@ -1350,7 +1386,7 @@
     },
     "event": "Approval"
    },
-   "id": "E65",
+   "id": "E67",
    "kind": "event",
    "sources": [
     {
@@ -1372,7 +1408,7 @@
     },
     "event": "Approval"
    },
-   "id": "E66",
+   "id": "E68",
    "kind": "event",
    "sources": [
     {
@@ -1387,7 +1423,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E67",
+   "id": "E69",
    "kind": "event",
    "sources": [
     {
@@ -1409,7 +1445,7 @@
     },
     "event": "Approval"
    },
-   "id": "E68",
+   "id": "E70",
    "kind": "event",
    "sources": [
     {
@@ -1424,7 +1460,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E69",
+   "id": "E71",
    "kind": "event",
    "sources": [
     {
@@ -1446,7 +1482,7 @@
     },
     "event": "BorrowRateUpdate"
    },
-   "id": "E70",
+   "id": "E72",
    "kind": "event",
    "sources": [
     {
@@ -1461,7 +1497,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E71",
+   "id": "E73",
    "kind": "event",
    "sources": [
     {
@@ -1475,8 +1511,26 @@
   },
   {
    "confidence": "single_source",
+   "data": {
+    "signature": "AccrueInterest(bytes32,uint256,uint256,uint256)",
+    "topic": "0x9d9bd501d0657d7dfe415f779a620a62b78bc508ddc0891fbbd8b7ac0f8fce87"
+   },
+   "id": "E74",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0x9d9bd501d0657d7dfe415f779a620a62b78bc508ddc0891fbbd8b7ac0f8fce87"
+    }
+   ],
+   "text": "The event's topic 0x9d9bd501… is the hash of AccrueInterest(bytes32,uint256,uint256,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
    "data": {},
-   "id": "E72",
+   "id": "E75",
    "kind": "event",
    "sources": [
     {
@@ -1490,8 +1544,26 @@
   },
   {
    "confidence": "single_source",
+   "data": {
+    "signature": "Borrow(bytes32,address,address,address,uint256,uint256)",
+    "topic": "0x570954540bed6b1304a87dfe815a5eda4a648f7097a16240dcd85c9b5fd42a43"
+   },
+   "id": "E76",
+   "kind": "event_signature",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/event-signatures/?hex_signature=0x570954540bed6b1304a87dfe815a5eda4a648f7097a16240dcd85c9b5fd42a43"
+    }
+   ],
+   "text": "The event's topic 0x57095454… is the hash of Borrow(bytes32,address,address,address,uint256,uint256): that text comes from the public signature database www.4byte.directory, and its hash was checked to equal the topic. Its arguments are not decoded: which of them are indexed is not known."
+  },
+  {
+   "confidence": "single_source",
    "data": {},
-   "id": "E73",
+   "id": "E77",
    "kind": "event",
    "sources": [
     {
@@ -1506,7 +1578,7 @@
   {
    "confidence": "single_source",
    "data": {},
-   "id": "E74",
+   "id": "E78",
    "kind": "event",
    "sources": [
     {
@@ -1529,7 +1601,7 @@
     },
     "event": "FlashLoan"
    },
-   "id": "E75",
+   "id": "E79",
    "kind": "event",
    "sources": [
     {
@@ -1550,7 +1622,7 @@
     },
     "event": "ActionEvent"
    },
-   "id": "E76",
+   "id": "E80",
    "kind": "event",
    "sources": [
     {
@@ -1572,7 +1644,7 @@
     },
     "event": "LogForbid"
    },
-   "id": "E77",
+   "id": "E81",
    "kind": "event",
    "sources": [
     {
@@ -1593,7 +1665,7 @@
     },
     "event": "RecipeEvent"
    },
-   "id": "E78",
+   "id": "E82",
    "kind": "event",
    "sources": [
     {

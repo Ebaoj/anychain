@@ -258,3 +258,38 @@ def decode_revert(data: str | None, decoder: "AbiDecoder | None" = None) -> Deco
                              None, selector, custom)
     return DecodedRevert("unknown", f"a custom error with selector {selector} that the called contract's ABI does "
                          "not declare (or no ABI for it is available)", None, selector)
+
+
+def fit_signature(signature: str, data: str) -> list[DecodedArg] | None:
+    """Arguments when `data` (selector included) is exactly the encoding of `signature`'s types.
+
+    Strict: decoded and encoded again, the bytes must be identical, so a signature that only decodes by
+    accident (wrong types that happen to parse) is refused. Names are unknown: arg0, arg1, ...
+    """
+    raw = _hex_bytes(data)
+    if raw is None or len(raw) < 4 or "(" not in signature or not signature.endswith(")"):
+        return None
+    inner = signature[signature.index("(") + 1:-1]
+    types = _split_types(inner) if inner else []
+    if function_signature_to_4byte_selector(signature) != raw[:4]:
+        return None
+    try:
+        values = decode(types, raw[4:])
+        if encode(types, list(values)) != raw[4:]:
+            return None
+    except Exception:
+        return None
+    return [DecodedArg(f"arg{n}", t, format_value(t, v)) for n, (t, v) in enumerate(zip(types, values))]
+
+
+def _split_types(text: str) -> list[str]:
+    parts, depth, cur = [], 0, []
+    for c in text:
+        depth += (c == "(") - (c == ")")
+        if c == "," and depth == 0:
+            parts.append("".join(cur))
+            cur = []
+        else:
+            cur.append(c)
+    parts.append("".join(cur))
+    return [p.strip() for p in parts]
