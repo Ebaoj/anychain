@@ -20,6 +20,8 @@ from eth_utils import function_signature_to_4byte_selector
 
 DECLARATION = re.compile(r"\b(abstract\s+contract|contract|interface|library)\s+([A-Za-z_]\w*)\s*(?:is\s+([^{]*))?\{")
 FUNCTION = re.compile(r"\bfunction\s+([A-Za-z_]\w*)\s*\(")
+EVENT = re.compile(r"\bevent\s+([A-Za-z_]\w*)\s*\(")
+ERROR = re.compile(r"\berror\s+([A-Za-z_]\w*)\s*\(")
 STRUCT = re.compile(r"\bstruct\s+([A-Za-z_]\w*)\s*\{([^}]*)\}")
 ENUM = re.compile(r"\benum\s+([A-Za-z_]\w*)\s*\{")
 VALUE_TYPE = re.compile(r"\btype\s+([A-Za-z_]\w*)\s+is\s+([A-Za-z_]\w*)\s*;")
@@ -37,10 +39,23 @@ class Function:
     end: int  # last line of its body (or of the declaration when it has none)
     text: str  # the source text without comments or whitespace, for comparing two copies
     has_body: bool
+    inputs: tuple = ()  # ((canonical type, name), ...) when the signature is known
 
     @property
     def selector(self) -> str | None:
         return "0x" + function_signature_to_4byte_selector(self.signature).hex() if self.signature else None
+
+
+@dataclass(frozen=True)
+class EventOrError:
+    kind: str  # event | error
+    name: str
+    inputs: tuple  # ((canonical type, name, indexed), ...); None in a slot = not resolvable
+    anonymous: bool = False
+
+    @property
+    def resolvable(self) -> bool:
+        return all(t is not None for t, _n, _i in self.inputs)
 
 
 @dataclass
@@ -52,6 +67,7 @@ class Contract:
     end: int
     bases: list[str]
     functions: list[Function] = field(default_factory=list)
+    declared: list[EventOrError] = field(default_factory=list)  # events and custom errors
 
 
 @dataclass(frozen=True)
@@ -77,8 +93,14 @@ class SolidityIndex:
             for m in STRUCT.finditer(text):
                 self._structs.setdefault(m.group(1), []).append((_enclosing(text, m.start()), m.group(2)))
         self._all: dict[str, list[Contract]] = {}
+        self.file_level: dict[str, list[EventOrError]] = {}  # errors and events declared outside contracts
         for path, text in masked.items():
             self._read_contracts(path, text, self.uncommented[path])
+            spans = [(m.start(), _matching(text, m.end() - 1, "{", "}") or len(text)) for m in DECLARATION.finditer(text)]
+            for pattern, what in ((EVENT, "event"), (ERROR, "error")):
+                for e in pattern.finditer(text):
+                    if not any(a <= e.start() <= b for a, b in spans):
+                        self.file_level.setdefault(path, []).append(self._declared(text, e, what))
         self.ambiguous = {name for name, found in self._all.items() if len(found) > 1}
         self.contracts = {name: found[0] for name, found in self._all.items() if len(found) == 1}
 
@@ -102,6 +124,9 @@ class SolidityIndex:
             contract = Contract(m.group(2), kind, path, _line(text, m.start()), _line(text, close_at), bases)
             for f in FUNCTION.finditer(text, open_at + 1, close_at):
                 contract.functions.append(self._function(text, uncommented, f, kind))
+            for pattern, what in ((EVENT, "event"), (ERROR, "error")):
+                for e in pattern.finditer(text, open_at + 1, close_at):
+                    contract.declared.append(self._declared(text, e, what))
             self._all.setdefault(contract.name, []).append(contract)
 
     def _function(self, text: str, uncommented: str, m: re.Match, kind: str) -> Function:
@@ -118,10 +143,23 @@ class SolidityIndex:
         has_body = i < len(text) and text[i] == "{"
         end = (_matching(text, i, "{", "}") if has_body else i) or i
         visible = kind == "interface" or bool(re.search(r"\b(external|public)\b", header))
-        types = [self._canonical(p) for p in _split_top(text[params_open + 1:params_close]) if p.strip()]
+        params = [p for p in _split_top(text[params_open + 1:params_close]) if p.strip()]
+        types = [self._canonical(p) for p in params]
         signature = f"{m.group(1)}({','.join(types)})" if visible and None not in types else None
         body = re.sub(r"\s+", "", uncommented[m.start():end + 1])
-        return Function(m.group(1), signature, _line(text, m.start()), _line(text, end), body, has_body)
+        inputs = tuple((t, _param_name(p)) for t, p in zip(types, params)) if signature else ()
+        return Function(m.group(1), signature, _line(text, m.start()), _line(text, end), body, has_body, inputs)
+
+    def _declared(self, text: str, m: re.Match, kind: str) -> EventOrError:
+        params_open = m.end() - 1
+        params_close = _matching(text, params_open, "(", ")") or params_open
+        rest = text[params_close + 1:text.find(";", params_close)]
+        inputs = []
+        for p in (p for p in _split_top(text[params_open + 1:params_close]) if p.strip()):
+            indexed = bool(re.search(r"\bindexed\b", p))
+            inputs.append((self._canonical(re.sub(r"\bindexed\b", "", p)), _param_name(re.sub(r"\bindexed\b", "", p)),
+                           indexed))
+        return EventOrError(kind, m.group(1), tuple(inputs), bool(re.search(r"\banonymous\b", rest)))
 
     def _canonical(self, param: str, seen: frozenset = frozenset()) -> str | None:
         param = re.sub(r"\baddress\s+payable\b", "address", param)
@@ -183,6 +221,28 @@ class SolidityIndex:
                     return Found(f, c)
         return None
 
+    def abi(self, contract: str | None = None) -> list[dict]:
+        """ABI entries from the source: of `contract` and its bases in C3 order (most derived first, so its
+        parameter names win), plus file-level errors and events of their files; or of everything.
+
+        Only entries whose types are all resolved and are not tuples (structs need components this index
+        does not build). An entry declared with two different shapes for one selector or topic is left out
+        (filter_abi).
+        """
+        names = (self.linearization(contract) or []) if contract is not None else list(self.contracts)
+        chosen = [self.contracts[n] for n in names if n in self.contracts]
+        files = {c.path for c in chosen} if contract is not None else set(self.file_level)
+        entries = []
+        for c in chosen:
+            for f in c.functions:
+                if f.signature and not any(t.startswith("(") for t, _n in f.inputs):
+                    entries.append({"type": "function", "name": f.name,
+                                    "inputs": [{"type": t, "name": n} for t, n in f.inputs]})
+            entries += [_declared_entry(d) for d in c.declared if _plain(d)]
+        for path in sorted(files):
+            entries += [_declared_entry(d) for d in self.file_level.get(path, []) if _plain(d)]
+        return filter_abi(entries)
+
     def external_bases(self, contract: str) -> list[str]:
         """Bases in the inheritance chain whose source is not in this index (e.g. an imported library)."""
         return sorted(n for n in (self.linearization(contract) or []) if n not in self.contracts and n != contract)
@@ -192,6 +252,48 @@ class SolidityIndex:
         quoted = (f'"{text}"', f"'{text}'")
         return [(path, n) for path, source in self.uncommented.items()
                 for n, line in enumerate(source.splitlines(), 1) if any(q in line for q in quoted)]
+
+
+def _plain(d: "EventOrError") -> bool:
+    return d.resolvable and not any(t.startswith("(") for t, _n, _i in d.inputs)
+
+
+def _declared_entry(d: "EventOrError") -> dict:
+    entry = {"type": d.kind, "name": d.name,
+             "inputs": [{"type": t, "name": n, **({"indexed": i} if d.kind == "event" else {})} for t, n, i in d.inputs]}
+    if d.kind == "event":
+        entry["anonymous"] = d.anonymous
+    return entry
+
+
+def _abi_key(entry: dict) -> tuple:
+    """What identifies an entry on chain: a function's or error's selector, an event's topic."""
+    sig = f"{entry['name']}({','.join(i['type'] for i in entry['inputs'])})"
+    if entry["type"] == "event":
+        return ("event", sig, entry.get("anonymous", False))
+    return (entry["type"], function_signature_to_4byte_selector(sig).hex())
+
+
+def _shape(entry: dict) -> tuple:
+    """Everything that changes how data decodes; parameter names do not."""
+    return (entry["name"], tuple((i["type"], i.get("indexed", False)) for i in entry["inputs"]), entry.get("anonymous"))
+
+
+def filter_abi(entries: list[dict]) -> list[dict]:
+    """One entry per selector or topic: the first, unless another one decodes differently (then none)."""
+    first: dict[tuple, dict] = {}
+    clash: set[tuple] = set()
+    for e in entries:
+        key = _abi_key(e)
+        if key in first and _shape(first[key]) != _shape(e):
+            clash.add(key)
+        first.setdefault(key, e)
+    return [e for k, e in first.items() if k not in clash]
+
+
+def _param_name(param: str) -> str:
+    words = [w for w in param.split() if w not in LOCATIONS and w != "payable"]
+    return words[-1] if len(words) > 1 and re.match(r"^[A-Za-z_]\w*$", words[-1]) else ""
 
 
 def _merge(seqs: list[list[str]]) -> list[str] | None:

@@ -91,3 +91,43 @@ def test_literal_search_ignores_comments():
     idx = _index(A='''contract A { // revert("NOT_YET") was the old message
         function f() external { require(false, "NOT_YET"); } }''')
     assert idx.literal("NOT_YET") == [("A.sol", 2)]
+
+
+def test_abi_from_source_leaves_out_structs_and_ambiguous_selectors():
+    idx = _index(A='''contract A { struct P { uint256 a; } event E(address indexed who, uint256 v);
+                     error Nope(uint256 code);
+                     function plain(address to) external {} function withStruct(P calldata p) external {} }
+        contract B { function plain(address to) external {} }''')
+    abi = idx.abi()
+    names = {(e["type"], e["name"]) for e in abi}
+    assert ("function", "plain") in names and ("function", "withStruct") not in names  # tuples not built
+    assert ("event", "E") in names and ("error", "Nope") in names
+    [event] = [e for e in abi if e["type"] == "event"]
+    assert event["inputs"][0] == {"type": "address", "name": "who", "indexed": True}
+
+
+def test_same_event_with_indexed_in_other_places_is_ambiguous():
+    idx = _index(A="""contract A { event Moved(address indexed from, address to); }
+        contract B { event Moved(address from, address indexed to); }""")
+    assert not [e for e in idx.abi() if e["type"] == "event"]
+
+
+def test_parameter_names_alone_are_not_a_clash():
+    idx = _index(A="""interface I { function f(address to) external; }
+        contract C is I { function f(address recipient) external {} }""")
+    [entry] = [e for e in idx.abi("C") if e["type"] == "function"]
+    assert entry["inputs"] == [{"type": "address", "name": "recipient"}]  # the most derived contract's names
+
+
+def test_file_level_errors_and_events_are_included():
+    idx = _index(A="""error Unauthorized(address who); event Ping(uint256 n);
+        contract C { function f() external {} }""")
+    names = {(e["type"], e["name"]) for e in idx.abi("C")}
+    assert ("error", "Unauthorized") in names and ("event", "Ping") in names
+
+
+def test_ambiguity_across_repos_is_filtered_too():
+    from anychain.solidity import filter_abi
+    a = _index(A="contract A { event Moved(address indexed from, address to); }").abi()
+    b = _index(B="contract B { event Moved(address from, address indexed to); }").abi()
+    assert len(a) == len(b) == 1 and filter_abi(a + b) == []  # same topic, two layouts: neither is trusted

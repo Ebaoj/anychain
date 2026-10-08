@@ -39,6 +39,10 @@ class Repo:
         return f"https://github.com/{self.owner}/{self.name}/blob/{self.commit}/{path}#L{start}-L{end}"
 
     @property
+    def tree_url(self) -> str:
+        return f"https://github.com/{self.owner}/{self.name}/tree/{self.commit}"
+
+    @property
     def label(self) -> str:
         return f"{self.owner}/{self.name}@{self.commit[:7]}"
 

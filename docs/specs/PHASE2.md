@@ -82,7 +82,7 @@ No `git push`, no deploy. No tracing node (`debug_traceTransaction`) as a requir
 3. T3 (R3): `eth_call` reads, with typed results and block-pinned sources.
 4. T4 (R1, R3): diagnosis rules for the failures seen in the sample (balance, paused, deadline, opaque contract codes, out of gas, zkSync bootloader), each confirmed by a read when possible; allowance added for the common ERC-20 case even though the sample has none (tested on a recorded real case found for it).
 5. T5 (R2): revert replay at the parent block for failures without a reason.
-6. T6 (R4, R5): repo clone, index and permalinks; repo artifacts and source signatures in the ABI cascade.
+6. T6 (R4, R5): repo clone, index and permalinks; source signatures in the ABI cascade. Scope change (2026-10-08, D34): compiled artifacts are not read, since no configured repo commits them and the ABI from source covers the need except struct parameters.
 7. T7 (R5): signature database as a candidate source.
 8. T8 (R8): degradation matrix, one eval case per missing source.
 9. T9: architecture docs (both), decisions, clean-context review per task, Phase 2 report.
@@ -105,7 +105,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 | R2 | `tests/test_networks.py` replay tests (text reason recovered on zkSync, custom error gapped, inconclusive and data-less replays, node refusal, no replay when a reason exists) | T5 done 2026-10-08: 538 passed; 39 of 40 sampled zkSync failures revert on replay (D32) |
 | R3 | `tests/test_reads.py` (balance, paused, replay, archive refusal, unreadable answers; real node recordings) | T3 done 2026-10-08: 450 passed (D30); facts come with T4 |
 | R4 | `tests/test_repos.py` (BRLC setPauser cited and same as verified; transfer outside the repo and a different deployed version; reason located; unsynced repo gap; sync pins and path safety) | T6 part 1 done 2026-10-08: 565 passed; live BRLC explain cites the permalink (D33) |
-| R5 | unverified contract decoded from repo; 4byte match stated as candidate | pasted |
+| R5 | `tests/test_repos.py` repo part (pinned decode single source, unpinned match a candidate, address_map validation); 4byte part comes with T7 | T6 part 2 done 2026-10-08: 589 passed (D34) |
 | R6 | `tests/test_confidence.py` (all 41 recordings: confidence follows the sources; candidate only on purpose; shown to reader and model) | T2 done 2026-10-08: 442 passed (D29) |
 | R7 | `tests/test_validator.py` (real answers pass; tampered numbers, hex, links and citations caught; retry and withhold flow; event log) | T1 done 2026-10-08: 374 passed; live: support ok, developer fixed on retry (D28) |
 | R8 | one case per missing source | pasted |

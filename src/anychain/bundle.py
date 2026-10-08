@@ -24,7 +24,7 @@ from anychain.config import AppConfig
 from anychain.decoder import AbiDecoder, decode_revert
 from anychain.collectors.repo import Repo, RepoCache
 from anychain.diagnosis import Context, diagnose, reason_text
-from anychain.solidity import SolidityIndex
+from anychain.solidity import SolidityIndex, filter_abi
 from anychain.reads import REPLAY_LIMITS, StateReader
 from anychain.models import EvidenceBundle, GapCause, Source
 
@@ -124,6 +124,8 @@ class BundleBuilder:
         self.rpc_view: RpcView | None = None
         self.repos: list[Repo] | None = None  # configured repos from the local cache, loaded on first use
         self.source_repo: Repo | None = None  # the repo matched to the called contract, if any
+        self.abi_origin: dict[str, tuple] = {}  # address -> (repo_pinned | repo_match, repo, contract) when not the explorer
+        self.repo_notes: dict[str, str] = {}  # address -> how the repo ABI was chosen
         self.verified_cache: dict[str, tuple] = {}
         self.undecoded_events: set[str] = set()
         self.anonymous_unmatched: set[str] = set()
@@ -577,7 +579,14 @@ class BundleBuilder:
                             f"transaction's own call, it did not revert. That is inconclusive: the replay is "
                             f"{REPLAY_LIMITS}.", sources, {"reverted": False, "block": replay.block})
             return
-        decoded = decode_revert(replay.revert_data, self._decoder_for(to) if self.explorer_answered else None)
+        # A custom error is decoded with the contract's own ABI: the explorer's, or a repo's when pinned in the
+        # config. A repo selector match (not pinned) is never used here: a generic error name from an unrelated
+        # repo would read as this contract's.
+        decoder = self._decoder_for(to)
+        origin = self.abi_origin.get(to.lower(), ("explorer",))[0]
+        decoded = decode_revert(replay.revert_data, decoder if origin != "repo_match" else None)
+        if decoded.kind == "custom" and origin == "repo_pinned":
+            sources = sources + [self._abi_provenance(to)[0]]  # the error's meaning comes from the repo
         fact = self.bundle.add("replay", f"Re-run on the node at block {replay.block}, the block before, with the "
                                f"transaction's own call, it reverted with {decoded.text}. The replay is "
                                f"{REPLAY_LIMITS}, so this may differ from what happened in the original transaction.",
@@ -918,24 +927,41 @@ class BundleBuilder:
                   [source], {"selector": data[:10]})
             self._declare_undecoded("Call decoding", to.address, f"selector {data[:10]}", code_owner=delegate_here)
             return
-        abi_source = self._api_source(f"/smart-contracts/{to.address}", "Explorer API: contract ABI")
-        b.add("call",
-              f"Called {decoded.signature} on {self._party(to)}{with_args(decoded.args)}. "
-              f"ABI source: {self.abi_notes[to.address.lower()]}.",
-              [source, abi_source],
-              {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
+        abi_source, confidence = self._abi_provenance(to.address)
+        b.add("call", self._call_text(to.address, decoded, self._party(to)), [source, abi_source],
+              {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}}, confidence=confidence)
+
+    def _abi_provenance(self, address: str) -> tuple[Source, str | None]:
+        """The ABI's source for a decoded fact, and the confidence it allows (None: follow the sources)."""
+        origin = self.abi_origin.get(address.lower())
+        if origin is None:
+            return self._api_source(f"/smart-contracts/{address}", "Explorer API: contract ABI"), None
+        kind, repo, contract = origin
+        self.abi_notes[address.lower()] = self.repo_notes[address.lower()]  # used for this fact: now it is the source
+        self.bundle.abi_sources[address] = self.repo_notes[address.lower()]
+        if kind == "repo_pinned":
+            c = repo.index.contracts[contract]
+            return Source(kind="repo", label=f"Repository {repo.label}", url=repo.permalink(c.path, c.start, c.end)), None
+        return Source(kind="repo", label=f"Repository {repo.label if repo else 'source signatures'}",
+                      url=repo.tree_url if repo else None), "candidate"
+
+    def _call_text(self, address: str, decoded, party: str) -> str:
+        if self.abi_origin.get(address.lower(), ("",))[0] == "repo_match":
+            return (f"The call's selector matches {decoded.signature} in a configured repository; decoded with it, the "
+                    f"call on {party} would be{with_args(decoded.args) or ' without arguments'}. Not confirmed: "
+                    f"{self.abi_notes[address.lower()]}.")
+        return f"Called {decoded.signature} on {party}{with_args(decoded.args)}. ABI source: {self.abi_notes[address.lower()]}."
 
     def _add_native_contract_call(self, to_text: str, address: str, data: str, source: Source) -> None:
         """A call to a contract built into the node: it runs without bytecode, but it can have a
         published ABI (e.g. Rootstock's Bridge), so the normal ABI lookup still applies."""
-        decoder = self._decoder_for(address) if self.explorer_answered else None
+        decoder = self._decoder_for(address)
         decoded = decoder.decode_call(data) if decoder else None
         if decoded:
-            abi_source = self._api_source(f"/smart-contracts/{address}", "Explorer API: contract ABI")
-            self.bundle.add("call", f"Called {decoded.signature} on {to_text}{with_args(decoded.args)}. "
-                            f"ABI source: {self.abi_notes[address.lower()]}.", [source, abi_source],
+            abi_source, confidence = self._abi_provenance(address)
+            self.bundle.add("call", self._call_text(address, decoded, to_text), [source, abi_source],
                             {"function": decoded.name, "args": {a.name: a.value for a in decoded.args},
-                             "native_contract": True})
+                             "native_contract": True}, confidence=confidence)
             return
         self.bundle.add("call", f"Called {to_text}, a contract built into the network's node, with selector "
                         f"{data[:10]}; not decoded.", [source], {"selector": data[:10], "native_contract": True})
@@ -946,8 +972,9 @@ class BundleBuilder:
         key = address.lower()
         if key in self.decoders:
             return self.decoders[key]
-        decoder, note = None, "none (explorer ABI disabled in config)"
-        if "explorer" in self.cfg.abi_strategy.order:
+        explorer_on = "explorer" in self.cfg.abi_strategy.order
+        decoder, note = None, ("none (explorer unavailable)" if explorer_on else "none (explorer ABI disabled in config)")
+        if explorer_on and self.explorer_answered:
             lookup = self.explorer.abi_for(address, implementations)
             decoder = AbiDecoder(lookup.abi) if lookup.abi else None
             note = f"explorer: {lookup.note}" if decoder else "none"
@@ -957,10 +984,47 @@ class BundleBuilder:
                 self._gap("ABI lookup", f"the ABI lookup for {address} failed: {lookup.failures[0]}",
                           "Try again in a few minutes" if retryable else "Check the contract on the explorer page",
                           retryable, _source_cause(retryable))
+        if decoder is None:
+            repo_decoder = self._repo_decoder(address)
+            if repo_decoder:  # its note is recorded only when it decodes something (_abi_provenance)
+                decoder, self.repo_notes[key] = repo_decoder
         self.decoders[key] = decoder
         self.abi_notes[key] = note
         self.bundle.abi_sources[address] = note
         return decoder
+
+    def _repo_decoder(self, address: str) -> tuple[AbiDecoder, str] | None:
+        """No ABI from the explorer: decode with the configured repos' source (PHASE2 T6, D34).
+        A contract pinned in address_map uses its own ABI from source (single source: the config says which
+        contract it is); otherwise every selector the repos declare once is tried, and a match is a candidate."""
+        order = self.cfg.abi_strategy.order
+        if not self.cfg.repos or "repo_source_signatures" not in order:
+            return None
+        repos = self._loaded_repos()
+        pin = self.cfg.address_map.get(address.lower())
+        if pin is not None:
+            repo = next((r for r in repos if r.url == pin.repo), None)
+            problem = ("the repository is not synced" if repo is None else
+                       f"{pin.contract} is declared in more than one of its files" if pin.contract in repo.index.ambiguous
+                       else f"it has no contract named {pin.contract}" if pin.contract not in repo.index.contracts
+                       else None)
+            abi = repo.index.abi(pin.contract) if problem is None else []
+            if problem is None and not abi:
+                problem = f"no ABI could be built from {pin.contract}'s source (unresolved types or inheritance)"
+            if problem:
+                self._gap("ABI lookup", f"address_map pins {address} to {pin.contract} in {pin.repo}, but {problem}",
+                          "Sync the repo, or fix the contract name in address_map", retryable=False,
+                          cause="config_error")
+                return None
+            self.abi_origin[address.lower()] = ("repo_pinned", repo, pin.contract)
+            return AbiDecoder(abi), f"repository {repo.label}: {pin.contract} (pinned to this address in the config)"
+        abi = filter_abi([e for r in repos for e in r.index.abi()])  # ambiguity across repos too
+        if not abi:
+            return None
+        self.abi_origin[address.lower()] = ("repo_match", repos[0] if len(repos) == 1 else None, None)
+        labels = ", ".join(r.label for r in repos)
+        return AbiDecoder(abi), (f"repository {labels} source signatures (a selector match in the repository; "
+                                 "which contract this is was not confirmed)")
 
     def _declare_undecoded(self, topic: str, address: str, what: str, code_owner: str | None = None) -> None:
         """Gap for something we could not decode, saying whether the ABI is missing or just unreachable."""
@@ -1221,8 +1285,19 @@ class BundleBuilder:
         event = decoder.decode_log(topics, log.data) if decoder else None
         if event:
             args = ": " + ", ".join(f"{a.name}={a.value}" for a in event.args) if event.args else ""
-            self.bundle.add("event", f"Event {event.signature} emitted by {self._party(emitter)}{args}.", [source],
-                            {"event": event.name, "args": {a.name: a.value for a in event.args}})
+            origin = self.abi_origin.get(address.lower())
+            if origin is None:
+                self.bundle.add("event", f"Event {event.signature} emitted by {self._party(emitter)}{args}.", [source],
+                                {"event": event.name, "args": {a.name: a.value for a in event.args}})
+            else:
+                abi_source, confidence = self._abi_provenance(address)
+                text = (f"Event {event.signature} emitted by {self._party(emitter)}{args}." if origin[0] == "repo_pinned"
+                        else f"An event of {self._party(emitter)} matches {event.signature} in a configured repository; "
+                             f"decoded with it{args or ' (no arguments)'}. Not confirmed: the repository was matched by "
+                             "the event's signature only.")
+                self.bundle.add("event", text, [source, abi_source],
+                                {"event": event.name, "args": {a.name: a.value for a in event.args}},
+                                confidence=confidence)
             return
         if decoder and decoder.could_be_anonymous(topics):
             # The first topic may be an argument, not a signature: do not label it "topic0".
@@ -1316,13 +1391,13 @@ class BundleBuilder:
             self._add_data_to_codeless(to, (len(data) - 2) // 2, False,
                                        "The node shows no contract code at this address today", source)
             return
-        decoder = self._decoder_for(to) if self.explorer_answered else None
+        decoder = self._decoder_for(to)  # explorer ABI when it answered, else the configured repos
         decoded = decoder.decode_call(data) if decoder else None
-        if decoded:  # calldata from the node, its meaning from the explorer's ABI
-            abi_source = self._api_source(f"/smart-contracts/{to}", "Explorer API: contract ABI")
-            self.bundle.add("call", f"Called {decoded.signature} on {to}{with_args(decoded.args)}. "
-                            f"ABI source: {self.abi_notes[to.lower()]}.", [source, abi_source],
-                            {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
+        if decoded:  # calldata from the node, its meaning from the explorer's ABI or a repo
+            abi_source, confidence = self._abi_provenance(to)
+            self.bundle.add("call", self._call_text(to, decoded, to), [source, abi_source],
+                            {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}},
+                            confidence=confidence)
             return
         self.bundle.add("call", f"Called function with selector {data[:10]} on {to}; not decoded.", [source],
                         {"selector": data[:10]})

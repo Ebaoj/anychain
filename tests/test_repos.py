@@ -191,3 +191,86 @@ def test_a_damaged_pins_file_is_a_clear_error(tmp_path):
     (tmp_path / "pins.json").write_text('{"half": ')
     with pytest.raises(CollectorError, match="damaged"):
         cache.load(RepoConfig(url="https://github.com/acme/tokens", ref="main"))
+
+
+# ---- PHASE2 T6 part 2 (R5): decoding a contract the explorer has no ABI for, from the repo ------------
+
+PROXY, IMPL = "0xAC176d9e75384F7d71275bb9D5265281CC0Dd284", "0xbEA441d7cf3f79b57cc5ae33251a084A063825dc"
+
+
+def _unverified():
+    """The real recording, with the explorer's ABI and source removed: as if neither contract was verified."""
+    from tests.conftest import mutated
+
+    def strip(meta):
+        for k in ("abi", "source_code", "additional_sources", "implementations"):
+            meta.pop(k, None)
+    overrides = {}
+    for address in (PROXY, IMPL):
+        overrides.update(mutated("eth_brlc_set_pauser", f"/smart-contracts/{address}", strip))
+    return overrides
+
+
+def _pinned(cfg):
+    from anychain.config import AddressMapEntry
+    cfg = cfg.model_copy(deep=True)
+    cfg.address_map = {PROXY.lower(): AddressMapEntry(repo=BRLC, contract="BRLCTokenBridgeable")}
+    return cfg
+
+
+def test_pinned_contract_is_decoded_from_the_repo():
+    b = replay_bundle(_pinned(_eth()), SET_PAUSER, "eth_brlc_set_pauser", overrides=_unverified())
+    [call] = [e for e in b.items if e.kind == "call"]
+    assert call.text.startswith("Called setPauser(address) on ") and "newPauser=0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520" in call.text
+    assert "pinned to this address in the config" in call.text and call.confidence == "single_source"
+    assert any(s.kind == "repo" and "BRLCTokenBridgeable.sol" in s.url for s in call.sources)
+    [event] = [e for e in b.items if e.kind == "event"]
+    assert "PauserChanged(address)" in event.text and event.confidence == "single_source"
+
+
+def test_unpinned_selector_match_is_only_a_candidate():
+    b = replay_bundle(_eth(), SET_PAUSER, "eth_brlc_set_pauser", overrides=_unverified())
+    [call] = [e for e in b.items if e.kind == "call"]
+    assert call.confidence == "candidate" and not call.text.startswith("Called")
+    assert "selector matches setPauser(address) in a configured repository" in call.text and "Not confirmed" in call.text
+
+
+def test_address_map_must_name_a_configured_repo():
+    from anychain.config import AppConfig
+    raw = _eth().model_dump()
+    raw["address_map"] = {PROXY: {"repo": "https://github.com/someone/else", "contract": "X"}}
+    with pytest.raises(ValueError, match="not in repos"):
+        AppConfig.model_validate(raw)
+    raw["address_map"] = {"not-an-address": {"repo": BRLC, "contract": "X"}}
+    with pytest.raises(ValueError, match="20-byte addresses"):
+        AppConfig.model_validate(raw)
+
+
+def test_replay_never_decodes_with_an_unpinned_repo_match(monkeypatch):
+    # A generic custom error from an unrelated repo must not read as this contract's (review of T6 part 2).
+    from anychain.bundle import BundleBuilder
+    from anychain.decoder import AbiDecoder
+    from tests.test_golden import _case
+
+    def fake(self, address):  # a repo that happens to declare an error with the replay's selector 0x40206e43
+        self.abi_origin[address.lower()] = ("repo_match", None, None)
+        abi = [{"type": "error", "name": "Whatever", "inputs": [{"type": "uint256", "name": "x"}]}]
+        decoder = AbiDecoder(abi)
+        decoder.errors[bytes.fromhex("40206e43")] = abi[0]
+        return decoder, "repository source signatures (a selector match)"
+    monkeypatch.setattr(BundleBuilder, "_repo_decoder", fake)
+    cfg = load_config(str(ROOT / "configs" / "zksync-era.yaml"))
+    cfg = cfg.model_copy(update={"repos": [RepoConfig(url=BRLC, ref=COMMIT)]})
+    _config, tx = _case("zksync_fail_generic")
+    b = replay_bundle(cfg, tx, "zksync_fail_generic")
+    [replay] = [e for e in b.items if e.kind == "replay"]
+    assert "Whatever" not in replay.text and "0x40206e43" in replay.text
+
+
+def test_pin_to_a_missing_contract_is_a_config_gap():
+    from anychain.config import AddressMapEntry
+    cfg = _eth().model_copy(deep=True)
+    cfg.address_map = {PROXY.lower(): AddressMapEntry(repo=BRLC, contract="NoSuchToken")}
+    b = replay_bundle(cfg, SET_PAUSER, "eth_brlc_set_pauser", overrides=_unverified())
+    assert any(g.what == "ABI lookup" and "no contract named NoSuchToken" in g.why and g.cause == "config_error"
+               for g in b.gaps)

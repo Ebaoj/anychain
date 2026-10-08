@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 DEFAULT_CONFIG_ENV = "ANYCHAIN_CONFIG"
@@ -128,6 +128,11 @@ class RepoConfig(BaseModel):
     artifact_globs: list[str] = []
 
 
+class AddressMapEntry(BaseModel):
+    repo: str  # one of the configured repos' url
+    contract: str  # the contract's name in that repo
+
+
 class SignatureDbConfig(BaseModel):
     enabled: bool = False
     url: str | None = None
@@ -191,7 +196,9 @@ class AppConfig(BaseModel):
     explorer: ExplorerConfig
     rpc: RpcConfig
     repos: list[RepoConfig] = []
-    address_map: dict[str, dict[str, str]] = {}
+    # Contracts whose code is in a configured repo, by address: {"0x...": {"repo": <repos[].url>, "contract": Name}}.
+    # Used to decode a contract the explorer has no ABI for (a private network's, for example).
+    address_map: dict[str, AddressMapEntry] = {}
     # Names for special addresses of this network (system contracts, bridges), shown when
     # the explorer has no name for them. Network knowledge lives here, not in code.
     address_labels: dict[str, str] = {}
@@ -201,13 +208,21 @@ class AppConfig(BaseModel):
     # Fee tokens the explorer cannot describe, keyed by the address in the fee (Celo adapters).
     fee_tokens: dict[str, FeeTokenConfig] = {}
 
-    @field_validator("address_labels", "native_contracts", "fee_tokens")
+    @field_validator("address_labels", "native_contracts", "fee_tokens", "address_map")
     @classmethod
     def _keys_are_addresses(cls, v: dict) -> dict:
         bad = [k for k in v if not (isinstance(k, str) and k.startswith("0x") and len(k) == 42)]
         if bad:
             raise ValueError(f"keys must be 0x-prefixed 20-byte addresses: {bad}")
         return {k.lower(): value for k, value in v.items()}
+
+    @model_validator(mode="after")
+    def _mapped_repos_are_configured(self) -> "AppConfig":
+        urls = {r.url for r in self.repos}
+        unknown = sorted({e.repo for e in self.address_map.values()} - urls)
+        if unknown:
+            raise ValueError(f"address_map names repos that are not in repos: {unknown}")
+        return self
 
     def label_for(self, address: str) -> str | None:
         """Config name for an address: a native contract or a labelled one."""
