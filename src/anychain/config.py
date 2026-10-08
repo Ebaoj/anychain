@@ -188,6 +188,16 @@ class StorageConfig(BaseModel):
     event_sink: Literal["sqlite", "none"] = "sqlite"  # production would add a queue sink (D24)
 
 
+class CacheConfig(BaseModel):
+    """Answers kept by (network, hash) when their facts cannot change (PHASE3 T0, D44)."""
+    enabled: bool = True
+    path: str = "data/cache.db"
+    # Without the node's "finalized" block (Rootstock rejects the tag), a block this deep counts as final.
+    min_confirmations: int = Field(64, ge=1)
+    # Even a final answer is fetched again after this: explorer names, labels and verification can change.
+    max_age_days: float = Field(30, gt=0)
+
+
 # Sections accepted now and used from phase 2 on: repos, address_map,
 # abi_strategy (beyond "explorer"), storage. They are validated already, so a
 # typo is caught today rather than when the feature arrives.
@@ -233,6 +243,7 @@ class AppConfig(BaseModel):
     abi_strategy: AbiStrategyConfig = AbiStrategyConfig()
     llm: LlmConfig
     assistant: AssistantConfig = AssistantConfig()
+    cache: CacheConfig = CacheConfig()
     storage: StorageConfig = StorageConfig()
 
 

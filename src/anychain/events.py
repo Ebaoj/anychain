@@ -53,6 +53,7 @@ class RunEvent:
     error: str | None = None  # crash message: the tool could not answer at all
     writer: str | None = None  # written answer: ok | retried | withheld | unavailable | skipped (None: not asked)
     diagnosis: str | None = None  # the failure's conclusion label: CONFIRMED | LIKELY | UNKNOWN (None: no failure)
+    cache: str | None = None  # hit | stored | off | "not kept: <reason>" (PHASE3 T0)
     gaps: tuple[GapEvent, ...] = ()
     checks: tuple[CheckEvent, ...] = ()
     ts: float = field(default_factory=time.time)
@@ -60,14 +61,14 @@ class RunEvent:
     @classmethod
     def from_bundle(cls, bundle: EvidenceBundle, source: str, duration_ms: int,
                     checks: tuple[CheckEvent, ...] = (), ts: float | None = None,
-                    writer: str | None = None) -> "RunEvent":
+                    writer: str | None = None, cache: str | None = None) -> "RunEvent":
         gaps = tuple(GapEvent(g.what, g.cause, g.why, g.retryable) for g in bundle.gaps)
         problem = (any(g.cause in PROBLEM_CAUSES for g in gaps) or any(c.status == "fail" for c in checks)
                    or writer in WRITER_PROBLEMS)
         return cls(network=bundle.network, tx_hash=bundle.tx_hash, source=source,
                    outcome="degraded" if problem else "ok", duration_ms=duration_ms, status=bundle.status,
                    facts=len(bundle.items), gaps=gaps, checks=checks, writer=writer,
-                   diagnosis=_diagnosis_label(bundle), **({"ts": ts} if ts else {}))
+                   diagnosis=_diagnosis_label(bundle), cache=cache, **({"ts": ts} if ts else {}))
 
     @classmethod
     def crash(cls, network: str, tx_hash: str, source: str, duration_ms: int, error: str,
@@ -91,7 +92,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY, ts REAL NOT NULL, network TEXT NOT NULL, tx_hash TEXT NOT NULL,
     source TEXT NOT NULL, outcome TEXT NOT NULL, duration_ms INTEGER NOT NULL,
-    status TEXT, facts INTEGER NOT NULL, error TEXT, writer TEXT, diagnosis TEXT);
+    status TEXT, facts INTEGER NOT NULL, error TEXT, writer TEXT, diagnosis TEXT, cache TEXT);
 CREATE TABLE IF NOT EXISTS gaps (
     run_id INTEGER NOT NULL REFERENCES runs(id), topic TEXT NOT NULL, cause TEXT NOT NULL,
     why TEXT NOT NULL, retryable INTEGER NOT NULL);
@@ -133,6 +134,8 @@ class SqliteEventLog:
                 db.execute("ALTER TABLE runs ADD COLUMN writer TEXT")
             if "diagnosis" not in columns:  # logs created before PHASE2_5 T5
                 db.execute("ALTER TABLE runs ADD COLUMN diagnosis TEXT")
+            if "cache" not in columns:  # logs created before PHASE3 T0
+                db.execute("ALTER TABLE runs ADD COLUMN cache TEXT")
 
     @contextmanager
     def _connect(self):
@@ -160,15 +163,20 @@ class SqliteEventLog:
                 db.executemany("DELETE FROM runs WHERE id = ?", [(i,) for i in old])
             run_id = db.execute(
                 "INSERT INTO runs (ts, network, tx_hash, source, outcome, duration_ms, status, facts, error, writer,"
-                " diagnosis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                " diagnosis, cache) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (event.ts, event.network, event.tx_hash, event.source, event.outcome, event.duration_ms,
-                 event.status, event.facts, event.error, event.writer, event.diagnosis)).lastrowid
+                 event.status, event.facts, event.error, event.writer, event.diagnosis, event.cache)).lastrowid
             db.executemany("INSERT INTO gaps (run_id, topic, cause, why, retryable) VALUES (?, ?, ?, ?, ?)",
                            [(run_id, g.topic, g.cause, g.why, int(g.retryable)) for g in event.gaps])
             db.executemany("INSERT INTO checks (run_id, name, status, detail) VALUES (?, ?, ?, ?)",
                            [(run_id, c.name, c.status, c.detail) for c in event.checks])
 
     # ---- queries (used by `anychain log`) --------------------------------
+
+    def recent(self, limit: int = 20) -> list[dict]:
+        """The most recent runs, newest first."""
+        with self._connect() as db:
+            return [dict(r) for r in db.execute("SELECT * FROM runs ORDER BY ts DESC, id DESC LIMIT ?", (limit,))]
 
     def summary(self, since_ts: float, network: str | None = None) -> list[dict]:
         """Per network: answers, crashes, degraded answers, and each problem cause with its count."""

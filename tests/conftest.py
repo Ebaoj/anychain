@@ -105,6 +105,17 @@ REPO_CACHE = ROOT / "tests" / "fixtures_repos" / "repos"
 
 
 @pytest.fixture(autouse=True)
+def answer_cache(monkeypatch, tmp_path):
+    """Tests never touch the real cache or ask a live node whether a block is final: each test gets its own
+    cache file, and no node (nothing is kept) unless the test gives one."""
+    from anychain import cli
+    from anychain.cache import BundleCache
+    # created only when a command asks for it: opening SQLite in each of ~800 tests doubled the suite's time
+    monkeypatch.setattr(cli, "cache_for", lambda _cfg: BundleCache(tmp_path / "cache.db"))
+    monkeypatch.setattr(cli, "finality_rpc_for", lambda _cfg: None)
+
+
+@pytest.fixture(autouse=True)
 def repo_cache(monkeypatch):
     """Tests read configured repos from real snapshots in tests/fixtures_repos, never the local cache."""
     from anychain.collectors import repo as repo_module

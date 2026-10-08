@@ -19,9 +19,17 @@
   "body": "{\"items\":[{\"block_hash\":\"0x418d2ff4d8dc969f44ca73918a020cc5ec81f55559c1f19831ca6bc3f94622e5\",\"block_number\":9305291,\"from\":{\"ens_domain_name\":null,\"hash\":\"0x1A9bDCd4f23051dD5376484579672675831871a5\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"log_index\":2,\"method\":null,\"timestamp\":null,\"to\":{\"ens_domain_name\":null,\"hash\":\"0x859E409b84a79bf8B1e6d012eB6940483C3496de\",\"implementations\":[],\"is_contract\":false,\"is_scam\":false,\"is_verified\":false,\"metadata\":null,\"name\":null,\"private_tags\":[],\"proxy_type\":null,\"public_tags\":[],\"reputation\":\"ok\",\"watchlist_names\":[]},\"token\":{\"address_hash\":\"0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5\",\"circulating_market_cap\":\"83226200.33192523\",\"circulating_supply\":null,\"decimals\":\"18\",\"exchange_rate\":\"0.083239\",\"holders_count\":\"19128\",\"icon_url\":\"https://assets.coingecko.com/coins/images/7460/small/8befc44a46c247e8a3f7fc8abba586b1_%283%29.png?1705501867\",\"name\":\"Rootstock Infrastructure Framework\",\"reputation\":\"ok\",\"symbol\":\"RIF\",\"total_supply\":\"1000000000000000000000000000\",\"type\":\"ERC-20\",\"volume_24h\":\"7776685.244186639\"},\"token_type\":\"ERC-20\",\"total\":{\"decimals\":\"18\",\"value\":\"24013533870382100514296\"},\"transaction_hash\":\"0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351\",\"type\":\"token_transfer\"}],\"next_page_params\":null}",
   "status": 200
  },
+ "POST https://public-node.rsk.co eth_blockNumber []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x8e07e3\"}\n",
+  "status": 200
+ },
  "POST https://public-node.rsk.co eth_chainId []": {
   "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x1e\"}\n",
   "status": 200
+ },
+ "POST https://public-node.rsk.co eth_getBlockByNumber [\"finalized\", false]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32602,\"message\":\"invalid blocknumber finalized\"}}\n",
+  "status": 400
  },
  "POST https://public-node.rsk.co eth_getTransactionByHash [\"0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351\"]": {
   "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"hash\":\"0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351\",\"nonce\":\"0x71f\",\"blockHash\":\"0x418d2ff4d8dc969f44ca73918a020cc5ec81f55559c1f19831ca6bc3f94622e5\",\"blockNumber\":\"0x8dfccb\",\"transactionIndex\":\"0x1\",\"from\":\"0x1a9bdcd4f23051dd5376484579672675831871a5\",\"to\":\"0x2acc95758f8b5f583470ba265eb685a8f45fc9d5\",\"gas\":\"0x123b8\",\"gasPrice\":\"0x18dbac0\",\"value\":\"0x0\",\"input\":\"0xa9059cbb000000000000000000000000859e409b84a79bf8b1e6d012eb6940483c3496de000000000000000000000000000000000000000000000515c6ba41f5104805f8\",\"v\":\"0x5f\",\"r\":\"0x9409d0e2561823d615e4bf52f41b87e6880e3c1a75f5a772976abe6890958329\",\"s\":\"0xe7d188b3854450f87466f9a699424b0587af255a03d72d438ee6341b308d7ae\",\"type\":\"0x0\"}}\n",

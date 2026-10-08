@@ -128,6 +128,25 @@ class RpcClient:
             raise CollectorError(f"RPC eth_call returned {result!r}", retryable=False)
         return result
 
+    def block_number(self) -> int:
+        """The latest block the node knows."""
+        return _quantity(self.call("eth_blockNumber", []), "eth_blockNumber")
+
+    def finalized_block(self) -> int | None:
+        """The node's finalized block (the "finalized" tag), or None when the node does not support the tag.
+        Seen on 2026-10-08: Ethereum, Optimism, Celo, Gnosis and zkSync support it (on zkSync it is the last
+        block whose batch is executed on L1: checked with zks_getBlockDetails); Rootstock answers -32602
+        "invalid blocknumber finalized"."""
+        try:
+            block = self.call("eth_getBlockByNumber", ["finalized", False])
+        except CollectorError as exc:
+            if not exc.retryable and "finalized" in str(exc).lower():
+                return None  # the node names the tag it does not know (Rootstock: "invalid blocknumber finalized")
+            raise
+        if not isinstance(block, dict):
+            raise CollectorError(f"RPC eth_getBlockByNumber(finalized) returned {block!r}", retryable=False)
+        return _quantity(block.get("number"), "eth_getBlockByNumber(finalized).number")
+
     def chain_id(self) -> int:
         """The node's chain id. The standard is a hex string; some nodes send a plain number."""
         value = self.call("eth_chainId", [])
@@ -148,3 +167,15 @@ def _dict_or_none(value: object, method: str) -> dict | None:
         return value
     shape = "an empty object" if isinstance(value, dict) else type(value).__name__
     raise CollectorError(f"RPC {method} returned {shape}, expected a transaction or receipt", retryable=False)
+
+
+def _quantity(value: object, what: str) -> int:
+    """A JSON-RPC quantity (hex string) as an int."""
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    if isinstance(value, str) and value.startswith("0x"):
+        try:
+            return int(value, 16)
+        except ValueError:
+            pass
+    raise CollectorError(f"RPC {what} returned {value!r}, not a number", retryable=False)

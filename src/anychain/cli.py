@@ -9,10 +9,12 @@ from dotenv import load_dotenv
 
 from anychain.answer import structured_answer
 from anychain.bundle import InvalidHashError, build_bundle
+from anychain.cache import BundleCache, NoCache, answer_key, cached_bundle
+from anychain.collectors.rpc import RpcClient
 from anychain.config import ConfigError, load_config
 from anychain.events import PROBLEM_CAUSES, CheckEvent, NullEventLog, RunEvent, SqliteEventLog, event_log_for
 from anychain.render import render_markdown
-from anychain.writer import WriterError, write_checked
+from anychain.writer import CheckedAnswer, WriterError, write_checked
 
 app = typer.Typer(help="Explain and troubleshoot EVM transactions on any configured network.", no_args_is_help=True)
 
@@ -41,6 +43,7 @@ def explain(
     as_json: bool = typer.Option(False, "--json", help="Print the structured answer as JSON (the summary included)"),
     as_evidence: bool = typer.Option(False, "--evidence", help="Print the evidence bundle as JSON"),
     no_llm: bool = typer.Option(False, "--no-llm", help="Skip the LLM; print the evidence only"),
+    fresh: bool = typer.Option(False, "--fresh", help="Fetch everything again, ignoring the cache"),
 ) -> None:
     """Explain what a transaction did, with a cited source for each fact."""
     if as_json and as_evidence:
@@ -51,16 +54,20 @@ def explain(
         _fail(str(exc))
     log = _open_log(cfg)
     started = time.monotonic()
+    store = cache_for(cfg)
     try:
-        bundle = build_bundle(tx_hash.strip(), cfg)
+        bundle, cache_state = cached_bundle(tx_hash.strip(), cfg, store, build_bundle, lambda: finality_rpc_for(cfg),
+                                            fresh)
     except InvalidHashError as exc:
         _fail(str(exc))
     except Exception as exc:  # last line of defence: never a stack trace for the user
         _record(log, RunEvent.crash(cfg.network.name, tx_hash.strip(), "cli", _ms(started),
                                     f"{type(exc).__name__}: {exc}"))
         _fail(f"Unexpected error while collecting data ({type(exc).__name__}: {exc}). Please report it.")
+    def event(**kw) -> RunEvent:
+        return RunEvent.from_bundle(bundle, "cli", _ms(started), cache=cache_state, **kw)
     if as_evidence:  # (with --json: refused before collecting anything, below)
-        _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started)))
+        _record(log, event())
         print(bundle.model_dump_json(indent=2))
         return
     mode_name = (mode or Mode(cfg.assistant.default_mode)).value
@@ -70,13 +77,21 @@ def explain(
         print(json.dumps(structured_answer(bundle, summary, status, mode_name), indent=2, ensure_ascii=False))
     evidence_md = render_markdown(bundle)
     if no_llm or not bundle.items:
-        _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), writer="skipped"))
+        _record(log, event(writer="skipped"))
         as_answer(None, "skipped" if no_llm else "no_evidence") if as_json else print(evidence_md)
         return
+    final = cache_state in ("hit", "stored")  # a written answer is kept only for evidence that cannot change
+    key = answer_key(bundle, cfg, mode_name) if final else None
+    kept = None
+    if key and not fresh:
+        try:
+            kept = store.get_answer(key)
+        except Exception:  # a cache that cannot be read is skipped
+            kept = None
     try:
-        checked = write_checked(bundle, cfg, mode_name)
+        checked = CheckedAnswer(kept[0], "cached", []) if kept else write_checked(bundle, cfg, mode_name)
     except WriterError as exc:
-        _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), writer="unavailable"))
+        _record(log, event(writer="unavailable"))
         print(f"_(LLM unavailable: {exc}. " + ("The answer has no summary.)_" if as_json else
                                                   "Showing the evidence only.)_\n"), file=sys.stderr)
         as_answer(None, "unavailable") if as_json else print(evidence_md)
@@ -84,7 +99,12 @@ def explain(
     # What the model stated outside the evidence, kept for review: "retried" (fixed) or "fail" (withheld).
     check = (CheckEvent("answer_check", "fail" if checked.text is None else "retried", "; ".join(checked.problems)),
              ) if checked.problems else ()
-    _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), checks=check, writer=checked.outcome))
+    _record(log, event(checks=check, writer=checked.outcome))
+    if key and checked.text is not None and not kept:
+        try:
+            store.put_answer(key, checked.text, checked.outcome)
+        except Exception as exc:
+            print(f"(cache unavailable: {type(exc).__name__}: {exc})", file=sys.stderr)
     if as_json:
         as_answer(checked.text, checked.outcome)
         return
@@ -95,6 +115,90 @@ def explain(
         print(evidence_md)
         return
     print(checked.text + "\n\n---\n" + evidence_md)
+
+
+def cache_for(cfg):
+    """The answer cache (PHASE3 T0, D44); off by config, or when it cannot be opened (said, never fatal)."""
+    if not cfg.cache.enabled:
+        return NoCache()
+    try:
+        return BundleCache(cfg.cache.path, cfg.cache.max_age_days)
+    except Exception as exc:
+        print(f"(cache unavailable: {type(exc).__name__}: {exc})", file=sys.stderr)
+        return NoCache()
+
+
+def finality_rpc_for(cfg) -> RpcClient:
+    """The node asked whether a block is final before an answer is kept (only when a cache is on), with its own
+    small time budget."""
+    from anychain.collectors.http import Budget
+    return RpcClient(cfg.rpc, budget=Budget(2 * cfg.rpc.timeout_s))
+
+
+@app.command()
+def batch(
+    file: str = typer.Argument(..., help="A text file with one transaction hash per line (# starts a comment)"),
+    config: str = typer.Option(None, "--config", help="Path to network YAML (or set ANYCHAIN_CONFIG)"),
+    out: str = typer.Option("batch.jsonl", "--out", help="JSON Lines file: one structured answer per hash"),
+    mode: Mode = typer.Option(None, help="Who the answers are for (default: from config)"),
+    workers: int = typer.Option(4, min=1, max=16, help="How many transactions at a time"),
+    fresh: bool = typer.Option(False, "--fresh", help="Fetch everything again, ignoring the cache"),
+) -> None:
+    """Explain many transactions (evidence and structured answer, no written summary). Resumes where it stopped:
+    hashes already answered in --out are skipped (PHASE3 T0, R11)."""
+    from concurrent.futures import ThreadPoolExecutor
+    from pathlib import Path
+    try:
+        cfg = load_config(config)
+    except ConfigError as exc:
+        _fail(str(exc))
+    try:
+        lines = Path(file).read_text().splitlines()
+    except OSError as exc:
+        _fail(f"Cannot read {file}: {exc}")
+    unique: dict[str, str] = {}  # the same hash in another letter case is the same transaction
+    for line in lines:
+        h = line.strip()
+        if h and not h.startswith("#"):
+            unique.setdefault(h.lower(), h)
+    hashes = list(unique.values())
+    done: set[str] = set()
+    out_path = Path(out)
+    if out_path.exists():
+        for line in out_path.read_text().splitlines():
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(row, dict) and "answer" in row:
+                done.add(str(row.get("tx_hash")).lower())
+    todo = [h for h in hashes if h.lower() not in done]
+    log, store = _open_log(cfg), cache_for(cfg)
+    rpc = None if isinstance(store, NoCache) else finality_rpc_for(cfg)
+    mode_name = (mode or Mode(cfg.assistant.default_mode)).value
+
+    def one(tx: str) -> dict:
+        started = time.monotonic()
+        try:
+            bundle, state = cached_bundle(tx, cfg, store, build_bundle, rpc, fresh)
+        except InvalidHashError as exc:
+            return {"tx_hash": tx, "error": str(exc)}
+        except Exception as exc:  # one transaction never stops the batch
+            _record(log, RunEvent.crash(cfg.network.name, tx, "batch", _ms(started), f"{type(exc).__name__}: {exc}"))
+            return {"tx_hash": tx, "error": f"{type(exc).__name__}: {exc}"}
+        _record(log, RunEvent.from_bundle(bundle, "batch", _ms(started), writer="skipped", cache=state))
+        return {"tx_hash": tx, "answer": structured_answer(bundle, None, "skipped", mode_name)}
+    answered = failed = 0
+    cut = out_path.exists() and out_path.stat().st_size and not out_path.read_bytes().endswith(b"\n")
+    with ThreadPoolExecutor(workers) as pool, out_path.open("a") as sink:
+        if cut:  # a run killed mid-line: the next line starts on its own (the cut one is skipped on resume)
+            sink.write("\n")
+        for row in pool.map(one, todo):  # in the file's order; each line written as soon as its turn comes
+            sink.write(json.dumps(row, ensure_ascii=False) + "\n")
+            sink.flush()
+            answered, failed = (answered + 1, failed) if "answer" in row else (answered, failed + 1)
+    print(f"{_n(len(hashes), 'hash')}: {len(hashes) - len(todo)} already in {out}, {answered} answered now, "
+          f"{failed} failed (written with their error; run again to retry them)")
 
 
 def _n(count: int, noun: str) -> str:
