@@ -100,11 +100,13 @@ def receipt_transfers(receipt: dict, skip_tokens: set[str]) -> list[tuple[str, s
 
 
 def check_answer(bundle: EvidenceBundle, cfg: AppConfig, tx: dict | None, receipt: dict | None,
-                 raw_corpus: str, fee_token_decimals: int | None = None) -> list[Check]:
+                 raw_corpus: str, fee_token_decimals: int | None = None,
+                 l1_details: dict | None = None, answered_at: float | None = None) -> list[Check]:
     """All checks for one answer. `tx`/`receipt` come straight from the node; `raw_corpus` is every
     response body the tool received while answering (for the invented-address check).
-    `fee_token_decimals`: decimals of the node's `feeCurrency` (Celo), resolved by the caller."""
-    return [
+    `fee_token_decimals`: decimals of the node's `feeCurrency` (Celo), resolved by the caller.
+    `l1_details`: zkSync only, see _check_l1_status (pass `zksync=True` via a dict, None elsewhere)."""
+    checks = [
         _check_status(bundle, receipt),
         _check_value(bundle, cfg, tx),
         _check_fee(bundle, cfg, tx, receipt, fee_token_decimals),
@@ -112,6 +114,44 @@ def check_answer(bundle: EvidenceBundle, cfg: AppConfig, tx: dict | None, receip
         _check_no_double_native(bundle),
         _check_addresses_exist(bundle, cfg, raw_corpus),
     ]
+    if cfg.network.chain_type == "zksync":
+        checks.append(_check_l1_status(bundle, l1_details, answered_at))
+    return checks
+
+
+L1_DENIALS = ("not yet committed", "no l1 transaction for it yet either")  # claims that nothing reached L1
+L1_LABELS = ("precommitted", "committed", "proven", "executed")
+
+
+def _check_l1_status(bundle: EvidenceBundle, l1: dict | None, answered_at: float | None = None) -> Check:
+    """zkSync: the answer's L1 steps, label by label, against steps proven on Ethereum.
+
+    `l1` (from the caller): {"steps": {label: hash}, "times": {label: L1 block time}}, every step proven
+    on an Ethereum node of another provider (the L1 transaction succeeded and the zkSync contract logged
+    that step for this batch). Which steps exist at all still comes from the zkSync node (see D25).
+    A claimed step must match exactly; a step that existed when the answer was given must be claimed,
+    unless the answer declares the node check could not run.
+    """
+    claims = [e for e in bundle.items if "l1_status" in e.data or "node_l1_status" in e.data]
+    declared = any(g.what == "L1 status from the node" or g.cause == "config_error" for g in bundle.gaps)
+    if not claims and not declared:
+        return Check("l1_status", "skip", "the answer makes no claim about L1")
+    if l1 is None:
+        return Check("l1_status", "skip", "the oracle could not prove the L1 steps")
+    proven = {label: h.lower() for label, h in l1["steps"].items()}
+    claimed = {label: str(e.data[label]).lower() for e in claims for label in L1_LABELS if e.data.get(label)}
+    wrong = sorted(label for label, h in claimed.items() if proven.get(label) != h)
+    if wrong:
+        return Check("l1_status", "fail", f"the answer's L1 {', '.join(wrong)} step(s) do not match L1")
+    existed = {label for label in proven
+               if answered_at is None or l1["times"].get(label) is None or l1["times"][label] <= answered_at}
+    texts = " ".join(e.text.lower() for e in claims)
+    if existed and any(d in texts for d in L1_DENIALS):
+        return Check("l1_status", "fail", f"L1 steps {sorted(existed)} existed; the answer says none did")
+    missing = sorted(existed - set(claimed))
+    if missing and not declared:
+        return Check("l1_status", "fail", f"the answer does not state the L1 {', '.join(missing)} step(s)")
+    return Check("l1_status", "pass", "not confirmed, and the answer declares it" if missing else "")
 
 
 def _check_status(bundle: EvidenceBundle, receipt: dict | None) -> Check:

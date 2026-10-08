@@ -6,24 +6,28 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF matches selector 0x493a4f84"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
    "why": "no ABI for 0x0000000000000000000000000000000000008008 matches its events"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
    "why": "no ABI for 0x000000000000000000000000000000000000800A matches its events"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
@@ -112,13 +116,31 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4"
     }
    ],
-   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); not yet committed to L1."
+   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); the explorer lists no L1 transaction for it yet."
+  },
+  {
+   "data": {
+    "committed": "0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1",
+    "node_l1_status": "included",
+    "proven": "0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa"
+   },
+   "id": "E5",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": "zks_getTransactionDetails 0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.era.zksync.io"
+    }
+   ],
+   "text": "The node reports this transaction committed in L1 transaction 0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1, proven in L1 transaction 0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa (node status 'included'); the explorer does not list the committed and proven steps yet."
   },
   {
    "data": {
     "selector": "0x493a4f84"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "call",
    "sources": [
     {
@@ -137,7 +159,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -156,7 +178,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "internal_call",
    "sources": [
     {
@@ -175,7 +197,7 @@
     "type": "delegatecall",
     "value": "0"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "internal_call",
    "sources": [
     {
@@ -194,7 +216,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -211,7 +233,7 @@
     "system_calls": 24,
     "value": "0"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "internal_call",
    "sources": [
     {
@@ -225,20 +247,6 @@
   },
   {
    "data": {},
-   "id": "E11",
-   "kind": "event",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
-    }
-   ],
-   "text": "Event with topic0 0xc86ba04c55bc5eb2f2876b91c438849a296dbec7b08751c3074d92e04f0a77af emitted by 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF; could not decode."
-  },
-  {
-   "data": {},
    "id": "E12",
    "kind": "event",
    "sources": [
@@ -249,7 +257,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
     }
    ],
-   "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
+   "text": "Event with topic0 0xc86ba04c55bc5eb2f2876b91c438849a296dbec7b08751c3074d92e04f0a77af emitted by 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF; could not decode."
   },
   {
    "data": {},
@@ -277,6 +285,20 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
     }
    ],
+   "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
+  },
+  {
+   "data": {},
+   "id": "E15",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4/logs"
+    }
+   ],
    "text": "Event with topic0 0x27fe8c0b49f49507b9d4fe5968c9f49edfe5c9df277d433a07a0717ede97638d emitted by 0x0000000000000000000000000000000000008008 (zkSync L1Messenger system contract); could not decode."
   },
   {
@@ -284,7 +306,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "cross_check",
    "sources": [
     {

@@ -49,14 +49,18 @@ flowchart TD
     OUT["7. Output<br/>markdown + JSON"] --> CLI["CLI<br/>anychain explain"]
     OUT --> API["API + web UI<br/>chat with tools"]
     OUT --> DB["SQLite runs<br/>metrics + eval"]
+    BUN --> LOG["Event log<br/>one row per answer:<br/>gaps with cause, crashes,<br/>checks against the node"]
+    LOG --> QRY["anychain log<br/>query by network and cause"]
+    LOG -.production, design only.-> FILA["Queue (e.g. SQS)"]
+    FILA -.-> WRK["Worker<br/>aggregates by network and cause,<br/>alerts"]
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI done
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY done
     class REPO,CAS,DIAG,VAL next
-    class API,DB later
+    class API,DB,FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
 
@@ -116,7 +120,7 @@ Which file does what, and who calls whom.
 ```mermaid
 flowchart LR
     subgraph entry["Entry points"]
-        cli["cli.py<br/>anychain explain"]
+        cli["cli.py<br/>anychain explain<br/>anychain log"]
     end
 
     subgraph core["Core"]
@@ -124,7 +128,8 @@ flowchart LR
         chains["chains.py<br/>one profile per chain type"]
         bundle["bundle.py<br/>builds the evidence"]
         decoder["decoder.py<br/>ABI decoding"]
-        models["models.py<br/>Evidence, Gap, Bundle"]
+        models["models.py<br/>Evidence, Gap (with cause), Bundle"]
+        events["events.py<br/>event log: RunEvent,<br/>SqliteEventLog, queries"]
     end
 
     subgraph collectors["collectors/"]
@@ -145,6 +150,7 @@ flowchart LR
     cli --> bundle
     cli --> render
     cli --> writer
+    cli --> events
     bundle --> explorer
     bundle --> rpc
     bundle --> decoder
@@ -183,11 +189,50 @@ flowchart TD
     class OK ok
 ```
 
+Besides "retryable", every gap carries a **cause**, which the event log counts (D24). Every gap site must name one:
+
+| Cause | Meaning | Problem? |
+|---|---|---|
+| `source_unavailable` | a source did not answer (timeout, 5xx, rate limit) | yes, alert when the rate rises |
+| `source_error` | a source refused or sent something unreadable (4xx, node error, missing field) | yes |
+| `source_behind` | the explorer has not indexed it yet, or disagrees with the node | yes, if it persists |
+| `processing_error` | our code failed on the payload, or our arithmetic contradicts a source | yes, always a defect |
+| `config_error` | the network config does not fit the sources (wrong chain id or chain type) | yes |
+| `pending` | the transaction is not mined yet | no |
+| `not_interpretable` | no ABI, list truncated, unknown field, hash not found | no |
+
+---
+
+## 5. Event log and alerts
+
+Today the log is a local SQLite file queried with `anychain log`. In production the same event would go to a queue and a worker would aggregate and alert; that part is design only.
+
+```mermaid
+flowchart LR
+    EX["anychain explain<br/>(later the API)"] --> EV["RunEvent<br/>network, hash, duration,<br/>gaps with cause, crash"]
+    CAN["Canary: acceptance script<br/>(today run by hand; daily schedule<br/>is production design)"] --> EV
+    EV --> SINK{"storage.event_sink"}
+    SINK -->|sqlite| DBL["data/runs.db"]
+    DBL --> Q["anychain log<br/>totals by network and cause,<br/>--problems lists the cases"]
+    SINK -.->|"queue (production)"| QUEUE["Queue"]
+    QUEUE -.-> W["Worker"]
+    W -.-> AL["Alert<br/>crash or processing error: always<br/>source unavailable above 5% per hour<br/>a canary check failed"]
+
+    classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
+    classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
+    class EX,EV,CAN,SINK,DBL,Q done
+    class QUEUE,W,AL later
+```
+
+The canary is the only way to catch the silent kind (a false fact nothing flagged), which is why the acceptance run writes to the same log with source `canary`.
+
 ---
 
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-07, zkSync L1 status (D25):** the explorer's status is never asserted; the profile confirms it with the node (`node_facts`); every gap must name its cause, with the new cause `config_error`.
+- **2026-10-07, event log (D24):** every gap has a cause; every answer becomes an event in local SQLite, queried with `anychain log`; production design with a queue and a worker (not built).
 - **2026-10-07, typed objects (D21):** explorer and RPC answers become typed objects once, in `collectors/types.py`.
 - **2026-10-07, chain-type profiles (D20):** config names the Blockscout CHAIN_TYPE; profiles for six network types; address labels in config.
 - **2026-10-07, phase 1 review rounds:** EIP-7702 delegates as an ABI source; accounts without code today are never asserted codeless (D18).

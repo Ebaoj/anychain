@@ -4,6 +4,7 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",
@@ -64,7 +65,10 @@
   {
    "data": {
     "batch": 499177,
-    "l1_status": "Executed on L1"
+    "committed": "0x7a8fa83f5c6b9142550e6f89a81bf5ed57c307e746d335853173a673591f2b3e",
+    "executed": "0x7b254d9232f7ad0d23cdb251187c4f97afc0e932cdb7677e45623a8c58fcdd13",
+    "l1_status": "Executed on L1",
+    "proven": "0xf7b5edf731b466dbfa13a41de7157788597faf60ecc4ee82d86d483d044a776f"
    },
    "id": "E3",
    "kind": "chain",

@@ -1,5 +1,19 @@
 """Data shapes shared across the pipeline: evidence facts and the bundle."""
+from typing import Literal
+
 from pydantic import BaseModel, Field
+
+# Why a gap exists. The event log counts these per network; only some of them are problems:
+#   source_unavailable  a source did not answer (timeout, 5xx, rate limit) -> alert when the rate rises
+#   source_error        a source refused (4xx, node error) or sent something unreadable -> alert
+#   source_behind       the explorer has not indexed it yet, or disagrees with the node -> alert if persistent
+#   processing_error    our code failed on this payload, or our arithmetic contradicts a source -> always alert
+#   config_error        the network config does not fit what the sources report (wrong chain id or type) -> alert
+#   pending             the transaction is not mined yet -> expected
+#   not_interpretable   no ABI, list truncated, unknown field, needs a source we do not have -> expected limit
+# Note: "not found" (a hash neither source knows) is not_interpretable: usually a typo or the wrong network.
+GapCause = Literal["source_unavailable", "source_error", "source_behind", "processing_error", "config_error",
+                   "pending", "not_interpretable"]
 
 
 class Source(BaseModel):
@@ -28,6 +42,7 @@ class Gap(BaseModel):
     why: str
     needed: str
     retryable: bool = False  # True: network trouble, trying again later may fill it
+    cause: GapCause = "not_interpretable"
 
 
 class EvidenceBundle(BaseModel):
@@ -43,8 +58,9 @@ class EvidenceBundle(BaseModel):
         self.items.append(ev)
         return ev
 
-    def add_gap(self, what: str, why: str, needed: str, retryable: bool) -> None:
-        self.gaps.append(Gap(what=what, why=why, needed=needed, retryable=retryable))
+    def add_gap(self, what: str, why: str, needed: str, retryable: bool,
+                cause: GapCause = "not_interpretable") -> None:
+        self.gaps.append(Gap(what=what, why=why, needed=needed, retryable=retryable, cause=cause))
 
     def ids(self) -> set[str]:
         return {e.id for e in self.items}

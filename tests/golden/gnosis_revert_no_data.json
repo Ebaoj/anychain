@@ -4,6 +4,7 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",

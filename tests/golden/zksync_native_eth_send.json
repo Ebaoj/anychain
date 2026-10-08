@@ -67,11 +67,29 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4"
     }
    ],
-   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); not yet committed to L1."
+   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); the explorer lists no L1 transaction for it yet."
+  },
+  {
+   "data": {
+    "committed": "0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1",
+    "node_l1_status": "included",
+    "proven": "0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa"
+   },
+   "id": "E4",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": "zks_getTransactionDetails 0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.era.zksync.io"
+    }
+   ],
+   "text": "The node reports this transaction committed in L1 transaction 0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1, proven in L1 transaction 0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa (node status 'included'); the explorer does not list the committed and proven steps yet."
   },
   {
    "data": {},
-   "id": "E4",
+   "id": "E5",
    "kind": "call",
    "sources": [
     {
@@ -89,7 +107,7 @@
     "to": "0xec186B08821ab71d774Bfe28f9162532Df3c9fbC",
     "value": 73403258318442
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "native_transfer",
    "sources": [
     {
@@ -112,7 +130,7 @@
     "prepaid": 13668459350000,
     "refunded": 9162645350000
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "fee_flow",
    "sources": [
     {
@@ -131,25 +149,6 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E7",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E8",
    "kind": "internal_call",
    "sources": [
@@ -160,7 +159,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684."
   },
   {
    "data": {
@@ -179,7 +178,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x000000000000000000000000000000000000800A (Ether)."
+   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
   },
   {
    "data": {
@@ -198,7 +197,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000000001."
+   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x000000000000000000000000000000000000800A (Ether)."
   },
   {
    "data": {
@@ -217,7 +216,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684."
+   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000000001."
   },
   {
    "data": {
@@ -236,14 +235,14 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684."
   },
   {
    "data": {
-    "moves_value": true,
-    "same_as": "E6",
+    "moves_value": false,
+    "same_as": null,
     "type": "call",
-    "value": "13668459350000"
+    "value": "0"
    },
    "id": "E13",
    "kind": "internal_call",
@@ -255,14 +254,14 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal ETH transfer of 0.00001366845935 ETH from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds): the same movement as E6, not an additional one."
+   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
   },
   {
    "data": {
-    "moves_value": false,
-    "same_as": null,
+    "moves_value": true,
+    "same_as": "E7",
     "type": "call",
-    "value": "0"
+    "value": "13668459350000"
    },
    "id": "E14",
    "kind": "internal_call",
@@ -274,7 +273,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684."
+   "text": "Internal ETH transfer of 0.00001366845935 ETH from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds): the same movement as E7, not an additional one."
   },
   {
    "data": {
@@ -293,14 +292,14 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684."
   },
   {
    "data": {
-    "moves_value": true,
-    "same_as": "E5",
+    "moves_value": false,
+    "same_as": null,
     "type": "call",
-    "value": "73403258318442"
+    "value": "0"
    },
    "id": "E16",
    "kind": "internal_call",
@@ -312,14 +311,33 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
     }
    ],
-   "text": "Internal ETH transfer of 0.000073403258318442 ETH from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0xec186B08821ab71d774Bfe28f9162532Df3c9fbC: the same movement as E5, not an additional one."
+   "text": "Internal call from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
+  },
+  {
+   "data": {
+    "moves_value": true,
+    "same_as": "E6",
+    "type": "call",
+    "value": "73403258318442"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4/internal-transactions"
+    }
+   ],
+   "text": "Internal ETH transfer of 0.000073403258318442 ETH from 0x6daF0Bd3AFd10171675B5A1465F8E6e40f126684 to 0xec186B08821ab71d774Bfe28f9162532Df3c9fbC: the same movement as E6, not an additional one."
   },
   {
    "data": {
     "system_calls": 57,
     "value": "0"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "internal_call",
    "sources": [
     {
@@ -336,7 +354,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E18",
+   "id": "E19",
    "kind": "cross_check",
    "sources": [
     {

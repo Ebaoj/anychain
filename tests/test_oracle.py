@@ -83,3 +83,73 @@ def test_token_paid_fee_is_checked_against_the_node():
     next(e for e in bundle.items if e.kind == "fee").data["fee"] = "0.0036"
     fee = {c.name: c for c in check_answer(bundle, cfg, tx, receipt, corpus, fee_token_decimals=18)}["fee"]
     assert fee.status == "fail"
+
+
+
+L1 = {"steps": {"committed": "0x13ad85", "proven": "0x8e6caf", "executed": "0x918d2b"},
+      "times": {"committed": 100, "proven": 200, "executed": 300}}
+EXPLORER_NONE = ("Status on L1, as reported by the explorer: 'Sealed on L2'; the explorer lists no L1 transaction "
+                 "for it yet.", {"l1_status": "Sealed on L2"})
+
+
+def _zk_answer(*facts):
+    from anychain.models import EvidenceBundle
+    b = EvidenceBundle(network="zksync-era", tx_hash="0x1", status="success")
+    for text, data in facts:
+        b.add("chain", text, [], data)
+    return b
+
+
+def _node(steps: dict, status="verified"):
+    text = "The node reports this transaction " + ", ".join(f"{k} in L1 transaction {h}" for k, h in steps.items())
+    return text, {"node_l1_status": status, **steps}
+
+
+def test_l1_denial_of_existing_steps_fails():
+    from anychain.oracle import _check_l1_status
+    old = _zk_answer(("Status on L1, as reported by the explorer: 'Sealed on L2'; not yet committed to L1.",
+                      {"l1_status": "Sealed on L2"}))
+    assert _check_l1_status(old, L1).status == "fail"
+    either = _zk_answer(EXPLORER_NONE, ("The node reports no L1 transaction for it yet either (node status "
+                                        "'included').", {"node_l1_status": "included"}))
+    assert _check_l1_status(either, L1).status == "fail"
+
+
+def test_l1_every_existing_step_must_be_stated():
+    from anychain.oracle import _check_l1_status
+    assert _check_l1_status(_zk_answer(EXPLORER_NONE, _node({"committed": "0x13ad85"})), L1).status == "fail"
+    full = _zk_answer(EXPLORER_NONE, _node(dict(L1["steps"])))
+    assert _check_l1_status(full, L1).status == "pass"
+
+
+def test_l1_wrong_label_or_extra_step_fails():
+    from anychain.oracle import _check_l1_status
+    swapped = _zk_answer(EXPLORER_NONE, _node({"committed": "0x8e6caf", "proven": "0x13ad85", "executed": "0x918d2b"}))
+    assert _check_l1_status(swapped, L1).status == "fail"
+    not_yet = {"steps": {"committed": "0x13ad85"}, "times": {"committed": 100}}
+    extra = _zk_answer(("Status on L1, as reported by the explorer: 'Executed on L1'; committed in L1 transaction "
+                        "0x13ad85, executed in L1 transaction 0xdead.",
+                        {"l1_status": "Executed on L1", "committed": "0x13ad85", "executed": "0xdead"}))
+    assert _check_l1_status(extra, not_yet).status == "fail"
+
+
+def test_l1_steps_after_the_answer_are_not_held_against_it():
+    from anychain.oracle import _check_l1_status
+    early = _zk_answer(EXPLORER_NONE, _node({"committed": "0x13ad85"}))
+    assert _check_l1_status(early, L1, answered_at=150).status == "pass"
+    nothing_yet = _zk_answer(EXPLORER_NONE, ("The node reports no L1 transaction for it yet either (node status "
+                                             "'included').", {"node_l1_status": "included"}))
+    assert _check_l1_status(nothing_yet, L1, answered_at=50).status == "pass"
+
+
+def test_l1_no_claim_or_no_oracle_is_a_skip_and_a_declared_gap_passes():
+    from anychain.models import EvidenceBundle
+    from anychain.oracle import _check_l1_status
+    rpc_only = EvidenceBundle(network="zksync-era", tx_hash="0x1", status="success")
+    rpc_only.add("overview", "(From RPC only) Transaction succeeded.", [])
+    assert _check_l1_status(rpc_only, L1).status == "skip"
+    assert _check_l1_status(_zk_answer(EXPLORER_NONE), None).status == "skip"
+    for what, cause in (("L1 status from the node", "source_unavailable"), ("RPC transaction data", "config_error")):
+        declared = _zk_answer(EXPLORER_NONE)
+        declared.add_gap(what, "could not ask the node", "Try again", False, cause)
+        assert _check_l1_status(declared, L1).status == "pass"

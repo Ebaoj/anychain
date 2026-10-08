@@ -54,6 +54,16 @@ def no_retry_sleep(monkeypatch):
     monkeypatch.setattr(http_module.time, "sleep", lambda _s: None)
 
 
+@pytest.fixture(autouse=True)
+def event_log(monkeypatch, tmp_path):
+    """Tests never write to the real event log; each test gets its own, and can read it."""
+    from anychain import cli
+    from anychain.events import SqliteEventLog
+    log = SqliteEventLog(tmp_path / "runs.db")
+    monkeypatch.setattr(cli, "event_log_for", lambda _sink, _path: log)
+    return log
+
+
 @pytest.fixture
 def eth_cfg():
     return load_config(str(ROOT / "configs" / "ethereum-mainnet.yaml"))

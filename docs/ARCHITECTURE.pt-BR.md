@@ -49,14 +49,18 @@ flowchart TD
     OUT["7. Saída<br/>markdown + JSON"] --> CLI["Linha de comando<br/>anychain explain"]
     OUT --> API["API + tela web<br/>chat com ferramentas"]
     OUT --> DB["Banco SQLite<br/>métricas + avaliação"]
+    BUN --> LOG["Log de eventos<br/>uma linha por resposta:<br/>lacunas com causa, travamentos,<br/>conferência contra o nó"]
+    LOG --> QRY["anychain log<br/>consulta por rede e causa"]
+    LOG -.produção, só desenho.-> FILA["Fila (ex.: SQS)"]
+    FILA -.-> WRK["Worker<br/>agrega por rede e causa,<br/>dispara alerta"]
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI done
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY done
     class REPO,CAS,DIAG,VAL next
-    class API,DB later
+    class API,DB,FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
 
@@ -116,7 +120,7 @@ Qual arquivo faz o quê, e quem chama quem. Ordem sugerida de leitura: `cli.py`,
 ```mermaid
 flowchart LR
     subgraph entry["Ponto de entrada"]
-        cli["cli.py<br/>anychain explain"]
+        cli["cli.py<br/>anychain explain<br/>anychain log"]
     end
 
     subgraph core["Núcleo"]
@@ -124,7 +128,8 @@ flowchart LR
         chains["chains.py<br/>um perfil por tipo de rede"]
         bundle["bundle.py<br/>monta as evidências"]
         decoder["decoder.py<br/>decodificação pela ABI"]
-        models["models.py<br/>Evidência, Lacuna, Pacote"]
+        models["models.py<br/>Evidência, Lacuna (com causa), Pacote"]
+        events["events.py<br/>log de eventos: RunEvent,<br/>SqliteEventLog, consultas"]
     end
 
     subgraph collectors["collectors/"]
@@ -145,6 +150,7 @@ flowchart LR
     cli --> bundle
     cli --> render
     cli --> writer
+    cli --> events
     bundle --> explorer
     bundle --> rpc
     bundle --> decoder
@@ -183,6 +189,43 @@ flowchart TD
     class OK ok
 ```
 
+Além de "vale tentar de novo", cada lacuna leva uma **causa**, que é o que o log de eventos conta (decisão D24):
+
+| Causa | O que quer dizer | É problema? |
+|---|---|---|
+| `source_unavailable` | a fonte não respondeu (tempo esgotado, 5xx, limite de uso) | sim, alerta se a taxa sobe |
+| `source_error` | a fonte recusou ou mandou algo ilegível (4xx, erro do nó, campo faltando) | sim |
+| `source_behind` | o explorador ainda não indexou, ou discorda do nó | sim, se persistir |
+| `processing_error` | nosso código quebrou com aquele dado, ou nossa conta contradiz uma fonte | sim, sempre é defeito |
+| `config_error` | a configuração não bate com as fontes (chain id ou tipo de rede errado) | sim |
+| `pending` | a transação ainda não foi minerada | não |
+| `not_interpretable` | sem ABI, lista truncada, campo desconhecido, hash não encontrado: limite esperado | não |
+
+---
+
+## 5. Log de eventos e alertas
+
+Hoje o log é um arquivo SQLite local, consultado com `anychain log`. Em produção o mesmo evento iria para uma fila, e um worker agregaria e alertaria. Esse trecho é só desenho, não foi construído.
+
+```mermaid
+flowchart LR
+    EX["anychain explain<br/>(e depois a API)"] --> EV["RunEvent<br/>rede, hash, duração,<br/>lacunas com causa, travamento"]
+    CAN["Canário: script de aceitação<br/>(hoje rodado à mão; o agendamento<br/>diário é desenho de produção)"] --> EV
+    EV --> SINK{"storage.event_sink"}
+    SINK -->|sqlite| DBL["data/runs.db"]
+    DBL --> Q["anychain log<br/>totais por rede e causa,<br/>--problems lista os casos"]
+    SINK -.->|"fila (produção)"| QUEUE["Fila"]
+    QUEUE -.-> W["Worker"]
+    W -.-> AL["Alerta<br/>travamento ou erro de processamento: sempre<br/>fonte fora do ar acima de 5% na hora<br/>conferência do canário falhou"]
+
+    classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
+    classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
+    class EX,EV,CAN,SINK,DBL,Q done
+    class QUEUE,W,AL later
+```
+
+O canário é o único jeito de pegar o erro silencioso (um fato falso que nada denunciou): por isso a rodada de aceitação grava no mesmo log, com origem `canary`.
+
 ---
 
 ## Histórico deste documento
@@ -191,4 +234,6 @@ flowchart TD
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
 - **07/10/2026, objetos tipados (D21):** as respostas do explorador e do nó viram objetos tipados uma única vez, em `collectors/types.py`.
+- **07/10/2026, estado na L1 da zkSync (D25):** o estado do explorador nunca é afirmado; o perfil confirma com o nó (`node_facts`); a causa de cada lacuna é obrigatória, com a nova causa `config_error`.
+- **07/10/2026, log de eventos (D24):** cada lacuna ganhou uma causa; cada resposta vira um evento no SQLite local, consultado com `anychain log`; desenho de produção com fila e worker (não construído).
 - **07/10/2026, perfis por tipo de rede (D20):** a configuração declara o CHAIN_TYPE do Blockscout; perfis para seis tipos de rede; rótulos de endereços na configuração.

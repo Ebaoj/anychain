@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from eth_utils import to_checksum_address
 
-from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, Fee, FeePart, TokenRef, audit_fields, profile_for
+from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, ChainGap, Fee, FeePart, TokenRef, audit_fields, profile_for
 from anychain.collectors.explorer import MAX_PAGES, ExplorerClient
 from anychain.collectors.http import Budget, CollectorError, NotFoundError
 from anychain.collectors.rpc import RpcClient
@@ -20,7 +20,7 @@ from anychain.collectors.types import (
 )
 from anychain.config import AppConfig
 from anychain.decoder import AbiDecoder
-from anychain.models import EvidenceBundle, Source
+from anychain.models import EvidenceBundle, GapCause, Source
 
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
 MAX_EVENTS = 40
@@ -97,6 +97,7 @@ class BundleBuilder:
         self.abi_lookup_failed: dict[str, bool] = {}  # lowercase address -> was the failure retryable?
         self.explorer_not_found = False
         self.explorer_answered = False  # True when the explorer responded at all (even with 404)
+        self.rpc_verified = False  # True once the RPC's chain id matched the config
         self.undecoded_events: set[str] = set()
         self.anonymous_unmatched: set[str] = set()
         # (from, to, value) of native movements already stated -> the fact id that states them,
@@ -116,7 +117,7 @@ class BundleBuilder:
         if explorer_lagging:
             self._gap("Explorer index", f"the explorer shows this transaction as {explorer_status}, "
                       "but the RPC node already has its receipt", "Ask again in a minute for full details",
-                      retryable=True)
+                      retryable=True, cause="source_behind")
         if self.explorer_not_found:
             self._declare_explorer_miss(has_receipt)
         if tx is not None and not explorer_lagging:
@@ -132,10 +133,10 @@ class BundleBuilder:
         """The explorer answered 404. If the node has the tx, the explorer is just behind."""
         if has_receipt:
             self._gap("Explorer transaction data", "the explorer has not indexed this transaction yet",
-                      "Ask again in a minute for decoded details", retryable=True)
+                      "Ask again in a minute for decoded details", retryable=True, cause="source_behind")
         else:
             self._gap("Explorer transaction data", "the explorer does not know this hash",
-                      "Check the hash and that the config points to the right network", retryable=False)
+                      "Check the hash and that the config points to the right network", retryable=False, cause="not_interpretable")
 
     # ---- plumbing ----------------------------------------------------------
 
@@ -145,10 +146,11 @@ class BundleBuilder:
             step()
         except CollectorError as exc:
             needed = "Try again in a few minutes" if exc.retryable else "Check this part on the explorer page"
-            self._gap(topic, str(exc), needed, exc.retryable)
+            self._gap(topic, str(exc), needed, exc.retryable,
+                      cause="source_unavailable" if exc.retryable else "source_error")
         except Exception as exc:  # unexpected payload shape, decoding edge case...
             self._gap(topic, f"could not process the data ({type(exc).__name__}: {exc})",
-                      "Check this part on the explorer page", retryable=False)
+                      "Check this part on the explorer page", retryable=False, cause="processing_error")
 
     def _party(self, ref: AddressRef | str | None) -> str:
         return party(ref, self.cfg.label_for)
@@ -156,8 +158,9 @@ class BundleBuilder:
     def _is_native_contract(self, address: str | None) -> bool:
         return bool(address) and address.lower() in self.cfg.native_contracts
 
-    def _gap(self, what: str, why: str, needed: str, retryable: bool) -> None:
-        self.bundle.add_gap(what, why, needed, retryable)
+    def _gap(self, what: str, why: str, needed: str, retryable: bool, cause: GapCause) -> None:
+        """Every gap names its cause (models.GapCause): the event log alerts on the problem ones."""
+        self.bundle.add_gap(what, why, needed, retryable, cause)
 
     def _api_source(self, path: str, label: str) -> Source:
         return Source(kind="explorer_api", label=label, url=self.explorer.url(path))
@@ -181,7 +184,8 @@ class BundleBuilder:
             return None
         except CollectorError as exc:
             self._gap("Explorer transaction data", str(exc),
-                      "Explorer API reachable and indexing this transaction", exc.retryable)
+                      "Explorer API reachable and indexing this transaction", exc.retryable,
+                      _source_cause(exc.retryable))
             return None
 
     def _fetch_rpc(self, tx_hash: str, explorer_status: str | None) -> RpcView | None:
@@ -192,16 +196,18 @@ class BundleBuilder:
                 self._gap("RPC transaction data",
                           f"the RPC is on chain {chain_id}, but the config says "
                           f"{self.cfg.network.chain_id}; RPC data ignored",
-                          "Fix rpc.url or network.chain_id in the config", retryable=False)
+                          "Fix rpc.url or network.chain_id in the config", retryable=False, cause="config_error")
                 return None
+            self.rpc_verified = True
             tx = self.rpc.transaction(tx_hash)
             receipt = self.rpc.receipt(tx_hash) if tx else None
         except CollectorError as exc:
-            self._gap("RPC transaction data", str(exc), "RPC endpoint reachable", exc.retryable)
+            self._gap("RPC transaction data", str(exc), "RPC endpoint reachable", exc.retryable,
+                      _source_cause(exc.retryable))
             return None
         except Exception as exc:  # unexpected payload shape
             self._gap("RPC transaction data", f"could not process the RPC answer ({type(exc).__name__}: {exc})",
-                      "Check the RPC endpoint", retryable=False)
+                      "Check the RPC endpoint", retryable=False, cause="processing_error")
             return None
         if tx is None:
             self._explain_rpc_miss(explorer_status)
@@ -212,13 +218,13 @@ class BundleBuilder:
         """The node returned null. Why depends on what the explorer knows."""
         if explorer_status is None:
             self._gap("RPC transaction data", "the RPC node does not know this hash",
-                      "Check the hash and that the config points to the right network", retryable=False)
+                      "Check the hash and that the config points to the right network", retryable=False, cause="not_interpretable")
         elif explorer_status in ("pending", "dropped"):
             return  # not mined: the node not having it is expected
         else:
             self._gap("RPC transaction data",
                       "the RPC node returned nothing for a transaction the explorer has; it may not keep old history",
-                      "An RPC endpoint with full (archive) history", retryable=False)
+                      "An RPC endpoint with full (archive) history", retryable=False, cause="source_error")
 
     # ---- explorer path -----------------------------------------------------
 
@@ -262,7 +268,7 @@ class BundleBuilder:
             b.add("overview", f"Transaction is pending: not yet included in a block. From {sender} to {target}. "
                   f"Native value offered: {value} {sym}. Nothing is final until it is mined.", sources, data)
             self._gap("Final outcome", "the transaction is still pending",
-                      "Wait for it to be mined, then ask again", retryable=True)
+                      "Wait for it to be mined, then ask again", retryable=True, cause="pending")
             return
         if b.status == "dropped":
             b.add("overview", f"Transaction was dropped or replaced: it was never executed. From {sender} to {target}.",
@@ -295,11 +301,11 @@ class BundleBuilder:
             return
         text = f"Fee paid: {self._fee_text(fee)}."
         for warning in fee.warnings:
-            self._gap("Fee", warning, "Check the fee on the explorer page", retryable=False)
+            self._gap("Fee", warning, "Check the fee on the explorer page", retryable=False, cause="source_error")
         for token in [p.token for p in fee.parts if p.token and p.token.decimals is None]:
             self._gap("Fee", f"the explorer does not report the decimals of the fee token {token.address}, so the "
                       "fee is shown in raw units", "The token's decimals (its contract or the explorer's token page)",
-                      retryable=False)
+                      retryable=False, cause="not_interpretable")
         if self.bundle.status == "failed":
             text += " The fee is charged even though the transaction failed."
         self.bundle.add("fee", text, [self._tx_source(tx_hash)], {
@@ -347,31 +353,41 @@ class BundleBuilder:
             text = " + ".join(f"{money(p.raw, p.token)} {p.label}" for p in fee.parts)
         return f"{text} {fee.note}" if fee.note else text
 
+    def _add_node_chain_facts(self, tx_hash: str, tx: Transaction) -> None:
+        if not self.rpc_verified:
+            return  # the node's chain was not confirmed (wrong chain, or the check failed): nothing it says counts
+        for item in self.profile.node_facts(tx_hash, tx.raw, self.rpc.call):
+            if isinstance(item, ChainGap):
+                self._gap(item.what, item.why, item.needed, retryable=item.cause == "source_behind", cause=item.cause)
+            else:
+                self.bundle.add(item.kind, item.text, [self._rpc_source(item.rpc_method or "node")], item.data)
+
     def _add_chain_facts(self, tx_hash: str, tx: Transaction) -> None:
         """Facts only this network type has, plus a check that the config's chain_type fits the payload."""
         source = self._tx_source(tx_hash)
         for fact in self.profile.facts(tx.raw):
             self.bundle.add(fact.kind, fact.text, [source], fact.data)
+        self._safely("L1 status from the node", lambda: self._add_node_chain_facts(tx_hash, tx))
         configured = self.cfg.network.chain_type
         if configured not in BLOCKSCOUT_CHAIN_TYPES:
             self._gap("Chain type", f"chain_type {configured!r} is not a Blockscout CHAIN_TYPE value this tool knows "
                       f"(typo, or an older/newer Blockscout); the generic profile is used",
                       f"Check network.chain_type; known values: {', '.join(sorted(BLOCKSCOUT_CHAIN_TYPES))}",
-                      retryable=False)
+                      retryable=False, cause="config_error")
         elif not self.dedicated_profile:
             self._gap("Network-specific details", f"chain_type {configured!r} has no dedicated profile yet, so only "
                       "the details common to every EVM network are interpreted",
-                      "A profile for this chain type in chains.py", retryable=False)
+                      "A profile for this chain type in chains.py", retryable=False, cause="not_interpretable")
         audit = audit_fields(tx.raw, self.profile)
         for other_type, names in audit.other_types.items():
             self._gap("Chain type", f"the config says chain_type {configured!r}, but the explorer reports "
                       f"fields typical of {other_type!r} ({', '.join(names)})",
                       f"Check network.chain_type; if this network is {other_type!r}, set it so these are interpreted",
-                      retryable=False)
+                      retryable=False, cause="config_error")
         if audit.unknown:
             self._gap("Network-specific details", f"the explorer reports data this tool does not interpret: "
                       f"{', '.join(audit.unknown)}", "A chain type profile that covers these fields",
-                      retryable=False)
+                      retryable=False, cause="not_interpretable")
 
     def _add_revert(self, tx_hash: str, tx: Transaction) -> None:
         if self.bundle.status != "failed":
@@ -390,7 +406,7 @@ class BundleBuilder:
             self.bundle.add("revert", f"Explorer reports the failure as: {result!r}.", [source], {"result": result})
         else:
             self._gap("Revert reason", "the explorer did not report why the transaction failed",
-                      "A node that can re-execute or trace the call (debug/trace RPC)", retryable=False)
+                      "A node that can re-execute or trace the call (debug/trace RPC)", retryable=False, cause="not_interpretable")
 
     def _add_authorizations(self, tx_hash: str, tx: Transaction) -> None:
         """EIP-7702 (type 4): accounts that set or cleared the contract code they run.
@@ -401,7 +417,7 @@ class BundleBuilder:
         source = self._tx_source(tx_hash)
         if not tx.authorizations_readable:
             self._gap("Code delegations", "the explorer's EIP-7702 authorization list is not readable",
-                      "Check the authorizations on the explorer page", retryable=False)
+                      "Check the authorizations on the explorer page", retryable=False, cause="source_error")
         auths = tx.authorizations
         last_valid = {str(a.authority).lower(): n for n, a in enumerate(auths) if a.status == "ok"}
         for n, auth in enumerate(auths):
@@ -466,7 +482,7 @@ class BundleBuilder:
                         "was a function call.", [source], {"data_bytes": size, "had_code": None})
         self._gap("Code at execution time", "an account's code during a transaction cannot be confirmed from the "
                   "explorer or a plain state read (code can change within a block, and built-in precompiles run "
-                  "without stored code)", "An execution trace of the transaction (debug/trace RPC)", retryable=False)
+                  "without stored code)", "An execution trace of the transaction (debug/trace RPC)", retryable=False, cause="not_interpretable")
 
     def _add_call(self, tx_hash: str, tx: Transaction) -> None:
         b, sym = self.bundle, self.cfg.network.native_symbol
@@ -474,11 +490,11 @@ class BundleBuilder:
         data, to = tx.raw_input, tx.to
         if data is None:
             self._gap("Call decoding", "the explorer's call data is not readable", "Check the input on the explorer page",
-                      retryable=False)
+                      retryable=False, cause="source_error")
             return
         if to is not None and to.address is None:
             self._gap("Call decoding", "the explorer did not report the target address of the call",
-                      "Check the transaction on the explorer page", retryable=False)
+                      "Check the transaction on the explorer page", retryable=False, cause="source_error")
             return
         if to is None:
             created = tx.created_contract
@@ -554,7 +570,7 @@ class BundleBuilder:
                 self.abi_lookup_failed[key] = retryable
                 self._gap("ABI lookup", f"the ABI lookup for {address} failed: {lookup.failures[0]}",
                           "Try again in a few minutes" if retryable else "Check the contract on the explorer page",
-                          retryable)
+                          retryable, _source_cause(retryable))
         self.decoders[key] = decoder
         self.abi_notes[key] = note
         self.bundle.abi_sources[address] = note
@@ -562,23 +578,23 @@ class BundleBuilder:
 
     def _declare_undecoded(self, topic: str, address: str, what: str, code_owner: str | None = None) -> None:
         """Gap for something we could not decode, saying whether the ABI is missing or just unreachable."""
-        if self._is_native_contract(address):
-            self._gap(topic, f"{address} is a native contract built into the node and the explorer has no verified "
-                      f"ABI for it, so {what} cannot be decoded", "Its published ABI (e.g. from the network node's "
-                      "source) in a configured repo", retryable=False)
-            return
         if address.lower() in self.abi_lookup_failed:
             retryable = self.abi_lookup_failed[address.lower()]
             self._gap(topic, f"{what} on {address} not decoded because the ABI lookup failed",
                       "Try again in a few minutes" if retryable else "Check the contract on the explorer page",
-                      retryable)
+                      retryable, _source_cause(retryable))
+        elif self._is_native_contract(address):
+            self._gap(topic, f"{address} is a native contract built into the node and the explorer has no verified "
+                      f"ABI for it, so {what} cannot be decoded", "Its published ABI (e.g. from the network node's "
+                      "source) in a configured repo", retryable=False, cause="not_interpretable")
         elif code_owner:
             self._gap(topic, f"{address} ran the code of {code_owner} (EIP-7702), and no ABI for it matches {what}",
-                      f"{code_owner} verified on the explorer, or its ABI in a configured repo", retryable=False)
+                      f"{code_owner} verified on the explorer, or its ABI in a configured repo", retryable=False,
+                      cause="not_interpretable")
         else:
             self._gap(topic, f"no ABI for {address} matches {what}",
                       "A verified contract on the explorer, or the contract ABI in a configured repo",
-                      retryable=False)
+                      retryable=False, cause="not_interpretable")
 
     def _add_transfers(self, tx_hash: str, tx: Transaction) -> set[int]:
         """Token transfers. Returns the log indexes they cover, so events skip them."""
@@ -599,7 +615,7 @@ class BundleBuilder:
                              "value": t.value, "token_id": t.token_id})
         if truncated:
             self._gap("Token transfers", f"more than {MAX_PAGES} pages of transfers",
-                      "Open the explorer page for the full list", retryable=False)
+                      "Open the explorer page for the full list", retryable=False, cause="not_interpretable")
         return covered
 
     def _remember_movement(self, t: TokenTransfer, fact_id: str) -> None:
@@ -655,7 +671,7 @@ class BundleBuilder:
                                                            "matches_explorer_fee": matches})
         if explorer_fee is not None and not matches:
             self._gap("Fee", "the fee flow seen in transfers does not match the explorer's fee",
-                      "Check the fee on the explorer page", retryable=False)
+                      "Check the fee on the explorer page", retryable=False, cause="processing_error")
         return fact.id
 
     def _paid_to_paymaster(self, sender: str | None, paymasters: list[str], transfers: list[TokenTransfer]) -> str:
@@ -697,7 +713,7 @@ class BundleBuilder:
     def _add_internal(self, tx_hash: str, tx: Transaction) -> None:
         if tx.result == "awaiting_internal_transactions":
             self._gap("Internal calls", "the explorer is still indexing this transaction's internal calls",
-                      "Ask again in a few minutes", retryable=True)
+                      "Ask again in a few minutes", retryable=True, cause="source_behind")
             return
         items, truncated = self.explorer.internal_transactions(tx_hash)
         source = self._api_source(f"/transactions/{tx_hash}/internal-transactions", "Explorer API: internal transactions")
@@ -721,7 +737,7 @@ class BundleBuilder:
             self.bundle.add("internal_call", text, [source], {"system_calls": len(system), "value": str(moved)})
         if truncated or len(calls) > MAX_INTERNAL:
             self._gap("Internal calls", f"showing the first {MAX_INTERNAL}",
-                      "Open the explorer page for the full list", retryable=False)
+                      "Open the explorer page for the full list", retryable=False, cause="not_interpretable")
 
     def _same_native_movement(self, it: InternalCall) -> str | None:
         """Fact id of a native movement already stated with the same sender, recipient and value."""
@@ -776,23 +792,28 @@ class BundleBuilder:
         logs = [log for log in items if log.index not in covered_logs]
         if len(logs) > MAX_EVENTS:
             logs, truncated = logs[:MAX_EVENTS], True
-        broken = 0
+        unreadable, failed = 0, []
         for log in logs:
             try:
                 self._add_one_event(log, source)
-            except Exception:  # one odd log must not cost the others
-                broken += 1
-        if broken:
-            self._gap("Events", f"{broken} log(s) had an unexpected shape and were skipped",
-                      "Check the logs on the explorer page", retryable=False)
+            except UnreadableLog:
+                unreadable += 1
+            except Exception as exc:  # one log our code failed on must not cost the others
+                failed.append(f"{type(exc).__name__}: {exc}")
+        if unreadable:
+            self._gap("Events", f"{unreadable} log(s) had an unexpected shape and were skipped",
+                      "Check the logs on the explorer page", retryable=False, cause="source_error")
+        if failed:
+            self._gap("Events", f"could not process {len(failed)} log(s) ({failed[0]})",
+                      "Check the logs on the explorer page", retryable=False, cause="processing_error")
         if truncated:
             self._gap("Events", f"showing the first {MAX_EVENTS}", "Open the explorer page for the full list",
-                      retryable=False)
+                      retryable=False, cause="not_interpretable")
 
     def _add_one_event(self, log: Log, source: Source) -> None:
         emitter = log.emitter
         if emitter is None or emitter.address is None:
-            raise ValueError("log without a readable emitter address")  # counted as an odd log by _add_events
+            raise UnreadableLog("log without a readable emitter address")  # counted by _add_events
         address = emitter.address
         topics = list(log.topics)
         decoder = self._decoder_for(address, list(emitter.implementations))
@@ -818,7 +839,7 @@ class BundleBuilder:
             self._declare_undecoded("Event decoding", address, "its events")
         for address in sorted(self.anonymous_unmatched):
             self._gap("Event decoding", f"{address} declares anonymous events (no signature topic); some of its "
-                      "logs fit none or several of them", "Check those logs on the explorer page", retryable=False)
+                      "logs fit none or several of them", "Check those logs on the explorer page", retryable=False, cause="not_interpretable")
 
     # ---- rpc path ----------------------------------------------------------
 
@@ -833,7 +854,7 @@ class BundleBuilder:
             b.add("overview", f"(From RPC only) Transaction is pending. From {tx.sender} to "
                   f"{tx.to or '(contract creation)'}. Native value offered: {value} {sym}.", [source])
             self._gap("Final outcome", "the transaction is still pending", "Wait for it to be mined, then ask again",
-                      retryable=True)
+                      retryable=True, cause="pending")
             return
 
         b.status = receipt.status
@@ -845,7 +866,7 @@ class BundleBuilder:
             value_text = f"Native value: {value} {sym}."
         if b.status == "unknown":
             self._gap("Outcome", "this receipt has no status field (the node's receipt format predates it)",
-                      "The explorer, which infers the outcome from execution traces", retryable=False)
+                      "The explorer, which infers the outcome from execution traces", retryable=False, cause="not_interpretable")
         b.add("overview",
               f"(From RPC only) Transaction {verb} in block {tx.block_number}. "
               f"From {tx.sender} to {target}. {value_text} "
@@ -854,7 +875,7 @@ class BundleBuilder:
 
         data, authorizations = tx.input, tx.delegates
         if data is None:
-            self._gap("Call decoding", "the node's call data is not readable", "Check the RPC endpoint", retryable=False)
+            self._gap("Call decoding", "the node's call data is not readable", "Check the RPC endpoint", retryable=False, cause="source_error")
             data = ""  # neither "no data" nor a call: no call fact below
         if authorizations:
             delegates = ", ".join(sorted(set(authorizations)))
@@ -862,7 +883,8 @@ class BundleBuilder:
                   f"{delegates}; who signed them and whether they were valid is not checked without the explorer.",
                   [source], {"applied": None})
             self._gap("Code delegations", "signers and validity of EIP-7702 authorizations need the explorer",
-                      "Explorer API reachable", retryable=True)
+                      "Explorer API reachable", retryable=True,
+                      cause="source_behind" if self.explorer_answered else "source_unavailable")
         if tx.to and data == "0x" and authorizations and not tx.value:
             b.add("call", f"No call data and no value were sent; the transaction carries {len(authorizations)} "
                   "EIP-7702 authorization(s).", [source])
@@ -871,10 +893,10 @@ class BundleBuilder:
         b.add("receipt", f"Receipt has {receipt.log_count} log(s).", [source])
         if receipt.log_count and self.explorer_answered:
             self._gap("Event decoding", "the explorer has not indexed this transaction's events yet",
-                      "Ask again in a minute", retryable=True)
+                      "Ask again in a minute", retryable=True, cause="source_behind")
         elif receipt.log_count:
             self._gap("Event decoding", "explorer unavailable, so events stay undecoded", "Explorer API reachable",
-                      retryable=True)
+                      retryable=True, cause="source_unavailable")
 
     def _add_rpc_call(self, to: str, data: str, source: Source) -> None:
         """Decode the call from RPC data, using the explorer's ABI when the explorer answers."""
@@ -888,7 +910,7 @@ class BundleBuilder:
         except CollectorError as exc:
             has_code_today = None
             self._gap("Contract check", f"could not read whether {to} has contract code: {exc}",
-                      "Try again in a few minutes", exc.retryable)
+                      "Try again in a few minutes", exc.retryable, _source_cause(exc.retryable))
         if has_code_today is False:
             self._add_data_to_codeless(to, (len(data) - 2) // 2, False,
                                        "The node shows no contract code at this address today", source)
@@ -906,7 +928,8 @@ class BundleBuilder:
             self._declare_undecoded("Call decoding", to, f"selector {data[:10]}")
         else:
             self._gap("Call decoding", "explorer unavailable, so no ABI could be fetched",
-                      "Explorer API reachable, or the contract ABI in a configured repo", retryable=True)
+                      "Explorer API reachable, or the contract ABI in a configured repo", retryable=True,
+                      cause="source_unavailable")
 
     def _add_cross_check(self, view: RpcView) -> None:
         receipt = view.receipt
@@ -921,7 +944,17 @@ class BundleBuilder:
         self.bundle.add("cross_check", text, [source], {"rpc_status": receipt.status, "agrees": agree})
         if not agree:
             self._gap("Status disagreement", "explorer and RPC report different statuses",
-                      "Treat the RPC receipt as authoritative and re-check the explorer index", retryable=True)
+                      "Treat the RPC receipt as authoritative and re-check the explorer index", retryable=True,
+                      cause="source_behind")
+
+
+class UnreadableLog(ValueError):
+    """The explorer sent a log this tool cannot read (a source problem, not a defect here)."""
+
+
+def _source_cause(retryable: bool) -> GapCause:
+    """A source that failed: unavailable (worth retrying) or refused the request."""
+    return "source_unavailable" if retryable else "source_error"
 
 
 def build_bundle(tx_hash: str, cfg: AppConfig, explorer: ExplorerClient | None = None,

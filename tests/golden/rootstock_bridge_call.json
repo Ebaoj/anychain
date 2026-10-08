@@ -4,24 +4,28 @@
  },
  "gaps": [
   {
+   "cause": "source_behind",
    "needed": "Ask again in a minute for full details",
    "retryable": true,
    "what": "Explorer index",
    "why": "the explorer shows this transaction as pending, but the RPC node already has its receipt"
   },
   {
+   "cause": "source_unavailable",
    "needed": "Try again in a few minutes",
    "retryable": true,
    "what": "ABI lookup",
    "why": "the ABI lookup for 0x0000000000000000000000000000000001000006 failed: https://rootstock.blockscout.com/api/v2/smart-contracts/0x0000000000000000000000000000000001000006 failed after 3 attempts: ConnectError: no fixture for GET https://rootstock.blockscout.com/api/v2/smart-contracts/0x0000000000000000000000000000000001000006"
   },
   {
-   "needed": "Its published ABI (e.g. from the network node's source) in a configured repo",
-   "retryable": false,
+   "cause": "source_unavailable",
+   "needed": "Try again in a few minutes",
+   "retryable": true,
    "what": "Call decoding",
-   "why": "0x0000000000000000000000000000000001000006 is a native contract built into the node and the explorer has no verified ABI for it, so selector 0x0c5a9990 cannot be decoded"
+   "why": "selector 0x0c5a9990 on 0x0000000000000000000000000000000001000006 not decoded because the ABI lookup failed"
   },
   {
+   "cause": "source_behind",
    "needed": "Ask again in a minute",
    "retryable": true,
    "what": "Event decoding",

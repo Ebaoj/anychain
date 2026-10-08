@@ -2,6 +2,7 @@
  "abi_sources": {},
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "An execution trace of the transaction (debug/trace RPC)",
    "retryable": false,
    "what": "Code at execution time",

@@ -4,6 +4,7 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "Its published ABI (e.g. from the network node's source) in a configured repo",
    "retryable": false,
    "what": "Event decoding",

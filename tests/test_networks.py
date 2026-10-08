@@ -117,9 +117,28 @@ def test_zksync_reports_its_l1_status_and_names_system_contracts():
     final = replay_bundle(cfg, "0x669f390346545904cb53a9934f6140d054675fe5463f3dc71624bb3e4f351a21",
                           "zksync_executed_on_l1")
     assert "'Executed on L1' (batch 499177)" in _texts(final) and "executed in L1 transaction 0x7b254d92" in _texts(final)
+    assert not _gaps(final, "L1 status from the node")  # the explorer named the L1 execution: nothing to confirm
     fresh = replay_bundle(cfg, NETWORK_CASES[5][2], "zksync_processed_on_l2")
-    assert "not yet committed to L1" in _texts(fresh)
+    assert "the explorer lists no L1 transaction for it yet" in _texts(fresh)
+    assert "not yet committed" not in _texts(fresh)  # the explorer lags, so it is never asserted
+    # the node's answer was added to this recording later (2026-10-07): committed and proven, not executed
+    assert "the explorer does not list the committed and proven steps yet" in _texts(fresh)
     assert "(zkSync bootloader: collects fees and pays refunds)" in _texts(fresh)
+
+
+def test_zksync_l1_status_lagging_on_the_explorer_is_corrected_by_the_node():
+    # Real tx: the explorer still said "Sealed on L2" with no L1 hashes on 2026-10-07, while the node
+    # reported batch 517442 committed, proven and executed on L1 on 2026-09-19 (found by the acceptance review).
+    b = replay_bundle(_cfg("zksync-era"), "0xb83b703477961ca98d2bad14f001590ed1d1afca81cbee5e3ad0353d9dfd793f",
+                      "zksync_explorer_l1_behind")
+    text = _texts(b)
+    assert "'Sealed on L2' (batch 517442); the explorer lists no L1 transaction for it yet" in text
+    assert "not yet committed" not in text
+    assert ("The node reports this transaction committed in L1 transaction 0x13ad8527935" in text
+            and "executed in L1 transaction 0x918d2b407ba8" in text
+            and "the explorer does not list the committed, proven and executed steps yet" in text)
+    node_fact = next(e for e in b.items if "The node reports" in e.text)
+    assert node_fact.sources[0].kind == "rpc" and "zks_getTransactionDetails" in node_fact.sources[0].detail
 
 
 # ---- wrong or missing chain_type ---------------------------------------------------
@@ -308,3 +327,83 @@ def test_zksync_user_calls_are_not_hidden_behind_system_calls():
     send = [e for e in b.items if e.kind == "internal_call" and e.data.get("value") == "73403258318442"]
     assert send and send[0].data["same_as"]  # the user's ETH send, visible and linked to its native movement
     assert not _gaps(b, "Internal calls")  # nothing cut by the 30-call limit any more
+
+
+# ---- every branch of the node's L1 confirmation, from the real node answer ---------------
+
+L1_TX = "0xb83b703477961ca98d2bad14f001590ed1d1afca81cbee5e3ad0353d9dfd793f"
+
+
+def _node_answer():
+    from tests.conftest import recorded_body
+    return recorded_body("zksync_explorer_l1_behind", f'zks_getTransactionDetails ["{L1_TX}"]')["result"]
+
+
+def _l1(explorer: dict, node):
+    from anychain.chains import ZkSyncProfile
+    tx = {"zksync": {"status": "Sealed on L2", "batch_number": 517442, **explorer}}
+    return ZkSyncProfile().node_facts(L1_TX, tx, lambda _m, _p: node)
+
+
+def test_l1_same_steps_on_both_sources_is_not_called_behind():
+    node = _node_answer()
+    node["ethExecuteTxHash"] = None
+    [fact] = _l1({"commit_transaction_hash": node["ethCommitTxHash"],
+                  "prove_transaction_hash": node["ethProveTxHash"]}, node)
+    assert "the same L1 steps the explorer lists" in fact.text and "not list" not in fact.text
+
+
+def test_l1_only_the_missing_step_is_named():
+    node = _node_answer()
+    [fact] = _l1({"commit_transaction_hash": node["ethCommitTxHash"]}, node)
+    assert "the explorer does not list the proven and executed steps yet" in fact.text
+
+
+def test_l1_explorer_ahead_of_the_node_is_a_gap_not_a_fact():
+    from anychain.chains import ChainGap
+    node = _node_answer()
+    commit = node["ethCommitTxHash"]
+    for key in ("ethCommitTxHash", "ethProveTxHash", "ethExecuteTxHash"):
+        node[key] = None
+    [gap] = _l1({"commit_transaction_hash": commit}, node)
+    assert isinstance(gap, ChainGap) and gap.cause == "source_behind" and "disagree" in gap.why
+
+
+def test_l1_different_hash_for_a_step_is_a_gap():
+    from anychain.chains import ChainGap
+    node = _node_answer()
+    [gap] = _l1({"commit_transaction_hash": "0x" + "ab" * 32}, node)
+    assert isinstance(gap, ChainGap)
+
+
+def test_l1_neither_source_has_a_step():
+    node = _node_answer()
+    for key in ("ethCommitTxHash", "ethProveTxHash", "ethExecuteTxHash"):
+        node[key] = None
+    node["status"] = "included"
+    [fact] = _l1({}, node)
+    assert fact.text == "The node reports no L1 transaction for it yet either (node status 'included')."
+
+
+def test_l1_unknown_to_the_node_is_a_source_error_not_our_defect():
+    from anychain.collectors.http import CollectorError
+    with pytest.raises(CollectorError) as err:
+        _l1({}, None)
+    assert err.value.retryable is False  # becomes a source_error gap via _safely
+
+
+def test_l1_no_explorer_claim_means_no_node_call():
+    from anychain.chains import ZkSyncProfile
+    calls = []
+    assert ZkSyncProfile().node_facts(L1_TX, {}, lambda m, p: calls.append(m)) == []
+    assert ZkSyncProfile().node_facts(L1_TX, {"zksync": {"status": "Executed on L1", "execute_transaction_hash": "0x1"}},
+                                      lambda m, p: calls.append(m)) == []
+    assert calls == []
+
+
+def test_l1_node_on_the_wrong_chain_is_not_asked():
+    cfg = _cfg("zksync-era").model_copy(deep=True)
+    cfg.network.chain_id = 1
+    b = replay_bundle(cfg, L1_TX, "zksync_explorer_l1_behind")
+    assert not [e for e in b.items if "The node reports" in e.text]
+    assert not _gaps(b, "L1 status from the node")

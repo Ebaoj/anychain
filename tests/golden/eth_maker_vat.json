@@ -11,12 +11,14 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 matches selector 0x085c8c5e"
   },
   {
+   "cause": "not_interpretable",
    "needed": "Open the explorer page for the full list",
    "retryable": false,
    "what": "Internal calls",

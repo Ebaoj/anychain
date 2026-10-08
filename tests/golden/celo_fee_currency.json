@@ -5,12 +5,14 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0xbEDAcCBd65230Ea441e7955c0f5344ACfC2A45e5 matches selector 0xb5b27b7e"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",

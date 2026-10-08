@@ -2,12 +2,14 @@
  "abi_sources": {},
  "gaps": [
   {
+   "cause": "source_error",
    "needed": "An RPC endpoint with full (archive) history",
    "retryable": false,
    "what": "RPC transaction data",
    "why": "the RPC node returned nothing for a transaction the explorer has; it may not keep old history"
   },
   {
+   "cause": "source_unavailable",
    "needed": "Try again in a few minutes",
    "retryable": true,
    "what": "Internal calls",

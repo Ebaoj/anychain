@@ -8,8 +8,10 @@ and extra facts such as Optimism withdrawals or zkSync's status on L1.
 Unknown or profile-less types fall back to the generic profile, and the bundle declares
 what it could not interpret. Field shapes were checked on live explorers (DECISIONS D20).
 """
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from anychain.collectors.http import CollectorError
 from anychain.collectors.types import to_int as _int
 
 # Every CHAIN_TYPE value Blockscout accepts (blockscout/config/config_helper.exs).
@@ -67,11 +69,23 @@ class Fee:
 
 @dataclass(frozen=True)
 class ChainFact:
-    """One type-specific fact; the bundle numbers it and attaches the explorer source."""
+    """One type-specific fact; the bundle numbers it and attaches its source (explorer, or the node
+    method in `rpc_method` for facts from node_facts)."""
 
     kind: str
     text: str
     data: dict = field(default_factory=dict)
+    rpc_method: str | None = None
+
+
+@dataclass
+class ChainGap:
+    """Something node_facts could not establish (e.g. the explorer and the node disagree)."""
+
+    what: str
+    why: str
+    needed: str
+    cause: str  # a models.GapCause
 
 
 def classified_as(tx: dict, kind: str) -> bool:
@@ -91,6 +105,14 @@ class ChainProfile:
         return Fee([FeePart("fee", total)]) if total is not None else None
 
     def facts(self, tx: dict) -> list[ChainFact]:
+        return []
+
+    def node_facts(self, tx_hash: str, tx: dict,
+                   call: Callable[[str, list], object]) -> list[ChainFact | ChainGap]:
+        """Facts the explorer may report late, confirmed with the network's own node (`call` = JSON-RPC).
+
+        A CollectorError raised here becomes a gap; nothing is asserted without the node's answer.
+        """
         return []
 
 
@@ -213,8 +235,58 @@ class ZkSyncProfile(ChainProfile):
         text = f"Status on L1, as reported by the explorer: {info['status']!r}"
         if info.get("batch_number") is not None:
             text += f" (batch {info['batch_number']})"
-        text += f"; {done}." if done else "; not yet committed to L1."
-        return found + [ChainFact("chain", text, {"l1_status": info["status"], "batch": info.get("batch_number")})]
+        # The explorer's L1 status can lag by days (real tx 0xb83b7034...: "Sealed on L2" while the node
+        # reported the batch executed on L1), so without its hashes we only say what the explorer lists.
+        text += f"; {done}." if done else "; the explorer lists no L1 transaction for it yet."
+        hashes = {label: h for label, h in steps if h}
+        return found + [ChainFact("chain", text, {"l1_status": info["status"], "batch": info.get("batch_number"),
+                                                  **hashes})]
+
+    # zks_getTransactionDetails (zkSync Era JSON-RPC): status plus the L1 commit/prove/execute hashes,
+    # field names as answered by mainnet.era.zksync.io on 2026-10-07.
+    # ethPrecommitTxHash was null on every mainnet batch checked (518336 to 518348), but it is a step.
+    NODE_STEPS = (("precommitted", "ethPrecommitTxHash"), ("committed", "ethCommitTxHash"),
+                  ("proven", "ethProveTxHash"), ("executed", "ethExecuteTxHash"))
+
+    EXPLORER_STEPS = (("committed", "commit_transaction_hash"), ("proven", "prove_transaction_hash"),
+                      ("executed", "execute_transaction_hash"))
+
+    def node_facts(self, tx_hash: str, tx: dict,
+                   call: Callable[[str, list], object]) -> list[ChainFact | ChainGap]:
+        info = tx.get("zksync")
+        if not isinstance(info, dict) or not info.get("status") or info.get("execute_transaction_hash"):
+            return []  # no explorer claim to confirm, or the explorer already names the L1 execution
+        details = call("zks_getTransactionDetails", [tx_hash])
+        if not isinstance(details, dict):  # null is the node's answer for a hash it does not know
+            raise CollectorError("the node does not know this transaction (zks_getTransactionDetails returned "
+                                 f"{'null' if details is None else type(details).__name__})", retryable=False)
+        explorer = {label: info[key].lower() for label, key in self.EXPLORER_STEPS if info.get(key)}
+        node = {label: details[key].lower() for label, key in self.NODE_STEPS if details.get(key)}
+        status = details.get("status")
+        source = f"zks_getTransactionDetails {tx_hash}"
+        data = {"node_l1_status": status, **node}
+        # Disagreement (a step only the explorer has, or a different hash): state neither as true.
+        if any(node.get(label) != h for label, h in explorer.items()):
+            return [ChainGap("L1 status from the node",
+                             f"the explorer and the node disagree on the L1 steps (explorer: "
+                             f"{_steps(explorer) or 'none'}; node: {_steps(node) or 'none'})",
+                             "Check the batch on L1 directly", "source_behind")]
+        if not node:
+            return [ChainFact("chain", f"The node reports no L1 transaction for it yet either (node status "
+                              f"{status!r}).", data, rpc_method=source)]
+        missing = [label for label in node if label not in explorer]
+        text = f"The node reports this transaction {_steps(node)} (node status {status!r})"
+        text += f"; the explorer does not list the {_and(missing)} step{'s' if len(missing) > 1 else ''} yet." \
+            if missing else ", the same L1 steps the explorer lists."
+        return [ChainFact("chain", text, data, rpc_method=source)]
+
+
+def _steps(steps: dict[str, str]) -> str:
+    return ", ".join(f"{label} in L1 transaction {h}" for label, h in steps.items())
+
+
+def _and(words: list[str]) -> str:
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " and " + words[-1]
 
 
 class RskProfile(ChainProfile):

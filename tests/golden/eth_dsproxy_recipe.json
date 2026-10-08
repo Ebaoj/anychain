@@ -12,18 +12,21 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "Open the explorer page for the full list",
    "retryable": false,
    "what": "Internal calls",
    "why": "showing the first 30"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
    "why": "no ABI for 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E matches its events"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",

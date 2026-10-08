@@ -4,6 +4,7 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "0xec15C4d466296454865652b0056D03e5A359BbfC verified on the explorer, or its ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",

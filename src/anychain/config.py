@@ -1,6 +1,7 @@
 """Configuration: one validated YAML file describes the whole network."""
 import os
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field, field_validator
@@ -175,8 +176,9 @@ class AssistantConfig(BaseModel):
 
 
 class StorageConfig(BaseModel):
-    sqlite_path: str = "data/runs.db"
+    sqlite_path: str = "data/runs.db"  # event log (one row per answer; `anychain log` reads it)
     cache_dir: str = "data/cache"
+    event_sink: Literal["sqlite", "none"] = "sqlite"  # production would add a queue sink (D24)
 
 
 # Sections accepted now and used from phase 2 on: repos, address_map,

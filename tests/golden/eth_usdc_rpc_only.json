@@ -2,18 +2,21 @@
  "abi_sources": {},
  "gaps": [
   {
+   "cause": "source_unavailable",
    "needed": "Explorer API reachable and indexing this transaction",
    "retryable": true,
    "what": "Explorer transaction data",
    "why": "https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 failed after 3 attempts: ConnectError: simulated outage of eth.blockscout.com"
   },
   {
+   "cause": "source_unavailable",
    "needed": "Explorer API reachable, or the contract ABI in a configured repo",
    "retryable": true,
    "what": "Call decoding",
    "why": "explorer unavailable, so no ABI could be fetched"
   },
   {
+   "cause": "source_unavailable",
    "needed": "Explorer API reachable",
    "retryable": true,
    "what": "Event decoding",

@@ -536,3 +536,43 @@ def test_internal_create_without_success_flag_is_not_asserted(eth_cfg):
     b = replay_bundle(eth_cfg, SAFE_DEPLOY_TX, "eth_safe_deploy", overrides=overrides)
     create = next(e for e in b.items if e.kind == "internal_call" and "create" in e.text)
     assert "does not say if the deployment succeeded" in create.text and create.data["moves_value"] is None
+
+
+# ---- every problem gap names the right cause (the event log alerts on these) ----------
+
+def _causes(b, what):
+    return {g.cause for g in b.gaps if g.what == what}
+
+
+def test_our_own_failure_is_a_processing_error(monkeypatch, eth_cfg):
+    from anychain.bundle import BundleBuilder
+
+    def boom(*_a, **_k):
+        raise KeyError("odd")
+    monkeypatch.setattr(BundleBuilder, "_add_fee", boom)
+    monkeypatch.setattr(BundleBuilder, "_add_one_event", boom)
+    b = replay_bundle(eth_cfg, MAKER_TX, "eth_maker_vat")  # has events no transfer covers
+    assert _causes(b, "Fee") == {"processing_error"}
+    assert _causes(b, "Events") == {"processing_error"}
+
+
+def test_a_refusing_source_is_a_source_error(eth_cfg):
+    b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer",
+                      overrides={"/token-transfers": {"status": 400, "body": "{}"}})
+    assert _causes(b, "Token transfers") == {"source_error"}
+
+
+def test_an_rpc_on_the_wrong_chain_is_a_config_error(eth_cfg):
+    cfg = eth_cfg.model_copy(deep=True)
+    cfg.network.chain_id = 10
+    b = replay_bundle(cfg, USDC_TX, "eth_usdc_transfer")
+    assert _causes(b, "RPC transaction data") == {"config_error"}
+
+
+def test_an_unreadable_log_from_the_explorer_is_a_source_error(eth_cfg):
+    def drop_emitter(body):
+        for item in body["items"]:
+            item["address"] = None
+    b = replay_bundle(eth_cfg, MAKER_TX, "eth_maker_vat",
+                      overrides=mutated("eth_maker_vat", "/logs", drop_emitter))
+    assert "source_error" in _causes(b, "Events") and "processing_error" not in _causes(b, "Events")

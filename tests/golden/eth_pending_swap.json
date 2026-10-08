@@ -2,6 +2,7 @@
  "abi_sources": {},
  "gaps": [
   {
+   "cause": "pending",
    "needed": "Wait for it to be mined, then ask again",
    "retryable": true,
    "what": "Final outcome",

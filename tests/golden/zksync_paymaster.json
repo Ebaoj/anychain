@@ -6,30 +6,35 @@
  },
  "gaps": [
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36 matches selector 0x58893201"
   },
   {
+   "cause": "not_interpretable",
    "needed": "Open the explorer page for the full list",
    "retryable": false,
    "what": "Internal calls",
    "why": "showing the first 30"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
    "why": "no ABI for 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 matches its events"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
    "why": "no ABI for 0xBD4372e44c5eE654dd838304006E1f0f69983154 matches its events"
   },
   {
+   "cause": "not_interpretable",
    "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
    "retryable": false,
    "what": "Event decoding",
@@ -102,13 +107,31 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af"
     }
    ],
-   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); not yet committed to L1."
+   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); the explorer lists no L1 transaction for it yet."
+  },
+  {
+   "data": {
+    "committed": "0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1",
+    "node_l1_status": "included",
+    "proven": "0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa"
+   },
+   "id": "E4",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": "zks_getTransactionDetails 0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.era.zksync.io"
+    }
+   ],
+   "text": "The node reports this transaction committed in L1 transaction 0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1, proven in L1 transaction 0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa (node status 'included'); the explorer does not list the committed and proven steps yet."
   },
   {
    "data": {
     "selector": "0x58893201"
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "call",
    "sources": [
     {
@@ -131,7 +154,7 @@
     "prepaid": 49775000000000,
     "refunded": 42315809000000
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "fee_flow",
    "sources": [
     {
@@ -151,7 +174,7 @@
     "token_id": null,
     "value": 598421180396209706487
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "token_transfer",
    "sources": [
     {
@@ -171,7 +194,7 @@
     "token_id": null,
     "value": 210314775792516402875
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "token_transfer",
    "sources": [
     {
@@ -191,7 +214,7 @@
     "token_id": null,
     "value": 512637504186413045062
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "token_transfer",
    "sources": [
     {
@@ -210,25 +233,6 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E9",
-   "kind": "internal_call",
-   "sources": [
-    {
-     "detail": null,
-     "kind": "explorer_api",
-     "label": "Explorer API: internal transactions",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
-    }
-   ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
-  },
-  {
-   "data": {
-    "moves_value": false,
-    "same_as": null,
-    "type": "call",
-    "value": "0"
-   },
    "id": "E10",
    "kind": "internal_call",
    "sources": [
@@ -239,7 +243,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
   },
   {
    "data": {
@@ -258,7 +262,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x000000000000000000000000000000000000800A (Ether)."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
   },
   {
    "data": {
@@ -277,7 +281,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000000001."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x000000000000000000000000000000000000800A (Ether)."
   },
   {
    "data": {
@@ -296,7 +300,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000000001."
   },
   {
    "data": {
@@ -315,7 +319,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
   },
   {
    "data": {
@@ -334,7 +338,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
    "data": {
@@ -372,7 +376,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
@@ -391,7 +395,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
    "data": {
@@ -429,7 +433,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
@@ -448,7 +452,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
   },
   {
    "data": {
@@ -467,7 +471,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
    "data": {
@@ -505,7 +509,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
@@ -524,7 +528,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
    "data": {
@@ -562,7 +566,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
@@ -581,7 +585,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
   },
   {
    "data": {
@@ -600,7 +604,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359."
   },
   {
    "data": {
@@ -619,7 +623,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
   },
   {
    "data": {
@@ -657,7 +661,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000000001."
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
@@ -676,7 +680,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000000001."
   },
   {
    "data": {
@@ -695,7 +699,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
    "data": {
@@ -733,7 +737,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
    "data": {
@@ -752,7 +756,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
    "data": {
@@ -775,7 +779,9 @@
   },
   {
    "data": {
-    "system_calls": 61,
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
     "value": "0"
    },
    "id": "E39",
@@ -788,21 +794,24 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "61 internal call(s) between the network's system contracts not listed (no value carried)."
+   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
-   "data": {},
+   "data": {
+    "system_calls": 61,
+    "value": "0"
+   },
    "id": "E40",
-   "kind": "event",
+   "kind": "internal_call",
    "sources": [
     {
      "detail": null,
      "kind": "explorer_api",
-     "label": "Explorer API: logs",
-     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
+   "text": "61 internal call(s) between the network's system contracts not listed (no value carried)."
   },
   {
    "data": {},
@@ -830,11 +839,25 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
     }
    ],
-   "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
+   "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
   },
   {
    "data": {},
    "id": "E43",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/logs"
+    }
+   ],
+   "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
+  },
+  {
+   "data": {},
+   "id": "E44",
    "kind": "event",
    "sources": [
     {
@@ -851,7 +874,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E44",
+   "id": "E45",
    "kind": "cross_check",
    "sources": [
     {
