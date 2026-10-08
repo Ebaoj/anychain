@@ -111,6 +111,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Reverted",
     "moves_value": false,
     "same_as": null,
     "type": "delegatecall",
@@ -131,6 +132,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Reverted",
     "moves_value": false,
     "same_as": null,
     "type": "delegatecall",

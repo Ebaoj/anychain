@@ -1,0 +1,346 @@
+{
+ "abi_sources": {
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": "explorer: verified contract UniswapV2Router02"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 26149987,
+    "from": "0x449ed53a5600A0336069C9de52A8E322f977fDc4",
+    "gas_limit": "172298",
+    "gas_used": "168382",
+    "status": "failed",
+    "timestamp": "2026-10-08T20:11:47.000000Z",
+    "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 26149987 at 2026-10-08T20:11:47.000000Z. From 0x449ed53a5600A0336069C9de52A8E322f977fDc4 to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02). Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 168382 of limit 172298."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000256612236995224",
+    "parts": {
+     "fee": "0.000256612236995224"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    }
+   ],
+   "text": "Fee paid: 0.000256612236995224 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "TransferHelper: TRANSFER_FROM_FAILED"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='TransferHelper: TRANSFER_FROM_FAILED'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "abi_origin": "explorer",
+    "args": {
+     "amountIn": "4749297923366582",
+     "amountOutMin": "0",
+     "deadline": "1791490899",
+     "path": "[0x4F827024D012d56733CE099F2f3dECCCe634C422, 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2]",
+     "to": "0x449ed53a5600A0336069C9de52A8E322f977fDc4"
+    },
+    "function": "swapExactTokensForETHSupportingFeeOnTransferTokens"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "Called swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256) on 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) with amountIn=4749297923366582, amountOutMin=0, path=[0x4F827024D012d56733CE099F2f3dECCCe634C422, 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2], to=0x449ed53a5600A0336069C9de52A8E322f977fDc4, deadline=1791490899. ABI source: explorer: verified contract UniswapV2Router02."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "UniswapV2Router02",
+    "function": "swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)",
+    "lines": [
+     379,
+     400
+    ],
+    "path": "contracts/UniswapV2Router02.sol",
+    "raise_line": null,
+    "raises": null,
+    "show": []
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "Code of swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256) in UniswapV2Router02 (contracts/UniswapV2Router02.sol, lines 379-400), from the verified source of the contract 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, as the explorer lists it:\n379 |     function swapExactTokensForETHSupportingFeeOnTransferTokens(\n380 |         uint amountIn,\n381 |         uint amountOutMin,\n382 |         address[] calldata path,\n383 |         address to,\n384 |         uint deadline\n385 |     )\n386 |         external\n387 |         virtual\n388 |         override\n389 |         ensure(deadline)\n390 |     {\n391 |         require(path[path.length - 1] == WETH, 'UniswapV2Router: INVALID_PATH');\n392 |         TransferHelper.safeTransferFrom(\n393 |             path[0], msg.sender, UniswapV2Library.pairFor(factory, path[0], path[1]), amountIn\n394 |         );\n395 |         _swapSupportingFeeOnTransferTokens(path, address(this));\n396 |         uint amountOut = IERC20(WETH).balanceOf(address(this));\n397 |         require(amountOut >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');\n398 |         IWETH(WETH).withdraw(amountOut);\n399 |         TransferHelper.safeTransferETH(to, amountOut);\n400 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x4F827024D012d56733CE099F2f3dECCCe634C422 (Contract) (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x4F827024D012d56733CE099F2f3dECCCe634C422 (Contract) to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x4F827024D012d56733CE099F2f3dECCCe634C422 (Contract) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x57563479E1C05A712d6c646b9D511000c7Dd4dE2 (Uniswap V2) (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "out of gas",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x57563479E1C05A712d6c646b9D511000c7Dd4dE2 (Uniswap V2) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) (this internal call failed: the explorer reports 'out of gas')."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 3
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832/internal-transactions"
+    }
+   ],
+   "text": "3 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "computed": {
+     "cites": [
+      "E10"
+     ]
+    },
+    "label": "LIKELY",
+    "level": "candidate",
+    "next_steps": {
+     "developer": [
+      "Look at which inner call failed and how much gas it was given (a token that runs its own code on transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that estimate and a margin."
+     ],
+     "support": [
+      "The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction."
+     ]
+    },
+    "reads": [],
+    "rule": "out_of_gas"
+   },
+   "id": "E12",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    }
+   ],
+   "text": "LIKELY: An internal call ran out of gas: the internal call from 0x57563479E1C05A712d6c646b9D511000c7Dd4dE2 (Uniswap V2) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) failed with 'out of gas', as the explorer's trace reports (E10), and the transaction used 168382 of its 172298 gas limit; the reason 'TransferHelper: TRANSFER_FROM_FAILED' at the top is the outer call failing because of it. Next step for a non-technical reader: The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction. Next step for a developer: Look at which inner call failed and how much gas it was given (a token that runs its own code on transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that estimate and a margin."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "places": [
+     "the verified source @uniswap/lib/contracts/libraries/TransferHelper.sol, line 20"
+    ],
+    "reason": "TransferHelper: TRANSFER_FROM_FAILED"
+   },
+   "id": "E13",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "The reason 'TransferHelper: TRANSFER_FROM_FAILED' is written in the verified source @uniswap/lib/contracts/libraries/TransferHelper.sol, line 20."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E14",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "failed",
+ "tx_hash": "0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
+}

@@ -2,7 +2,7 @@
 import pytest
 
 from anychain.config import load_config
-from anychain.diagnosis import Context, diagnose
+from anychain.diagnosis import Context, diagnose, label_for
 from tests.conftest import ROOT, replay_bundle
 from tests.test_golden import _case
 
@@ -182,3 +182,124 @@ def test_an_owner_read_that_is_not_an_address_is_not_held_permission():
     reader = FakeReader(owner=None)
     f = _access(_custom("OwnableUnauthorizedAccount(address account)", [("account", SENDER)]), reader)
     assert f.level == "single_source" and "held" not in f.text and f.missing
+
+
+# ---- PHASE3 T5: out of gas, from a real Ethereum failure (USDT transfer, 60000 of 60000 gas, block 26150083) ----
+
+def test_out_of_gas_is_its_own_rule_not_a_contract_message():
+    b = _bundle("eth_fail_out_of_gas")
+    finding = _finding(b)
+    assert finding.data["rule"] == "out_of_gas" and finding.data["label"] == "CONFIRMED"
+    assert "used all 60000 of its 60000 gas limit" in finding.text
+    assert "refused the operation with its own message" not in finding.text
+    assert "gas" in " ".join(finding.data["next_steps"]["support"]).lower()
+
+
+def test_out_of_gas_with_gas_left_is_only_likely():
+    ctx = _ctx(explorer_text="out of gas", gas_used=40000, gas_limit=60000)
+    finding = diagnose(ctx)
+    assert finding.rule == "out_of_gas" and finding.level == "candidate" and "inner call" in finding.text
+
+
+# ---- the router could not pull the input token (real Uniswap V2 failure, block 26149987) ----
+
+def test_a_router_pull_failure_without_reads_is_likely():
+    # the real case turned out to be an inner out of gas (above); the rule alone, with no node, stays LIKELY
+    f = diagnose(_ctx(reason=_text("TransferHelper: TRANSFER_FROM_FAILED"),
+                      call={"function": "swapExactTokensForETH", "args": {"amountIn": "1000", "path": f"[{TARGET}]"}},
+                      sender=SENDER, to=OTHER, block=100, reader=None))
+    assert (f.rule, f.level) == ("router_transfer_from", "candidate") and f.missing
+
+
+class AllowanceReader(FakeReader):
+    def __init__(self, allowance, balance):
+        super().__init__()
+        self.values = {"allowance": allowance, "balance": balance}
+
+    def erc20_allowance(self, token, owner, spender, block):
+        return Read("allowance(address,address)", token, (owner, spender), block, self.values["allowance"])
+
+    def erc20_balance(self, token, holder, block):
+        return Read("balanceOf(address)", token, (holder,), block, self.values["balance"])
+
+
+@pytest.mark.parametrize("allowance, balance, rule, level", [
+    (0, 10**18, "insufficient_allowance", "confirmed"),
+    (10**18, 5, "insufficient_balance", "confirmed"),
+    (10**18, 10**18, "router_transfer_from", "candidate"),
+])
+def test_a_router_pull_failure_with_reads_names_its_cause(allowance, balance, rule, level):
+    call = {"function": "swapExactTokensForETH", "args": {"amountIn": "1000", "path": f"[{TARGET}, {OTHER}]"}}
+    f = diagnose(_ctx(reason=_text("TransferHelper: TRANSFER_FROM_FAILED"), call=call, sender=SENDER, to=OTHER,
+                      block=100, reader=AllowanceReader(allowance, balance)))
+    assert (f.rule, f.level) == (rule, level)
+
+
+# ---- review of T5: the inner out of gas behind TRANSFER_FROM_FAILED, and the node's receipt ----
+
+def test_an_inner_out_of_gas_explains_the_routers_failure():
+    # the real recording: the tax token's transferFrom calls back into the router, whose call to WETH9 runs out of gas
+    finding = _finding(_bundle("eth_fail_transfer_from"))
+    assert finding.data["rule"] == "out_of_gas" and finding.data["label"] == "LIKELY"
+    assert "WETH9" in finding.text and "'out of gas'" in finding.text and "168382 of its 172298" in finding.text
+    assert "approved" not in " ".join(finding.data["next_steps"]["support"])
+
+
+def test_out_of_gas_is_confirmed_by_the_nodes_receipt():
+    b = _bundle("eth_fail_out_of_gas")
+    finding = _finding(b)
+    assert finding.data["label"] == "CONFIRMED" and "the node's receipt" in finding.text
+    assert any(s.kind == "rpc" for s in finding.sources)
+
+
+@pytest.mark.parametrize("text", ["out of gas: not enough gas for reentrancy sentry", "Out Of Gas", "OutOfGas"])
+def test_out_of_gas_spellings(text):
+    assert diagnose(_ctx(explorer_text=text, gas_used=None, gas_limit=None)).rule == "out_of_gas"
+    assert "None" not in diagnose(_ctx(explorer_text=text, gas_used=None, gas_limit=None)).text
+
+
+# ---- D51: the failure's origin first, and every failure signal accounted for ----
+
+def test_another_execution_error_inside_is_the_origin():
+    ctx = _ctx(reason=_text("TransferHelper: TRANSFER_FROM_FAILED"),
+               inner_failures=[("E5", "Parent reverted", "Internal call from A to B"),
+                               ("E6", "invalid opcode", "Internal call from B to C")])
+    f = diagnose(ctx)
+    assert f.rule == "inner_execution_error" and f.level == "candidate"
+    assert "'invalid opcode'" in f.text and "E6" in f.text and "where the failure began" in f.text
+
+
+def test_propagating_errors_are_not_an_origin():
+    ctx = _ctx(reason=_text("UniswapV2Router: EXPIRED"), call={"function": "swap", "args": {"deadline": 5}},
+               block_time=1_791_479_507, inner_failures=[("E5", "Reverted", "Internal call"),
+                                                         ("E6", "Parent reverted", "Internal call")])
+    f = diagnose(ctx)
+    assert f.rule == "deadline" and "not explained" not in f.text
+
+
+def test_a_confirmed_cause_that_leaves_a_signal_unexplained_is_likely():
+    reader = FakeReader(owner=OTHER)
+    ctx = _ctx(reason=_custom("OwnableUnauthorizedAccount(address account)", [("account", SENDER)]),
+               sender=SENDER, to=TARGET, block=100, reader=reader,
+               inner_failures=[("E9", "out of gas", "Internal call from X to Y")])
+    f = diagnose(ctx)
+    assert f.rule == "access_control" and f.label == "LIKELY"
+    assert "Also present, and not explained by this conclusion" in f.text and "E9" in f.text
+
+
+def test_all_gas_used_next_to_another_reason_is_said():
+    ctx = _ctx(reason=_text("Pausable: paused"), gas_used=99_500, gas_limit=100_000)
+    f = diagnose(ctx)
+    assert f.rule == "paused" and "used 99500 of its 100000 gas limit" in f.text and f.label == "LIKELY"
+
+
+def test_a_conclusion_that_explains_the_signals_keeps_its_label():
+    b = _bundle("eth_fail_out_of_gas")  # all gas used, explained by the out-of-gas conclusion itself
+    finding = _finding(b)
+    assert finding.data["label"] == "CONFIRMED" and "not explained" not in finding.text
+
+
+def test_the_signal_check_never_raises_a_label():
+    ctx = _ctx(generic_failure="zkSync's generic failure text", inner_failures=[("E3", "out of gas", "Internal call")])
+    f = diagnose(ctx)
+    assert label_for(f.rule, f.level, f.label) == "UNKNOWN" and "not explained" in f.text

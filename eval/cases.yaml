@@ -1,0 +1,100 @@
+# The evaluation set (PHASE3 T5, R7, D50). Every case is a real transaction, recorded from the explorer and the
+# node into tests/fixtures/<fixture>.json; `anychain eval` replays them offline and asks the configured model to
+# write each answer, then measures it. Nothing here is made up: the expected values were read in the recordings.
+#
+# expect:
+#   status       the transaction's status
+#   rule, label  the failure's own diagnosis rule and its label (none for a success)
+#   abi_source   where the main call's ABI came from (D45)
+#   gaps         gap causes the answer must declare (degradation)
+#   entities     each entry is a list of accepted spellings; one of them must appear in the written answer
+
+# Categories of the original plan with no real case yet, reported as missing (never filled with another one):
+missing:
+  - category: allowance revert
+    why: no real failure with a confirmed missing approval was found in a bounded search (2026-10-08); the router's
+      TRANSFER_FROM_FAILED case found turned out to be an inner out of gas, and the public node keeps the parent
+      block's state for about 128 blocks only, too short to read the allowance of most failures found later
+
+cases:
+  - id: erc20_transfer
+    category: ERC-20 transfer
+    config: ethereum-mainnet
+    fixture: eth_usdc_transfer
+    mode: support
+    expect: {status: success, rule: null, label: null, abi_source: explorer, gaps: [],
+             entities: [["69.3484", "69,3484"], ["USDC"]]}
+
+  - id: dex_swap
+    category: DEX swap (events and internal transfers)
+    config: ethereum-mainnet
+    fixture: eth_uniswap_v2_swap
+    mode: developer
+    expect: {status: success, rule: null, label: null, abi_source: explorer, gaps: [],
+             entities: [["0.2", "0,2"], ["BUNKER"]]}
+
+  - id: explicit_reason
+    category: revert with an explicit message (Uniswap EXPIRED, deadline parameter 2400)
+    config: ethereum-mainnet
+    fixture: eth_fail_expired_v2
+    mode: developer
+    expect: {status: failed, rule: deadline, label: CONFIRMED, abi_source: explorer, gaps: [],
+             entities: [["EXPIRED"], ["2400"]]}
+
+  - id: inner_out_of_gas
+    category: an inner call ran out of gas (a tax token's transferFrom, behind the router's TRANSFER_FROM_FAILED);
+      found while looking for an allowance case, which it is not
+    config: ethereum-mainnet
+    fixture: eth_fail_transfer_from
+    mode: support
+    expect: {status: failed, rule: out_of_gas, label: LIKELY, abi_source: explorer, gaps: [],
+             entities: [["out of gas", "sem gás", "gás"], ["WETH"]]}
+
+  - id: out_of_gas
+    category: out of gas (60000 of 60000)
+    config: ethereum-mainnet
+    fixture: eth_fail_out_of_gas
+    mode: support
+    expect: {status: failed, rule: out_of_gas, label: CONFIRMED, abi_source: explorer, gaps: [],
+             entities: [["60000", "60.000", "60 000"]]}
+
+  - id: unverified_contract
+    category: a contract the explorer has not verified (no ABI)
+    config: ethereum-mainnet
+    fixture: eth_failed_unverified_bot
+    mode: developer
+    expect: {status: failed, rule: slippage, label: LIKELY, abi_source: raw, gaps: [],
+             entities: [["INSUFFICIENT_OUTPUT_AMOUNT"]]}
+
+  - id: custom_error
+    category: a Solidity custom error (SlippageExceeded)
+    config: ethereum-mainnet
+    fixture: eth_fail_custom_error
+    mode: developer
+    expect: {status: failed, rule: contract_reason, label: CONFIRMED, abi_source: raw, gaps: [],
+             entities: [["SlippageExceeded"]]}
+
+  - id: node_unavailable
+    category: the node is down (degradation)
+    config: ethereum-mainnet
+    fixture: eth_usdc_transfer
+    offline_hosts: [ethereum-rpc.publicnode.com]
+    mode: support
+    expect: {status: success, rule: null, label: null, abi_source: explorer, gaps: [source_unavailable],
+             entities: [["69.3484", "69,3484"]]}
+
+  - id: second_network_transfer
+    category: ERC-20 transfer on the second network (Optimism)
+    config: optimism-mainnet
+    fixture: op_usdc_transfer
+    mode: support
+    expect: {status: success, rule: null, label: null, abi_source: explorer, gaps: [],
+             entities: [["199.820981", "199,820981"], ["USDC"]]}
+
+  - id: second_network_failure
+    category: a failure on the second network (a time limit by block number)
+    config: optimism-mainnet
+    fixture: op_fail_deadline
+    mode: support
+    expect: {status: failed, rule: deadline, label: LIKELY, abi_source: signature_db, gaps: [],
+             entities: [["block number deadline"]]}

@@ -53,6 +53,7 @@ def _diagnosis(e, bundle: EvidenceBundle) -> dict:
     drawn from the decoded reason, the reason; for a deadline comparison, the call holding the parameter."""
     steps = e.data.get("next_steps") or {}
     facts = [e.id] + list(e.data.get("reads") or []) + ([e.data["replay"]] if e.data.get("replay") else [])
+    facts += list((e.data.get("computed") or {}).get("cites") or [])  # facts the finding names (a failed inner call)
     if not e.data.get("from_replay"):
         facts += [r.id for r in bundle.items if r.kind == "revert"]
     if (e.data.get("computed") or {}).get("deadline_check"):

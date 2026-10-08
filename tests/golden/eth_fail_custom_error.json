@@ -1,0 +1,828 @@
+{
+ "abi_sources": {
+  "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA matches selector 0x32bb9270"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the explorer page for the full list",
+   "retryable": false,
+   "what": "Internal calls",
+   "why": "showing 30 of 63 internal calls; every internal call that carried ETH is listed"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 26150083,
+    "from": "0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9",
+    "gas_limit": "777776",
+    "gas_used": "628329",
+    "status": "failed",
+    "timestamp": "2026-10-08T20:31:11.000000Z",
+    "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 26150083 at 2026-10-08T20:31:11.000000Z. From 0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9 to 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA. Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 628329 of limit 777776."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000245878271661087",
+    "parts": {
+     "fee": "0.000245878271661087"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    }
+   ],
+   "text": "Fee paid: 0.000245878271661087 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "SlippageExceeded(uint256 _outputAmount, uint256 _outputAmountMin)",
+     "method_id": "71c4efed",
+     "parameters": [
+      {
+       "name": "_outputAmount",
+       "type": "uint256",
+       "value": "14328709197402396616239"
+      },
+      {
+       "name": "_outputAmountMin",
+       "type": "uint256",
+       "value": "14563846497565974891109"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    }
+   ],
+   "text": "Explorer reports the revert reason: SlippageExceeded(uint256 _outputAmount, uint256 _outputAmountMin) with _outputAmount='14328709197402396616239', _outputAmountMin='14563846497565974891109'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x32bb9270"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    }
+   ],
+   "text": "Called function with selector 0x32bb9270 on 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA; not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA to 0x000000003e6B7C98504bEa19cd1A5A064522499b (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xE3F35754954B0B77958C72b83EC5205971463064 (ERC1967Proxy) to 0x0000000037f8a8e865354D8316b2eed2BAb1d115 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xE3F35754954B0B77958C72b83EC5205971463064 (ERC1967Proxy) to 0x0000000037f8a8e865354D8316b2eed2BAb1d115 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xE3F35754954B0B77958C72b83EC5205971463064 (ERC1967Proxy) to 0x0000000037f8a8e865354D8316b2eed2BAb1d115 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xE3F35754954B0B77958C72b83EC5205971463064 (ERC1967Proxy) to 0x0000000037f8a8e865354D8316b2eed2BAb1d115 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xE3F35754954B0B77958C72b83EC5205971463064 (ERC1967Proxy) to 0x0000000037f8a8e865354D8316b2eed2BAb1d115 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xE3F35754954B0B77958C72b83EC5205971463064 (ERC1967Proxy) to 0x0000000037f8a8e865354D8316b2eed2BAb1d115 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E16",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA to 0x000000034714Cd2778c7FC0f284a89d1116171EE (MetaSwapHandlerV2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E18",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E19",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA to 0xa929c559E5e6537359680F39CB4E3708E1a14dd1 (AggregatorGuard) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E20",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa929c559E5e6537359680F39CB4E3708E1a14dd1 (AggregatorGuard) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E21",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E22",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa929c559E5e6537359680F39CB4E3708E1a14dd1 (AggregatorGuard) to 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E23",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E24",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E25",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E26",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E27",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E28",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E29",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E30",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E31",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E32",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E33",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x22ec88b9Ff78c6f2458Ab1A7AA8Bb99d84bd4B86 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Parent reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E34",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x75E2Fc69Ff2ac12aF65Ba7D321bBf4f878c535d2 (LaunchToken) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 38
+   },
+   "id": "E35",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8/internal-transactions"
+    }
+   ],
+   "text": "38 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "computed": {},
+    "label": "CONFIRMED",
+    "level": "single_source",
+    "next_steps": {
+     "developer": [
+      "Read the contract's source where this reason is raised, or ask its developers.",
+      "Do not send the same transaction again until the condition behind the reason has changed."
+     ],
+     "support": [
+      "The service refused the operation with its own message. Contact the app's or project's support with that message and the link to this transaction."
+     ]
+    },
+    "reads": [],
+    "rule": "contract_reason"
+   },
+   "id": "E36",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    }
+   ],
+   "text": "CONFIRMED: The contract reverted with its own reason 'SlippageExceeded(uint256 _outputAmount, uint256 _outputAmountMin)'. What it means is defined in the contract's code. Next step for a non-technical reader: The service refused the operation with its own message. Contact the app's or project's support with that message and the link to this transaction. Next step for a developer: Read the contract's source where this reason is raised, or ask its developers. Next step for a developer: Do not send the same transaction again until the condition behind the reason has changed."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E37",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "failed",
+ "tx_hash": "0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+}

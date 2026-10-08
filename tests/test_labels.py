@@ -29,7 +29,8 @@ def test_label_mapping(rule, level, label):
 def test_every_rule_has_steps_for_a_non_technical_reader():
     rules = {r.__name__.lstrip("_") for r in RULES}
     names = {"balance": "insufficient_balance", "allowance": "insufficient_allowance", "access": "access_control",
-             "all_gas_no_reason": "possibly_out_of_gas"}
+             "all_gas_no_reason": "possibly_out_of_gas", "router_pull": "router_transfer_from",
+             "inner_origin": "out_of_gas"}
     for rule in rules:
         steps = SUPPORT_STEPS[names.get(rule, rule)]
         assert steps and not any("0x" in s or "eth_call" in s or "ABI" in s for s in steps)  # no jargon or hex

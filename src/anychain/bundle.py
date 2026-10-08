@@ -678,7 +678,10 @@ class BundleBuilder:
                       to_text=self._party(tx.to), block=tx.block_number, gas_used=tx.gas_used, gas_limit=tx.gas_limit,
                       reader=StateReader(self.rpc) if self.rpc_verified else None,
                       generic_failure=generic[0] if generic else None,
-                      explorer_text=None if generic else explorer_text, block_time=_unix(tx.timestamp))
+                      explorer_text=None if generic else explorer_text, block_time=_unix(tx.timestamp),
+                      inner_failures=[(e.id, e.data["error"], e.text.split(" (this internal call failed")[0])
+                                      for e in self.bundle.items if e.kind == "internal_call" and e.data.get("error")],
+                      node_gas=self._node_gas())
         finding = diagnose(ctx)
         read_ids = []
         for read in finding.reads:
@@ -687,6 +690,8 @@ class BundleBuilder:
                                    [self._rpc_source(read.detail)], {"call": read.detail, "value": str(read.value)})
             read_ids.append(fact.id)
         sources = [self._tx_source(tx_hash)] + [self._rpc_source(r.detail) for r in finding.reads]
+        if finding.data.get("node_gas"):  # the node's receipt and transaction agree on the gas (D50)
+            sources.append(self._rpc_source(f"eth_getTransactionReceipt {tx_hash} gasUsed, eth_getTransactionByHash gas"))
         if generic:
             sources.append(Source(kind="repo", label="Network software source", url=generic[1]))
         sources += [Source(kind="repo", label="Source of the rule's meaning", url=u) for u in finding.source_urls]
@@ -700,6 +705,14 @@ class BundleBuilder:
             self._gap("Diagnosis", missing.why, missing.needed, retryable=missing.retryable, cause=missing.cause)
         if finding.rule in REPLAY_WHEN and ctx.reader is not None:
             self._add_replay(tx_hash, tx, ctx)
+
+    def _node_gas(self) -> tuple[int, int] | None:
+        """(gas used, gas limit) as the node reports them (receipt, transaction), when both are known."""
+        view = self.rpc_view
+        if view is None or view.receipt is None or view.tx is None:
+            return None
+        used, limit = getattr(view.receipt, "gas_used", None), getattr(view.tx, "gas", None)
+        return (used, limit) if isinstance(used, int) and isinstance(limit, int) else None
 
     def _add_replay(self, tx_hash: str, tx: Transaction | None, ctx: Context) -> None:
         """No reason from the explorer: run the call again on the node at the parent block (PHASE2 T5, R2, D32).
@@ -1440,7 +1453,8 @@ class BundleBuilder:
             if same_as:
                 text = text.rstrip(".") + f": the same movement as {same_as}, not an additional one."
             self.bundle.add("internal_call", text, [source],
-                            {"type": it.type, "value": str(it.value), "moves_value": moves_value, "same_as": same_as})
+                            {"type": it.type, "value": str(it.value), "moves_value": moves_value, "same_as": same_as,
+                             **({"error": it.error} if it.error else {})})
         if reads:
             self.bundle.add("internal_call", f"{len(reads)} read-only staticcall(s) (no state change) not listed.",
                             [source], {"staticcalls": len(reads)})

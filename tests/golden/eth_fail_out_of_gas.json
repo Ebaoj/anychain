@@ -1,0 +1,195 @@
+{
+ "abi_sources": {
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7": "explorer: verified contract TetherToken"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 26150083,
+    "from": "0x7a703f3C2970B0bB4934a06A85bE4Fb3b03eAB02",
+    "gas_limit": "60000",
+    "gas_used": "60000",
+    "status": "failed",
+    "timestamp": "2026-10-08T20:31:11.000000Z",
+    "to": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 26150083 at 2026-10-08T20:31:11.000000Z. From 0x7a703f3C2970B0bB4934a06A85bE4Fb3b03eAB02 to 0xdAC17F958D2ee523a2206206994597C13D831ec7 (TetherToken). Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 60000 of limit 60000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.00002899040274",
+    "parts": {
+     "fee": "0.00002899040274"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    }
+   ],
+   "text": "Fee paid: 0.00002899040274 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "result": "out of gas"
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    }
+   ],
+   "text": "Explorer reports the failure as: 'out of gas'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "abi_origin": "explorer",
+    "args": {
+     "_to": "0xd47a298C3A5d2F6d7B6EdB93c924eB979408E624",
+     "_value": "10000"
+    },
+    "function": "transfer"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    }
+   ],
+   "text": "Called transfer(address,uint256) on 0xdAC17F958D2ee523a2206206994597C13D831ec7 (TetherToken) with _to=0xd47a298C3A5d2F6d7B6EdB93c924eB979408E624, _value=10000. ABI source: explorer: verified contract TetherToken."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "TetherToken",
+    "function": "transfer(address,uint256)",
+    "lines": [
+     336,
+     343
+    ],
+    "path": ".sol",
+    "raise_line": null,
+    "raises": null,
+    "show": []
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    }
+   ],
+   "text": "Code of transfer(address,uint256) in TetherToken (.sol, lines 336-343), from the verified source of the contract 0xdAC17F958D2ee523a2206206994597C13D831ec7, as the explorer lists it:\n336 |     function transfer(address _to, uint _value) public whenNotPaused {\r\n337 |         require(!isBlackListed[msg.sender]);\r\n338 |         if (deprecated) {\r\n339 |             return UpgradedStandardToken(upgradedAddress).transferByLegacy(msg.sender, _to, _value);\r\n340 |         } else {\r\n341 |             return super.transfer(_to, _value);\r\n342 |         }\r\n343 |     }\r"
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "computed": {
+     "node_gas": true
+    },
+    "label": "CONFIRMED",
+    "level": "confirmed",
+    "next_steps": {
+     "developer": [
+      "Send it again with a higher gas limit: estimate the gas for the same call first and use that estimate with a margin; the limit set this time was too low for the call."
+     ],
+     "support": [
+      "The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction."
+     ]
+    },
+    "reads": [],
+    "rule": "out_of_gas"
+   },
+   "id": "E6",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    },
+    {
+     "detail": "eth_getTransactionReceipt 0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81 gasUsed, eth_getTransactionByHash gas",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    }
+   ],
+   "text": "CONFIRMED: The explorer reports the failure as 'out of gas', the execution's own error, not a message of the contract, and the transaction used all 60000 of its 60000 gas limit; the node's receipt agrees (all of the transaction's gas was used): it ran out of gas. Next step for a non-technical reader: The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction. Next step for a developer: Send it again with a higher gas limit: estimate the gas for the same call first and use that estimate with a margin; the limit set this time was too low for the call."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E7",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "failed",
+ "tx_hash": "0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+}

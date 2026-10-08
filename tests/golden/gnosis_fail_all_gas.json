@@ -103,6 +103,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -123,6 +124,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -143,6 +145,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -163,6 +166,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -183,6 +187,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -203,6 +208,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -223,6 +229,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Out of gas",
     "moves_value": false,
     "same_as": null,
     "type": "call",
@@ -260,19 +267,23 @@
   {
    "confidence": "candidate",
    "data": {
-    "computed": {},
+    "computed": {
+     "cites": [
+      "E11"
+     ]
+    },
     "label": "LIKELY",
     "level": "candidate",
     "next_steps": {
      "developer": [
-      "Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
+      "Look at which inner call failed and how much gas it was given (a token that runs its own code on transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that estimate and a margin."
      ],
      "support": [
-      "Contact the app's support with the link to this transaction before trying again: trying again may fail the same way and charge the fee again."
+      "The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction."
      ]
     },
     "reads": [],
-    "rule": "possibly_out_of_gas"
+    "rule": "out_of_gas"
    },
    "id": "E13",
    "kind": "diagnosis",
@@ -284,25 +295,7 @@
      "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
     }
    ],
-   "text": "LIKELY: Possible cause: the transaction used 293252 of its 293668 gas limit and reverted with no reason, which is what running out of gas inside a call looks like. A failed assert in old Solidity or an invalid instruction also uses all the gas. The explorer does not say which. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again: trying again may fail the same way and charge the fee again. Next step for a developer: Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
-  },
-  {
-   "confidence": "confirmed",
-   "data": {
-    "block": 48651846,
-    "reverted": false
-   },
-   "id": "E14",
-   "kind": "replay",
-   "sources": [
-    {
-     "detail": "eth_call replay of 0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57 from 0xd14e38693f4a8b7cc71a3c0203e146fd58a046d1 with its gas limit",
-     "kind": "rpc",
-     "label": "JSON-RPC",
-     "url": "https://rpc.gnosischain.com"
-    }
-   ],
-   "text": "Re-run on the node at block 48651846, the block before, with the transaction's own call, it did not revert. That is inconclusive: the replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends)."
+   "text": "LIKELY: An internal call ran out of gas: the internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c failed with 'Out of gas', as the explorer's trace reports (E11), and the transaction used 293252 of its 293668 gas limit. Next step for a non-technical reader: The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction. Next step for a developer: Look at which inner call failed and how much gas it was given (a token that runs its own code on transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that estimate and a margin."
   },
   {
    "confidence": "confirmed",
@@ -310,7 +303,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E15",
+   "id": "E14",
    "kind": "cross_check",
    "sources": [
     {

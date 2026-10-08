@@ -314,6 +314,35 @@ def chat(
                 break
 
 
+@app.command("eval")
+def run_eval(
+    cases: str = typer.Option("eval/cases.yaml", "--cases", help="The evaluation set"),
+    case: str = typer.Option(None, "--case", help="Run only this case id"),
+    no_llm: bool = typer.Option(False, "--no-llm", help="Measure the evidence only (no written answers, no cost)"),
+    out: str = typer.Option("eval", "--out", help="Folder for report.md and report.json"),
+) -> None:
+    """Run the evaluation set (PHASE3 T5): real recorded transactions, offline, measured, saved as a report."""
+    from pathlib import Path
+
+    from anychain.evaluate import load_cases, report, run_case
+    try:
+        selected = [c for c in load_cases(Path(cases)) if case is None or c["id"] == case]
+    except (OSError, KeyError) as exc:
+        _fail(f"Cannot read the evaluation set {cases}: {exc}")
+    if not selected:
+        _fail(f"No case {case!r} in {cases}")
+    results = []
+    for c in selected:
+        print(f"{c['id']}…", end=" ", flush=True)
+        r = run_case(c, write=not no_llm)
+        results.append(r)
+        print(f"{r.got['status']} {r.got['rule'] or ''} {r.summary_status}")
+    model = "none (--no-llm)" if no_llm else load_config(str(Path("configs") / f"{selected[0]['config']}.yaml")).llm.model
+    summary = report(results, model, Path(out))
+    print(json.dumps(summary, indent=1))
+    print(f"Report: {Path(out) / 'report.md'}")
+
+
 LOCAL_HOSTS = ("127.0.0.1", "localhost", "::1")
 
 

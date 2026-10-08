@@ -36,6 +36,8 @@ class Context:
     generic_failure: str | None = None  # the network type's note when `result` is a text that carries no reason
     explorer_text: str | None = None  # the explorer's failure text when it says more than "Reverted"
     block_time: int | None = None  # the block's timestamp (seconds since 1970-01-01 UTC)
+    inner_failures: list = field(default_factory=list)  # (fact id, explorer's error, the call) of failed inner calls
+    node_gas: tuple | None = None  # (gas used, gas limit) as the node's receipt and transaction give them
 
 
 @dataclass
@@ -76,7 +78,7 @@ def diagnose(ctx: Context) -> Finding:
     for rule in RULES:
         finding = rule(ctx)
         if finding:
-            return _with_passed_deadline(finding, ctx)
+            return _with_unexplained_signals(_with_passed_deadline(finding, ctx), ctx)
     raise AssertionError("the last rule always matches")
 
 
@@ -124,6 +126,70 @@ def _allowance(ctx: Context) -> Finding | None:
     token, owner, amount = token_call  # direct transferFrom: the spender is whoever called it
     return _compare_read(ctx, "insufficient_allowance", text, steps, amount,
                          lambda r, b: r.erc20_allowance(token, owner, ctx.sender, b), "allowance", owner, token)
+
+
+# A Uniswap router could not pull the swap's input token from the sender. 'TransferHelper: TRANSFER_FROM_FAILED' is in
+# the deployed v2 router's verified source (@uniswap/lib TransferHelper.sol L20, read on 2026-10-08; the library's
+# master now says something else); 'STF' is v3-periphery's TransferHelper.sol L21 (commit 0682387). Both are a failed
+# token.transferFrom(sender, …): a missing or too small approval, too small a balance, or the token refusing.
+ROUTER_PULL = {"TransferHelper: TRANSFER_FROM_FAILED": [],
+               "STF": ["https://github.com/Uniswap/v3-periphery/blob/0682387198a24c7cd63566a2c58398533860a5d1/contracts/"
+                       "libraries/TransferHelper.sol#L21"]}
+ROUTER_PULL_STEPS = ["Check, on the input token, the sender's approval for the router (allowance) and balance against "
+                     "the amount; if both are enough, the token itself refuses the transfer (fees on transfer, a "
+                     "blocked address, a pause): read its code."]
+
+
+def _router_pull(ctx: Context) -> Finding | None:
+    text = reason_text(ctx.reason) or ""
+    if text not in ROUTER_PULL:
+        return None
+    urls = ROUTER_PULL[text]
+    said = (f"The reason {text!r} is Uniswap's TransferHelper: the router could not move the swap's input token from "
+            "the sender (its transferFrom failed): a missing or too small approval for the router, too small a "
+            "balance, or the token refusing the transfer.")
+    args = (ctx.call or {}).get("args") or {}
+    path, amount = args.get("path"), _int(args.get("amountIn"))
+    # the decoded path is shown as text ("[0x…, 0x…]") or a list: the input token is its first address
+    first = re.findall(r"0x[0-9a-fA-F]{40}", path if isinstance(path, str) else " ".join(map(str, path or [])))
+    token = first[0] if first else None
+    if not (token and amount is not None and ctx.sender and ctx.to):
+        return Finding("router_transfer_from", "candidate", said + " This call's data does not say which token and "
+                       "amount, so neither can be read.", ROUTER_PULL_STEPS, source_urls=urls)
+    if ctx.reader is None or ctx.block is None:
+        return Finding("router_transfer_from", "candidate", said, ROUTER_PULL_STEPS,
+                       missing=[_unavailable("the allowance and the balance", ctx)], source_urls=urls)
+    try:
+        allowance = ctx.reader.erc20_allowance(token, ctx.sender, ctx.to, ctx.block - 1)
+        balance = ctx.reader.erc20_balance(token, ctx.sender, ctx.block - 1)
+    except (CollectorError, UnreadableState) as exc:
+        return Finding("router_transfer_from", "candidate", said, ROUTER_PULL_STEPS,
+                       missing=[_failed_read("the allowance and the balance", exc)], source_urls=urls)
+    units, missing = _units(ctx, token, allowance.block)
+    shown = lambda raw: f"{raw} raw units" + (f" ({units.amount(raw)})" if units else "")  # noqa: E731
+    scale = (f" The amounts in the token's units use its {units.described}, read at block {allowance.block}."
+             if units else "")
+    reads = [allowance, balance] + (units.reads if units else [])
+    at = f"at block {allowance.block}, the block before this transaction"
+    if allowance.value < amount:
+        return Finding("insufficient_allowance", "confirmed",
+                       f"Cause confirmed: {at}, the sender's approval (allowance) for the router {ctx.to_text} on "
+                       f"token {token} was {shown(allowance.value)}, less than the {shown(amount)} the swap's amountIn "
+                       f"needed. {said}{scale}",
+                       ["Approve the router (the spender) for at least the swap's amountIn on the input token, then "
+                        "send the swap again."], reads, missing=missing, source_urls=urls)
+    if balance.value < amount:
+        return Finding("insufficient_balance", "confirmed",
+                       f"Cause confirmed: {at}, the sender's balance of token {token} was {shown(balance.value)}, less "
+                       f"than the {shown(amount)} the swap's amountIn needed (its approval for the router was enough). "
+                       f"{said}{scale}",
+                       ["Swap at most the balance of the input token, or add to it first."], reads, missing=missing,
+                       source_urls=urls)
+    return Finding("router_transfer_from", "candidate",
+                   f"{said} At {at.split(', ')[0]} both the sender's approval for the router ({shown(allowance.value)}) "
+                   f"and balance ({shown(balance.value)}) were enough for the {shown(amount)}: the token itself likely "
+                   f"refused the transfer, or they changed earlier in this transaction's own block.{scale}",
+                   ROUTER_PULL_STEPS, reads, missing=missing, source_urls=urls)
 
 
 # OpenZeppelin's access checks, read in their source on 2026-10-08: v4.9.6 (commit dc44c9f) Ownable.sol L51
@@ -340,6 +406,25 @@ def _deadline_compared(ctx: Context) -> dict | None:
 
 
 NO_REASON_RULES = ("no_reason", "possibly_out_of_gas")
+GAS_RULES = ("out_of_gas", "possibly_out_of_gas")
+
+
+def _with_unexplained_signals(finding: Finding, ctx: Context) -> Finding:
+    """Every failure signal the conclusion does not account for is said, and a conclusion that leaves one is LIKELY
+    at most (D51): an error of execution inside that it does not cite, or the whole gas limit used when it is not about
+    gas. The rules read the reason at the top; these signals say the failure may have begun elsewhere."""
+    cited = set(finding.data.get("cites") or [])
+    left = [f"an internal call failed with {error!r} ({fid})" for fid, error, _call in _origins(ctx) if fid not in cited]
+    if finding.rule not in GAS_RULES and ctx.gas_used and ctx.gas_limit and ctx.gas_used / ctx.gas_limit >= ALL_GAS:
+        left.append(f"the transaction used {ctx.gas_used} of its {ctx.gas_limit} gas limit")
+    if not left:
+        return finding
+    finding.text += (" Also present, and not explained by this conclusion: " + "; ".join(left)
+                     + ". The failure may have begun there instead.")
+    finding.data["unexplained"] = left
+    if label_for(finding.rule, finding.level, finding.label) == "CONFIRMED":
+        finding.label = "LIKELY"  # a cause that leaves a signal unexplained is not proven (D51); never raised
+    return finding
 
 
 def _with_passed_deadline(finding: Finding, ctx: Context) -> Finding:
@@ -361,6 +446,78 @@ def _utc(seconds: int) -> str:
         return datetime.fromtimestamp(seconds, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     except (OverflowError, OSError, ValueError):
         return "beyond any calendar date"
+
+
+OUT_OF_GAS_STEPS = ["Send it again with a higher gas limit: estimate the gas for the same call first and use that "
+                    "estimate with a margin; the limit set this time was too low for the call."]
+
+
+OUT_OF_GAS = re.compile(r"^\s*out\s*of\s*gas", re.IGNORECASE)  # "out of gas", "OutOfGas", "out of gas: not enough …"
+
+
+def _out_of_gas(ctx: Context) -> Finding | None:
+    """The explorer reports "out of gas": the execution's own error (from its trace), not a message of the contract.
+    With all the gas used it is the cause, CONFIRMED when the node's receipt agrees (D42: a read on the chain); with
+    gas left over, an inner call ran out of the gas it was given."""
+    if not OUT_OF_GAS.match(ctx.explorer_text or "") or reason_text(ctx.reason):
+        return None
+    said = (f"The explorer reports the failure as {ctx.explorer_text.strip()!r}, the execution's own error, not a "
+            "message of the contract")
+    if not (ctx.gas_used and ctx.gas_limit):
+        return Finding("out_of_gas", "candidate", f"{said}; the gas the transaction used is not known.",
+                       OUT_OF_GAS_STEPS)
+    if ctx.gas_used >= ctx.gas_limit:
+        node_agrees = ctx.node_gas is not None and ctx.node_gas[0] >= ctx.node_gas[1] == ctx.gas_limit
+        return Finding("out_of_gas", "confirmed" if node_agrees else "single_source",
+                       f"{said}, and the transaction used all {ctx.gas_used} of its {ctx.gas_limit} gas limit"
+                       + ("; the node's receipt agrees (all of the transaction's gas was used)" if node_agrees else "")
+                       + ": it ran out of gas.", OUT_OF_GAS_STEPS, data={"node_gas": node_agrees},
+                       label=None if node_agrees else "LIKELY")
+    return Finding("out_of_gas", "candidate",
+                   f"{said}; the transaction used {ctx.gas_used} of its {ctx.gas_limit} gas limit, so an inner call "
+                   "likely ran out of the gas it was given rather than the whole transaction.", INNER_GAS_STEPS)
+
+
+INNER_GAS_STEPS = ["Look at which inner call failed and how much gas it was given (a token that runs its own code on "
+                   "transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that "
+                   "estimate and a margin."]
+
+
+# Errors of an internal call that only pass a failure on from inside (seen in the recordings, 2026-10-08):
+# everything else the explorer reports for an internal call ("out of gas", "invalid opcode"…) is an error of execution
+# that marks where the failure began (D51).
+PROPAGATING = {"reverted", "parent reverted", "execution reverted"}
+
+
+def _origins(ctx: Context) -> list[tuple[str, str, str]]:
+    return [(fid, error, call) for fid, error, call in ctx.inner_failures
+            if error and error.strip().lower() not in PROPAGATING]
+
+
+def _inner_origin(ctx: Context) -> Finding | None:
+    """The failure began inside: an internal call failed with an error of execution, and the failure at the top is the
+    outer call failing because of it (D51; found by the eval, D50: a tax token's transferFrom called back into the
+    router, whose call to WETH9 ran out of gas, and the router reported TRANSFER_FROM_FAILED)."""
+    origins = _origins(ctx)
+    text = reason_text(ctx.reason) or ""
+    if not origins or OUT_OF_GAS.match(ctx.explorer_text or ""):
+        return None  # none, or the transaction itself reports it (_out_of_gas)
+    if text and text not in ROUTER_PULL and text.lower() != "execution reverted":
+        return None  # a reason of its own: the rule that reads it decides, and the signal check says what it leaves
+    fid, error, call = origins[0]
+    call = re.sub(r"^Internal call", "the internal call", call)
+    used = (f", and the transaction used {ctx.gas_used} of its {ctx.gas_limit} gas limit"
+            if ctx.gas_used and ctx.gas_limit else "")
+    outer = f"; the reason {text!r} at the top is the outer call failing because of it" if text else ""
+    if OUT_OF_GAS.match(error):
+        return Finding("out_of_gas", "candidate",
+                       f"An internal call ran out of gas: {call} failed with {error!r}, as the explorer's trace reports "
+                       f"({fid}){used}{outer}.", INNER_GAS_STEPS, data={"cites": [fid]})
+    return Finding("inner_execution_error", "candidate",
+                   f"An internal call failed with the execution error {error!r}: {call}, as the explorer's trace "
+                   f"reports ({fid}); that is where the failure began{outer}.",
+                   ["Look at that internal call and the error the explorer reports; a trace of the transaction shows "
+                    "the exact instruction."], data={"cites": [fid]})
 
 
 def _all_gas_no_reason(ctx: Context) -> Finding | None:
@@ -418,6 +575,13 @@ SUPPORT_STEPS = {
                  "amount or a limit that fits it, or contact the app's support."],
     "deadline": ["The operation was refused by a time-limit check. Contact the app's support with the link to this "
                  "transaction before trying again."],
+    "router_transfer_from": ["The swap could not take the token from the account: check in the app that the token is "
+                             "approved for this swap and that the balance is enough, then try again; if both are, "
+                             "contact the app's support with the link to this transaction."],
+    "inner_execution_error": ["The operation failed inside one of its steps, with an error of execution, not a message "
+                              "of the service. Contact the app's support with the link to this transaction."],
+    "out_of_gas": ["The operation stopped because it ran out of gas (the limit on the work it may do). Try again "
+                   "from the app and let it set that limit, or contact its support with the link to this transaction."],
     "possibly_out_of_gas": ["Contact the app's support with the link to this transaction before trying again: "
                             "trying again may fail the same way and charge the fee again."],
     "contract_reason": ["The service refused the operation with its own message. Contact the app's or project's "
@@ -450,7 +614,7 @@ def steps_text(rule: str, developer: list[str]) -> str:
             + " ".join(f"Next step for a developer: {s}" for s in developer))
 
 
-RULES = [_generic_failure, _balance, _allowance, _access, _paused, _slippage, _deadline, _all_gas_no_reason,
+RULES = [_generic_failure, _inner_origin, _balance, _allowance, _router_pull, _access, _paused, _slippage, _deadline, _out_of_gas, _all_gas_no_reason,
          _contract_reason,
          _no_reason]
 

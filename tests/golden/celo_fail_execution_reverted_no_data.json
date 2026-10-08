@@ -124,6 +124,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "error": "Parent reverted",
     "moves_value": false,
     "same_as": null,
     "type": "delegatecall",

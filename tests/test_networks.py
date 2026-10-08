@@ -427,8 +427,8 @@ DIAGNOSIS_CASES = [
     ("rootstock_fail_paused", "rootstock-mainnet", "paused", "confirmed", ["paused() returned true"]),
     ("op_fail_deadline", "optimism-mainnet", "deadline", "candidate",  # unverified contract: words only
      ["Possible cause", "'block number deadline'"]),
-    ("gnosis_fail_all_gas", "gnosis-mainnet", "possibly_out_of_gas", "candidate",
-     ["Possible cause", "293252 of its 293668", "does not say which"]),
+    ("gnosis_fail_all_gas", "gnosis-mainnet", "out_of_gas", "candidate",  # the trace names the inner call (D50)
+     ["An internal call ran out of gas", "'Out of gas'", "293252 of its 293668"]),
     ("celo_fail_execution_reverted_no_data", "celo-mainnet", "no_reason", "single_source",
      ["No reason is available"]),  # the explorer's "execution reverted" is not a reason
     ("zksync_fail_generic", "zksync-era", "generic_failure", "single_source", ["carries no reason"]),
@@ -507,7 +507,6 @@ def test_replay_custom_error_without_abi_is_named_and_gapped():
 
 
 @pytest.mark.parametrize("fixture, network, words", [
-    ("gnosis_fail_all_gas", "gnosis-mainnet", "did not revert. That is inconclusive"),
     ("celo_fail_execution_reverted_no_data", "celo-mainnet", "did not revert. That is inconclusive"),
     ("gnosis_revert_no_data", "gnosis-mainnet", "reverted with no revert data"),
 ])

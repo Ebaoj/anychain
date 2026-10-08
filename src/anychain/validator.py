@@ -133,6 +133,9 @@ def _check(answer: str, evidence: str, allowed_urls: set[str], ids: set[str]) ->
     known = _numbers(evidence) + code_lines
     for m in NUMBER.finditer(rest):
         sign, token, scale = m.group(1), m.group(2), (m.group(3) or "").lower()
+        word = _word_around(rest, m.start(2), m.end(2))
+        if word != token and re.search(rf"(?<!\w){re.escape(word)}(?!\w)", evidence):
+            continue  # digits inside a name the evidence has ("ERC1967Proxy"), not a number (found by the eval)
         digits = sum(c.isdigit() for c in token)
         readings = _readings(token, scale)
         has_decimals = bool(readings) and all(unit < 1 for _v, unit in readings) and not scale
@@ -163,6 +166,15 @@ def _unit_problems(answer: str, evidence: str) -> list[str]:
                 problems.append(f"{m.group(0).strip()} is not the amount in the token's units the evidence gives "
                                 f"(those are {', '.join(str(c) for c in converted) or 'none'} {symbol})")
     return problems
+
+
+def _word_around(text: str, start: int, end: int) -> str:
+    """The letters, digits and underscores around a number written inside a word ("ERC1967Proxy")."""
+    while start > 0 and (text[start - 1].isalnum() or text[start - 1] == "_"):
+        start -= 1
+    while end < len(text) and (text[end].isalnum() or text[end] == "_"):
+        end += 1
+    return text[start:end]
 
 
 def _citations(answer: str) -> tuple[set[int], str]:

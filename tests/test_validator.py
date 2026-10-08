@@ -185,3 +185,10 @@ URL_TX = "https://eth.blockscout.com/tx/0xd58d09060a633d461c0d260bfdb4f61bd4ab84
 ])
 def test_review_false_positives_pass(legit, bundle):
     assert _check(legit, bundle) == [], legit
+
+
+def test_digits_inside_a_name_are_not_a_number():
+    # found by the eval (PHASE3 T5): "ERC1967Proxy", a contract name in the evidence, was read as the number 1967
+    evidence = json.dumps({"evidence": [{"id": "E1", "kind": "call", "fact": "Called upgradeTo on 0x1 (ERC1967Proxy)."}]})
+    assert check_answer("The proxy ERC1967Proxy forwarded the call [E1].", evidence, set(), {"E1"}) == []
+    assert check_answer("It moved 1967 tokens [E1].", evidence, set(), {"E1"})  # a real number still checked
