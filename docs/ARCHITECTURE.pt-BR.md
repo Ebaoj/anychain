@@ -42,7 +42,7 @@ flowchart TD
     BUN["4. Pacote de evidências<br/>fatos E1, E2... cada um com fonte<br/>lacunas: o que falta + vale tentar de novo?"]
     BUN --> WRI["5. Redator com IA<br/>instrução por modo, cita [E#]<br/>Claude Code (padrão), API Anthropic ou OpenAI"]
     BUN --> REN["Saída sem IA<br/>funciona sem o modelo"]
-    WRI --> VAL["6. Validador<br/>números citados existem, nenhum endereço,<br/>valor ou hash inventado"]
+    WRI --> VAL["6. Validador<br/>ids citados existem, nenhum endereço,<br/>valor ou hash inventado<br/>tenta de novo uma vez, senão só os fatos"]
     VAL --> OUT
     REN --> OUT
 
@@ -58,8 +58,8 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY done
-    class REPO,CAS,DIAG,VAL next
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL done
+    class REPO,CAS,DIAG next
     class API,DB,FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
@@ -146,6 +146,7 @@ flowchart LR
     subgraph output["Saída"]
         render["render.py<br/>markdown, sem IA"]
         writer["writer.py<br/>motores de IA: claude_code,<br/>anthropic, openai"]
+        validator["validator.py<br/>confere a resposta escrita<br/>contra os fatos"]
         prompts["prompts/*.md<br/>uma instrução por modo"]
     end
 
@@ -165,6 +166,7 @@ flowchart LR
     rpc --> types
     bundle --> types
     writer --> prompts
+    writer --> validator
     replay -.usado nos testes.-> explorer
     replay -.usado nos testes.-> rpc
 ```
@@ -237,6 +239,7 @@ O canário é o único jeito de pegar o erro silencioso (um fato falso que nada 
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
 - **07/10/2026, objetos tipados (D21):** as respostas do explorador e do nó viram objetos tipados uma única vez, em `collectors/types.py`.
+- **08/10/2026, validador (D28, Fase 2 T1):** a resposta escrita é conferida contra os fatos; com problema, o modelo tenta de novo uma vez; se falhar de novo, aparecem só os fatos.
 - **08/10/2026, motores de IA (D27):** o redator usa o Claude Code local por padrão; as APIs da Anthropic e da OpenAI são opções de configuração para um serviço publicado.
 - **08/10/2026, correções de nível C (D26):** pedidos ao explorador em paralelo e uma vez só; o corte das chamadas internas mantém todas as que moveram valor; reversões descritas como o explorador informa.
 - **07/10/2026, estado na L1 da zkSync (D25):** o estado do explorador nunca é afirmado; o perfil confirma com o nó (`node_facts`); a causa de cada lacuna é obrigatória, com a nova causa `config_error`.

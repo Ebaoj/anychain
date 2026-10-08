@@ -42,7 +42,7 @@ flowchart TD
     BUN["4. Evidence bundle<br/>facts E1, E2... each with a source<br/>gaps: what is missing + retryable?"]
     BUN --> WRI["5. LLM writer<br/>prompt per mode, cites [E#]<br/>Claude Code (default), Anthropic or OpenAI API"]
     BUN --> REN["Deterministic render<br/>works with no LLM"]
-    WRI --> VAL["6. Validator<br/>cited ids exist, no invented<br/>addresses, values or hashes"]
+    WRI --> VAL["6. Validator<br/>cited ids exist, no invented<br/>addresses, values or hashes<br/>retry once, else evidence only"]
     VAL --> OUT
     REN --> OUT
 
@@ -58,8 +58,8 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY done
-    class REPO,CAS,DIAG,VAL next
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL done
+    class REPO,CAS,DIAG next
     class API,DB,FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
@@ -146,6 +146,7 @@ flowchart LR
     subgraph output["Output"]
         render["render.py<br/>markdown, no LLM"]
         writer["writer.py<br/>LLM backends: claude_code,<br/>anthropic, openai"]
+        validator["validator.py<br/>checks the written answer<br/>against the evidence"]
         prompts["prompts/*.md<br/>one per mode"]
     end
 
@@ -165,6 +166,7 @@ flowchart LR
     rpc --> types
     bundle --> types
     writer --> prompts
+    writer --> validator
     replay -.used by tests.-> explorer
     replay -.used by tests.-> rpc
 ```
@@ -234,6 +236,7 @@ The canary is the only way to catch the silent kind (a false fact nothing flagge
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-08, validator (D28, PHASE2 T1):** the written answer is checked against the evidence, retried once with the problems, else withheld.
 - **2026-10-08, LLM backends (D27):** the writer runs on the local Claude Code CLI by default; the Anthropic and OpenAI APIs are config options for a deployed service.
 - **2026-10-08, level C fixes (D26):** explorer requests in parallel and fetched once; the internal-call cutoff keeps every call that moved value; reverts worded as the explorer reports them.
 - **2026-10-07, zkSync L1 status (D25):** the explorer's status is never asserted; the profile confirms it with the node (`node_facts`); every gap must name its cause, with the new cause `config_error`.

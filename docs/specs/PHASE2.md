@@ -1,6 +1,6 @@
 # PHASE2: failures and degradation (diagnosis, eth_call, repo grounding, ABI cascade, validator)
 
-- **Status:** DRAFT (waiting for Joabe's approval)
+- **Status:** IN PROGRESS (approved by Joabe on 2026-10-08 with the proposed defaults: spec in the repo, order T1 to T9, signature database on as candidates only)
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)
@@ -91,7 +91,7 @@ No `git push`, no deploy. No tracing node (`debug_traceTransaction`) as a requir
 
 Local tool, no deploy. Each source can be turned off by config (`abi_strategy.order`, `signature_db.enabled`, `repos: []`), which returns to Phase 1 behaviour.
 
-## 12. Open decisions (Joabe)
+## 12. Decisions (Joabe, decided 2026-10-08: the proposed defaults)
 
 - **D1. Where this spec lives.** The global rule sends tickets to Jira (KAN), and asks before creating one for a project without a Jira space. Proposed default: keep it in the repo (`docs/specs/`), as the rest of this project's decisions.
 - **D2. Order.** Proposed default: T1 to T9 as listed (validator first).
@@ -107,7 +107,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 | R4 | BRLC call cites file, lines and commit | pasted |
 | R5 | unverified contract decoded from repo; 4byte match stated as candidate | pasted |
 | R6 | every fact has a confidence; a candidate never reads as confirmed | pasted |
-| R7 | invented number or `[E99]` rejected, retry, then fallback | pasted |
+| R7 | `tests/test_validator.py` (real answers pass; tampered numbers, hex, links and citations caught; retry and withhold flow; event log) | T1 done 2026-10-08: 374 passed; live: support ok, developer fixed on retry (D28) |
 | R8 | one case per missing source | pasted |
 
 ## 14. How to verify
@@ -116,6 +116,6 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 
 ## 15. Definition of done
 
-- [ ] D1 to D3 decided.
+- [x] D1 to D3 decided (2026-10-08).
 - [ ] T1 to T9 committed, each with its tests and a clean-context review.
 - [ ] Architecture docs (en and pt-BR) updated; Phase 2 explained to Joabe in plain Portuguese.

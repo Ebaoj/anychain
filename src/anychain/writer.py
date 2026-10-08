@@ -13,6 +13,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
@@ -20,6 +21,7 @@ import httpx
 
 from anychain.config import AppConfig, LlmConfig
 from anychain.models import EvidenceBundle, Source
+from anychain.validator import allowed_urls, check_answer, evidence_ids
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 
@@ -189,11 +191,45 @@ def backend_for(llm: LlmConfig) -> LlmBackend:
     return BACKENDS[llm.provider](llm)
 
 
-def write_explanation(bundle: EvidenceBundle, cfg: AppConfig, mode: str, backend: LlmBackend | None = None) -> str:
+def write_explanation(bundle: EvidenceBundle, cfg: AppConfig, mode: str, backend: LlmBackend | None = None,
+                      feedback: list[str] | None = None) -> str:
+    """One answer. `feedback`: problems the validator found in a previous attempt, sent back once."""
     backend = backend or backend_for(cfg.llm)
+    user = evidence_payload(bundle, cfg)
+    if feedback:
+        user += ("\n\nYour previous answer was rejected because it contained things that are not in the "
+                 "evidence above:\n" + "\n".join(f"- {p[:160]}" for p in feedback[:20]) +
+                 "\nWrite the answer again. Quote values exactly as the evidence has them, and leave out "
+                 "anything the evidence does not hold.")
     try:
-        return backend.complete(load_prompt(mode, cfg.assistant.language), evidence_payload(bundle, cfg))
+        return backend.complete(load_prompt(mode, cfg.assistant.language), user)
     except WriterError:
         raise
     except Exception as exc:
         raise WriterError(f"LLM call failed: {type(exc).__name__}: {exc}") from exc
+
+
+@dataclass
+class CheckedAnswer:
+    text: str | None  # None: withheld, show the evidence only
+    outcome: str  # ok | retried | withheld
+    problems: list[str]  # retried: what the first attempt had wrong; withheld: what the last one had
+
+
+def write_checked(bundle: EvidenceBundle, cfg: AppConfig, mode: str,
+                  backend: LlmBackend | None = None) -> CheckedAnswer:
+    """Write, check against the evidence (validator), retry once with the problems, else withhold.
+
+    WriterError (no model available) propagates: the caller shows the evidence only.
+    """
+    backend = backend or backend_for(cfg.llm)
+    evidence, urls, ids = evidence_payload(bundle, cfg), allowed_urls(bundle), evidence_ids(bundle)
+    answer = write_explanation(bundle, cfg, mode, backend)
+    first = check_answer(answer, evidence, urls, ids)
+    if not first:
+        return CheckedAnswer(answer, "ok", [])
+    answer = write_explanation(bundle, cfg, mode, backend, feedback=first)
+    problems = check_answer(answer, evidence, urls, ids)
+    if not problems:
+        return CheckedAnswer(answer, "retried", first)
+    return CheckedAnswer(None, "withheld", problems)

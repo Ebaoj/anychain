@@ -21,6 +21,7 @@ from typing import Protocol
 from anychain.models import EvidenceBundle
 
 # Causes that mean something is wrong (as opposed to an expected limit).
+WRITER_PROBLEMS = ("withheld", "unavailable")  # the user got the evidence only
 PROBLEM_CAUSES = ("processing_error", "config_error", "source_error", "source_unavailable", "source_behind")
 
 
@@ -50,18 +51,21 @@ class RunEvent:
     status: str | None = None  # the transaction's status as answered
     facts: int = 0
     error: str | None = None  # crash message: the tool could not answer at all
+    writer: str | None = None  # written answer: ok | retried | withheld | unavailable | skipped (None: not asked)
     gaps: tuple[GapEvent, ...] = ()
     checks: tuple[CheckEvent, ...] = ()
     ts: float = field(default_factory=time.time)
 
     @classmethod
     def from_bundle(cls, bundle: EvidenceBundle, source: str, duration_ms: int,
-                    checks: tuple[CheckEvent, ...] = (), ts: float | None = None) -> "RunEvent":
+                    checks: tuple[CheckEvent, ...] = (), ts: float | None = None,
+                    writer: str | None = None) -> "RunEvent":
         gaps = tuple(GapEvent(g.what, g.cause, g.why, g.retryable) for g in bundle.gaps)
-        problem = any(g.cause in PROBLEM_CAUSES for g in gaps) or any(c.status == "fail" for c in checks)
+        problem = (any(g.cause in PROBLEM_CAUSES for g in gaps) or any(c.status == "fail" for c in checks)
+                   or writer in WRITER_PROBLEMS)
         return cls(network=bundle.network, tx_hash=bundle.tx_hash, source=source,
                    outcome="degraded" if problem else "ok", duration_ms=duration_ms, status=bundle.status,
-                   facts=len(bundle.items), gaps=gaps, checks=checks, **({"ts": ts} if ts else {}))
+                   facts=len(bundle.items), gaps=gaps, checks=checks, writer=writer, **({"ts": ts} if ts else {}))
 
     @classmethod
     def crash(cls, network: str, tx_hash: str, source: str, duration_ms: int, error: str,
@@ -85,7 +89,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY, ts REAL NOT NULL, network TEXT NOT NULL, tx_hash TEXT NOT NULL,
     source TEXT NOT NULL, outcome TEXT NOT NULL, duration_ms INTEGER NOT NULL,
-    status TEXT, facts INTEGER NOT NULL, error TEXT);
+    status TEXT, facts INTEGER NOT NULL, error TEXT, writer TEXT);
 CREATE TABLE IF NOT EXISTS gaps (
     run_id INTEGER NOT NULL REFERENCES runs(id), topic TEXT NOT NULL, cause TEXT NOT NULL,
     why TEXT NOT NULL, retryable INTEGER NOT NULL);
@@ -110,6 +114,9 @@ class SqliteEventLog:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as db:
             db.executescript(SCHEMA)
+            columns = {row[1] for row in db.execute("PRAGMA table_info(runs)")}
+            if "writer" not in columns:  # logs created before PHASE2 T1
+                db.execute("ALTER TABLE runs ADD COLUMN writer TEXT")
 
     @contextmanager
     def _connect(self):
@@ -136,10 +143,10 @@ class SqliteEventLog:
                     db.executemany(f"DELETE FROM {table} WHERE run_id = ?", [(i,) for i in old])
                 db.executemany("DELETE FROM runs WHERE id = ?", [(i,) for i in old])
             run_id = db.execute(
-                "INSERT INTO runs (ts, network, tx_hash, source, outcome, duration_ms, status, facts, error)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO runs (ts, network, tx_hash, source, outcome, duration_ms, status, facts, error, writer)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (event.ts, event.network, event.tx_hash, event.source, event.outcome, event.duration_ms,
-                 event.status, event.facts, event.error)).lastrowid
+                 event.status, event.facts, event.error, event.writer)).lastrowid
             db.executemany("INSERT INTO gaps (run_id, topic, cause, why, retryable) VALUES (?, ?, ?, ?, ?)",
                            [(run_id, g.topic, g.cause, g.why, int(g.retryable)) for g in event.gaps])
             db.executemany("INSERT INTO checks (run_id, name, status, detail) VALUES (?, ?, ?, ?)",
@@ -153,9 +160,13 @@ class SqliteEventLog:
         if network:
             where, args = where + " AND r.network = ?", args + [network]
         with self._connect() as db:
+            # a log from before PHASE2 T1, opened read-only, has no writer column: read it as empty
+            w = "writer" if "writer" in {r[1] for r in db.execute("PRAGMA table_info(runs)")} else "NULL"
             runs = db.execute(
                 f"SELECT network, COUNT(*) AS answers, SUM(outcome = 'crash') AS crashes,"
-                f" SUM(outcome = 'degraded') AS degraded, CAST(AVG(duration_ms) AS INTEGER) AS avg_ms"
+                f" SUM(outcome = 'degraded') AS degraded, CAST(AVG(duration_ms) AS INTEGER) AS avg_ms,"
+                f" SUM({w} = 'retried') AS retried, SUM({w} = 'withheld') AS withheld,"
+                f" SUM({w} = 'unavailable') AS unavailable"
                 f" FROM runs r WHERE {where} GROUP BY network ORDER BY network", args).fetchall()
             causes = db.execute(
                 f"SELECT r.network, g.cause, g.topic, COUNT(DISTINCT r.id) AS answers FROM gaps g"
@@ -173,17 +184,20 @@ class SqliteEventLog:
 
     def problems(self, since_ts: float, network: str | None = None, cause: str | None = None,
                  limit: int = 20) -> list[dict]:
-        """Most recent answers that crashed, failed a check, or have a gap with a problem cause."""
+        """Most recent answers that crashed, failed a check, had their written answer withheld or
+        unavailable, or have a gap with a problem cause."""
         causes = (cause,) if cause else PROBLEM_CAUSES
         marks = ",".join("?" * len(causes))
         where, args = "r.ts >= ?", [since_ts]
         if network:
             where, args = where + " AND r.network = ?", args + [network]
         with self._connect() as db:
+            has_writer = "writer" in {r[1] for r in db.execute("PRAGMA table_info(runs)")}
+            writer = "r.writer IN ('withheld', 'unavailable') OR " if has_writer else ""
             rows = db.execute(
                 f"SELECT r.* FROM runs r WHERE {where} AND ("
-                + ("" if cause else "r.outcome = 'crash' OR EXISTS (SELECT 1 FROM checks c WHERE c.run_id = r.id"
-                   " AND c.status = 'fail') OR ")
+                + ("" if cause else "r.outcome = 'crash' OR " + writer + "EXISTS (SELECT 1 FROM checks c "
+                   "WHERE c.run_id = r.id AND c.status = 'fail') OR ")
                 + f"EXISTS (SELECT 1 FROM gaps g WHERE g.run_id = r.id AND g.cause IN ({marks})))"
                 f" ORDER BY r.ts DESC LIMIT ?", args + list(causes) + [limit]).fetchall()
             result = []

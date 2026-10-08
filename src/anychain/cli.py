@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 from anychain.bundle import InvalidHashError, build_bundle
 from anychain.config import ConfigError, load_config
-from anychain.events import PROBLEM_CAUSES, NullEventLog, RunEvent, SqliteEventLog, event_log_for
+from anychain.events import PROBLEM_CAUSES, CheckEvent, NullEventLog, RunEvent, SqliteEventLog, event_log_for
 from anychain.render import render_markdown
-from anychain.writer import WriterError, write_explanation
+from anychain.writer import WriterError, write_checked
 
 app = typer.Typer(help="Explain and troubleshoot EVM transactions on any configured network.", no_args_is_help=True)
 
@@ -54,21 +54,33 @@ def explain(
         _record(log, RunEvent.crash(cfg.network.name, tx_hash.strip(), "cli", _ms(started),
                                     f"{type(exc).__name__}: {exc}"))
         _fail(f"Unexpected error while collecting data ({type(exc).__name__}: {exc}). Please report it.")
-    _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started)))
-
     if as_json:
+        _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started)))
         print(bundle.model_dump_json(indent=2))
         return
     evidence_md = render_markdown(bundle)
     if no_llm or not bundle.items:
+        _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), writer="skipped"))
         print(evidence_md)
         return
     try:
-        answer = write_explanation(bundle, cfg, (mode or Mode(cfg.assistant.default_mode)).value)
-        print(answer + "\n\n---\n" + evidence_md)
+        checked = write_checked(bundle, cfg, (mode or Mode(cfg.assistant.default_mode)).value)
     except WriterError as exc:
+        _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), writer="unavailable"))
         print(f"_(LLM unavailable: {exc}. Showing the evidence only.)_\n", file=sys.stderr)
         print(evidence_md)
+        return
+    # What the model stated outside the evidence, kept for review: "retried" (fixed) or "fail" (withheld).
+    check = (CheckEvent("answer_check", "fail" if checked.text is None else "retried", "; ".join(checked.problems)),
+             ) if checked.problems else ()
+    _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), checks=check, writer=checked.outcome))
+    if checked.text is None:
+        listed = "; ".join(checked.problems[:3])
+        print(f"_(The written explanation was withheld: twice it stated things not in the evidence ({listed}). "
+              "Showing the evidence only.)_\n")
+        print(evidence_md)
+        return
+    print(checked.text + "\n\n---\n" + evidence_md)
 
 
 def _n(count: int, noun: str) -> str:
@@ -129,6 +141,8 @@ def show_log(
             print(f"{when}  {r['network']}  {r['tx_hash']}  {r['source']}  {r['outcome']}  {r['duration_ms']} ms")
             if r["error"]:
                 print(f"    crash: {r['error']}")
+            if r.get("writer") in ("withheld", "unavailable"):
+                print(f"    written answer {r['writer']}")
             for g in r["gaps"]:
                 print(f"    {g['cause']}: {g['topic']}: {g['why'][:140]}")
             for f in r["check_failures"]:
@@ -140,6 +154,9 @@ def show_log(
     for r in rows:
         print(f"{r['network']}: {_n(r['answers'], 'answer')}, {r['degraded']} with a problem, "
               f"{r['crashes']} crashed, avg {r['avg_ms']} ms")
+        if r["retried"] or r["withheld"] or r["unavailable"]:
+            print(f"    written answer: {r['retried'] or 0} fixed on retry, {r['withheld'] or 0} withheld "
+                  f"(stated things not in the evidence), {r['unavailable'] or 0} without a model")
         for g in r["gaps"]:
             if g["cause"] in PROBLEM_CAUSES:
                 share = 100 * g["answers"] / r["answers"]
