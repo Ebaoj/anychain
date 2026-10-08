@@ -170,3 +170,23 @@ def test_outages_are_logged_as_problems(monkeypatch, event_log, offline):
     [row] = event_log.summary(0)
     assert row["degraded"] == 1
     assert any(g["cause"] in PROBLEM_CAUSES for g in row["gaps"])
+
+
+def test_a_slow_explorer_does_not_take_the_nodes_time(monkeypatch):
+    # Acceptance run, 2026-10-08: the explorer used the whole 30 s budget on the transaction (three 10 s
+    # timeouts) and the node was never asked, so the answer was "unknown" while the node knew it succeeded.
+    import threading
+
+    from anychain.collectors.http import CollectorError
+    real = ExplorerClient.transaction
+
+    def slow(self, tx_hash):
+        threading.Event().wait(0.3)  # longer than the whole budget below (not time.sleep: the suite stubs it)
+        raise CollectorError(f"time budget of 0s used up before {tx_hash} (ReadTimeout)", retryable=True)
+    monkeypatch.setattr(ExplorerClient, "transaction", slow)
+    cfg = _eth()
+    client = httpx.Client(transport=make_transport("eth_usdc_transfer"))
+    budget = Budget(0.2)
+    b = BundleBuilder(cfg, ExplorerClient(cfg.explorer, client, budget), RpcClient(cfg.rpc, client, budget)).build(USDC_TX)
+    assert b.status == "success"  # the node answered in time
+    monkeypatch.setattr(ExplorerClient, "transaction", real)

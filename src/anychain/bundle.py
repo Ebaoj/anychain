@@ -127,6 +127,7 @@ class BundleBuilder:
         self.explorer_not_found = False
         self.explorer_answered = False  # True when the explorer responded at all (even with 404)
         self.rpc_verified = False  # True once the RPC's chain id matched the config
+        self.rpc_missed = False  # the node answered null for the hash
         self.rpc_view: RpcView | None = None
         self.repos: list[Repo] | None = None  # configured repos from the local cache, loaded on first use
         self.source_repo: Repo | None = None  # the repo matched to the called contract, if any
@@ -147,9 +148,18 @@ class BundleBuilder:
 
     def build(self, tx_hash: str) -> EvidenceBundle:
         self.bundle = EvidenceBundle(network=self.cfg.network.name, tx_hash=tx_hash, status="unknown")
-        tx = self._fetch_explorer_tx(tx_hash)
+        # Explorer and node in parallel: a slow explorer must not use up the time the node needs (acceptance
+        # run, 2026-10-08: two answers were "unknown" because the node was never asked).
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            explorer_future = pool.submit(self._fetch_explorer_tx, tx_hash)
+            rpc_future = pool.submit(self._fetch_rpc, tx_hash)
+            tx, rpc_view = explorer_future.result(), rpc_future.result()
+        # same order whichever finished first: the explorer's gaps, then the node's
+        self.bundle.gaps.sort(key=lambda g: g.what == "RPC transaction data")
+        self.rpc_view = rpc_view
         explorer_status = self._status_from_explorer(tx) if tx is not None else None
-        rpc_view = self.rpc_view = self._fetch_rpc(tx_hash, explorer_status)
+        if self.rpc_missed:
+            self._explain_rpc_miss(explorer_status)  # why the node has no copy depends on the explorer
 
         has_receipt = rpc_view is not None and rpc_view.receipt is not None
         explorer_lagging = explorer_status in ("pending", "dropped") and has_receipt
@@ -227,7 +237,7 @@ class BundleBuilder:
                       _source_cause(exc.retryable))
             return None
 
-    def _fetch_rpc(self, tx_hash: str, explorer_status: str | None) -> RpcView | None:
+    def _fetch_rpc(self, tx_hash: str) -> RpcView | None:
         """Transaction + receipt from the RPC node, after checking it is on the right chain."""
         try:
             chain_id = self.rpc.chain_id()
@@ -249,7 +259,7 @@ class BundleBuilder:
                       "Check the RPC endpoint", retryable=False, cause="processing_error")
             return None
         if tx is None:
-            self._explain_rpc_miss(explorer_status)
+            self.rpc_missed = True  # explained once the explorer's answer is in (_explain_rpc_miss)
             return None
         return RpcView(tx, receipt)
 

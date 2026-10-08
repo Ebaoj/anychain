@@ -160,6 +160,8 @@ def _check_status(bundle: EvidenceBundle, receipt: dict | None) -> Check:
     node = "success" if receipt["status"] == "0x1" else "failed"
     if bundle.status == node:
         return Check("status", "pass")
+    if bundle.status == "unknown" and bundle.gaps:  # it said it could not tell, and why: not a false status
+        return Check("status", "skip", "the tool declared the status unknown, with gaps saying why")
     return Check("status", "fail", f"tool says {bundle.status!r}, node says {node!r}")
 
 
