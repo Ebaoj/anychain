@@ -23,6 +23,16 @@ class CallReverted(CollectorError):
         self.data = data
 
 
+class InsufficientFunds(CollectorError):
+    """eth_call did not run: the sender does not hold the value it sends (not a revert)."""
+
+
+# eth_call with value from an account without it (seen live 2026-10-08 by the T5 review): Ethereum,
+# Gnosis and OP nodes answer -32003 "EVM error: OutOfFunds"; Celo -32003 "insufficient funds for gas * price + value".
+INSUFFICIENT_FUNDS_CODE = -32003
+INSUFFICIENT_FUNDS_WORDS = ("insufficient funds", "outoffunds")
+
+
 # How nodes say an eth_call reverted, each seen live on 2026-10-08 (all six configured nodes):
 #   reth/op-reth/Tenderly/zkSync: code 3, "execution reverted" or "execution reverted: <reason>"
 #   rskj (Rootstock): code -32015, "VM Exception while processing transaction: revert <reason>"
@@ -73,6 +83,9 @@ class RpcClient:
             if code in BUSY_RPC_CODES:
                 raise RpcBusyError(f"RPC {method} busy: {error}")
             message = str(error.get("message", "")) if isinstance(error, dict) else str(error)
+            if method == "eth_call" and (code == INSUFFICIENT_FUNDS_CODE
+                                         or any(w in message.lower() for w in INSUFFICIENT_FUNDS_WORDS)):
+                raise InsufficientFunds(f"the sender does not hold the value: {message}", retryable=False)
             if method == "eth_call" and _is_revert(code, message):
                 data = error.get("data") if isinstance(error, dict) else None
                 raise CallReverted(f"the call reverted: {message}", data if isinstance(data, str) else None)
@@ -96,7 +109,8 @@ class RpcClient:
             raise CollectorError(f"RPC eth_getCode returned {value!r}", retryable=False)
         return value
 
-    def eth_call(self, to: str, data: str, block: int | str, sender: str | None = None, value: int = 0) -> str:
+    def eth_call(self, to: str, data: str, block: int | str, sender: str | None = None, value: int = 0,
+                 gas: int | None = None) -> str:
         """Read-only call as of `block` (a number or "latest"). Returns the raw result.
 
         Raises CallReverted when the contract reverts, CollectorError for anything else the node says
@@ -107,6 +121,8 @@ class RpcClient:
             call["from"] = sender
         if value:
             call["value"] = hex(value)
+        if gas:
+            call["gas"] = hex(gas)
         result = self.call("eth_call", [call, hex(block) if isinstance(block, int) else block])
         if not isinstance(result, str) or not result.startswith("0x"):
             raise CollectorError(f"RPC eth_call returned {result!r}", retryable=False)

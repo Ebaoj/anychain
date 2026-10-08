@@ -78,6 +78,7 @@ def _plain(value: object) -> str:
 class AbiDecoder:
     def __init__(self, abi: list[dict]):
         self.functions = {}
+        self.errors: dict[bytes, dict] = {}
         self.events = {}  # topic0 -> event entry
         self.anonymous_events = []  # events without a signature topic
         for entry in abi:
@@ -89,6 +90,8 @@ class AbiDecoder:
             elif entry.get("type") == "event":
                 topic = event_signature_to_log_topic(signature_of(entry))
                 self.events[topic] = entry
+            elif entry.get("type") == "error":
+                self.errors[function_signature_to_4byte_selector(signature_of(entry))] = entry
 
     def decode_call(self, data: str) -> DecodedCall | None:
         raw = _hex_bytes(data)
@@ -107,6 +110,21 @@ class AbiDecoder:
             for n, (i, v) in enumerate(zip(inputs, values))
         ]
         return DecodedCall(entry["name"], signature_of(entry), args)
+
+    def decode_error(self, data: str) -> DecodedCall | None:
+        """A custom error from revert data, when this ABI declares it."""
+        raw = _hex_bytes(data)
+        if raw is None or len(raw) < 4 or raw[:4] not in self.errors:
+            return None
+        entry = self.errors[raw[:4]]
+        inputs = entry.get("inputs", [])
+        try:
+            values = decode([_type_of(i) for i in inputs], raw[4:])
+        except Exception:
+            return None
+        return DecodedCall(entry["name"], signature_of(entry),
+                           [DecodedArg(i.get("name") or f"arg{n}", _type_of(i), format_value(_type_of(i), v))
+                            for n, (i, v) in enumerate(zip(inputs, values))])
 
     def could_be_anonymous(self, topics: list[str]) -> bool:
         """True when the log might come from one of the ABI's anonymous events: its first topic is
@@ -183,3 +201,60 @@ def _decode_event(entry: dict, arg_topics: list[str], payload: bytes, anonymous:
         args.append(DecodedArg(name, t, format_value(t, value)))
     signature = signature_of(entry) + (" (anonymous event)" if anonymous else "")
     return DecodedEvent(entry["name"], signature, args)
+
+
+# Solidity's built-in revert payloads (docs.soliditylang.org, control-structures, "Panic via assert
+# and Error via require", read 2026-10-08).
+ERROR_STRING = function_signature_to_4byte_selector("Error(string)")
+PANIC = function_signature_to_4byte_selector("Panic(uint256)")
+PANIC_CODES = {
+    0x00: "a generic panic inserted by the compiler",
+    0x01: "an assert that evaluated to false",
+    0x11: "an arithmetic overflow or underflow",
+    0x12: "a division or modulo by zero",
+    0x21: "a value too big or negative converted into an enum",
+    0x22: "an incorrectly encoded storage byte array",
+    0x31: "pop() on an empty array",
+    0x32: "an array, bytesN or slice index out of bounds",
+    0x41: "too much memory allocated, or an array too large",
+    0x51: "a call to a zero-initialized internal function variable",
+}
+
+
+@dataclass
+class DecodedRevert:
+    kind: str  # error_string | panic | custom | unknown | malformed | empty
+    text: str  # how to state it
+    reason: str | None = None  # the Error(string) message
+    selector: str | None = None
+    error: "DecodedCall | None" = None  # the custom error, when the ABI declares it
+
+
+def decode_revert(data: str | None, decoder: "AbiDecoder | None" = None) -> DecodedRevert:
+    """What revert data says: a reason text, a Solidity panic, a custom error from the ABI, or nothing."""
+    raw = _hex_bytes(data or "0x")
+    if not raw:
+        return DecodedRevert("empty", "no revert data")
+    if len(raw) < 4:
+        return DecodedRevert("malformed", f"revert data shorter than an error selector ({data})")
+    selector = "0x" + raw[:4].hex()
+    if raw[:4] == ERROR_STRING:
+        try:
+            (message,) = decode(["string"], raw[4:])
+            return DecodedRevert("error_string", f"the reason {message!r}", message, selector)
+        except Exception:
+            return DecodedRevert("malformed", "an Error(string) revert whose reason cannot be read", None, selector)
+    if raw[:4] == PANIC:
+        try:
+            (code,) = decode(["uint256"], raw[4:])
+        except Exception:
+            return DecodedRevert("malformed", "a Panic(uint256) revert whose code cannot be read", None, selector)
+        meaning = PANIC_CODES.get(code, "a panic code Solidity does not document")
+        return DecodedRevert("panic", f"a Solidity panic, code {hex(code)}: {meaning}", None, selector)
+    custom = decoder.decode_error(data) if decoder else None
+    if custom:
+        args = ", ".join(f"{a.name}={a.value}" for a in custom.args)
+        return DecodedRevert("custom", f"the custom error {custom.signature}" + (f" with {args}" if args else ""),
+                             None, selector, custom)
+    return DecodedRevert("unknown", f"a custom error with selector {selector} that the called contract's ABI does "
+                         "not declare (or no ABI for it is available)", None, selector)

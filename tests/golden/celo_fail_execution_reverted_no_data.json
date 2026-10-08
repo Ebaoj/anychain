@@ -162,10 +162,28 @@
   {
    "confidence": "confirmed",
    "data": {
+    "block": 78962840,
+    "reverted": false
+   },
+   "id": "E8",
+   "kind": "replay",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc from 0x224cfc26c83fccc3463c804e7f86b10651d5df96 with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "Re-run on the node at block 78962840, the block before, with the transaction's own call, it did not revert. That is inconclusive: the replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends)."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "cross_check",
    "sources": [
     {

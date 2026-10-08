@@ -9,6 +9,13 @@
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0x7c168119bf754269523AC9728aeEba8e4Eee6100 matches selector 0x8412a3b9"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "The contract's ABI: a verified contract on the explorer, or a configured repo",
+   "retryable": false,
+   "what": "Replay",
+   "why": "the replay's revert 0x40206e43 is a custom error the called contract's ABI does not declare, or no ABI for it is available"
   }
  ],
  "items": [
@@ -495,10 +502,31 @@
   {
    "confidence": "confirmed",
    "data": {
+    "block": 72116784,
+    "reason": null,
+    "revert_data": "0x40206e430000000000000000000000000000000000000000000000000000000000000006",
+    "revert_kind": "unknown",
+    "reverted": true
+   },
+   "id": "E24",
+   "kind": "replay",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a from 0x9e2c68a2c6ac3f5f80d9a857a53a3154176ce250 with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.era.zksync.io"
+    }
+   ],
+   "text": "Re-run on the node at block 72116784, the block before, with the transaction's own call, it reverted with a custom error with selector 0x40206e43 that the called contract's ABI does not declare (or no ABI for it is available). The replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends), so this may differ from what happened in the original transaction."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E24",
+   "id": "E25",
    "kind": "cross_check",
    "sources": [
     {

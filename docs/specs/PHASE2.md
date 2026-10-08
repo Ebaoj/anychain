@@ -102,7 +102,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 | Requirement | Test (written before the code) | Evidence |
 |---|---|---|
 | R1 | `tests/test_networks.py::test_diagnosis_on_real_failures` (10 real failures covering 8 rules) and `tests/test_diagnosis.py` (each rule's edges; allowance with a fake reader) | T4 done 2026-10-08: 526 passed; live Celo case confirmed (D31) |
-| R2 | a sample failure without reason, replay result or gap | pasted |
+| R2 | `tests/test_networks.py` replay tests (text reason recovered on zkSync, custom error gapped, inconclusive and data-less replays, node refusal, no replay when a reason exists) | T5 done 2026-10-08: 538 passed; 39 of 40 sampled zkSync failures revert on replay (D32) |
 | R3 | `tests/test_reads.py` (balance, paused, replay, archive refusal, unreadable answers; real node recordings) | T3 done 2026-10-08: 450 passed (D30); facts come with T4 |
 | R4 | BRLC call cites file, lines and commit | pasted |
 | R5 | unverified contract decoded from repo; 4byte match stated as candidate | pasted |

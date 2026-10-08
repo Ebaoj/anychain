@@ -34,7 +34,7 @@ flowchart TD
     DEC --> PRO["Chain-type profile<br/>default, ethereum, optimism,<br/>optimism-celo, rsk, zksync<br/>fees, L1 status, deposits"]
     PRO --> BUN
     DEC --> CAS["ABI cascade<br/>repo artifacts, source signatures,<br/>4byte, raw"]
-    DEC --> DIAG["3. Diagnostics<br/>only if failed: revert reason,<br/>eth_call state reads, rules"]
+    DEC --> DIAG["3. Diagnostics<br/>only if failed: revert reason, rules,<br/>eth_call state reads at the parent block,<br/>replay when no reason"]
     DEC --> BUN
     CAS --> BUN
     DIAG --> BUN
@@ -58,8 +58,8 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL done
-    class REPO,CAS,DIAG next
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL,DIAG done
+    class REPO,CAS next
     class API,DB,FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
@@ -236,6 +236,7 @@ The canary is the only way to catch the silent kind (a false fact nothing flagge
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-08, diagnosis and replay (D29 to D32, PHASE2 T2 to T5):** confidence per fact, state reads, failure diagnosis, replay when the explorer has no reason.
 - **2026-10-08, validator (D28, PHASE2 T1):** the written answer is checked against the evidence, retried once with the problems, else withheld.
 - **2026-10-08, LLM backends (D27):** the writer runs on the local Claude Code CLI by default; the Anthropic and OpenAI APIs are config options for a deployed service.
 - **2026-10-08, level C fixes (D26):** explorer requests in parallel and fetched once; the internal-call cutoff keeps every call that moved value; reverts worded as the explorer reports them.

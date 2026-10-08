@@ -443,7 +443,7 @@ def test_diagnosis_on_real_failures(fixture, network, rule, level, words):
     from tests.test_golden import _case
     _config, tx = _case(fixture)
     b = replay_bundle(_cfg(network), tx, fixture)
-    [finding] = [e for e in b.items if e.kind == "diagnosis"]
+    [finding] = [e for e in b.items if e.kind == "diagnosis" and not e.data.get("from_replay")]
     assert (finding.data["rule"], finding.data["level"], finding.confidence) == (rule, level, level)
     for w in words:
         assert w in finding.text, (w, finding.text)
@@ -472,6 +472,125 @@ def test_the_node_not_keeping_old_state_is_a_gap_not_a_cause():
                                       'personal token."},"id":1}'}
     b = replay_bundle(_cfg("celo-mainnet"), tx, "celo_fail_balance_confirmed",
                       overrides={f'"{hex(78962883)}"]': refusal})  # the balance read at the parent block
-    [finding] = [e for e in b.items if e.kind == "diagnosis"]
+    [finding] = [e for e in b.items if e.kind == "diagnosis" and not e.data.get("from_replay")]
     assert finding.data["level"] == "single_source" and "Cause confirmed" not in finding.text
     assert any(g.what == "Diagnosis" and "could not be read" in g.why for g in b.gaps)
+
+
+
+# ---- PHASE2 T5: re-run the call when the explorer gives no reason -----------------------------------
+
+def _replay_case(fixture, network, **kw):
+    from tests.test_golden import _case
+    _config, tx = _case(fixture)
+    b = replay_bundle(_cfg(network), tx, fixture, **kw)
+    replays = [e for e in b.items if e.kind == "replay"]
+    from_replay = [e for e in b.items if e.kind == "diagnosis" and e.data.get("from_replay")]
+    return b, replays, from_replay
+
+
+def test_replay_finds_a_reason_the_explorer_did_not_give():
+    # zkSync stores "Bootloader-based tx failed" for every failure; the replay reverts with "Too little received".
+    b, [replay], [finding] = _replay_case("zksync_fail_replay_reason", "zksync-era")
+    assert replay.confidence == "confirmed" and "'Too little received'" in replay.text
+    assert "may differ from what happened" in replay.text  # its limits are stated
+    assert finding.confidence == "candidate" and "slippage" in finding.text  # never more than a candidate
+    assert not finding.text.count("Possible cause") > 1
+
+
+def test_replay_custom_error_without_abi_is_named_and_gapped():
+    b, [replay], from_replay = _replay_case("zksync_fail_generic", "zksync-era")
+    assert "0x40206e43" in replay.text and from_replay == []  # a selector alone says nothing about the cause
+    assert any(g.what == "Replay" and g.cause == "not_interpretable" for g in b.gaps)
+
+
+@pytest.mark.parametrize("fixture, network, words", [
+    ("gnosis_fail_all_gas", "gnosis-mainnet", "did not revert. That is inconclusive"),
+    ("celo_fail_execution_reverted_no_data", "celo-mainnet", "did not revert. That is inconclusive"),
+    ("gnosis_revert_no_data", "gnosis-mainnet", "reverted with no revert data"),
+])
+def test_replay_without_a_reason_adds_no_cause(fixture, network, words):
+    b, [replay], from_replay = _replay_case(fixture, network)
+    assert words in replay.text and from_replay == []
+
+
+def test_no_replay_when_the_explorer_gave_a_reason():
+    b, replays, _ = _replay_case("celo_fail_balance_confirmed", "celo-mainnet")
+    assert replays == []
+
+
+def test_a_node_that_refuses_the_replay_is_a_gap():
+    from tests.test_golden import _case
+    _config, tx = _case("gnosis_revert_no_data")
+    refusal = {"status": 403, "body": '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Archive requests require a '
+                                      'personal token."},"id":1}'}
+    b, replays, _ = _replay_case("gnosis_revert_no_data", "gnosis-mainnet",
+                                 overrides={f'"{hex(48639299)}"]': refusal})
+    assert replays == [] and any(g.what == "Replay" and g.cause == "source_error" for g in b.gaps)
+
+
+# ---- cases from the clean-context review of T5 (written before the fixes) ---------------------------
+
+def _gnosis_no_data(overrides=None):
+    from tests.test_golden import _case
+    _config, tx = _case("gnosis_revert_no_data")
+    return tx, replay_bundle(_cfg("gnosis-mainnet"), tx, "gnosis_revert_no_data", overrides=overrides)
+
+
+def _explorer_tx_override(change):
+    from tests.conftest import mutated
+    from tests.test_golden import _case
+    _config, tx = _case("gnosis_revert_no_data")
+    return mutated("gnosis_revert_no_data", f"/transactions/{tx}", change)
+
+
+def test_replay_limits_say_nodes_check_the_value():
+    from anychain.reads import REPLAY_LIMITS
+    assert "skip the sender's balance check" not in REPLAY_LIMITS and "value" in REPLAY_LIMITS
+
+
+def test_replay_without_the_senders_value_is_its_own_gap():
+    # Ethereum/Gnosis/OP nodes answer -32003 "EVM error: OutOfFunds" (seen live by the review)
+    body = '{"jsonrpc":"2.0","id":1,"error":{"code":-32003,"message":"EVM error: OutOfFunds"}}'
+    tx, b = _gnosis_no_data({f'"{hex(48639299)}"]': {"status": 200, "body": body}})
+    [gap] = [g for g in b.gaps if g.what == "Replay"]
+    assert gap.cause == "not_interpretable" and "did not hold the value" in gap.why
+    assert not [e for e in b.items if e.kind == "replay"]
+
+
+@pytest.mark.parametrize("change, words", [
+    (lambda body: body.update(type=126), "deposit"),                                         # OP deposit 0x7e
+    (lambda body: body.update(authorization_list=[{"address_hash": "0x" + "1" * 40, "authority": "0x" + "2" * 40,
+                                                   "status": "ok", "nonce": 1, "chain_id": 100}]), "EIP-7702"),
+    (lambda body: body.update(to=None), "creation"),
+])
+def test_replay_is_skipped_when_it_cannot_reproduce_the_call(change, words):
+    tx, b = _gnosis_no_data(_explorer_tx_override(change))
+    assert not [e for e in b.items if e.kind == "replay"]
+    assert any(g.what == "Replay" and words in g.why for g in b.gaps), [g.why for g in b.gaps]
+
+
+def test_replay_uses_the_nodes_transaction_including_gas():
+    from tests.conftest import make_transport
+    from tests.test_golden import _case
+    _config, tx = _case("gnosis_revert_no_data")
+    transport = make_transport("gnosis_revert_no_data", None, None)
+    b = replay_bundle(_cfg("gnosis-mainnet"), tx, "gnosis_revert_no_data", transport=transport)
+    [call] = [c for c in transport.calls if "eth_call" in c]
+    assert '"gas"' in call
+    [replay] = [e for e in b.items if e.kind == "replay"]
+    assert replay.confidence == "confirmed" and all(s.kind == "rpc" for s in replay.sources)
+
+
+def test_replay_finding_speaks_of_the_replay_not_the_transaction():
+    b, _replays, [finding] = _replay_case("zksync_fail_replay_reason", "zksync-era")
+    assert "the replay reverted with" in finding.text and "when the transaction ran" not in finding.text
+
+
+@pytest.mark.parametrize("data, kind", [
+    ("0x08c379a0", "malformed"), ("0x4e487b71", "malformed"), ("0x0102", "malformed"),
+])
+def test_malformed_revert_data_is_not_called_a_custom_error(data, kind):
+    from anychain.decoder import decode_revert
+    d = decode_revert(data)
+    assert d.kind == kind and "custom error" not in d.text

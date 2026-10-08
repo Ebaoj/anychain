@@ -125,10 +125,31 @@
   {
    "confidence": "confirmed",
    "data": {
+    "block": 48639299,
+    "reason": null,
+    "revert_data": null,
+    "revert_kind": "empty",
+    "reverted": true
+   },
+   "id": "E6",
+   "kind": "replay",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0xf354bf88343e794ca6f4574416778ef41bd06a51f32fb5c1ddfc1e71404ab6d1 from 0x202600f312dc1dc44ca46d9ef7fd134995038fd0 with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://rpc.gnosischain.com"
+    }
+   ],
+   "text": "Re-run on the node at block 48639299, the block before, with the transaction's own call, it reverted with no revert data. The replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends), so this may differ from what happened in the original transaction."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "cross_check",
    "sources": [
     {

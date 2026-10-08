@@ -8,25 +8,41 @@ objects (collectors/types.py); network-type specifics come from a profile (chain
 import re
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from eth_utils import to_checksum_address
 
 from anychain.chains import BLOCKSCOUT_CHAIN_TYPES, ChainGap, Fee, FeePart, TokenRef, audit_fields, profile_for
 from anychain.collectors.explorer import MAX_PAGES, ExplorerClient
 from anychain.collectors.http import Budget, CollectorError, NotFoundError
-from anychain.collectors.rpc import RpcClient
+from anychain.collectors.rpc import InsufficientFunds, RpcClient
 from anychain.collectors.types import (
-    AddressRef, Authorization, InternalCall, Log, RpcReceipt, RpcTransaction, TokenTransfer, Transaction, to_int,
+    AddressRef, Authorization, InternalCall, Log, RevertReason, RpcReceipt, RpcTransaction, TokenTransfer, Transaction,
+    to_int,
 )
 from anychain.config import AppConfig
-from anychain.decoder import AbiDecoder
+from anychain.decoder import AbiDecoder, decode_revert
 from anychain.diagnosis import Context, diagnose
-from anychain.reads import StateReader
+from anychain.reads import REPLAY_LIMITS, StateReader
 from anychain.models import EvidenceBundle, GapCause, Source
 
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
 MAX_EVENTS = 40
+REPLAY_WHEN = {"no_reason", "generic_failure", "possibly_out_of_gas"}  # findings without the explorer's reason
+DEPOSIT_TX_TYPES = {0x7E, 0xFF}  # OP Stack deposits and zkSync L1->L2 priority txs: funds minted as they run
+# What a replayed reason means, per diagnosis rule, worded about the replay (D32).
+REPLAY_MEANING = {
+    "insufficient_balance": "the standard ERC-20 message for a transfer larger than the balance it moves from",
+    "insufficient_allowance": "the standard ERC-20 message for moving tokens beyond an approval",
+    "paused": "the reason a paused contract gives",
+    ("slippage", "single_source"): "the slippage check of Uniswap's routers (the swap would not meet the "
+                                    "sender's limit)",
+    ("slippage", "candidate"): "the words of the slippage check of Uniswap's routers; this contract's code decides "
+                               "what they mean",
+    ("deadline", "single_source"): "Uniswap's deadline check (included after the deadline set in it)",
+    ("deadline", "candidate"): "a reason that mentions a time limit; which one is defined in the contract's code",
+    "contract_reason": "the contract's own reason; what it means is defined in its code",
+}
 PREFETCH_WORKERS = 6  # parallel explorer requests while prefetching (D26)
 MAX_INTERNAL = 30
 ZERO_ADDRESS = "0x" + "0" * 40
@@ -102,6 +118,7 @@ class BundleBuilder:
         self.explorer_not_found = False
         self.explorer_answered = False  # True when the explorer responded at all (even with 404)
         self.rpc_verified = False  # True once the RPC's chain id matched the config
+        self.rpc_view: RpcView | None = None
         self.undecoded_events: set[str] = set()
         self.anonymous_unmatched: set[str] = set()
         # (from, to, value) of native movements already stated -> the fact id that states them,
@@ -114,7 +131,7 @@ class BundleBuilder:
         self.bundle = EvidenceBundle(network=self.cfg.network.name, tx_hash=tx_hash, status="unknown")
         tx = self._fetch_explorer_tx(tx_hash)
         explorer_status = self._status_from_explorer(tx) if tx is not None else None
-        rpc_view = self._fetch_rpc(tx_hash, explorer_status)
+        rpc_view = self.rpc_view = self._fetch_rpc(tx_hash, explorer_status)
 
         has_receipt = rpc_view is not None and rpc_view.receipt is not None
         explorer_lagging = explorer_status in ("pending", "dropped") and has_receipt
@@ -344,6 +361,98 @@ class BundleBuilder:
                         confidence="confirmed" if finding.level == "confirmed" else finding.level)
         for missing in finding.missing:
             self._gap("Diagnosis", missing.why, missing.needed, retryable=missing.retryable, cause=missing.cause)
+        if finding.rule in REPLAY_WHEN and ctx.reader is not None:
+            self._add_replay(tx_hash, tx, ctx)
+
+    def _add_replay(self, tx_hash: str, tx: Transaction, ctx: Context) -> None:
+        """No reason from the explorer: run the call again on the node at the parent block (PHASE2 T5, R2, D32).
+        What the node answers is a fact about the replay; as a cause of the original failure it is a candidate."""
+        skip = self._replay_skip(tx)
+        if skip:
+            self._gap("Replay", f"the call was not re-run: {skip}", "A node that can trace the transaction",
+                      retryable=False, cause="not_interpretable")
+            return
+        node_tx = self.rpc_view.tx if self.rpc_view is not None else None
+        if node_tx is not None and node_tx.sender and node_tx.to and node_tx.input is not None:
+            # the node's own transaction: the replay's inputs then come from the node, like its answer
+            sender, to, data, value, gas = node_tx.sender, node_tx.to, node_tx.input, node_tx.value or 0, node_tx.gas
+            sources = [self._rpc_source(f"eth_call replay of {tx_hash} from {sender} with its gas limit")]
+        else:
+            sender, to, data, value, gas = ctx.sender, ctx.to, tx.raw_input, tx.value or 0, tx.gas_limit
+            sources = [self._rpc_source(f"eth_call replay of {tx_hash} from {sender}"), self._tx_source(tx_hash)]
+        block = tx.block_number
+        if not sender or not to or data is None or block is None:
+            self._gap("Replay", "the call was not re-run: its sender, target, data or block is not known",
+                      "The transaction's details from the explorer or the node", retryable=False, cause="not_interpretable")
+            return
+        try:
+            replay = ctx.reader.replay(sender, to, data, value, block - 1, gas=gas)
+        except InsufficientFunds:
+            self._gap("Replay", f"the call could not be re-run: at block {block - 1} the sender did not hold the value "
+                      "the transaction sends (it may have received it earlier in its own block)",
+                      "A node that can trace the transaction", retryable=False, cause="not_interpretable")
+            return
+        except CollectorError as exc:
+            self._gap("Replay", f"the call could not be re-run: {exc}",
+                      "Try again in a few minutes" if exc.retryable else
+                      "A node that keeps state for the block before the transaction", retryable=exc.retryable,
+                      cause="source_unavailable" if exc.retryable else "source_error")
+            return
+        if not replay.reverted:
+            self.bundle.add("replay", f"Re-run on the node at block {replay.block}, the block before, with the "
+                            f"transaction's own call, it did not revert. That is inconclusive: the replay is "
+                            f"{REPLAY_LIMITS}.", sources, {"reverted": False, "block": replay.block})
+            return
+        decoded = decode_revert(replay.revert_data, self._decoder_for(to) if self.explorer_answered else None)
+        fact = self.bundle.add("replay", f"Re-run on the node at block {replay.block}, the block before, with the "
+                               f"transaction's own call, it reverted with {decoded.text}. The replay is "
+                               f"{REPLAY_LIMITS}, so this may differ from what happened in the original transaction.",
+                               sources, {"reverted": True, "block": replay.block, "revert_kind": decoded.kind,
+                                         "revert_data": replay.revert_data, "reason": decoded.reason})
+        if decoded.kind == "unknown":
+            self._gap("Replay", f"the replay's revert {decoded.selector} is a custom error the called contract's ABI "
+                      "does not declare, or no ABI for it is available",
+                      "The contract's ABI: a verified contract on the explorer, or a configured repo",
+                      retryable=False, cause="not_interpretable")
+        if decoded.kind not in ("error_string", "custom", "panic"):
+            return  # nothing more to say than the replay fact
+        self._add_replay_finding(ctx, decoded, fact, sources)
+
+    def _replay_skip(self, tx: Transaction) -> str | None:
+        """Why a replay of this transaction would not reproduce its call (None: it can be tried)."""
+        if tx.to is None or not address_of(tx.to):
+            return "it is a contract creation, which a call cannot repeat"
+        if to_int(tx.raw.get("type")) in DEPOSIT_TX_TYPES:
+            return ("it is a deposit from L1, whose funds the network adds as it runs; a replay cannot include "
+                    "that")
+        if tx.authorizations or (self.rpc_view is not None and self.rpc_view.tx.delegates):
+            return "it set account code (EIP-7702), which a replay cannot include"
+        return None
+
+    def _add_replay_finding(self, ctx: Context, decoded, fact, sources: list[Source]) -> None:
+        """What the replayed revert would mean, worded as the replay's, never as the transaction's."""
+        if decoded.kind == "panic":
+            meaning, steps, urls = ("a check the compiler adds; the contract's code met that condition with these "
+                                    "inputs"), ["Check the inputs that reach this condition in the contract's code."], []
+        else:
+            if decoded.kind == "error_string":
+                reason = RevertReason.from_api({"method_call": "Error(string reason)",
+                                                "parameters": [{"name": "reason", "value": decoded.reason}]})
+            else:
+                reason = RevertReason.from_api({"method_call": decoded.error.signature, "parameters": [
+                    {"name": a.name, "value": a.value} for a in decoded.error.args]})
+            finding = diagnose(replace(ctx, reason=reason, result=None, generic_failure=None, explorer_text=None,
+                                       reader=None))  # no reads: they would describe the original, not the replay
+            meaning = REPLAY_MEANING.get((finding.rule, finding.level)) or REPLAY_MEANING.get(finding.rule)
+            if meaning is None:
+                return
+            steps, urls = finding.next_steps, finding.source_urls
+        self.bundle.add("diagnosis", f"Possible cause, from the replay ({fact.id}): the replay reverted with "
+                        f"{decoded.text}, {meaning}. If the original transaction failed the same way, that is its "
+                        "cause. " + " ".join(f"Next step: {s}" for s in steps),
+                        sources + [Source(kind="repo", label="Source of the rule's meaning", url=u) for u in urls],
+                        {"rule": "replay", "level": "candidate", "from_replay": True, "replay": fact.id, "reads": [],
+                         "next_steps": steps}, confidence="candidate")
 
     def _status_from_explorer(self, tx: Transaction) -> str:
         # Blockscout stores dropped transactions with status "error", so check `result` first.

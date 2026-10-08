@@ -134,3 +134,13 @@ def test_replay_that_does_not_revert_is_inconclusive():
     replay = StateReader(Fake()).replay("0x" + "1" * 40, "0x" + "2" * 40, "0x", 0, 1)
     assert not replay.reverted and "inconclusive" in replay.message
     assert "gas" in replay.message and "block" in replay.message  # the limits are stated
+
+
+
+def test_revert_data_decoding():
+    from anychain.decoder import decode_revert
+    assert decode_revert("0x").kind == "empty"
+    panic = decode_revert("0x4e487b71" + format(0x11, "064x"))
+    assert panic.kind == "panic" and "overflow" in panic.text  # Solidity docs: 0x11 arithmetic over/underflow
+    assert decode_revert("0x4e487b71" + format(0x99, "064x")).text.endswith("a panic code Solidity does not document")
+    assert decode_revert("0x40206e43" + format(6, "064x")).kind == "unknown"

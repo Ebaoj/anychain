@@ -34,7 +34,7 @@ flowchart TD
     DEC --> PRO["Perfil do tipo de rede<br/>default, ethereum, optimism,<br/>optimism-celo, rsk, zksync<br/>taxas, estado na L1, depósitos"]
     PRO --> BUN
     DEC --> CAS["Cascata de ABI<br/>artefatos do repo, assinaturas do código,<br/>4byte, dado cru"]
-    DEC --> DIAG["3. Diagnóstico<br/>só se falhou: motivo do revert,<br/>leituras eth_call, regras"]
+    DEC --> DIAG["3. Diagnóstico<br/>só se falhou: motivo do revert, regras,<br/>leituras eth_call no bloco anterior,<br/>repetição quando não há motivo"]
     DEC --> BUN
     CAS --> BUN
     DIAG --> BUN
@@ -58,8 +58,8 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL done
-    class REPO,CAS,DIAG next
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL,DIAG done
+    class REPO,CAS next
     class API,DB,FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
@@ -239,6 +239,7 @@ O canário é o único jeito de pegar o erro silencioso (um fato falso que nada 
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
 - **07/10/2026, objetos tipados (D21):** as respostas do explorador e do nó viram objetos tipados uma única vez, em `collectors/types.py`.
+- **08/10/2026, diagnóstico e repetição (D29 a D32, Fase 2 T2 a T5):** confiança de cada fato, leituras de estado, diagnóstico de falhas, repetição da chamada quando o explorador não dá motivo.
 - **08/10/2026, validador (D28, Fase 2 T1):** a resposta escrita é conferida contra os fatos; com problema, o modelo tenta de novo uma vez; se falhar de novo, aparecem só os fatos.
 - **08/10/2026, motores de IA (D27):** o redator usa o Claude Code local por padrão; as APIs da Anthropic e da OpenAI são opções de configuração para um serviço publicado.
 - **08/10/2026, correções de nível C (D26):** pedidos ao explorador em paralelo e uma vez só; o corte das chamadas internas mantém todas as que moveram valor; reversões descritas como o explorador informa.

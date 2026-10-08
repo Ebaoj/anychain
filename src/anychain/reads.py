@@ -43,8 +43,8 @@ class UnreadableState(Exception):
 
 # What a replay cannot reproduce, stated with every result.
 REPLAY_LIMITS = ("run on the parent block's state and context (its block number and time), without the "
-                 "transactions that came before it in its own block, without the original gas limit or gas "
-                 "price, and most nodes skip the sender's balance check")
+                 "transactions that came before it in its own block, and without charging the gas cost (nodes "
+                 "still check that the sender holds the value it sends)")
 
 
 @dataclass(frozen=True)
@@ -87,9 +87,10 @@ class StateReader:
     def paused(self, contract: str, block: int) -> Read:
         return self._read(contract, "paused()", (), [], "bool", block)
 
-    def replay(self, sender: str, to: str, data: str, value: int, block: int) -> Replay:
+    def replay(self, sender: str, to: str, data: str, value: int, block: int, gas: int | None = None) -> Replay:
+        """Raises InsufficientFunds when the sender does not hold `value` at `block` (not a revert)."""
         try:
-            self.rpc.eth_call(to, data, block, sender=sender, value=value)
+            self.rpc.eth_call(to, data, block, sender=sender, value=value, gas=gas)
         except CallReverted as exc:
             return Replay(block, True, exc.data, f"{exc} (replay {REPLAY_LIMITS})")
         return Replay(block, False, None, f"inconclusive: the call did not revert when run again ({REPLAY_LIMITS})")
