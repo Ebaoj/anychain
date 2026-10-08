@@ -9,7 +9,7 @@ As cores mostram o que já existe:
 - **Cinza**: fases seguintes
 - Caixas brancas são só agrupamentos.
 
-Estado atual: **fim da Fase 1** (07/10/2026).
+Estado atual: **fim da Fase 2.5** (08/10/2026).
 
 ---
 
@@ -33,11 +33,15 @@ flowchart TD
     COL --> DEC["2. Decodificador<br/>chamadas, eventos, eventos anônimos<br/>ABI do explorador, delegações EIP-7702"]
     DEC --> PRO["Perfil do tipo de rede<br/>default, ethereum, optimism,<br/>optimism-celo, rsk, zksync<br/>taxas, estado na L1, depósitos"]
     PRO --> BUN
-    DEC --> CAS["Cascata de ABI<br/>artefatos do repo, assinaturas do código,<br/>4byte, dado cru"]
-    DEC --> DIAG["3. Diagnóstico<br/>só se falhou: motivo do revert, regras,<br/>leituras eth_call no bloco anterior,<br/>repetição quando não há motivo"]
+    DEC --> CAS["Cascata de ABI<br/>explorador, artefatos do repo (endereço conferido<br/>na lista do próprio arquivo), assinaturas do código,<br/>4byte, dado cru"]
+    DEC --> DIAG["3. Diagnóstico<br/>só se falhou: motivo do revert, regras (saldo, allowance,<br/>controle de acesso, pausa, slippage, prazo pelo parâmetro),<br/>leituras eth_call no bloco anterior, repetição sem motivo<br/>rótulo CONFIRMED / LIKELY / UNKNOWN<br/>próximos passos para lojista e para desenvolvedor"]
+    DEC --> CODE["Código da função<br/>do código verificado, linhas numeradas,<br/>linha do motivo quando o código não deixa dúvida"]
+    CODE --> SEC["Notas de segurança<br/>7 padrões, cada um com a linha<br/>heurística, nunca auditoria"]
     DEC --> BUN
     CAS --> BUN
     DIAG --> BUN
+    CODE --> BUN
+    SEC --> BUN
 
     BUN["4. Pacote de evidências<br/>fatos E1, E2... cada um com fonte<br/>lacunas: o que falta + vale tentar de novo?"]
     BUN --> WRI["5. Redator com IA<br/>instrução por modo, cita [E#]<br/>Claude Code (padrão), API Anthropic ou OpenAI"]
@@ -46,10 +50,10 @@ flowchart TD
     VAL --> OUT
     REN --> OUT
 
-    OUT["7. Saída<br/>markdown + JSON"] --> CLI["Linha de comando<br/>anychain explain"]
+    OUT["7. Saída<br/>markdown + resposta estruturada (--json)<br/>+ pacote de fatos (--evidence)"] --> CLI["Linha de comando<br/>anychain explain"]
     OUT --> API["API + tela web<br/>chat com ferramentas"]
-    OUT --> DB["Banco SQLite<br/>métricas + avaliação"]
-    BUN --> LOG["Log de eventos<br/>uma linha por resposta:<br/>lacunas com causa, travamentos,<br/>conferência contra o nó"]
+    OUT --> DB["Cache por rede e hash, lote,<br/>métricas + avaliação"]
+    BUN --> LOG["Log de eventos<br/>uma linha por resposta:<br/>lacunas com causa, travamentos,<br/>conferência contra o nó,<br/>rótulo do diagnóstico"]
     LOG --> QRY["anychain log<br/>consulta por rede e causa"]
     LOG -.produção, só desenho.-> FILA["Fila (ex.: SQS)"]
     FILA -.-> WRK["Worker<br/>agrega por rede e causa,<br/>dispara alerta"]
@@ -58,17 +62,19 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL,DIAG,REPO,CAS done
-    class API,DB,FILA,WRK later
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL,DIAG,REPO,CAS,CODE,SEC done
+    class API,DB next
+    class FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
 
 | Fase | O que entra |
 |---|---|
 | 1 (pronta) | configuração, coletores do explorador e do nó, decodificador com a ABI do explorador, pacote de evidências, redator com IA, linha de comando |
-| 2 | diagnóstico de falhas, leituras de estado com `eth_call`, leitura dos repositórios, cascata completa de ABI, níveis de confiança, validador |
-| 3 | API, tela web, chat com ferramentas, modos, SQLite + métricas, suíte de avaliação |
-| 4 | perguntas de triagem, linha do tempo entre transações, notas de segurança, notas de gás |
+| 2 (pronta) | diagnóstico de falhas, leituras de estado com `eth_call`, leitura dos repositórios, cascata de ABI, níveis de confiança, validador |
+| 2.5 (pronta) | código da função como fato, notas de segurança, ABI de artefatos do repositório, controle de acesso, prazo pelo parâmetro, rótulos CONFIRMED / LIKELY / UNKNOWN, passos por leitor, resposta estruturada (`--json`) |
+| 3 | cache por rede e hash, lote, API, tela web, chat com ferramentas, métricas, suíte de avaliação |
+| 4 | perguntas de triagem, linha do tempo entre transações, notas de gás, `debug_traceTransaction`, rede privada de demonstração |
 
 ---
 
@@ -122,7 +128,7 @@ Qual arquivo faz o quê, e quem chama quem. Ordem sugerida de leitura: `cli.py`,
 ```mermaid
 flowchart LR
     subgraph entry["Ponto de entrada"]
-        cli["cli.py<br/>anychain explain<br/>anychain log"]
+        cli["cli.py<br/>anychain explain<br/>anychain log<br/>anychain repos sync"]
     end
 
     subgraph core["Núcleo"]
@@ -132,6 +138,10 @@ flowchart LR
         decoder["decoder.py<br/>decodificação pela ABI"]
         models["models.py<br/>Evidência, Lacuna (com causa), Pacote"]
         events["events.py<br/>log de eventos: RunEvent,<br/>SqliteEventLog, consultas"]
+        diagnosis["diagnosis.py<br/>regras de falha, rótulos,<br/>passos por leitor"]
+        reads["reads.py<br/>leituras eth_call e repetição"]
+        solidity["solidity.py<br/>índice do código Solidity"]
+        security["security.py<br/>notas de segurança"]
     end
 
     subgraph collectors["collectors/"]
@@ -139,11 +149,14 @@ flowchart LR
         types["types.py<br/>objetos tipados: Transaction,<br/>InternalCall, TokenTransfer, Log..."]
         explorer["explorer.py<br/>Blockscout"]
         rpc["rpc.py<br/>JSON-RPC"]
+        repo["repo.py<br/>repositórios em cache,<br/>artefatos de ABI"]
+        signatures["signatures.py<br/>base pública de assinaturas"]
         replay["replay.py<br/>grava e repete tráfego real<br/>para os testes"]
     end
 
     subgraph output["Saída"]
         render["render.py<br/>markdown, sem IA"]
+        answer["answer.py<br/>resposta estruturada (--json)"]
         writer["writer.py<br/>motores de IA: claude_code,<br/>anthropic, openai"]
         validator["validator.py<br/>confere a resposta escrita<br/>contra os fatos"]
         prompts["prompts/*.md<br/>uma instrução por modo"]
@@ -154,6 +167,15 @@ flowchart LR
     cli --> render
     cli --> writer
     cli --> events
+    cli --> answer
+    bundle --> diagnosis
+    bundle --> solidity
+    bundle --> security
+    bundle --> repo
+    bundle --> signatures
+    diagnosis --> reads
+    reads --> rpc
+    security --> solidity
     bundle --> explorer
     bundle --> rpc
     bundle --> decoder
@@ -213,7 +235,7 @@ Hoje o log é um arquivo SQLite local, consultado com `anychain log`. Em produç
 
 ```mermaid
 flowchart LR
-    EX["anychain explain<br/>(e depois a API)"] --> EV["RunEvent<br/>rede, hash, duração,<br/>lacunas com causa, travamento"]
+    EX["anychain explain<br/>(e depois a API)"] --> EV["RunEvent<br/>rede, hash, duração,<br/>lacunas com causa, travamento,<br/>rótulo do diagnóstico"]
     CAN["Canário: script de aceitação<br/>(hoje rodado à mão; o agendamento<br/>diário é desenho de produção)"] --> EV
     EV --> SINK{"storage.event_sink"}
     SINK -->|sqlite| DBL["data/runs.db"]
@@ -233,6 +255,8 @@ O canário é o único jeito de pegar o erro silencioso (um fato falso que nada 
 ---
 
 ## Histórico deste documento
+
+- **08/10/2026, fim da Fase 2.5 (D38 a D43):** o modelo recebe o código da função chamada (e a linha do motivo, quando o código não deixa dúvida); notas de segurança heurísticas; ABI de artefatos do repositório, com o endereço conferido na lista do próprio arquivo; regras de controle de acesso e de prazo pelo parâmetro; rótulos CONFIRMED / LIKELY / UNKNOWN em cada conclusão e no log; passos para lojista e para desenvolvedor; resposta estruturada (`--json`). Cabeçalho e mapa do código atualizados (faltavam os módulos da Fase 2).
 
 - **07/10/2026, fim da Fase 1:** primeira versão. Linha de montagem, sequência de um `explain`, mapa do código, classificação das lacunas.
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.

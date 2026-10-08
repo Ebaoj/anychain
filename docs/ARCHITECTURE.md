@@ -9,7 +9,7 @@ Living document: updated at the end of every phase. Colors show what exists. A P
 
 View the diagrams in VS Code (extension "Markdown Preview Mermaid Support") or on GitHub, which renders them natively.
 
-Current state: **end of phase 1** (2026-10-07).
+Current state: **end of phase 2.5** (2026-10-08).
 
 ---
 
@@ -33,11 +33,15 @@ flowchart TD
     COL --> DEC["2. Decoder<br/>calldata, events, anonymous events<br/>ABI from explorer"]
     DEC --> PRO["Chain-type profile<br/>default, ethereum, optimism,<br/>optimism-celo, rsk, zksync<br/>fees, L1 status, deposits"]
     PRO --> BUN
-    DEC --> CAS["ABI cascade<br/>repo artifacts, source signatures,<br/>4byte, raw"]
-    DEC --> DIAG["3. Diagnostics<br/>only if failed: revert reason, rules,<br/>eth_call state reads at the parent block,<br/>replay when no reason"]
+    DEC --> CAS["ABI cascade<br/>explorer, repo artifacts (address checked<br/>against the file's own list), source signatures,<br/>4byte, raw"]
+    DEC --> DIAG["3. Diagnostics<br/>only if failed: revert reason, rules (balance, allowance,<br/>access control, paused, slippage, deadline parameter),<br/>eth_call reads at the parent block, replay when no reason<br/>label CONFIRMED / LIKELY / UNKNOWN<br/>next steps for a merchant and for a developer"]
+    DEC --> CODE["Function code<br/>from the verified source, numbered lines,<br/>the reason's line when the code pins it down"]
+    CODE --> SEC["Security notes<br/>7 patterns, each with its line<br/>heuristic, never an audit"]
     DEC --> BUN
     CAS --> BUN
     DIAG --> BUN
+    CODE --> BUN
+    SEC --> BUN
 
     BUN["4. Evidence bundle<br/>facts E1, E2... each with a source<br/>gaps: what is missing + retryable?"]
     BUN --> WRI["5. LLM writer<br/>prompt per mode, cites [E#]<br/>Claude Code (default), Anthropic or OpenAI API"]
@@ -46,10 +50,10 @@ flowchart TD
     VAL --> OUT
     REN --> OUT
 
-    OUT["7. Output<br/>markdown + JSON"] --> CLI["CLI<br/>anychain explain"]
+    OUT["7. Output<br/>markdown + structured answer (--json)<br/>+ evidence bundle (--evidence)"] --> CLI["CLI<br/>anychain explain"]
     OUT --> API["API + web UI<br/>chat with tools"]
-    OUT --> DB["SQLite runs<br/>metrics + eval"]
-    BUN --> LOG["Event log<br/>one row per answer:<br/>gaps with cause, crashes,<br/>checks against the node"]
+    OUT --> DB["Cache by network and hash, batch,<br/>metrics + eval"]
+    BUN --> LOG["Event log<br/>one row per answer:<br/>gaps with cause, crashes,<br/>checks against the node,<br/>diagnosis label"]
     LOG --> QRY["anychain log<br/>query by network and cause"]
     LOG -.production, design only.-> FILA["Queue (e.g. SQS)"]
     FILA -.-> WRK["Worker<br/>aggregates by network and cause,<br/>alerts"]
@@ -58,17 +62,19 @@ flowchart TD
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
     classDef later fill:#eceff1,stroke:#90a4ae,color:#455a64
 
-    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL,DIAG,REPO,CAS done
-    class API,DB,FILA,WRK later
+    class IN,CFG,EXP,RPC,DEC,PRO,BUN,WRI,REN,OUT,CLI,LOG,QRY,VAL,DIAG,REPO,CAS,CODE,SEC done
+    class API,DB next
+    class FILA,WRK later
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
 
 | Phase | Adds |
 |---|---|
 | 1 (done) | config, explorer + RPC collectors, decoder with explorer ABI, evidence bundle, LLM writer, CLI |
-| 2 | diagnostics for failures, `eth_call` state reads, repo grounding, full ABI cascade, confidence levels, validator |
-| 3 | API, web UI, chat with tools, modes, SQLite + metrics, eval suite |
-| 4 | triage questions, multi-transaction timeline, security notes, gas notes |
+| 2 (done) | diagnostics for failures, `eth_call` state reads, repo grounding, ABI cascade, confidence levels, validator |
+| 2.5 (done) | function code as evidence, security notes, ABIs from repo artifacts, access control, deadline parameter, CONFIRMED / LIKELY / UNKNOWN labels, steps per reader, structured answer (`--json`) |
+| 3 | cache by network and hash, batch, API, web UI, chat with tools, metrics, eval suite |
+| 4 | triage questions, multi-transaction timeline, gas notes, `debug_traceTransaction`, private demo network |
 
 ---
 
@@ -122,7 +128,7 @@ Which file does what, and who calls whom.
 ```mermaid
 flowchart LR
     subgraph entry["Entry points"]
-        cli["cli.py<br/>anychain explain<br/>anychain log"]
+        cli["cli.py<br/>anychain explain<br/>anychain log<br/>anychain repos sync"]
     end
 
     subgraph core["Core"]
@@ -132,6 +138,10 @@ flowchart LR
         decoder["decoder.py<br/>ABI decoding"]
         models["models.py<br/>Evidence, Gap (with cause), Bundle"]
         events["events.py<br/>event log: RunEvent,<br/>SqliteEventLog, queries"]
+        diagnosis["diagnosis.py<br/>failure rules, labels,<br/>steps per reader"]
+        reads["reads.py<br/>eth_call reads and replay"]
+        solidity["solidity.py<br/>Solidity source index"]
+        security["security.py<br/>security notes"]
     end
 
     subgraph collectors["collectors/"]
@@ -139,11 +149,14 @@ flowchart LR
         types["types.py<br/>typed objects: Transaction,<br/>InternalCall, TokenTransfer, Log..."]
         explorer["explorer.py<br/>Blockscout"]
         rpc["rpc.py<br/>JSON-RPC"]
+        repo["repo.py<br/>cached repos,<br/>artifact ABIs"]
+        signatures["signatures.py<br/>public signature database"]
         replay["replay.py<br/>record / replay<br/>real traffic for tests"]
     end
 
     subgraph output["Output"]
         render["render.py<br/>markdown, no LLM"]
+        answer["answer.py<br/>structured answer (--json)"]
         writer["writer.py<br/>LLM backends: claude_code,<br/>anthropic, openai"]
         validator["validator.py<br/>checks the written answer<br/>against the evidence"]
         prompts["prompts/*.md<br/>one per mode"]
@@ -154,6 +167,15 @@ flowchart LR
     cli --> render
     cli --> writer
     cli --> events
+    cli --> answer
+    bundle --> diagnosis
+    bundle --> solidity
+    bundle --> security
+    bundle --> repo
+    bundle --> signatures
+    diagnosis --> reads
+    reads --> rpc
+    security --> solidity
     bundle --> explorer
     bundle --> rpc
     bundle --> decoder
@@ -213,7 +235,7 @@ Today the log is a local SQLite file queried with `anychain log`. In production 
 
 ```mermaid
 flowchart LR
-    EX["anychain explain<br/>(later the API)"] --> EV["RunEvent<br/>network, hash, duration,<br/>gaps with cause, crash"]
+    EX["anychain explain<br/>(later the API)"] --> EV["RunEvent<br/>network, hash, duration,<br/>gaps with cause, crash,<br/>diagnosis label"]
     CAN["Canary: acceptance script<br/>(today run by hand; daily schedule<br/>is production design)"] --> EV
     EV --> SINK{"storage.event_sink"}
     SINK -->|sqlite| DBL["data/runs.db"]
@@ -235,6 +257,7 @@ The canary is the only way to catch the silent kind (a false fact nothing flagge
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-08, end of phase 2.5 (D38 to D43):** the model gets the called function's code (and the reason's line when the code pins it down); heuristic security notes; ABIs from repo artifacts, the address checked against the file's own list; access-control and deadline-parameter rules; CONFIRMED / LIKELY / UNKNOWN labels on each conclusion and in the log; steps for a merchant and for a developer; structured answer (`--json`). Header and code map brought up to date (phase 2 modules were missing).
 - **2026-10-08, repos and signatures (D33 to D35, PHASE2 T6 and T7):** configured repos synced to a cache, cited and compared with the verified source, used to decode unverified contracts; public signature database as candidates, event signatures proven by hash.
 - **2026-10-08, diagnosis and replay (D29 to D32, PHASE2 T2 to T5):** confidence per fact, state reads, failure diagnosis, replay when the explorer has no reason.
 - **2026-10-08, validator (D28, PHASE2 T1):** the written answer is checked against the evidence, retried once with the problems, else withheld.

@@ -17,6 +17,7 @@
 ## 2. Context
 
 - Phases 1 and 2 closed (D37): `anychain explain` builds a sourced evidence bundle with diagnosis, replay, repo source and signature candidates; the writer runs on Claude Code (D27) and its answer is checked (D28); an event log in SQLite (D24) counts problems per network.
+- Phase 2.5 closed (D38 to D43, PHASE2_5.md): the called function's code and heuristic security notes as facts; ABIs from repo artifacts; access-control and deadline-parameter rules; each conclusion labelled CONFIRMED / LIKELY / UNKNOWN (also in the event log); next steps for a non-technical reader and for a developer; the structured answer (`explain --json`, schema `anychain.answer/1`), which this phase's API returns.
 - The original case plan, section 5 (interfaces), 7 (agent evaluation), 8 (metrics) and 9 (phase 3 "done when `anychain eval` runs and the UI does the full demo").
 
 ## 3. Problem (verified facts)
@@ -26,10 +27,10 @@
 | P1 | Commands are `explain`, `log`, `repos sync`; no `chat`, `eval`, `metrics` | `cli.py` | the original interface list is not met |
 | P2 | No web server or page; FastAPI is not a dependency | `pyproject.toml` | the case's "simple interface (web preferred)" is not met |
 | P3 | Modes exist (support, developer, auditor: one prompt each) but only on the CLI | `prompts/`, `cli.py` | |
-| P4 | The event log has no mode, diagnosis category, ABI source, tokens or user feedback | `events.py` runs table | the metrics the case asks for cannot be computed |
+| P4 | The event log has the diagnosis label (D42) but no mode, diagnosis rule, ABI source, tokens, cache hit or user feedback | `events.py` runs table | the metrics the case asks for cannot be computed |
 | P6 | Every explain fetches everything again; nothing is kept per (network, hash) | `bundle.py`, `cli.py` | repeated questions (the API will get many) cost explorer and node calls and seconds; public explorers have usage limits |
 | P7 | Explaining many hashes exists only inside the acceptance script | `scripts/acceptance.py` | no user command for volume |
-| P5 | No eval set: of the 8 categories the case requires on Ethereum, recorded real cases exist for 5 (ERC-20 transfer, DEX swap, explicit revert reason, unverified contract, node unavailable); none yet for an allowance revert, an out-of-gas failure, a Solidity custom error | `tests/fixtures/` | the eval cannot cover what the case asks |
+| P5 | No eval set: of the 8 categories the plan requires on Ethereum, recorded real cases exist for 5 (ERC-20 transfer, DEX swap, explicit revert reason, unverified contract, node unavailable) plus a passed deadline (D41); none yet for an allowance revert, an out-of-gas failure, a Solidity custom error. An access-control refusal was searched for in 1,600 recent failures on five networks and none was found (D41) | `tests/fixtures/` | the eval cannot cover what the plan asks |
 
 ## 4. Objective
 
@@ -37,13 +38,13 @@ A local API and web page with a chat whose every answer is grounded and checked,
 
 ## 5. Requirements
 
-- **R1. API.** THE SYSTEM SHALL serve `POST /explain` (hash, mode, optional question), `POST /chat` (session id, message) and `GET /health` (active network; status of explorer, node and LLM), locally, with FastAPI. **Accept:** `/health` on the Ethereum config reports the network and each source's state from a real probe; `/explain` returns the same evidence as the CLI for the same hash.
-- **R2. Web page.** THE SYSTEM SHALL serve one static page (no frontend build) with: the active network at the top, hash field, mode selector, chat area, clickable sources, a confidence badge per conclusion, and a "missing data" panel when there are gaps. **Accept:** the full demo runs in a browser (R9).
-- **R3. Chat with tools.** WHEN the user asks a follow-up question, THE SYSTEM SHALL let the model request a tool from a fixed list (read contract state with `eth_call` at a block, open a file or function from a configured repo, explain another transaction hash), run it, add each result to the session's evidence as a numbered, sourced fact, and answer citing it. Tools are read-only and limited per turn. **Accept:** on a real failed transaction, "what was the sender's balance before?" makes the model ask for the read, the read becomes a new fact, and the answer cites it.
+- **R1. API.** THE SYSTEM SHALL serve `POST /explain` (hash, mode, optional question), `POST /chat` (session id, message) and `GET /health` (active network; status of explorer, node and LLM), locally, with FastAPI. `/explain` returns the structured answer of D43 (`anychain.answer/1`). **Accept:** `/health` on the Ethereum config reports the network and each source's state from a real probe; `/explain` returns the same answer as `explain --json` for the same hash.
+- **R2. Web page.** THE SYSTEM SHALL serve one static page (no frontend build) with: the active network at the top, hash field, mode selector, chat area, clickable sources, a badge per conclusion with its label (CONFIRMED, LIKELY, UNKNOWN; D42), the next steps of the selected mode's reader, security notes marked as heuristics (D39), and a "missing data" panel when there are gaps. **Accept:** the full demo runs in a browser (R9).
+- **R3. Chat with tools.** WHEN the user asks a follow-up question, THE SYSTEM SHALL let the model request a tool from a fixed list (read contract state with `eth_call` at a block, show a function's verified code or a file from a configured repo, explain another transaction hash), run it, add each result to the session's evidence as a numbered, sourced fact, and answer citing it. Tools are read-only and limited per turn. **Accept:** on a real failed transaction, "what was the sender's balance before?" makes the model ask for the read, the read becomes a new fact, and the answer cites it.
 - **R4. Every chat answer is checked** by the validator (D28) against the session's evidence, with the same retry and withhold rules.
 - **R5. Modes** in API and UI (support, developer, auditor), using the existing prompts.
-- **R6. Metrics.** THE SYSTEM SHALL record per answer: mode, diagnosis category and level, ABI source of the main call, latency, tokens (when the backend reports them), and optional user feedback (thumbs up or down from the page); `anychain metrics` SHALL print 3 to 4 SQL queries with their SQL (failure causes, diagnosis levels, ABI source share, satisfaction by mode).
-- **R7. Eval.** `eval/cases.yaml` SHALL hold at least 8 real Ethereum cases and 2 of a second network, each recorded as a fixture, covering: ERC-20 transfer, DEX swap, explicit revert reason, allowance revert, out of gas, unverified contract, Solidity custom error, node unavailable. Each case states the expected status, diagnosis category, ABI source and entities that must appear. `anychain eval` SHALL run them offline (recorded data) through the whole pipeline including the LLM, and report: status and category accuracy, citation coverage (share of factual sentences citing evidence), hallucination rate (validator problems; target zero), share of degradation declared correctly, latency and tokens per case.
+- **R6. Metrics.** THE SYSTEM SHALL record per answer (the diagnosis label is already recorded, D42): mode, diagnosis rule, ABI source of the main call, latency, tokens (when the backend reports them), and optional user feedback (thumbs up or down from the page); `anychain metrics` SHALL print 3 to 4 SQL queries with their SQL (failure causes, diagnosis levels, ABI source share, satisfaction by mode).
+- **R7. Eval.** `eval/cases.yaml` SHALL hold at least 8 real Ethereum cases and 2 of a second network, each recorded as a fixture, covering: ERC-20 transfer, DEX swap, explicit revert reason, allowance revert, out of gas, unverified contract, Solidity custom error, node unavailable. Each case states the expected status, diagnosis rule and label, ABI source and entities that must appear; a category with no real case after the search is reported as missing, never filled with made-up data (PHASE2_5 D2). `anychain eval` SHALL run them offline (recorded data) through the whole pipeline including the LLM, and report: status and category accuracy, citation coverage (share of factual sentences citing evidence), hallucination rate (validator problems; target zero), share of degradation declared correctly, latency and tokens per case.
 - **R8. Production impact page** (`docs/IMPACT.md`, for the README in Phase 4): hypothesis, primary and guard metrics, experiment design, criteria to scale or roll back. One page.
 - **R9. Demo.** The full demo (explain a success, a diagnosed failure, a follow-up question with a tool call, an unverified contract with degradation) SHALL run in the browser and be recorded.
 
@@ -66,7 +67,7 @@ A local API and web page with a chat whose every answer is grounded and checked,
 
 ## 8. Out of scope
 
-No `git push`, no deploy, no auth, no cloud. The production queue and worker stay design only (D24). Triage questions, multi-transaction analysis, gas and security notes are Phase 4.
+No `git push`, no deploy, no auth, no cloud. The production queue and worker stay design only (D24). Triage questions, multi-transaction analysis, gas suggestions and `debug_traceTransaction` are Phase 4 (security notes moved into Phase 2.5, D39).
 
 ## 9. Approach
 
