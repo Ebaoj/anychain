@@ -9,7 +9,6 @@ not be reachable from another machine, and it answers only requests addressed to
 whose own name resolves to 127.0.0.1, "DNS rebinding", is refused). Error details never show an endpoint's URL:
 an RPC URL can carry the provider's key.
 """
-import re
 import shutil
 import time
 from typing import Literal
@@ -22,24 +21,16 @@ from pydantic import BaseModel, ConfigDict, Field
 from anychain.bundle import InvalidHashError, build_bundle
 from anychain.collectors.http import USER_AGENT, Budget, CollectorError, request_json
 from anychain.events import NullEventLog, RunEvent
+from anychain.redact import no_urls
 from anychain.collectors.rpc import RpcClient
 from anychain.config import AppConfig
+from anychain.chat import MAX_QUESTIONS
 from anychain.service import SKIP, WRITE, Crash, answer_transaction
 from anychain.writer import write_checked
 
 LOCAL_NAMES = ["127.0.0.1", "localhost", "[::1]", "::1"]
 PROBE_BUDGET_S = 15  # all of /health's probes together
-URL = re.compile(r"(?:https?|wss?)://\S+")
 
-
-def no_urls(text: str, hidden_hosts: tuple[str, ...] = ()) -> str:
-    """An error text without URLs, and without the node's host name even when written bare (an RPC URL can carry
-    the provider's key; errors also name the host alone, e.g. "outage of rpc.example.com")."""
-    text = URL.sub("<endpoint>", text)
-    for host in hidden_hosts:
-        if host:
-            text = text.replace(host, "<node>")
-    return text
 
 
 class ExplainRequest(BaseModel):
@@ -48,6 +39,14 @@ class ExplainRequest(BaseModel):
     mode: Literal["support", "developer", "auditor"] | None = Field(None, description="Default: the config's")
     fresh: bool = Field(False, description="Fetch everything again, ignoring the cache")
     write: bool = Field(True, description="Write the summary with the model (false: evidence only)")
+
+
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    message: str = Field(..., min_length=1, max_length=2000, description="The reader's question")
+    session_id: str | None = Field(None, description="To continue a conversation; without it, `hash` starts one")
+    hash: str | None = Field(None, description="The transaction to talk about (starts a conversation)")
+    mode: Literal["support", "developer", "auditor"] | None = None
 
 
 class FeedbackRequest(BaseModel):
@@ -97,8 +96,18 @@ def probe_model(cfg: AppConfig) -> dict:
             **({} if present else {"detail": f"{key} is not set"})}
 
 
+def chat_tools(cfg: AppConfig, bundle_for):
+    """The chat's tools against the network's own sources, each request within the explanation's time budget."""
+    from anychain.chat import Tools
+    from anychain.collectors.explorer import ExplorerClient
+    budget = cfg.assistant.time_budget_s
+    return Tools(cfg, rpc_factory=lambda: RpcClient(cfg.rpc, budget=Budget(budget)),
+                 explorer_factory=lambda: ExplorerClient(cfg.explorer, budget=Budget(budget)), build=bundle_for)
+
+
 def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write_checked, finality=None,
-               probe_client: httpx.Client | None = None, record=None) -> FastAPI:
+               probe_client: httpx.Client | None = None, record=None, backend_factory=None, tools=None,
+               sessions=None) -> FastAPI:
     """The app for one network's config. Collaborators are passed in, so tests replay recorded traffic."""
     from contextlib import asynccontextmanager
     client = probe_client or httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True)
@@ -112,6 +121,15 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
     finality = finality or (lambda: RpcClient(cfg.rpc))
     record = record or _record
     node = (httpx.URL(cfg.rpc.url).host,)
+    from anychain.cache import NoCache, cached_bundle
+    from anychain.chat import ChatSession, Sessions, turn_event
+    from anychain.writer import backend_for
+    sessions = sessions or Sessions()
+    backend_factory = backend_factory or (lambda: backend_for(cfg.llm))
+
+    def bundle_for(tx_hash: str):
+        return cached_bundle(tx_hash.strip(), cfg, store or NoCache(), build, finality)[0]
+    tools = tools or chat_tools(cfg, bundle_for)
 
     @app.get("/health")
     def health() -> dict:
@@ -147,11 +165,50 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
             out["writer_error"] = no_urls(result.writer_error, node)
         return out
 
+    @app.post("/chat")
+    def chat(request: ChatRequest) -> dict:
+        started = time.monotonic()
+        if request.session_id:
+            session = sessions.get(request.session_id)
+            if session is None:
+                raise HTTPException(404, "no such conversation (it ended after an hour without questions): start a "
+                                         "new one with the transaction's hash")
+            if request.mode and request.mode != session.mode or request.hash:
+                raise HTTPException(422, f"a conversation keeps the transaction and mode it started with "
+                                         f"({session.mode}): start a new one to change them")
+        elif request.hash:
+            try:
+                session = ChatSession(cfg, bundle_for(request.hash), request.mode or cfg.assistant.default_mode, tools)
+            except InvalidHashError as exc:
+                raise HTTPException(400, str(exc)) from exc
+            except Exception as exc:
+                record(log, RunEvent.crash(cfg.network.name, request.hash.strip(), "chat", _ms(started),
+                                           f"{type(exc).__name__}: {exc}"))
+                raise HTTPException(500, no_urls(f"Unexpected error ({type(exc).__name__}: {exc}). It was logged.",
+                                                 node)) from exc
+            sessions.add(session)
+        else:
+            raise HTTPException(422, "give session_id to continue a conversation, or hash to start one")
+        try:
+            turn = session.ask(request.message, backend_factory())
+        except Exception as exc:  # never a traceback; logged like any crash
+            record(log, RunEvent.crash(cfg.network.name, session.bundle.tx_hash, "chat", _ms(started),
+                                       f"{type(exc).__name__}: {exc}"))
+            raise HTTPException(500, no_urls(f"Unexpected error ({type(exc).__name__}: {exc}). It was logged.",
+                                             node)) from exc
+        run_id = record(log, turn_event(session, turn, "chat", _ms(started)))
+        added = [e.model_dump() for e in session.bundle.items if e.id in turn.new_facts]
+        return {"session_id": session.id, "answer": turn.answer, "outcome": turn.outcome, "new_facts": added,
+                "tool_calls": turn.tool_calls, "problems": turn.problems,
+                "error": no_urls(turn.error, node) if turn.error else None, "run_id": run_id,
+                "questions_left": max(0, MAX_QUESTIONS - len([t for t in session.turns if t.outcome != "refused"]))}
+
     @app.post("/feedback")
     def feedback(request: FeedbackRequest) -> dict:
         if isinstance(log, NullEventLog):
             raise HTTPException(503, "the event log is off (storage.event_sink: none): feedback cannot be saved")
-        if not log.set_feedback(request.run_id, request.value, source="api"):
+        if not (log.set_feedback(request.run_id, request.value, source="api")
+                or log.set_feedback(request.run_id, request.value, source="chat")):
             raise HTTPException(404, f"no answer given by this API with run_id {request.run_id}")
         return {"saved": True}
 

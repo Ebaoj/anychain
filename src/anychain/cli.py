@@ -255,6 +255,65 @@ def show_log(
             print(f"    check failed       {f['name']:<28} {f['n']:>5}")
 
 
+@app.command()
+def chat(
+    tx_hash: str = typer.Argument(..., help="Transaction hash (0x + 64 hex)"),
+    mode: Mode = typer.Option(None, help="Who the answers are for (default: from config)"),
+    config: str = typer.Option(None, "--config", help="Path to network YAML (or set ANYCHAIN_CONFIG)"),
+) -> None:
+    """Ask follow-up questions about one transaction (PHASE3 T3). The model may ask for read-only data (a contract's
+    state, a function's code, another transaction); every answer is checked against the evidence."""
+    from anychain.api import chat_tools
+    from anychain.chat import ChatSession, turn_event
+    from anychain.writer import backend_for
+    try:
+        cfg = load_config(config)
+    except ConfigError as exc:
+        _fail(str(exc))
+    log, store = _open_log(cfg), cache_for(cfg)
+
+    def bundle_for(h: str):
+        return cached_bundle(h.strip(), cfg, store, build_bundle, lambda: finality_rpc_for(cfg))[0]
+    try:
+        bundle = bundle_for(tx_hash)
+    except InvalidHashError as exc:
+        _fail(str(exc))
+    except Exception as exc:
+        _fail(f"Unexpected error while collecting data ({type(exc).__name__}: {exc}). Please report it.")
+    session = ChatSession(cfg, bundle, (mode or Mode(cfg.assistant.default_mode)).value, chat_tools(cfg, bundle_for))
+    backend = backend_for(cfg.llm)
+    print(f"Transaction {bundle.tx_hash} on {cfg.network.name}: {bundle.status}. Ask about it (empty line to quit).")
+    while True:
+        try:
+            question = input("> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+        if not question or question in ("exit", "quit"):
+            break
+        started = time.monotonic()
+        try:
+            turn = session.ask(question, backend)
+        except KeyboardInterrupt:
+            print("\n(question stopped)")
+            continue
+        _record(log, turn_event(session, turn, "chat", _ms(started)))
+        facts = {e.id: e.text.split("\n")[0] for e in session.bundle.items}
+        for call in turn.tool_calls:
+            result = call["result"]
+            shown = result if isinstance(result, str) else "; ".join(f"{i}: {facts.get(i, '')[:120]}" for i in result)
+            print(f"  [{call.get('tool', '?')}] {shown}")
+        if turn.answer:
+            print(turn.answer)
+        elif turn.outcome == "withheld":
+            print("_(The answer was withheld: it stated things not in the evidence "
+                  f"({'; '.join(turn.problems[:3])}).)_")
+        else:
+            print(f"_({turn.error or 'No answer.'})_")
+            if turn.outcome == "refused":
+                break
+
+
 LOCAL_HOSTS = ("127.0.0.1", "localhost", "::1")
 
 

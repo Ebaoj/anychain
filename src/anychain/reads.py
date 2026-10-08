@@ -25,6 +25,7 @@ class Read:
     args: tuple
     block: int
     value: object  # int for uint256, bool for bool
+    raw: str | None = None  # the node's answer as returned (hex), when kept
 
     @property
     def detail(self) -> str:
@@ -94,6 +95,23 @@ class StateReader:
         read = self._read(contract, "hasRole(bytes32,address)", (bytes.fromhex(role[2:]), account),
                           ["bytes32", "address"], "bool", block)
         return Read(read.signature, read.contract, (role, account), read.block, read.value)  # the role as hex
+
+    def view(self, contract: str, signature: str, args: tuple, out: str, block: int) -> Read:
+        """Any read-only function with simple types (the chat's read tool, PHASE3 T3): the argument types come from
+        the signature, the answer is decoded as `out`."""
+        types = [t for t in signature[signature.index("(") + 1:-1].split(",") if t]
+        data = selector(signature) + (encode(types, list(args)).hex() if types else "")
+        try:
+            raw = self.rpc.eth_call(contract, data, block)
+        except CallReverted as exc:
+            raise UnreadableState(f"{signature} on {contract} reverted at block {block}") from exc
+        try:
+            (value,) = decode([out], bytes.fromhex(raw[2:]))
+        except (DecodingError, ValueError) as exc:
+            raise UnreadableState(f"{signature} on {contract} answered {raw[:80]}, not a valid {out}") from exc
+        if isinstance(value, bytes):
+            value = "0x" + value.hex()
+        return Read(signature, contract, args, block, value, raw)
 
     def paused(self, contract: str, block: int) -> Read:
         return self._read(contract, "paused()", (), [], "bool", block)

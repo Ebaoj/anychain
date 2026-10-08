@@ -15,6 +15,9 @@ what the model may have added:
 Integers under 4 digits without decimals (counts like "30 of 93") are not checked: too common to
 judge. That is a known limit (D28).
 
+A read asked in the chat (facts of kind "chat_read", D47) counts only for what the node returned: its arguments
+and block were chosen by the model.
+
 Contract code (facts of kind "code", D38) is the author's text, not data of the transaction: its
 numbers and hex values never count as evidence values, so a constant in the code cannot let an
 invented amount or address through. Only the line numbers shown are accepted from it, and a
@@ -79,6 +82,13 @@ def _without_code(evidence: str) -> tuple[str, list[Decimal], list[str]]:
     numbers: list[Decimal] = []
     code: list[str] = []
     for item in items:
+        if isinstance(item, dict) and item.get("kind") == "chat_read" and isinstance(item.get("fact"), str):
+            # a read asked in the chat: its arguments and block were chosen by the model, so only what the node
+            # returned counts (else a number the model made up would pass once it put it in a request; D47)
+            text = item["fact"]
+            item["fact"] = text[text.index("The node returned"):] if "The node returned" in text else ""
+            item["sources"] = []
+            continue
         if isinstance(item, dict) and item.get("kind") == "code" and isinstance(item.get("fact"), str):
             numbers += [Decimal(n) for n in CODE_LINE.findall(item["fact"])]
             code += [_squeeze(CODE_LINE.sub("", line)) for line in item["fact"].split("\n") if CODE_LINE.match(line)]
