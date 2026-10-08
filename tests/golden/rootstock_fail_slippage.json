@@ -296,11 +296,17 @@
    "confidence": "single_source",
    "data": {
     "computed": {},
+    "label": "CONFIRMED",
     "level": "single_source",
-    "next_steps": [
-     "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",
-     "For large swaps, split them or use a deeper pool."
-    ],
+    "next_steps": {
+     "developer": [
+      "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",
+      "For large swaps, split them or use a deeper pool."
+     ],
+     "support": [
+      "The swap was refused by its price limit. Check the current price, and try again with a smaller amount or a limit that fits it, or contact the app's support."
+     ]
+    },
     "reads": [],
     "rule": "slippage"
    },
@@ -326,7 +332,7 @@
      "url": "https://github.com/Uniswap/swap-router-contracts/blob/70bc2e40dfca294c1cea9bf67a4036732ee54303/contracts/V3SwapRouter.sol#L220"
     }
    ],
-   "text": "The reason 'Too much requested' is the slippage check of Uniswap's routers: when the transaction ran, the swap would have needed more than the maximum input the sender had set, so it was refused. The price moved, or the limit was too tight. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
+   "text": "CONFIRMED: The reason 'Too much requested' is the slippage check of Uniswap's routers: when the transaction ran, the swap would have needed more than the maximum input the sender had set, so it was refused. The price moved, or the limit was too tight. Next step for a non-technical reader: The swap was refused by its price limit. Check the current price, and try again with a smaller amount or a limit that fits it, or contact the app's support. Next step for a developer: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step for a developer: For large swaps, split them or use a deeper pool."
   },
   {
    "confidence": "single_source",

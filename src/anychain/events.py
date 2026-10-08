@@ -52,6 +52,7 @@ class RunEvent:
     facts: int = 0
     error: str | None = None  # crash message: the tool could not answer at all
     writer: str | None = None  # written answer: ok | retried | withheld | unavailable | skipped (None: not asked)
+    diagnosis: str | None = None  # the failure's conclusion label: CONFIRMED | LIKELY | UNKNOWN (None: no failure)
     gaps: tuple[GapEvent, ...] = ()
     checks: tuple[CheckEvent, ...] = ()
     ts: float = field(default_factory=time.time)
@@ -65,7 +66,8 @@ class RunEvent:
                    or writer in WRITER_PROBLEMS)
         return cls(network=bundle.network, tx_hash=bundle.tx_hash, source=source,
                    outcome="degraded" if problem else "ok", duration_ms=duration_ms, status=bundle.status,
-                   facts=len(bundle.items), gaps=gaps, checks=checks, writer=writer, **({"ts": ts} if ts else {}))
+                   facts=len(bundle.items), gaps=gaps, checks=checks, writer=writer,
+                   diagnosis=_diagnosis_label(bundle), **({"ts": ts} if ts else {}))
 
     @classmethod
     def crash(cls, network: str, tx_hash: str, source: str, duration_ms: int, error: str,
@@ -89,7 +91,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY, ts REAL NOT NULL, network TEXT NOT NULL, tx_hash TEXT NOT NULL,
     source TEXT NOT NULL, outcome TEXT NOT NULL, duration_ms INTEGER NOT NULL,
-    status TEXT, facts INTEGER NOT NULL, error TEXT, writer TEXT);
+    status TEXT, facts INTEGER NOT NULL, error TEXT, writer TEXT, diagnosis TEXT);
 CREATE TABLE IF NOT EXISTS gaps (
     run_id INTEGER NOT NULL REFERENCES runs(id), topic TEXT NOT NULL, cause TEXT NOT NULL,
     why TEXT NOT NULL, retryable INTEGER NOT NULL);
@@ -99,6 +101,18 @@ CREATE INDEX IF NOT EXISTS runs_ts ON runs(ts);
 CREATE INDEX IF NOT EXISTS gaps_run ON gaps(run_id);
 CREATE INDEX IF NOT EXISTS checks_run ON checks(run_id);
 """
+
+
+def _diagnosis_label(bundle: EvidenceBundle) -> str | None:
+    """The label of the failure's own conclusion; a failure answered from the node only has the replay's
+    conclusion, or none (UNKNOWN). None: the transaction did not fail."""
+    labels = [(e.data.get("from_replay", False), e.data.get("label")) for e in bundle.items if e.kind == "diagnosis"]
+    own = [label for from_replay, label in labels if not from_replay]
+    if own:
+        return own[0]
+    if labels:
+        return labels[0][1]
+    return "UNKNOWN" if bundle.status == "failed" else None
 
 
 class SqliteEventLog:
@@ -117,6 +131,8 @@ class SqliteEventLog:
             columns = {row[1] for row in db.execute("PRAGMA table_info(runs)")}
             if "writer" not in columns:  # logs created before PHASE2 T1
                 db.execute("ALTER TABLE runs ADD COLUMN writer TEXT")
+            if "diagnosis" not in columns:  # logs created before PHASE2_5 T5
+                db.execute("ALTER TABLE runs ADD COLUMN diagnosis TEXT")
 
     @contextmanager
     def _connect(self):
@@ -143,10 +159,10 @@ class SqliteEventLog:
                     db.executemany(f"DELETE FROM {table} WHERE run_id = ?", [(i,) for i in old])
                 db.executemany("DELETE FROM runs WHERE id = ?", [(i,) for i in old])
             run_id = db.execute(
-                "INSERT INTO runs (ts, network, tx_hash, source, outcome, duration_ms, status, facts, error, writer)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO runs (ts, network, tx_hash, source, outcome, duration_ms, status, facts, error, writer,"
+                " diagnosis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (event.ts, event.network, event.tx_hash, event.source, event.outcome, event.duration_ms,
-                 event.status, event.facts, event.error, event.writer)).lastrowid
+                 event.status, event.facts, event.error, event.writer, event.diagnosis)).lastrowid
             db.executemany("INSERT INTO gaps (run_id, topic, cause, why, retryable) VALUES (?, ?, ?, ?, ?)",
                            [(run_id, g.topic, g.cause, g.why, int(g.retryable)) for g in event.gaps])
             db.executemany("INSERT INTO checks (run_id, name, status, detail) VALUES (?, ?, ?, ?)",
@@ -161,12 +177,16 @@ class SqliteEventLog:
             where, args = where + " AND r.network = ?", args + [network]
         with self._connect() as db:
             # a log from before PHASE2 T1, opened read-only, has no writer column: read it as empty
-            w = "writer" if "writer" in {r[1] for r in db.execute("PRAGMA table_info(runs)")} else "NULL"
+            columns = {r[1] for r in db.execute("PRAGMA table_info(runs)")}
+            w = "writer" if "writer" in columns else "NULL"
+            d = "diagnosis" if "diagnosis" in columns else "NULL"  # a log from before PHASE2_5 T5
             runs = db.execute(
                 f"SELECT network, COUNT(*) AS answers, SUM(outcome = 'crash') AS crashes,"
                 f" SUM(outcome = 'degraded') AS degraded, CAST(AVG(duration_ms) AS INTEGER) AS avg_ms,"
                 f" SUM({w} = 'retried') AS retried, SUM({w} = 'withheld') AS withheld,"
-                f" SUM({w} = 'unavailable') AS unavailable"
+                f" SUM({w} = 'unavailable') AS unavailable, COALESCE(SUM({d} = 'CONFIRMED'), 0) AS confirmed,"
+                f" COALESCE(SUM({d} = 'LIKELY'), 0) AS likely, COALESCE(SUM({d} = 'UNKNOWN'), 0) AS unknown,"
+                f" COALESCE(SUM(status = 'failed'), 0) AS failed"
                 f" FROM runs r WHERE {where} GROUP BY network ORDER BY network", args).fetchall()
             causes = db.execute(
                 f"SELECT r.network, g.cause, g.topic, COUNT(DISTINCT r.id) AS answers FROM gaps g"

@@ -172,11 +172,17 @@
    "confidence": "single_source",
    "data": {
     "computed": {},
+    "label": "CONFIRMED",
     "level": "single_source",
-    "next_steps": [
-     "Read the contract's source where this reason is raised, or ask its developers.",
-     "Do not send the same transaction again until the condition behind the reason has changed."
-    ],
+    "next_steps": {
+     "developer": [
+      "Read the contract's source where this reason is raised, or ask its developers.",
+      "Do not send the same transaction again until the condition behind the reason has changed."
+     ],
+     "support": [
+      "The service refused the operation with its own message. Contact the app's or project's support with that message and the link to this transaction."
+     ]
+    },
     "reads": [],
     "rule": "contract_reason"
    },
@@ -190,7 +196,7 @@
      "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
     }
    ],
-   "text": "The contract reverted with its own reason 'NOT_YET'. What it means is defined in the contract's code. Next step: Read the contract's source where this reason is raised, or ask its developers. Next step: Do not send the same transaction again until the condition behind the reason has changed."
+   "text": "CONFIRMED: The contract reverted with its own reason 'NOT_YET'. What it means is defined in the contract's code. Next step for a non-technical reader: The service refused the operation with its own message. Contact the app's or project's support with that message and the link to this transaction. Next step for a developer: Read the contract's source where this reason is raised, or ask its developers. Next step for a developer: Do not send the same transaction again until the condition behind the reason has changed."
   },
   {
    "confidence": "confirmed",

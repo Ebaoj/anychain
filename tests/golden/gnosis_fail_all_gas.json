@@ -261,10 +261,16 @@
    "confidence": "candidate",
    "data": {
     "computed": {},
+    "label": "LIKELY",
     "level": "candidate",
-    "next_steps": [
-     "Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
-    ],
+    "next_steps": {
+     "developer": [
+      "Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again: trying again may fail the same way and charge the fee again."
+     ]
+    },
     "reads": [],
     "rule": "possibly_out_of_gas"
    },
@@ -278,7 +284,7 @@
      "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
     }
    ],
-   "text": "Possible cause: the transaction used 293252 of its 293668 gas limit and reverted with no reason, which is what running out of gas inside a call looks like. A failed assert in old Solidity or an invalid instruction also uses all the gas. The explorer does not say which. Next step: Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
+   "text": "LIKELY: Possible cause: the transaction used 293252 of its 293668 gas limit and reverted with no reason, which is what running out of gas inside a call looks like. A failed assert in old Solidity or an invalid instruction also uses all the gas. The explorer does not say which. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again: trying again may fail the same way and charge the fee again. Next step for a developer: Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
   },
   {
    "confidence": "confirmed",

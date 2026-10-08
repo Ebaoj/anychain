@@ -178,11 +178,17 @@
    "confidence": "confirmed",
    "data": {
     "computed": {},
+    "label": "CONFIRMED",
     "level": "confirmed",
-    "next_steps": [
-     "Check the balance of the account the tokens are moved from before sending, and move at most that.",
-     "If the balance was expected, check for an earlier transaction that spent it."
-    ],
+    "next_steps": {
+     "developer": [
+      "Check the balance of the account the tokens are moved from before sending, and move at most that.",
+      "If the balance was expected, check for an earlier transaction that spent it."
+     ],
+     "support": [
+      "The operation tried to move more of a token than the account it comes from held. Check the amount and that balance before trying again."
+     ]
+    },
     "reads": [
      "E7"
     ],
@@ -204,7 +210,7 @@
      "url": "https://forno.celo.org"
     }
    ],
-   "text": "Cause confirmed: at block 78962883, the block before this transaction, the balance of 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 for token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e was 1445 (raw units), less than the 106500 the call asked for. The reason is the standard ERC-20 message 'ERC20: transfer amount exceeds balance'. Next step: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step: If the balance was expected, check for an earlier transaction that spent it."
+   "text": "CONFIRMED: Cause confirmed: at block 78962883, the block before this transaction, the balance of 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 for token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e was 1445 (raw units), less than the 106500 the call asked for. The reason is the standard ERC-20 message 'ERC20: transfer amount exceeds balance'. Next step for a non-technical reader: The operation tried to move more of a token than the account it comes from held. Check the amount and that balance before trying again. Next step for a developer: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step for a developer: If the balance was expected, check for an earlier transaction that spent it."
   },
   {
    "confidence": "single_source",

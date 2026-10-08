@@ -475,10 +475,16 @@
    "confidence": "single_source",
    "data": {
     "computed": {},
+    "label": "UNKNOWN",
     "level": "single_source",
-    "next_steps": [
-     "Find the reason with a node that can trace the transaction, or ask the contract's developers."
-    ],
+    "next_steps": {
+     "developer": [
+      "Find the reason with a node that can trace the transaction, or ask the contract's developers."
+     ],
+     "support": [
+      "Contact the support of the app or service you used, with the link to this transaction, before trying again."
+     ]
+    },
     "reads": [],
     "rule": "generic_failure"
    },
@@ -498,7 +504,7 @@
      "url": "https://github.com/matter-labs/zksync-era/blob/948aeaf5786ebc4e9b7dd947cc08a6a1df9a7e21/core/lib/dal/src/transactions_dal.rs#L663-L670"
     }
    ],
-   "text": "'Bootloader-based tx failed' is the text zkSync's node stores for every failed transaction; it carries no reason. Next step: Find the reason with a node that can trace the transaction, or ask the contract's developers."
+   "text": "UNKNOWN: 'Bootloader-based tx failed' is the text zkSync's node stores for every failed transaction; it carries no reason. Next step for a non-technical reader: Contact the support of the app or service you used, with the link to this transaction, before trying again. Next step for a developer: Find the reason with a node that can trace the transaction, or ask the contract's developers."
   },
   {
    "confidence": "confirmed",

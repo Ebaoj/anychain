@@ -448,7 +448,8 @@ def test_diagnosis_on_real_failures(fixture, network, rule, level, words):
     assert (finding.data["rule"], finding.data["level"], finding.confidence) == (rule, level, level)
     for w in words:
         assert w in finding.text, (w, finding.text)
-    assert finding.data["next_steps"] and "Next step:" in finding.text
+    assert finding.data["next_steps"]["support"] and finding.data["next_steps"]["developer"]
+    assert "Next step for a non-technical reader:" in finding.text and "Next step for a developer:" in finding.text
     for read_id in finding.data["reads"]:  # every read it relies on is a fact from the node
         read = next(e for e in b.items if e.id == read_id)
         assert read.kind == "state_read" and read.confidence == "confirmed"

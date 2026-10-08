@@ -58,6 +58,7 @@ class Finding:
     missing: list[Missing] = field(default_factory=list)
     source_urls: list[str] = field(default_factory=list)  # where the rule's meaning comes from
     data: dict = field(default_factory=dict)  # values the finding computed, kept in the fact's data
+    label: str | None = None  # set by a branch whose own data contradicts or does not decode it (D42)
 
 
 def reason_text(reason: RevertReason | None) -> str | None:
@@ -133,9 +134,10 @@ def _allowance(ctx: Context) -> Finding | None:
 OZ_V4 = "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/dc44c9f1a4c3b10af99492eed84f83ed244203f6/contracts/access"
 OZ_V5 = "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/dbb6104ce834628e473d2173bbc9d47f81a9eec3/contracts/access"
 ROLE_MESSAGE = re.compile(r"^AccessControl: account (0x[0-9a-fA-F]{40}) is missing role (0x[0-9a-fA-F]{64})$")
-ACCESS_STEPS = ["Only the contract's owner, or an account holding the role, can make this call: sending it again from "
-                "the same account fails the same way and costs the fee again.",
-                "If this account should have the permission, ask the contract's operators to grant it."]
+ACCESS_STEPS = ["The refusal comes from a permission check: sending the same call again unchanged fails the same way "
+                "and costs the fee again.",
+                "Find which account the check refused (OpenZeppelin v5 errors name it) and whether it should hold "
+                "the permission; if it should, ask the contract's operators to grant it."]
 
 
 def _access(ctx: Context) -> Finding | None:
@@ -161,11 +163,12 @@ def _access(ctx: Context) -> Finding | None:
     what = ("the pending owner (Ownable2Step's acceptOwnership refuses with the same error)" if pending else
             "the owner" if kind == "owner" else f"an account with the role {role}" if role else "an account with the role")
     shown = text or call
-    said = f"The reason {shown!r} is OpenZeppelin's access check: the call was refused because its caller is not {what}."
+    said = (f"The reason {shown!r} is OpenZeppelin's access check: a call was refused because the caller of that check "
+            f"(the sender or a contract in between) is not {what}.")
 
-    def stated(extra: str = "", missing=None, reads=None) -> Finding:
+    def stated(extra: str = "", missing=None, reads=None, label=None) -> Finding:
         return Finding("access_control", "single_source", said + extra, ACCESS_STEPS, list(reads or []),
-                       missing=list(missing or []), source_urls=[url])
+                       missing=list(missing or []), source_urls=[url], label=label)
     if named and not account:
         return stated(missing=[Missing("The refused account was not read: the explorer did not give the error's "
                                        "account parameter", "The error's parameters decoded with its ABI",
@@ -204,7 +207,8 @@ def _access(ctx: Context) -> Finding | None:
                        ACCESS_STEPS, [read], source_urls=[url])
     return stated(f" But at block {read.block} the sender held that permission on the contract it called "
                   f"({signature} answered {read.value}): the check that failed is in another contract further down "
-                  "the call, or the permission changed earlier in this transaction's own block.", reads=[read])
+                  "the call, or the permission changed earlier in this transaction's own block.", reads=[read],
+                  label="LIKELY")
 
 
 def _paused(ctx: Context) -> Finding | None:
@@ -229,7 +233,7 @@ def _paused(ctx: Context) -> Finding | None:
     return Finding("paused", "single_source",
                    f"{said} But the contract this transaction called was not paused at block {read.block} (paused() "
                    "returned false): another contract further down the call may be the paused one, or it was paused "
-                   "earlier in this transaction's own block.", steps, [read])
+                   "earlier in this transaction's own block.", steps, [read], label="LIKELY")
 
 
 # Uniswap routers' checks, read in their source on 2026-10-08:
@@ -304,7 +308,8 @@ def _deadline(ctx: Context) -> Finding | None:
             return Finding("deadline", "single_source",
                            f"The reason {text!r} is Uniswap's deadline check. {compared['text']}, so the deadline "
                            "is not before the block's time: the deadline that was checked is not this call's "
-                           "deadline parameter.", [DEADLINE_STEP], source_urls=DEADLINES[text], data=data)
+                           "deadline parameter.", [DEADLINE_STEP], source_urls=DEADLINES[text], data=data,
+                           label="LIKELY")
         return Finding("deadline", "single_source",
                        f"The reason {text!r} is Uniswap's deadline check: the transaction was included after the "
                        "deadline the sender set in it.", [DEADLINE_STEP], source_urls=DEADLINES[text])
@@ -377,11 +382,14 @@ def _contract_reason(ctx: Context) -> Finding | None:
         text = ctx.explorer_text
     if not text or text.lower() == "execution reverted":  # the node's words for "reverted", not a reason
         return None
+    decoded = bool(reason_text(ctx.reason))
     return Finding("contract_reason", "single_source",
-                   f"The contract reverted with its own reason {text!r}. What it means is defined in the "
-                   "contract's code.",
+                   (f"The contract reverted with its own reason {text!r}. What it means is defined in the "
+                    "contract's code." if decoded else
+                    f"The explorer reports the failure as {text!r}; no decoded reason confirms it."),
                    ["Read the contract's source where this reason is raised, or ask its developers.",
-                    "Do not send the same transaction again until the condition behind the reason has changed."])
+                    "Do not send the same transaction again until the condition behind the reason has changed."],
+                   label=None if decoded else "LIKELY")
 
 
 def _no_reason(ctx: Context) -> Finding | None:
@@ -389,6 +397,56 @@ def _no_reason(ctx: Context) -> Finding | None:
                    "No reason is available for this failure.",
                    ["Find where it reverted with a node that can trace the transaction, or ask the contract's "
                     "developers."])
+
+
+# Next steps for a non-technical reader (a merchant using an app), one set per rule; the rules' own steps are
+# the developer's (PHASE2_5 T5, R7, D42). Actions only: what happened is said by the facts, not here.
+SUPPORT_STEPS = {
+    "generic_failure": ["Contact the support of the app or service you used, with the link to this transaction, "
+                        "before trying again."],
+    "insufficient_balance": ["The operation tried to move more of a token than the account it comes from held. "
+                             "Check the amount and that balance before trying again."],
+    "insufficient_allowance": ["The operation needed permission to move a token (an approval) that was missing or "
+                               "too small. Check in the app that its approval step was completed before trying again."],
+    "access_control": ["The contract refused the operation for lack of permission. Contact the app's or project's "
+                       "support with the link to this transaction: sending it again the same way fails and charges "
+                       "the fee again."],
+    "paused": ["The contract refused the operation with a message about being paused. Check the project's "
+               "announcements, and contact its support before trying again."],
+    "slippage": ["The swap was refused by its price limit. Check the current price, and try again with a smaller "
+                 "amount or a limit that fits it, or contact the app's support."],
+    "deadline": ["The operation was refused by a time-limit check. Contact the app's support with the link to this "
+                 "transaction before trying again."],
+    "possibly_out_of_gas": ["Contact the app's support with the link to this transaction before trying again: "
+                            "trying again may fail the same way and charge the fee again."],
+    "contract_reason": ["The service refused the operation with its own message. Contact the app's or project's "
+                        "support with that message and the link to this transaction."],
+    "no_reason": ["Contact the app's support with the link to this transaction before trying again, so the fee is "
+                  "not charged again for the same failure."],
+    "replay": ["Contact the app's support with the link to this transaction before trying again."],
+}
+# Rules whose conclusion is the explorer's decoded reason itself (the original plan: "provado por revert reason
+# decodificado"); a read upgrades any rule to confirmed.
+REASON_RULES = {"insufficient_balance", "insufficient_allowance", "access_control", "paused", "slippage", "deadline",
+                "contract_reason"}
+
+
+def label_for(rule: str, level: str, label: str | None = None) -> str:
+    """The original plan's label for a conclusion (PHASE2_5 D4, D42): CONFIRMED, proven by a decoded revert reason or
+    a read; LIKELY, suggested by a pattern or a replay, or a reason the finding's own read contradicts or that was not
+    decoded (`label`, set by the branch); UNKNOWN, nothing to infer from (the gaps say what is missing)."""
+    if label:
+        return label
+    if level == "confirmed":
+        return "CONFIRMED"
+    if level == "candidate":
+        return "LIKELY"
+    return "CONFIRMED" if rule in REASON_RULES else "UNKNOWN"
+
+
+def steps_text(rule: str, developer: list[str]) -> str:
+    return (" ".join(f"Next step for a non-technical reader: {s}" for s in SUPPORT_STEPS[rule]) + " "
+            + " ".join(f"Next step for a developer: {s}" for s in developer))
 
 
 RULES = [_generic_failure, _balance, _allowance, _access, _paused, _slippage, _deadline, _all_gas_no_reason,
@@ -459,4 +517,4 @@ def _compare_read(ctx: Context, rule: str, text: str, steps: list[str], amount: 
                    f"{token} was {read.value} (raw units), enough for the {amount} asked. Possible reasons: it changed "
                    "earlier in this transaction's own block; the token checks more than this value (locked or frozen "
                    "amounts, a transfer fee); or another transfer inside the call is the one that failed.",
-                   steps, [read])
+                   steps, [read], label="LIKELY")

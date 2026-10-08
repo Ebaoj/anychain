@@ -149,10 +149,16 @@
       "text": "The call's deadline parameter is 2400 (1970-01-01T00:40:00Z) and the block's time is 1791479507 (2026-10-08T17:11:47Z)"
      }
     },
+    "label": "CONFIRMED",
     "level": "single_source",
-    "next_steps": [
-     "Check the current price, then send it again with a new deadline (and a fee high enough to be included in time)."
-    ],
+    "next_steps": {
+     "developer": [
+      "Check the current price, then send it again with a new deadline (and a fee high enough to be included in time)."
+     ],
+     "support": [
+      "The operation was refused by a time-limit check. Contact the app's support with the link to this transaction before trying again."
+     ]
+    },
     "reads": [],
     "rule": "deadline"
    },
@@ -172,7 +178,7 @@
      "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L19"
     }
    ],
-   "text": "The call's deadline parameter is 2400 (1970-01-01T00:40:00Z) and the block's time is 1791479507 (2026-10-08T17:11:47Z): the deadline had passed when the transaction was included, and the reason 'UniswapV2Router: EXPIRED' is Uniswap's deadline check. Next step: Check the current price, then send it again with a new deadline (and a fee high enough to be included in time)."
+   "text": "CONFIRMED: The call's deadline parameter is 2400 (1970-01-01T00:40:00Z) and the block's time is 1791479507 (2026-10-08T17:11:47Z): the deadline had passed when the transaction was included, and the reason 'UniswapV2Router: EXPIRED' is Uniswap's deadline check. Next step for a non-technical reader: The operation was refused by a time-limit check. Contact the app's support with the link to this transaction before trying again. Next step for a developer: Check the current price, then send it again with a new deadline (and a fee high enough to be included in time)."
   },
   {
    "confidence": "single_source",

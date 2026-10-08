@@ -28,7 +28,7 @@ from eth_utils import keccak
 from anychain.collectors.signatures import SignatureDb
 from anychain.decoder import AbiDecoder, decode_revert, fit_signature
 from anychain.collectors.repo import Repo, RepoCache
-from anychain.diagnosis import Context, diagnose, reason_text
+from anychain.diagnosis import SUPPORT_STEPS, Context, diagnose, label_for, reason_text, steps_text
 from anychain import security
 from anychain.solidity import SolidityIndex, filter_abi
 from anychain.reads import REPLAY_LIMITS, StateReader
@@ -690,10 +690,11 @@ class BundleBuilder:
         if generic:
             sources.append(Source(kind="repo", label="Network software source", url=generic[1]))
         sources += [Source(kind="repo", label="Source of the rule's meaning", url=u) for u in finding.source_urls]
-        steps = " ".join(f"Next step: {s}" for s in finding.next_steps)
-        self.bundle.add("diagnosis", f"{finding.text} {steps}", sources,
-                        {"rule": finding.rule, "level": finding.level, "reads": read_ids,
-                         "next_steps": finding.next_steps, "computed": finding.data},
+        label = label_for(finding.rule, finding.level, finding.label)
+        self.bundle.add("diagnosis", f"{label}: {finding.text} {steps_text(finding.rule, finding.next_steps)}", sources,
+                        {"rule": finding.rule, "level": finding.level, "label": label, "reads": read_ids,
+                         "next_steps": {"support": SUPPORT_STEPS[finding.rule], "developer": finding.next_steps},
+                         "computed": finding.data},
                         confidence="confirmed" if finding.level == "confirmed" else finding.level)
         for missing in finding.missing:
             self._gap("Diagnosis", missing.why, missing.needed, retryable=missing.retryable, cause=missing.cause)
@@ -799,12 +800,13 @@ class BundleBuilder:
             if meaning is None:
                 return
             steps, urls = finding.next_steps, finding.source_urls
-        self.bundle.add("diagnosis", f"Possible cause, from the replay ({fact.id}): the replay reverted with "
+        self.bundle.add("diagnosis", f"LIKELY: Possible cause, from the replay ({fact.id}): the replay reverted with "
                         f"{decoded.text}, {meaning}. If the original transaction failed the same way, that is its "
-                        "cause. " + " ".join(f"Next step: {s}" for s in steps),
+                        "cause. " + steps_text("replay", steps),
                         sources + [Source(kind="repo", label="Source of the rule's meaning", url=u) for u in urls],
-                        {"rule": "replay", "level": "candidate", "from_replay": True, "replay": fact.id, "reads": [],
-                         "next_steps": steps}, confidence="candidate")
+                        {"rule": "replay", "level": "candidate", "label": "LIKELY", "from_replay": True,
+                         "replay": fact.id, "reads": [], "next_steps": {"support": SUPPORT_STEPS["replay"],
+                                                                       "developer": steps}}, confidence="candidate")
 
     def _status_from_explorer(self, tx: Transaction) -> str:
         # Blockscout stores dropped transactions with status "error", so check `result` first.

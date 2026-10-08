@@ -70,11 +70,17 @@
    "confidence": "candidate",
    "data": {
     "from_replay": true,
+    "label": "LIKELY",
     "level": "candidate",
-    "next_steps": [
-     "Check the balance of the account the tokens are moved from before sending, and move at most that.",
-     "If the balance was expected, check for an earlier transaction that spent it."
-    ],
+    "next_steps": {
+     "developer": [
+      "Check the balance of the account the tokens are moved from before sending, and move at most that.",
+      "If the balance was expected, check for an earlier transaction that spent it."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again."
+     ]
+    },
     "reads": [],
     "replay": "E2",
     "rule": "replay"
@@ -89,7 +95,7 @@
      "url": "https://forno.celo.org"
     }
    ],
-   "text": "Possible cause, from the replay (E2): the replay reverted with the reason 'ERC20: transfer amount exceeds balance', the standard ERC-20 message for a transfer larger than the balance it moves from. If the original transaction failed the same way, that is its cause. Next step: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step: If the balance was expected, check for an earlier transaction that spent it."
+   "text": "LIKELY: Possible cause, from the replay (E2): the replay reverted with the reason 'ERC20: transfer amount exceeds balance', the standard ERC-20 message for a transfer larger than the balance it moves from. If the original transaction failed the same way, that is its cause. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again. Next step for a developer: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step for a developer: If the balance was expected, check for an earlier transaction that spent it."
   },
   {
    "confidence": "confirmed",

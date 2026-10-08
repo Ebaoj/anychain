@@ -136,10 +136,16 @@
    "confidence": "candidate",
    "data": {
     "computed": {},
+    "label": "LIKELY",
     "level": "candidate",
-    "next_steps": [
-     "Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
-    ],
+    "next_steps": {
+     "developer": [
+      "Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
+     ],
+     "support": [
+      "The operation was refused by a time-limit check. Contact the app's support with the link to this transaction before trying again."
+     ]
+    },
     "reads": [],
     "rule": "deadline"
    },
@@ -153,7 +159,7 @@
      "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
     }
    ],
-   "text": "Possible cause: the reason 'block number deadline' mentions a time limit. Which limit (one set in the transaction, a signature's, an order's, a price's freshness) and in which direction is defined in the contract's code. Next step: Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
+   "text": "LIKELY: Possible cause: the reason 'block number deadline' mentions a time limit. Which limit (one set in the transaction, a signature's, an order's, a price's freshness) and in which direction is defined in the contract's code. Next step for a non-technical reader: The operation was refused by a time-limit check. Contact the app's support with the link to this transaction before trying again. Next step for a developer: Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
   },
   {
    "confidence": "confirmed",

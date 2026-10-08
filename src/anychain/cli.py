@@ -154,6 +154,9 @@ def show_log(
     for r in rows:
         print(f"{r['network']}: {_n(r['answers'], 'answer')}, {r['degraded']} with a problem, "
               f"{r['crashes']} crashed, avg {r['avg_ms']} ms")
+        if r["failed"]:  # unlabelled failures (logs from before PHASE2_5 T5) count in no label
+            print(f"    {_n(r['failed'], 'failed transaction')}: CONFIRMED {r['confirmed']}, LIKELY {r['likely']}, "
+                  f"UNKNOWN {r['unknown']}")
         if r["retried"] or r["withheld"] or r["unavailable"]:
             print(f"    written answer: {r['retried'] or 0} fixed on retry, {r['withheld'] or 0} withheld "
                   f"(stated things not in the evidence), {r['unavailable'] or 0} without a model")

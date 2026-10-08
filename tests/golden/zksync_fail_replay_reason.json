@@ -825,10 +825,16 @@
    "confidence": "single_source",
    "data": {
     "computed": {},
+    "label": "UNKNOWN",
     "level": "single_source",
-    "next_steps": [
-     "Find the reason with a node that can trace the transaction, or ask the contract's developers."
-    ],
+    "next_steps": {
+     "developer": [
+      "Find the reason with a node that can trace the transaction, or ask the contract's developers."
+     ],
+     "support": [
+      "Contact the support of the app or service you used, with the link to this transaction, before trying again."
+     ]
+    },
     "reads": [],
     "rule": "generic_failure"
    },
@@ -848,7 +854,7 @@
      "url": "https://github.com/matter-labs/zksync-era/blob/948aeaf5786ebc4e9b7dd947cc08a6a1df9a7e21/core/lib/dal/src/transactions_dal.rs#L663-L670"
     }
    ],
-   "text": "'Bootloader-based tx failed' is the text zkSync's node stores for every failed transaction; it carries no reason. Next step: Find the reason with a node that can trace the transaction, or ask the contract's developers."
+   "text": "UNKNOWN: 'Bootloader-based tx failed' is the text zkSync's node stores for every failed transaction; it carries no reason. Next step for a non-technical reader: Contact the support of the app or service you used, with the link to this transaction, before trying again. Next step for a developer: Find the reason with a node that can trace the transaction, or ask the contract's developers."
   },
   {
    "confidence": "confirmed",
@@ -875,11 +881,17 @@
    "confidence": "candidate",
    "data": {
     "from_replay": true,
+    "label": "LIKELY",
     "level": "candidate",
-    "next_steps": [
-     "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",
-     "For large swaps, split them or use a deeper pool."
-    ],
+    "next_steps": {
+     "developer": [
+      "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",
+      "For large swaps, split them or use a deeper pool."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again."
+     ]
+    },
     "reads": [],
     "replay": "E41",
     "rule": "replay"
@@ -906,7 +918,7 @@
      "url": "https://github.com/Uniswap/swap-router-contracts/blob/70bc2e40dfca294c1cea9bf67a4036732ee54303/contracts/V3SwapRouter.sol#L128"
     }
    ],
-   "text": "Possible cause, from the replay (E41): the replay reverted with the reason 'Too little received', the words of the slippage check of Uniswap's routers; this contract's code decides what they mean. If the original transaction failed the same way, that is its cause. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
+   "text": "LIKELY: Possible cause, from the replay (E41): the replay reverted with the reason 'Too little received', the words of the slippage check of Uniswap's routers; this contract's code decides what they mean. If the original transaction failed the same way, that is its cause. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again. Next step for a developer: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step for a developer: For large swaps, split them or use a deeper pool."
   },
   {
    "confidence": "confirmed",

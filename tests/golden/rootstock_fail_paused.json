@@ -170,11 +170,17 @@
    "confidence": "confirmed",
    "data": {
     "computed": {},
+    "label": "CONFIRMED",
     "level": "confirmed",
-    "next_steps": [
-     "Wait until the contract's operator unpauses it; calls to it fail while it is paused.",
-     "Check the project's announcements for why it was paused."
-    ],
+    "next_steps": {
+     "developer": [
+      "Wait until the contract's operator unpauses it; calls to it fail while it is paused.",
+      "Check the project's announcements for why it was paused."
+     ],
+     "support": [
+      "The contract refused the operation with a message about being paused. Check the project's announcements, and contact its support before trying again."
+     ]
+    },
     "reads": [
      "E7"
     ],
@@ -196,7 +202,7 @@
      "url": "https://public-node.rsk.co"
     }
    ],
-   "text": "Cause confirmed: the contract this transaction called, 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, was paused at block 9261663, the block before it (paused() returned true), matching the reason 'paused'. Next step: Wait until the contract's operator unpauses it; calls to it fail while it is paused. Next step: Check the project's announcements for why it was paused."
+   "text": "CONFIRMED: Cause confirmed: the contract this transaction called, 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, was paused at block 9261663, the block before it (paused() returned true), matching the reason 'paused'. Next step for a non-technical reader: The contract refused the operation with a message about being paused. Check the project's announcements, and contact its support before trying again. Next step for a developer: Wait until the contract's operator unpauses it; calls to it fail while it is paused. Next step for a developer: Check the project's announcements for why it was paused."
   },
   {
    "confidence": "confirmed",

@@ -162,10 +162,16 @@
    "confidence": "single_source",
    "data": {
     "computed": {},
+    "label": "UNKNOWN",
     "level": "single_source",
-    "next_steps": [
-     "Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
-    ],
+    "next_steps": {
+     "developer": [
+      "Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again, so the fee is not charged again for the same failure."
+     ]
+    },
     "reads": [],
     "rule": "no_reason"
    },
@@ -179,7 +185,7 @@
      "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
     }
    ],
-   "text": "No reason is available for this failure. Next step: Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+   "text": "UNKNOWN: No reason is available for this failure. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again, so the fee is not charged again for the same failure. Next step for a developer: Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
   },
   {
    "confidence": "confirmed",
