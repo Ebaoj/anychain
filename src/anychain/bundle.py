@@ -29,6 +29,7 @@ from anychain.collectors.signatures import SignatureDb
 from anychain.decoder import AbiDecoder, decode_revert, fit_signature
 from anychain.collectors.repo import Repo, RepoCache
 from anychain.diagnosis import Context, diagnose, reason_text
+from anychain import security
 from anychain.solidity import SolidityIndex, filter_abi
 from anychain.reads import REPLAY_LIMITS, StateReader
 from anychain.models import EvidenceBundle, GapCause, Source
@@ -41,17 +42,28 @@ MAX_CODE_LINES = 80  # lines of one function given as a code fact; the rest is c
 MAX_CODE_CHARS = 200  # characters of one code line given to the model
 
 
-def render_code(lines: list[str], start: int, raise_line: int | None = None) -> str:
-    """Numbered source lines; a long function keeps its first lines and the lines around `raise_line`,
-    saying how many are not shown (review of D38: the raising line is always shown)."""
+def render_code(lines: list[str], start: int, raise_line: int | None = None, show: tuple[int, ...] = ()) -> str:
+    """Numbered source lines; a long function keeps the lines around `raise_line` and around each line in
+    `show` (lines a fact cites), then its first lines, saying how many are not shown (reviews of D38 and
+    D39: a cited line is always shown)."""
     n = len(lines)
+
+    def around(line: int, half: int) -> set[int]:
+        r = line - start
+        return set(range(max(0, r - half), min(n, r + half + 1))) if 0 <= r < n else set()
     if n <= MAX_CODE_LINES:
         keep = set(range(n))
-    elif raise_line is None or raise_line - start < MAX_CODE_LINES:
-        keep = set(range(MAX_CODE_LINES))
     else:
-        r, half = raise_line - start, MAX_CODE_LINES // 4
-        keep = set(range(MAX_CODE_LINES // 2)) | set(range(max(0, r - half), min(n, r + half)))
+        must = ({raise_line - start} if raise_line is not None and 0 <= raise_line - start < n else set()) | \
+               {s - start for s in show if 0 <= s - start < n}
+        keep = (around(raise_line, MAX_CODE_LINES // 4) if raise_line is not None else set()) | \
+            {i for s in show for i in around(s, 2)}
+        if len(keep) > MAX_CODE_LINES:
+            keep = set(must)
+        i = 0
+        while len(keep) < MAX_CODE_LINES and i < n:
+            keep.add(i)
+            i += 1
     out, last = [], -1
     for i in sorted(keep):
         if i != last + 1:
@@ -553,7 +565,7 @@ class BundleBuilder:
                 for a in self._contracts_behind(to)]
 
     def _code_fact(self, index: SolidityIndex, found, address: str, origin: str, raises: str | None = None,
-                   line: int | None = None):
+                   line: int | None = None, show: tuple[int, ...] = ()):
         """The code of one function as a fact: numbered lines, cut at MAX_CODE_LINES around the raising line
         (D38)."""
         f, c = found.function, found.contract
@@ -565,12 +577,14 @@ class BundleBuilder:
             if e.kind == "code" and e.data.get("path") == c.path and e.data.get("lines") == [f.start, f.end]:
                 if raises and not e.data.get("raises"):
                     e.data["raises"], e.data["raise_line"] = raises, line
-                    e.text = head + render_code(lines, f.start, line) + _raises_note(line, raises)
+                    e.text = (head + render_code(lines, f.start, line, tuple(e.data.get("show") or ()))
+                              + _raises_note(line, raises))
                 return e
-        text = head + render_code(lines, f.start, line) + (_raises_note(line, raises) if raises else "")
+        text = head + render_code(lines, f.start, line, show) + (_raises_note(line, raises) if raises else "")
         api = self._api_source(f"/smart-contracts/{address}", "Explorer API: verified source")
         return self.bundle.add("code", text, [api], {"function": what, "contract": c.name, "path": c.path,
-                                                      "lines": [f.start, f.end], "raises": raises, "raise_line": line})
+                                                      "lines": [f.start, f.end], "raises": raises, "raise_line": line,
+                                                      "show": list(show)})
 
     def _add_function_code(self, tx: Transaction) -> None:
         """The called function's code, from the verified source of the code it ran (PHASE2_5 T1, R1)."""
@@ -586,8 +600,22 @@ class BundleBuilder:
             _name, verified = self._verified(address) if name else (None, None)
             found = verified.find(name, selector) if verified else None
             if found:
-                self._code_fact(verified, found, address, origin)
+                notes = security.scan(verified, found, name)
+                code = self._code_fact(verified, found, address, origin, show=tuple(n.line for n in notes))
+                self._add_security_notes(notes, found, address, code.id)
                 return
+
+    def _add_security_notes(self, notes: list, found, address: str, code_id: str) -> None:
+        """Known risky patterns in the called function's code, each with its line (PHASE2_5 T2, R2, D39). An
+        absence states nothing: no fact is written when no pattern matches."""
+        if not notes:
+            return
+        what = found.function.signature or found.function.name
+        text = (f"Security notes for {what} (code in {code_id}): heuristic pattern matches on the source, not an "
+                f"audit and not a finding that the contract is vulnerable; the helpers it calls were not read. "
+                + " ".join(f"({i}) {n.text}." for i, n in enumerate(notes, 1)))
+        api = self._api_source(f"/smart-contracts/{address}", "Explorer API: verified source")
+        self.bundle.add("security_note", text, [api], {"notes": [n.__dict__ for n in notes], "code": code_id})
 
     def _add_reason_in_source(self, tx: Transaction) -> None:
         """Where the failure's reason text is written: in the verified source of the contract called, and in

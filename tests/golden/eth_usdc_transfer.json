@@ -94,7 +94,8 @@
     ],
     "path": "/Users/aloysius.chan/Repositories/circlefin/stablecoin-evm-private-eurc-mainnet-eth/contracts/v1/FiatTokenV1.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E4",
    "kind": "code",

@@ -93,7 +93,8 @@
     ],
     "path": "contracts/0.4.24/Lido.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E4",
    "kind": "code",

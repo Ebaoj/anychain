@@ -94,7 +94,8 @@
     ],
     "path": "RIFToken.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E4",
    "kind": "code",

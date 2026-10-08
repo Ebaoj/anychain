@@ -121,7 +121,8 @@
     ],
     "path": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E5",
    "kind": "code",
@@ -215,7 +216,8 @@
     ],
     "path": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
     "raise_line": 236,
-    "raises": "ERC20: transfer amount exceeds balance"
+    "raises": "ERC20: transfer amount exceeds balance",
+    "show": []
    },
    "id": "E9",
    "kind": "code",

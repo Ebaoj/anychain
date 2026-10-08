@@ -120,7 +120,8 @@
     ],
     "path": "src/pkgs/swap-router-contracts/contracts/V3SwapRouter.sol",
     "raise_line": 220,
-    "raises": "Too much requested"
+    "raises": "Too much requested",
+    "show": []
    },
    "id": "E5",
    "kind": "code",

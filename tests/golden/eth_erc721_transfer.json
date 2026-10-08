@@ -95,7 +95,8 @@
     ],
     "path": "src/pkgs/v4-periphery/src/PositionManager.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E4",
    "kind": "code",

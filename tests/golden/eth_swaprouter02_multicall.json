@@ -1,0 +1,515 @@
+{
+ "abi_sources": {
+  "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45": "explorer: verified contract SwapRouter02",
+  "0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1": "explorer: verified contract UniswapV3Pool",
+  "0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E": "explorer: verified contract FLOKI"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 26148933,
+    "from": "0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2",
+    "gas_limit": "291849",
+    "gas_used": "169984",
+    "status": "success",
+    "timestamp": "2026-10-08T16:39:59.000000Z",
+    "to": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+    }
+   ],
+   "text": "Transaction succeeded in block 26148933 at 2026-10-08T16:39:59.000000Z. From 0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2 to 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02). Native value sent: 0 ETH. Gas used 169984 of limit 291849."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000440126081949696",
+    "parts": {
+     "fee": "0.000440126081949696"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+    }
+   ],
+   "text": "Fee paid: 0.000440126081949696 ETH."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "data": "[0x04e45aaf000000000000000000000000cf0c122c6b73ff809c693db761e7baebe62b6a2e000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000000000000000000000000000000000000002710000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000cedfdd8534900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x49404b7c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f443b891ad0c3910ad430c7d619cf9a20b3a00b2]"
+    },
+    "function": "multicall"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+    }
+   ],
+   "text": "Called multicall(bytes[]) on 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) with data=[0x04e45aaf000000000000000000000000cf0c122c6b73ff809c693db761e7baebe62b6a2e000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000000000000000000000000000000000000002710000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000cedfdd8534900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x49404b7c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f443b891ad0c3910ad430c7d619cf9a20b3a00b2]. ABI source: explorer: verified contract SwapRouter02."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "Multicall",
+    "function": "multicall(bytes[])",
+    "lines": [
+     11,
+     27
+    ],
+    "path": "@uniswap/v3-periphery/contracts/base/Multicall.sol",
+    "raise_line": null,
+    "raises": null,
+    "show": [
+     14
+    ]
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+    }
+   ],
+   "text": "Code of multicall(bytes[]) in Multicall (@uniswap/v3-periphery/contracts/base/Multicall.sol, lines 11-27), from the verified source of the contract 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45, as the explorer lists it:\n11 |     function multicall(bytes[] calldata data) public payable override returns (bytes[] memory results) {\n12 |         results = new bytes[](data.length);\n13 |         for (uint256 i = 0; i < data.length; i++) {\n14 |             (bool success, bytes memory result) = address(this).delegatecall(data[i]);\n15 | \n16 |             if (!success) {\n17 |                 // Next 5 lines from https://ethereum.stackexchange.com/a/83577\n18 |                 if (result.length < 68) revert();\n19 |                 assembly {\n20 |                     result := add(result, 0x04)\n21 |                 }\n22 |                 revert(abi.decode(result, (string)));\n23 |             }\n24 | \n25 |             results[i] = result;\n26 |         }\n27 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "code": "E4",
+    "notes": [
+     {
+      "line": 14,
+      "pattern": "delegatecall",
+      "text": "line 14 uses delegatecall to this contract's own code in a loop (the multicall pattern): every item sees the same msg.value, and this function is payable: the setting of msg.value reuse bugs, where several items each count the same payment"
+     }
+    ]
+   },
+   "id": "E5",
+   "kind": "security_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+    }
+   ],
+   "text": "Security notes for multicall(bytes[]) (code in E4): heuristic pattern matches on the source, not an audit and not a finding that the contract is vulnerable; the helpers it calls were not read. (1) line 14 uses delegatecall to this contract's own code in a loop (the multicall pattern): every item sees the same msg.value, and this function is payable: the setting of msg.value reuse bugs, where several items each count the same payment."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1",
+    "to": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "token_id": null,
+    "value": 150366640622705
+   },
+   "id": "E6",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.000150366640622705 WETH from 0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1 (UniswapV3Pool) to 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2",
+    "to": "0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1",
+    "token": "0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E",
+    "token_id": null,
+    "value": 14216305595209
+   },
+   "id": "E7",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 14216.305595209 FLOKI from 0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2 to 0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1 (UniswapV3Pool)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+    "to": "0x0000000000000000000000000000000000000000",
+    "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "token_id": null,
+    "value": 150366640622705
+   },
+   "id": "E8",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 0.000150366640622705 WETH from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0x0000000000000000000000000000000000000000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1 (UniswapV3Pool)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1 (UniswapV3Pool) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1 (UniswapV3Pool) to 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E (Context)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E (Context) to 0xBc530Bfa3FCA1a731149248AfC7F750c18360de1 (TreasuryHandlerAlpha)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E (Context) to 0xBc530Bfa3FCA1a731149248AfC7F750c18360de1 (TreasuryHandlerAlpha)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E16",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": true,
+    "same_as": null,
+    "type": "call",
+    "value": "150366640622705"
+   },
+   "id": "E18",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal ETH transfer of 0.000150366640622705 ETH from 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) to 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": true,
+    "same_as": null,
+    "type": "call",
+    "value": "150366640622705"
+   },
+   "id": "E19",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "Internal ETH transfer of 0.000150366640622705 ETH from 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 (SwapRouter02) to 0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 4
+   },
+   "id": "E20",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/internal-transactions"
+    }
+   ],
+   "text": "4 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "owner": "0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2",
+     "spender": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+     "value": "115792089237316195423570985008687907853269984665640564039457583993696824044726"
+    },
+    "event": "Approval"
+   },
+   "id": "E21",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/logs"
+    }
+   ],
+   "text": "Event Approval(address,address,uint256) emitted by 0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E (Context): owner=0xf443b891Ad0c3910AD430c7D619cf9a20B3a00b2, spender=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45, value=115792089237316195423570985008687907853269984665640564039457583993696824044726."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "amount0": "-150366640622705",
+     "amount1": "14216305595209",
+     "liquidity": "17840995293291483",
+     "recipient": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+     "sender": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+     "sqrtPriceX96": "24270276405818576871506694167",
+     "tick": "-23663"
+    },
+    "event": "Swap"
+   },
+   "id": "E22",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0/logs"
+    }
+   ],
+   "text": "Event Swap(address,address,int256,int256,uint160,uint128,int24) emitted by 0xE41552E6212Cb6F7fAa381C7bC9434c58bf28ce1 (UniswapV3Pool): sender=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45, recipient=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45, amount0=-150366640622705, amount1=14216305595209, sqrtPriceX96=24270276405818576871506694167, liquidity=17840995293291483, tick=-23663."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E23",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+}

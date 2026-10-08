@@ -156,7 +156,8 @@
     ],
     "path": "Poisoner.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E7",
    "kind": "code",

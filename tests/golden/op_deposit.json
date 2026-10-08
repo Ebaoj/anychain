@@ -108,7 +108,8 @@
     ],
     "path": "src/L2/L1Block.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E5",
    "kind": "code",

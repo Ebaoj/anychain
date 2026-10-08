@@ -95,7 +95,8 @@
     ],
     "path": "/Users/default-admin/Documents/circle/stablecoin-evm-private-usdc-mainnet-op/contracts/v1/FiatTokenV1.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E4",
    "kind": "code",

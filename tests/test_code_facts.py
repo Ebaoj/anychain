@@ -125,6 +125,14 @@ def test_the_raising_line_is_shown_even_past_the_cut():
     assert 1180 in shown and len(shown) <= MAX_CODE_LINES and "not shown" in text
 
 
+def test_lines_a_note_cites_are_shown_even_past_the_cut():
+    from anychain.bundle import MAX_CODE_LINES, render_code
+    lines = [f"x{n};" for n in range(300)]
+    text = render_code(lines, 1, show=(250, 290))
+    shown = [int(line.split(" | ")[0]) for line in text.splitlines() if " | " in line]
+    assert {250, 290} <= set(shown) and len(shown) == MAX_CODE_LINES and 1 in shown
+
+
 def test_numbers_and_hex_inside_code_are_not_evidence_values():
     # review of T1: constants in contract code ("5000") must not let an amount through; line numbers shown do
     from anychain.validator import check_answer

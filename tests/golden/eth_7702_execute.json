@@ -118,7 +118,8 @@
     ],
     "path": "src/EIP7702/EIP7702DeleGatorCore.sol",
     "raise_line": null,
-    "raises": null
+    "raises": null,
+    "show": []
    },
    "id": "E5",
    "kind": "code",
