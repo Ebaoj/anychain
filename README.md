@@ -18,6 +18,6 @@ uv run anychain explain 0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b
 uv run pytest
 ```
 
-Flags: `--mode support|developer|auditor`, `--json` (evidence bundle), `--no-llm` (evidence only).
+Flags: `--mode support|developer|auditor`, `--json` (structured answer: summary, calls, transfers, events, labelled diagnosis, next steps, sources, gaps), `--evidence` (the evidence bundle), `--no-llm` (evidence only).
 
 Tests run offline against real recorded responses (`tests/fixtures/`, recorded with `scripts/record_fixture.py`).

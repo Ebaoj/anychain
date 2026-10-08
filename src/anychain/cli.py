@@ -1,4 +1,5 @@
 """Command line interface: `anychain explain <hash>`."""
+import json
 import sys
 import time
 from enum import Enum
@@ -6,6 +7,7 @@ from enum import Enum
 import typer
 from dotenv import load_dotenv
 
+from anychain.answer import structured_answer
 from anychain.bundle import InvalidHashError, build_bundle
 from anychain.config import ConfigError, load_config
 from anychain.events import PROBLEM_CAUSES, CheckEvent, NullEventLog, RunEvent, SqliteEventLog, event_log_for
@@ -36,10 +38,13 @@ def explain(
     tx_hash: str = typer.Argument(..., help="Transaction hash (0x + 64 hex)"),
     mode: Mode = typer.Option(None, help="Who the answer is for (default: from config)"),
     config: str = typer.Option(None, "--config", help="Path to network YAML (or set ANYCHAIN_CONFIG)"),
-    as_json: bool = typer.Option(False, "--json", help="Print the evidence bundle as JSON"),
+    as_json: bool = typer.Option(False, "--json", help="Print the structured answer as JSON (the summary included)"),
+    as_evidence: bool = typer.Option(False, "--evidence", help="Print the evidence bundle as JSON"),
     no_llm: bool = typer.Option(False, "--no-llm", help="Skip the LLM; print the evidence only"),
 ) -> None:
     """Explain what a transaction did, with a cited source for each fact."""
+    if as_json and as_evidence:
+        _fail("Use either --json (the structured answer) or --evidence (the evidence bundle), not both.")
     try:
         cfg = load_config(config)
     except ConfigError as exc:
@@ -54,26 +59,35 @@ def explain(
         _record(log, RunEvent.crash(cfg.network.name, tx_hash.strip(), "cli", _ms(started),
                                     f"{type(exc).__name__}: {exc}"))
         _fail(f"Unexpected error while collecting data ({type(exc).__name__}: {exc}). Please report it.")
-    if as_json:
+    if as_evidence:  # (with --json: refused before collecting anything, below)
         _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started)))
         print(bundle.model_dump_json(indent=2))
         return
+    mode_name = (mode or Mode(cfg.assistant.default_mode)).value
+
+    def as_answer(summary: str | None, status: str) -> None:
+        status = {"fail": "withheld"}.get(status, status)  # the writer's outcome names, as the JSON documents them
+        print(json.dumps(structured_answer(bundle, summary, status, mode_name), indent=2, ensure_ascii=False))
     evidence_md = render_markdown(bundle)
     if no_llm or not bundle.items:
         _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), writer="skipped"))
-        print(evidence_md)
+        as_answer(None, "skipped" if no_llm else "no_evidence") if as_json else print(evidence_md)
         return
     try:
-        checked = write_checked(bundle, cfg, (mode or Mode(cfg.assistant.default_mode)).value)
+        checked = write_checked(bundle, cfg, mode_name)
     except WriterError as exc:
         _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), writer="unavailable"))
-        print(f"_(LLM unavailable: {exc}. Showing the evidence only.)_\n", file=sys.stderr)
-        print(evidence_md)
+        print(f"_(LLM unavailable: {exc}. " + ("The answer has no summary.)_" if as_json else
+                                                  "Showing the evidence only.)_\n"), file=sys.stderr)
+        as_answer(None, "unavailable") if as_json else print(evidence_md)
         return
     # What the model stated outside the evidence, kept for review: "retried" (fixed) or "fail" (withheld).
     check = (CheckEvent("answer_check", "fail" if checked.text is None else "retried", "; ".join(checked.problems)),
              ) if checked.problems else ()
     _record(log, RunEvent.from_bundle(bundle, "cli", _ms(started), checks=check, writer=checked.outcome))
+    if as_json:
+        as_answer(checked.text, checked.outcome)
+        return
     if checked.text is None:
         listed = "; ".join(checked.problems[:3])
         print(f"_(The written explanation was withheld: twice it stated things not in the evidence ({listed}). "

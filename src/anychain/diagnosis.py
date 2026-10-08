@@ -392,11 +392,12 @@ def _contract_reason(ctx: Context) -> Finding | None:
                    label=None if decoded else "LIKELY")
 
 
+NO_REASON_STEPS = ["Find where it reverted with a node that can trace the transaction, or ask the contract's "
+                   "developers."]
+
+
 def _no_reason(ctx: Context) -> Finding | None:
-    return Finding("no_reason", "single_source",
-                   "No reason is available for this failure.",
-                   ["Find where it reverted with a node that can trace the transaction, or ask the contract's "
-                    "developers."])
+    return Finding("no_reason", "single_source", "No reason is available for this failure.", list(NO_REASON_STEPS))
 
 
 # Next steps for a non-technical reader (a merchant using an app), one set per rule; the rules' own steps are
