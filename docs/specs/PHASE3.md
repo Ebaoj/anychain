@@ -9,7 +9,7 @@
 ## 1. Summary for the decision
 
 - **What is missing:** the tool answers one question per command, on the command line only. There is no conversation, no web page, no API, no way to measure answer quality across a fixed set of cases, and no usage metrics beyond the event log.
-- **What changes for the user:** a local web page and API. The user pastes a hash, picks a mode, gets the explanation with clickable sources, a confidence badge per conclusion and a "missing data" panel, then asks follow-up questions in a chat. In the chat the model can ask for more data (read contract state, open a repo file, look at another transaction), and every answer it gets becomes a new citable fact. `anychain eval` runs a fixed set of real cases and reports accuracy, citation coverage and hallucination rate; `anychain metrics` prints usage numbers from SQL.
+- **What changes for the user:** a local web page and API. The user pastes a hash, picks a mode, gets the explanation with clickable sources, a confidence badge per conclusion and a "missing data" panel, then asks follow-up questions in a chat. In the chat the model can ask for more data (read contract state, open a repo file, look at another transaction), and every answer it gets becomes a new citable fact. `anychain eval` runs a fixed set of real cases and reports accuracy, citation coverage and hallucination rate; `anychain metrics` prints usage numbers from SQL. Asking again about the same transaction answers from a local cache (no new explorer or node calls), and a list of hashes can be explained in one batch command that resumes where it stopped.
 - **What does not change:** facts stay sourced, the answer check (validator) runs on every chat answer, nothing is asserted without a source, the tool stays read-only, network changes stay config-only.
 - **Risk:** a chat where the model chooses what to look up is where it can drift from the evidence; every tool result is a fact with a source, and every chat answer goes through the validator.
 - **Decisions for Joabe:** section 12.
@@ -27,6 +27,8 @@
 | P2 | No web server or page; FastAPI is not a dependency | `pyproject.toml` | the case's "simple interface (web preferred)" is not met |
 | P3 | Modes exist (support, developer, auditor: one prompt each) but only on the CLI | `prompts/`, `cli.py` | |
 | P4 | The event log has no mode, diagnosis category, ABI source, tokens or user feedback | `events.py` runs table | the metrics the case asks for cannot be computed |
+| P6 | Every explain fetches everything again; nothing is kept per (network, hash) | `bundle.py`, `cli.py` | repeated questions (the API will get many) cost explorer and node calls and seconds; public explorers have usage limits |
+| P7 | Explaining many hashes exists only inside the acceptance script | `scripts/acceptance.py` | no user command for volume |
 | P5 | No eval set: of the 8 categories the case requires on Ethereum, recorded real cases exist for 5 (ERC-20 transfer, DEX swap, explicit revert reason, unverified contract, node unavailable); none yet for an allowance revert, an out-of-gas failure, a Solidity custom error | `tests/fixtures/` | the eval cannot cover what the case asks |
 
 ## 4. Objective
@@ -45,12 +47,16 @@ A local API and web page with a chat whose every answer is grounded and checked,
 - **R8. Production impact page** (`docs/IMPACT.md`, for the README in Phase 4): hypothesis, primary and guard metrics, experiment design, criteria to scale or roll back. One page.
 - **R9. Demo.** The full demo (explain a success, a diagnosed failure, a follow-up question with a tool call, an unverified contract with degradation) SHALL run in the browser and be recorded.
 
+- **R10. Cache by (network, hash).** THE SYSTEM SHALL keep each evidence bundle in the local SQLite, keyed by chain id and transaction hash plus a bundle format version (so a code change that alters facts invalidates old entries), and answer a repeated request from it. A bundle is kept only when its facts cannot change: the block is final for the network (the node's `finalized` block where supported, otherwise a configured number of confirmations) and it has no retryable gap (source unavailable, source behind, pending). A bundle with such gaps is not kept, so a later request tries the sources again. Written answers are kept apart, keyed by the bundle's digest, mode, language, prompt version and model. `--fresh` (and a field in the API) skips the cache. **Accept:** the second explain of a recorded hash makes no network request and gives the same evidence; a bundle with an unavailable source is not kept; a zkSync transaction not yet executed on L1 is not kept.
+- **R11. Batch.** `anychain batch <file>` SHALL explain a list of hashes with bounded parallelism, write one result per line (JSONL), resume from where it stopped, use the cache, and log every run in the event log. **Accept:** a list of recorded hashes, interrupted and resumed, gives each hash once.
+
 ## 6. Non-functional
 
 - **Local only:** binds to 127.0.0.1; no authentication (out of scope in the case).
 - **Latency:** the page shows the evidence first and the written answer when ready.
 - **Cost:** the chat is limited in tool calls per turn (proposed: 3) and turns per session; the eval reports tokens.
 - **Privacy:** sessions in memory, logged in the local SQLite only.
+- **Cache size:** bounded (proposed: oldest entries removed past a configured size); production would move it to PostgreSQL next to the event log (design only, D24).
 
 ## 7. Threats
 
@@ -69,10 +75,12 @@ No `git push`, no deploy, no auth, no cloud. The production queue and worker sta
 - `web/index.html`: one page, plain JavaScript.
 - `events.py`: new columns (mode, category, level, ABI source, tokens, feedback), migrated on open as in D28.
 - `eval/cases.yaml`, `eval.py`, `anychain eval` and `anychain metrics`.
+- `cache.py`: bundle and answer cache in SQLite; finality from the node (`eth_getBlockByNumber("finalized")`) or confirmations from config; `anychain batch` built on the acceptance script's resume logic.
 
 ## 10. Tasks (each ends in a commit with tests and a clean-context review)
 
-1. T1 (R6): event log columns and `anychain metrics` with its SQL.
+1. T0 (R10, R11): bundle and answer cache, `--fresh`, `anychain batch`; cache hits recorded in the event log.
+1. T1 (R6): event log columns (with cache hit) and `anychain metrics` with its SQL (cache hit rate among the queries).
 2. T2 (R1, R5): API with `/explain` and `/health`.
 3. T3 (R3, R4): chat session, tools, loop, validator on every answer; `/chat` and `anychain chat`.
 4. T4 (R2): the web page.
@@ -90,6 +98,7 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 - **D2. Missing eval categories.** Find real Ethereum transactions for an allowance revert, an out-of-gas failure and a custom error through the explorer. Proposed: search the explorer's recent failures by reason; if a category has no real case on Ethereum after a bounded search, take it from another network and say so in the report, never a made-up one.
 - **D3. The page.** Proposed: one plain HTML page with vanilla JavaScript served by the API (the original plan), no framework.
 - **D4. Where this spec lives.** Proposed: in the repo (`docs/specs/`), as Phase 2.
+- **D5. When a transaction is final enough to cache** (requested by Joabe on 2026-10-08). Proposed: the node's `finalized` block where the node supports it (Ethereum and most L2s); otherwise `cache.min_confirmations` in the network config (proposed 64); networks with extra steps (zkSync L1 status) are kept only once those steps are done.
 
 ## 13. Tests and tracing
 
@@ -104,6 +113,8 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 | R7 | `anychain eval` on the recorded cases; report fields | report |
 | R8 | the page exists and has the four parts | review |
 | R9 | demo recording | link |
+| R10 | second explain with no network request; not kept with retryable gaps, before finality, or zkSync not executed; format version change invalidates | pasted |
+| R11 | batch interrupted and resumed on recorded hashes | pasted |
 
 ## 14. How to verify
 
@@ -111,7 +122,7 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 
 ## 15. Definition of done
 
-- [ ] D1 to D4 decided.
-- [ ] T1 to T7 committed, each with tests and a clean-context review.
+- [ ] D1 to D5 decided.
+- [ ] T0 to T7 committed, each with tests and a clean-context review.
 - [ ] `anychain eval` runs and the UI does the full demo (the original plan's criterion).
 - [ ] Architecture docs updated; Phase 3 explained to Joabe in plain Portuguese.
