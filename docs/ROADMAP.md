@@ -47,4 +47,7 @@ Added at the close of Phase 2 (2026-10-08), sent to the backlog by Joabe:
 | C21 | Claude Code adds the logged-in user's email to the model's context whatever the flags | D27 review |
 | C22 | A base function overridden by a public state variable (`uint public override v`) is still named as the function writing a reason: the index does not read state variables | review of D38 |
 | C23 | Shown code line numbers count as known numbers for the answer check, so a 4-digit amount equal to one passes | review of D38 |
+| C25 | A sensitive-name note on a function that does nothing (Compound `mintVerify`: the `mint` prefix of the name rule) | review of D39, sent to the backlog by Joabe 2026-10-08 |
+| C26 | A function authorized by a signature (`ecrecover(...) == owner`) gets "no check of the caller": literally true, may mislead | review of D39, sent to the backlog by Joabe 2026-10-08 |
+| C27 | A selfdestruct anywhere in the contract's chain repeats the same note on every function (1inch router: 45 functions) | review of D39, sent to the backlog by Joabe 2026-10-08 |
 | C24 | Uniswap V3 SwapRouter (0xE592…1564) gets no code fact: its verified source holds `Multicall.sol` and `PeripheryPayments.sol` twice under different paths, and the index gives up on duplicate names (no false fact, a missing one) | review of D39 |

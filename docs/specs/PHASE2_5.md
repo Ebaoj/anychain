@@ -1,6 +1,6 @@
 # PHASE2_5: the gaps between Phase 2 and the case (before the interface of Phase 3)
 
-- **Status:** DONE, waiting for Joabe's approval (approved to start on 2026-10-08 with the proposed defaults D1 to D4; T1 to T7 committed)
+- **Status:** DONE, approved by Joabe on 2026-10-08 (the three security-note wordings to the backlog as C25 to C27; the bare v4 Ownable text stays CONFIRMED and a no-reason failure with a passed deadline stays UNKNOWN, as D42 says)
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)
@@ -113,6 +113,6 @@ Each addition is a new fact kind or rule; the answer check and the degradation r
 - [x] D1 to D4 decided (2026-10-08, the proposed defaults).
 - [x] T1 to T7 committed, each with tests and a clean-context review (T1 D38, T2 D39, T3 D40, T4 D41, T5 D42, T6 D43); every review found real errors, all fixed before the commit.
 - [x] Phase 3 spec updated to build on this.
-- [ ] Phase 2.5 explained to Joabe in plain Portuguese and approved.
+- [x] Phase 2.5 explained to Joabe in plain Portuguese and approved (2026-10-08).
 
 Results: suite 792 tests; no real access-control failure found in 1,600 recent failures on five networks (D41), so that rule is tested on OpenZeppelin's exact texts only.
