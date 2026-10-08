@@ -101,12 +101,34 @@
    "text": "Called function with selector 0x4ba77e21 on 0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44 (FROSTCoordinator); not decoded."
   },
   {
+   "confidence": "single_source",
+   "data": {
+    "level": "single_source",
+    "next_steps": [
+     "Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+    ],
+    "reads": [],
+    "rule": "no_reason"
+   },
+   "id": "E5",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xf354bf88343e794ca6f4574416778ef41bd06a51f32fb5c1ddfc1e71404ab6d1"
+    }
+   ],
+   "text": "No reason is available for this failure. Next step: Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+  },
+  {
    "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "cross_check",
    "sources": [
     {

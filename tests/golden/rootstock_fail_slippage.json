@@ -1,0 +1,332 @@
+{
+ "abi_sources": {
+  "0x0B14ff67F0014046b4b99057Aec4509640b3947A": "explorer: verified contract SwapRouter02"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 9239184,
+    "from": "0x93BeAC98ABAC34cc174B5F772b16B388fC5b30e3",
+    "gas_limit": "191707",
+    "gas_used": "123734",
+    "status": "failed",
+    "timestamp": "2026-09-14T12:43:44.000000Z",
+    "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://rootstock.blockscout.com/tx/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 9239184 at 2026-09-14T12:43:44.000000Z. From 0x93BeAC98ABAC34cc174B5F772b16B388fC5b30e3 to 0x0B14ff67F0014046b4b99057Aec4509640b3947A (SwapRouter02). Native value attached: 0 RBTC, not transferred because the transaction reverted. Gas used 123734 of limit 191707."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.0000064504019008",
+    "parts": {
+     "fee": "0.0000064504019008"
+    },
+    "token": "RBTC"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    }
+   ],
+   "text": "Fee paid: 0.0000064504019008 RBTC. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "Too much requested"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='Too much requested'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "params": "(0xaf368c91793cb22739386dfcbbb2f1a9e4bcbebf, 0x2acc95758f8b5f583470ba265eb685a8f45fc9d5, 3000, 0x93beac98abac34cc174b5f772b16b388fc5b30e3, 2000000000000000000000, 161727788, 0)"
+    },
+    "function": "exactOutputSingle"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://rootstock.blockscout.com/api/v2/smart-contracts/0x0B14ff67F0014046b4b99057Aec4509640b3947A"
+    }
+   ],
+   "text": "Called exactOutputSingle((address,address,uint24,address,uint256,uint256,uint160)) on 0x0B14ff67F0014046b4b99057Aec4509640b3947A (SwapRouter02) with params=(0xaf368c91793cb22739386dfcbbb2f1a9e4bcbebf, 0x2acc95758f8b5f583470ba265eb685a8f45fc9d5, 3000, 0x93beac98abac34cc174b5f772b16b388fc5b30e3, 2000000000000000000000, 161727788, 0). ABI source: explorer: verified contract SwapRouter02."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0B14ff67F0014046b4b99057Aec4509640b3947A (SwapRouter02) to 0xa89a86d3d9481a741833208676fa57d0f1d5C6Cb (UniswapV3Pool) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa89a86d3d9481a741833208676fa57d0f1d5C6Cb (UniswapV3Pool) to 0x2aCc95758f8b5F583470bA265Eb685a8f45fC9D5 (RIFToken) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xAF368c91793cb22739386DFCBbB2f1A9E4bcBEBf (Stargate Bridged USDT) to 0xE9abA835F813Ca05E50A6C0ce65D0D74390F7DE7 (TetherTokenV2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xa89a86d3d9481a741833208676fa57d0f1d5C6Cb (UniswapV3Pool) to 0x0B14ff67F0014046b4b99057Aec4509640b3947A (SwapRouter02) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0B14ff67F0014046b4b99057Aec4509640b3947A (SwapRouter02) to 0xAF368c91793cb22739386DFCBbB2f1A9E4bcBEBf (Stargate Bridged USDT) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xAF368c91793cb22739386DFCBbB2f1A9E4bcBEBf (Stargate Bridged USDT) to 0xE9abA835F813Ca05E50A6C0ce65D0D74390F7DE7 (TetherTokenV2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xAF368c91793cb22739386DFCBbB2f1A9E4bcBEBf (Stargate Bridged USDT) to 0xE9abA835F813Ca05E50A6C0ce65D0D74390F7DE7 (TetherTokenV2) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 2
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d/internal-transactions"
+    }
+   ],
+   "text": "2 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "level": "single_source",
+    "next_steps": [
+     "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",
+     "For large swaps, split them or use a deeper pool."
+    ],
+    "reads": [],
+    "rule": "slippage"
+   },
+   "id": "E13",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Source of the rule's meaning",
+     "url": "https://github.com/Uniswap/v3-periphery/blob/0682387198a24c7cd63566a2c58398533860a5d1/contracts/SwapRouter.sol#L218"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Source of the rule's meaning",
+     "url": "https://github.com/Uniswap/swap-router-contracts/blob/70bc2e40dfca294c1cea9bf67a4036732ee54303/contracts/V3SwapRouter.sol#L220"
+    }
+   ],
+   "text": "The reason 'Too much requested' is the slippage check of Uniswap's routers: when the transaction ran, the swap would have needed more than the maximum input the sender had set, so it was refused. The price moved, or the limit was too tight. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E14",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "rootstock-mainnet",
+ "status": "failed",
+ "tx_hash": "0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+}

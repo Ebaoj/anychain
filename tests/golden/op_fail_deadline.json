@@ -1,0 +1,162 @@
+{
+ "abi_sources": {
+  "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993 matches selector 0x83730cc3"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 157785200,
+    "from": "0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013",
+    "gas_limit": "2600000",
+    "gas_used": "26311",
+    "status": "failed",
+    "timestamp": "2026-10-05T02:59:37.000000Z",
+    "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://explorer.optimism.io/tx/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 157785200 at 2026-10-05T02:59:37.000000Z. From 0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993. Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 26311 of limit 2600000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000000001092458893",
+    "parts": {
+     "L1 data": "0.000000001035074602",
+     "L2 execution": "0.000000000057384291"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    }
+   ],
+   "text": "Fee paid: 0.000000001092458893 ETH in total: 0.000000000057384291 ETH L2 execution + 0.000000001035074602 ETH L1 data. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "block number deadline"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='block number deadline'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x83730cc3"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    }
+   ],
+   "text": "Called function with selector 0x83730cc3 on 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993; not decoded."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "level": "candidate",
+    "next_steps": [
+     "Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
+    ],
+    "reads": [],
+    "rule": "deadline"
+   },
+   "id": "E5",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    }
+   ],
+   "text": "Possible cause: the reason 'block number deadline' mentions a time limit. Which limit (one set in the transaction, a signature's, an order's, a price's freshness) and in which direction is defined in the contract's code. Next step: Read the contract's code for this reason before sending again: resending may fail the same way and cost the fee again."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E6",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.optimism.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "optimism-mainnet",
+ "status": "failed",
+ "tx_hash": "0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+}

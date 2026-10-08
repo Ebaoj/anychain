@@ -184,5 +184,5 @@ def evidence_ids(bundle: EvidenceBundle) -> set[str]:
 
 
 def allowed_urls(bundle: EvidenceBundle) -> set[str]:
-    """The links the model was given (explorer pages only: writer._sources_for_llm)."""
-    return {s.url for e in bundle.items for s in e.sources if s.kind == "explorer_ui" and s.url}
+    """The links the model was given (explorer pages and source code: writer._sources_for_llm)."""
+    return {s.url for e in bundle.items for s in e.sources if s.kind in ("explorer_ui", "repo") and s.url}

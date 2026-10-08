@@ -346,12 +346,41 @@
    "text": "4 read-only staticcall(s) (no state change) not listed."
   },
   {
+   "confidence": "candidate",
+   "data": {
+    "level": "candidate",
+    "next_steps": [
+     "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",
+     "For large swaps, split them or use a deeper pool."
+    ],
+    "reads": [],
+    "rule": "slippage"
+   },
+   "id": "E17",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Source of the rule's meaning",
+     "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L232"
+    }
+   ],
+   "text": "Possible cause: the reason 'INSUFFICIENT_OUTPUT_AMOUNT' uses the words of the slippage check of Uniswap's routers (the swap would have given less than the minimum output the sender set). This contract may use them with the same meaning; its own code decides. Next step: Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade. Next step: For large swaps, split them or use a deeper pool."
+  },
+  {
    "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "cross_check",
    "sources": [
     {

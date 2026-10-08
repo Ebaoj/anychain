@@ -1,0 +1,186 @@
+{
+ "abi_sources": {
+  "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e": "explorer: verified contract TransparentUpgradeableProxy proxy -> TetherTokenCeloExtension"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 78962884,
+    "from": "0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0",
+    "gas_limit": "100000",
+    "gas_used": "33839",
+    "status": "failed",
+    "timestamp": "2026-10-01T14:07:22.000000Z",
+    "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://celo.blockscout.com/tx/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 78962884 at 2026-10-01T14:07:22.000000Z. From 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 to 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD). Native value attached: 0 CELO, not transferred because the transaction reverted. Gas used 33839 of limit 100000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.008222877",
+    "parts": {
+     "fee": "0.008222877"
+    },
+    "token": "CELO"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    }
+   ],
+   "text": "Fee paid: 0.008222877 CELO. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "ERC20: transfer amount exceeds balance"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='ERC20: transfer amount exceeds balance'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "amount": "106500",
+     "recipient": "0x14634De7D71618013Dc48F2e85E80A28023f4367"
+    },
+    "function": "transfer"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://celo.blockscout.com/api/v2/smart-contracts/0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+    }
+   ],
+   "text": "Called transfer(address,uint256) on 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD) with recipient=0x14634De7D71618013Dc48F2e85E80A28023f4367, amount=106500. ABI source: explorer: verified contract TransparentUpgradeableProxy proxy -> TetherTokenCeloExtension."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD) to 0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98 (TetherTokenCeloExtension) (this internal call failed: the explorer reports 'execution reverted')."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "call": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e balanceOf(0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0) at block 78962883",
+    "value": "1445"
+   },
+   "id": "E6",
+   "kind": "state_read",
+   "sources": [
+    {
+     "detail": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e balanceOf(0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0) at block 78962883",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "At block 78962883, balanceOf on 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e returned 1445."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "level": "confirmed",
+    "next_steps": [
+     "Check the balance of the account the tokens are moved from before sending, and move at most that.",
+     "If the balance was expected, check for an earlier transaction that spent it."
+    ],
+    "reads": [
+     "E6"
+    ],
+    "rule": "insufficient_balance"
+   },
+   "id": "E7",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    },
+    {
+     "detail": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e balanceOf(0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0) at block 78962883",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "Cause confirmed: at block 78962883, the block before this transaction, the balance of 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 for token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e was 1445 (raw units), less than the 106500 the call asked for. The reason is the standard ERC-20 message 'ERC20: transfer amount exceeds balance'. Next step: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step: If the balance was expected, check for an earlier transaction that spent it."
+  }
+ ],
+ "network": "celo-mainnet",
+ "status": "failed",
+ "tx_hash": "0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+}

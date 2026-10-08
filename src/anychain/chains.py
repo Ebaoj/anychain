@@ -107,6 +107,10 @@ class ChainProfile:
     def facts(self, tx: dict) -> list[ChainFact]:
         return []
 
+    def generic_failure(self, result: str | None) -> tuple[str, str] | None:
+        """(note, source url) when this network type's failure text carries no reason; None otherwise."""
+        return None
+
     def node_facts(self, tx_hash: str, tx: dict,
                    call: Callable[[str, list], object]) -> list[ChainFact | ChainGap]:
         """Facts the explorer may report late, confirmed with the network's own node (`call` = JSON-RPC).
@@ -247,6 +251,18 @@ class ZkSyncProfile(ChainProfile):
     # ethPrecommitTxHash was null on every mainnet batch checked (518336 to 518348), but it is a step.
     NODE_STEPS = (("precommitted", "ethPrecommitTxHash"), ("committed", "ethCommitTxHash"),
                   ("proven", "ethProveTxHash"), ("executed", "ethExecuteTxHash"))
+
+    # The node stores this same text for every failed transaction: "Bootloader currently doesn't return
+    # detailed errors" (zksync-era, core/lib/dal/src/transactions_dal.rs, lines 663-670, read 2026-10-08).
+    GENERIC_FAILURE = "Bootloader-based tx failed"
+    GENERIC_FAILURE_SOURCE = ("https://github.com/matter-labs/zksync-era/blob/948aeaf5786ebc4e9b7dd947cc08a6a1df9a7e21/"
+                              "core/lib/dal/src/transactions_dal.rs#L663-L670")
+
+    def generic_failure(self, result: str | None) -> tuple[str, str] | None:
+        if result != self.GENERIC_FAILURE:
+            return None
+        return (f"{self.GENERIC_FAILURE!r} is the text zkSync's node stores for every failed transaction; it "
+                "carries no reason.", self.GENERIC_FAILURE_SOURCE)
 
     EXPLORER_STEPS = (("committed", "commit_transaction_hash"), ("proven", "prove_transaction_hash"),
                       ("executed", "execute_transaction_hash"))

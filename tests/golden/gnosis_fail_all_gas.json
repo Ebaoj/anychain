@@ -1,0 +1,310 @@
+{
+ "abi_sources": {
+  "0x8C9A555402A8F14c20810ea1b8C6B27479F96669": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 matches selector 0xfc40415e"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 48651847,
+    "from": "0xd14E38693f4a8B7cc71A3c0203e146Fd58A046d1",
+    "gas_limit": "293668",
+    "gas_used": "293252",
+    "status": "failed",
+    "timestamp": "2026-10-08T12:32:30.000000Z",
+    "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://gnosisscan.io/tx/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 48651847 at 2026-10-08T12:32:30.000000Z. From 0xd14E38693f4a8B7cc71A3c0203e146Fd58A046d1 to 0x8C9A555402A8F14c20810ea1b8C6B27479F96669. Native value attached: 0 XDAI, not transferred because the transaction reverted. Gas used 293252 of limit 293668."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000000000003812276",
+    "parts": {
+     "fee": "0.000000000003812276"
+    },
+    "token": "XDAI"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    }
+   ],
+   "text": "Fee paid: 0.000000000003812276 XDAI. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "raw": "0x"
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    }
+   ],
+   "text": "The transaction reverted without any revert data: no reason text and no custom error (e.g. a bare revert(), a failed assert in old Solidity, or a call to code that does not exist)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0xfc40415e"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    }
+   ],
+   "text": "Called function with selector 0xfc40415e on 0x8C9A555402A8F14c20810ea1b8C6B27479F96669; not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xdc4c66f906A054e0dDdfEE1cEF7bd3b26a677b1D (ConvictionStakingStorage) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x8C9A555402A8F14c20810ea1b8C6B27479F96669 to 0xea53A20b2f066c184439090da2e5b286B40d8c1c (this internal call failed: the explorer reports 'Out of gas')."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 27
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57/internal-transactions"
+    }
+   ],
+   "text": "27 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "level": "candidate",
+    "next_steps": [
+     "Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
+    ],
+    "reads": [],
+    "rule": "possibly_out_of_gas"
+   },
+   "id": "E13",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    }
+   ],
+   "text": "Possible cause: the transaction used 293252 of its 293668 gas limit and reverted with no reason, which is what running out of gas inside a call looks like. A failed assert in old Solidity or an invalid instruction also uses all the gas. The explorer does not say which. Next step: Estimate the gas for the same call first. If the estimate fails, the call fails for another reason: do not send it again with more gas. If it succeeds, send with that gas limit."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E14",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://rpc.gnosischain.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "gnosis-mainnet",
+ "status": "failed",
+ "tx_hash": "0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+}

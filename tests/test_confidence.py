@@ -24,6 +24,8 @@ def test_every_fact_has_a_confidence_that_follows_its_sources(fixture):
         only_node = all(s.kind == "rpc" for s in e.sources)
         comparison = e.kind == "cross_check" or "node_l1_status" in e.data  # explorer checked against the node
         expected = "confirmed" if only_node or comparison else "single_source"
+        if e.kind == "diagnosis":  # a finding's level is its own: confirmed by a read, the explorer's reason, or a pattern
+            expected = e.data["level"]
         assert e.confidence == expected, (e.id, e.text[:80])
 
 

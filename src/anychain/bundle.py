@@ -21,6 +21,8 @@ from anychain.collectors.types import (
 )
 from anychain.config import AppConfig
 from anychain.decoder import AbiDecoder
+from anychain.diagnosis import Context, diagnose
+from anychain.reads import StateReader
 from anychain.models import EvidenceBundle, GapCause, Source
 
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
@@ -309,6 +311,39 @@ class BundleBuilder:
         self._safely("Internal calls", lambda: self._add_internal(tx_hash, tx))
         self._safely("Events", lambda: self._add_events(tx_hash, covered_logs))
         self._declare_undecoded_events()
+        self._safely("Diagnosis", lambda: self._add_diagnosis(tx_hash, tx))
+
+    def _add_diagnosis(self, tx_hash: str, tx: Transaction) -> None:
+        """A failed transaction's likely cause, confirmed by a state read when one can (PHASE2 T4)."""
+        if self.bundle.status != "failed":
+            return
+        call = next((e for e in self.bundle.items if e.kind == "call" and e.data.get("function")), None)
+        generic = self.profile.generic_failure(tx.result if isinstance(tx.result, str) else None)
+        explorer_text = tx.result if isinstance(tx.result, str) and tx.result not in RESULT_WITHOUT_REASON else None
+        ctx = Context(reason=tx.revert_reason, result=tx.result if isinstance(tx.result, str) else None,
+                      call=call.data if call else None, sender=address_of(tx.sender), to=address_of(tx.to),
+                      to_text=self._party(tx.to), block=tx.block_number, gas_used=tx.gas_used, gas_limit=tx.gas_limit,
+                      reader=StateReader(self.rpc) if self.rpc_verified else None,
+                      generic_failure=generic[0] if generic else None,
+                      explorer_text=None if generic else explorer_text)
+        finding = diagnose(ctx)
+        read_ids = []
+        for read in finding.reads:
+            fact = self.bundle.add("state_read", f"At block {read.block}, {read.signature.split('(')[0]} on "
+                                   f"{read.contract} returned {read.value}.",
+                                   [self._rpc_source(read.detail)], {"call": read.detail, "value": str(read.value)})
+            read_ids.append(fact.id)
+        sources = [self._tx_source(tx_hash)] + [self._rpc_source(r.detail) for r in finding.reads]
+        if generic:
+            sources.append(Source(kind="repo", label="Network software source", url=generic[1]))
+        sources += [Source(kind="repo", label="Source of the rule's meaning", url=u) for u in finding.source_urls]
+        steps = " ".join(f"Next step: {s}" for s in finding.next_steps)
+        self.bundle.add("diagnosis", f"{finding.text} {steps}", sources,
+                        {"rule": finding.rule, "level": finding.level, "reads": read_ids,
+                         "next_steps": finding.next_steps},
+                        confidence="confirmed" if finding.level == "confirmed" else finding.level)
+        for missing in finding.missing:
+            self._gap("Diagnosis", missing.why, missing.needed, retryable=missing.retryable, cause=missing.cause)
 
     def _status_from_explorer(self, tx: Transaction) -> str:
         # Blockscout stores dropped transactions with status "error", so check `result` first.

@@ -1,0 +1,190 @@
+{
+ "abi_sources": {
+  "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A matches selector 0x61461954"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 78962841,
+    "from": "0x224cFC26c83Fccc3463c804e7F86b10651D5dF96",
+    "gas_limit": "402993",
+    "gas_used": "37799",
+    "status": "failed",
+    "timestamp": "2026-10-01T14:06:39.000000Z",
+    "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://celo.blockscout.com/tx/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 78962841 at 2026-10-01T14:06:39.000000Z. From 0x224cFC26c83Fccc3463c804e7F86b10651D5dF96 to 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A. Native value attached: 0 CELO, not transferred because the transaction reverted. Gas used 37799 of limit 402993."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.009457357086549",
+    "parts": {
+     "fee": "0.009457357086549"
+    },
+    "token": "CELO"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    }
+   ],
+   "text": "Fee paid: 0.009457357086549 CELO. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "raw": "0x"
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    }
+   ],
+   "text": "The transaction reverted without any revert data: no reason text and no custom error (e.g. a bare revert(), a failed assert in old Solidity, or a call to code that does not exist)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x61461954"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    }
+   ],
+   "text": "Called function with selector 0x61461954 on 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A; not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xe8f84C5DaCC3c308747b953aB84FA47b4859263C to 0x321f7Dfb9B2eA9131B8C17691CF6e01E5c149cA8 (CLPool) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 2
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc/internal-transactions"
+    }
+   ],
+   "text": "2 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "level": "single_source",
+    "next_steps": [
+     "Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+    ],
+    "reads": [],
+    "rule": "no_reason"
+   },
+   "id": "E7",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    }
+   ],
+   "text": "No reason is available for this failure. Next step: Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E8",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "celo-mainnet",
+ "status": "failed",
+ "tx_hash": "0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+}

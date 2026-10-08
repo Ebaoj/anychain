@@ -1,0 +1,199 @@
+{
+ "abi_sources": {
+  "0xa89eee597C69fFc0F83d7CF69793250f73d1D190": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0xa89eee597C69fFc0F83d7CF69793250f73d1D190 matches selector 0x457094cc"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 48221164,
+    "from": "0x68769FC9A71A10754b33C326fDF30914Aa8A3B10",
+    "gas_limit": "2000000",
+    "gas_used": "32156",
+    "status": "failed",
+    "timestamp": "2026-09-13T00:43:50.000000Z",
+    "to": "0xa89eee597C69fFc0F83d7CF69793250f73d1D190",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://gnosisscan.io/tx/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 48221164 at 2026-09-13T00:43:50.000000Z. From 0x68769FC9A71A10754b33C326fDF30914Aa8A3B10 to 0xa89eee597C69fFc0F83d7CF69793250f73d1D190. Native value attached: 0 XDAI, not transferred because the transaction reverted. Gas used 32156 of limit 2000000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.0000000000064312",
+    "parts": {
+     "fee": "0.0000000000064312"
+    },
+    "token": "XDAI"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    }
+   ],
+   "text": "Fee paid: 0.0000000000064312 XDAI. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "NOT_YET"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='NOT_YET'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x457094cc"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    }
+   ],
+   "text": "Called function with selector 0x457094cc on 0xa89eee597C69fFc0F83d7CF69793250f73d1D190; not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x2Dae5307c5E3FD1CF5A72Cb6F698f915860607e0 (InitializableImmutableAdminUpgradeabilityProxy) to 0xCF86A65779e88bedfF0319FE13aE2B47358EB1bF (Pool) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 1
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a/internal-transactions"
+    }
+   ],
+   "text": "1 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "level": "single_source",
+    "next_steps": [
+     "Read the contract's source where this reason is raised, or ask its developers.",
+     "Do not send the same transaction again until the condition behind the reason has changed."
+    ],
+    "reads": [],
+    "rule": "contract_reason"
+   },
+   "id": "E7",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    }
+   ],
+   "text": "The contract reverted with its own reason 'NOT_YET'. What it means is defined in the contract's code. Next step: Read the contract's source where this reason is raised, or ask its developers. Next step: Do not send the same transaction again until the condition behind the reason has changed."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E8",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://rpc.gnosischain.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "gnosis-mainnet",
+ "status": "failed",
+ "tx_hash": "0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a"
+}

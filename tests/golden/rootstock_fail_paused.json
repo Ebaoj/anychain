@@ -1,0 +1,228 @@
+{
+ "abi_sources": {
+  "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e": "explorer: verified contract StakingProxy proxy -> ModulesProxy"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e matches selector 0x25629ec0"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 9261664,
+    "from": "0x9E954ef6a88A85a8FC203148c360Af5a4EFA3640",
+    "gas_limit": "2100000",
+    "gas_used": "26614",
+    "status": "failed",
+    "timestamp": "2026-09-22T10:37:48.000000Z",
+    "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://rootstock.blockscout.com/tx/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 9261664 at 2026-09-22T10:37:48.000000Z. From 0x9E954ef6a88A85a8FC203148c360Af5a4EFA3640 to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e. Native value attached: 0 RBTC, not transferred because the transaction reverted. Gas used 26614 of limit 2100000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.00000092856246",
+    "parts": {
+     "fee": "0.00000092856246"
+    },
+    "token": "RBTC"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    }
+   ],
+   "text": "Fee paid: 0.00000092856246 RBTC. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "revert_reason": {
+     "method_call": "Error(string reason)",
+     "method_id": "08c379a0",
+     "parameters": [
+      {
+       "name": "reason",
+       "type": "string",
+       "value": "paused"
+      }
+     ]
+    }
+   },
+   "id": "E3",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    }
+   ],
+   "text": "Explorer reports the revert reason: Error(string reason) with reason='paused'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x25629ec0"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    }
+   ],
+   "text": "Called function with selector 0x25629ec0 on 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e; not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E5",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e to 0xe2b4A4213c823cb3E1B90D128aED17A86F45bBc0 (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e to 0xDf7224A755A8cf59c6d30ECc1a1eFdD83c46eE36 (this internal call reverted)."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "call": "eth_call 0x5684a06CaB22Db16d901fEe2A5C081b4C91eA40e paused() at block 9261663",
+    "value": "True"
+   },
+   "id": "E7",
+   "kind": "state_read",
+   "sources": [
+    {
+     "detail": "eth_call 0x5684a06CaB22Db16d901fEe2A5C081b4C91eA40e paused() at block 9261663",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "At block 9261663, paused on 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e returned True."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "level": "confirmed",
+    "next_steps": [
+     "Wait until the contract's operator unpauses it; calls to it fail while it is paused.",
+     "Check the project's announcements for why it was paused."
+    ],
+    "reads": [
+     "E7"
+    ],
+    "rule": "paused"
+   },
+   "id": "E8",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    },
+    {
+     "detail": "eth_call 0x5684a06CaB22Db16d901fEe2A5C081b4C91eA40e paused() at block 9261663",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    }
+   ],
+   "text": "Cause confirmed: the contract this transaction called, 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, was paused at block 9261663, the block before it (paused() returned true), matching the reason 'paused'. Next step: Wait until the contract's operator unpauses it; calls to it fail while it is paused. Next step: Check the project's announcements for why it was paused."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E9",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://public-node.rsk.co"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "rootstock-mainnet",
+ "status": "failed",
+ "tx_hash": "0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"
+}

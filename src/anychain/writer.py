@@ -69,12 +69,12 @@ def _without_urls(text: str, hidden_hosts: tuple[str, ...] = ()) -> str:
 
 
 def _sources_for_llm(sources: list[Source]) -> list[dict]:
-    """What the model may cite. Only explorer pages keep their URL: API and RPC URLs
-    can be internal (e.g. a private network's node) and are no use to a reader."""
+    """What the model may cite. Explorer pages and source-code links keep their URL: API and RPC
+    URLs can be internal (e.g. a private network's node) and are no use to a reader."""
     out = []
     for s in sources:
         item = {"label": s.label}
-        if s.kind == "explorer_ui" and s.url:
+        if s.kind in ("explorer_ui", "repo") and s.url:  # public pages: the explorer, and source code
             item["url"] = s.url
         if s.detail:
             item["detail"] = s.detail

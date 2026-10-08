@@ -64,8 +64,15 @@ def test_every_shipped_config_loads_with_a_dedicated_profile(config):
 def test_no_network_specific_values_in_code():
     """Portability by config only: no explorer/RPC domains, chain ids, symbols or addresses in src/."""
     src = "\n".join(p.read_text() for p in (ROOT / "src" / "anychain").rglob("*.py"))
-    # Not network values: Blockscout's docs link, and the OpenAI API endpoint (an LLM provider, D27).
-    domains = set(re.findall(r"https?://([a-z0-9.-]+\.[a-z]{2,})", src)) - {"docs.blockscout.com", "api.openai.com"}
+    # Not network values: Blockscout's docs link, the OpenAI API endpoint (an LLM provider, D27), and
+    # source links for chain-type behaviour, which live in chain profiles only (D31).
+    allowed = {"docs.blockscout.com", "api.openai.com"}
+    domains = set(re.findall(r"https?://([a-z0-9.-]+\.[a-z]{2,})", src)) - allowed
+    # Source links (github.com) for behaviour a rule relies on are allowed only where rules live.
+    rule_files = {"chains.py", "diagnosis.py"}
+    domains -= {"github.com"}
+    elsewhere = "\n".join(p.read_text() for p in (ROOT / "src" / "anychain").rglob("*.py") if p.name not in rule_files)
+    assert "github.com" not in elsewhere, "source links only in chains.py and diagnosis.py"
     assert not domains, f"hardcoded hosts: {domains}"
     assert not re.search(r"chain_id\s*(==|!=)\s*\d|chain_id\s+in\s*[\[({]\s*\d", src), "chain id literal"
     assert not re.findall(r"0x[0-9a-fA-F]{40}", src), "hardcoded address"
@@ -408,3 +415,63 @@ def test_l1_node_on_the_wrong_chain_is_not_asked():
     b = replay_bundle(cfg, L1_TX, "zksync_explorer_l1_behind")
     assert not [e for e in b.items if "The node reports" in e.text]
     assert not _gaps(b, "L1 status from the node")
+
+
+# ---- PHASE2 T4: one real failed transaction per diagnosis rule -------------------------------------
+
+DIAGNOSIS_CASES = [
+    # fixture, network, rule, level, words the finding must say
+    ("celo_fail_balance_confirmed", "celo-mainnet", "insufficient_balance", "confirmed",
+     ["Cause confirmed", "was 1445 (raw units), less than the 106500"]),
+    ("rootstock_fail_paused", "rootstock-mainnet", "paused", "confirmed", ["paused() returned true"]),
+    ("op_fail_deadline", "optimism-mainnet", "deadline", "candidate",  # unverified contract: words only
+     ["Possible cause", "'block number deadline'"]),
+    ("gnosis_fail_all_gas", "gnosis-mainnet", "possibly_out_of_gas", "candidate",
+     ["Possible cause", "293252 of its 293668", "does not say which"]),
+    ("celo_fail_execution_reverted_no_data", "celo-mainnet", "no_reason", "single_source",
+     ["No reason is available"]),  # the explorer's "execution reverted" is not a reason
+    ("zksync_fail_generic", "zksync-era", "generic_failure", "single_source", ["carries no reason"]),
+    ("rootstock_fail_slippage", "rootstock-mainnet", "slippage", "single_source", ["'Too much requested'"]),
+    ("gnosis_fail_contract_reason", "gnosis-mainnet", "contract_reason", "single_source", ["'NOT_YET'"]),
+    ("eth_failed_unverified_bot", "ethereum-mainnet", "slippage", "candidate", ["Possible cause"]),
+    ("gnosis_revert_no_data", "gnosis-mainnet", "no_reason", "single_source", ["No reason is available"]),
+]
+
+
+@pytest.mark.parametrize("fixture, network, rule, level, words", DIAGNOSIS_CASES)
+def test_diagnosis_on_real_failures(fixture, network, rule, level, words):
+    from tests.test_golden import _case
+    _config, tx = _case(fixture)
+    b = replay_bundle(_cfg(network), tx, fixture)
+    [finding] = [e for e in b.items if e.kind == "diagnosis"]
+    assert (finding.data["rule"], finding.data["level"], finding.confidence) == (rule, level, level)
+    for w in words:
+        assert w in finding.text, (w, finding.text)
+    assert finding.data["next_steps"] and "Next step:" in finding.text
+    for read_id in finding.data["reads"]:  # every read it relies on is a fact from the node
+        read = next(e for e in b.items if e.id == read_id)
+        assert read.kind == "state_read" and read.confidence == "confirmed"
+
+
+def test_reused_slippage_words_without_a_swap_call_are_only_a_candidate():
+    from anychain.collectors.types import RevertReason
+    from anychain.diagnosis import Context, diagnose
+    reason = RevertReason.from_api({"method_call": "Error(string reason)",
+                                    "parameters": [{"name": "reason", "value": "Too much requested"}]})
+    ctx = Context(reason=reason, result="Reverted", call={"function": "execute", "args": {}}, sender="0x1", to="0x2",
+                  to_text="0x2", block=10, gas_used=1, gas_limit=10, reader=None)
+    assert diagnose(ctx).level == "candidate"
+
+
+def test_the_node_not_keeping_old_state_is_a_gap_not_a_cause():
+    # The balance read needs the parent block's state; when the node refuses it, the finding stays
+    # on the explorer's reason and a gap says what is missing.
+    from tests.test_golden import _case
+    _config, tx = _case("celo_fail_balance_confirmed")
+    refusal = {"status": 403, "body": '{"jsonrpc":"2.0","error":{"code":-32602,"message":"Archive requests require a '
+                                      'personal token."},"id":1}'}
+    b = replay_bundle(_cfg("celo-mainnet"), tx, "celo_fail_balance_confirmed",
+                      overrides={f'"{hex(78962883)}"]': refusal})  # the balance read at the parent block
+    [finding] = [e for e in b.items if e.kind == "diagnosis"]
+    assert finding.data["level"] == "single_source" and "Cause confirmed" not in finding.text
+    assert any(g.what == "Diagnosis" and "could not be read" in g.why for g in b.gaps)

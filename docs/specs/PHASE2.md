@@ -101,7 +101,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 
 | Requirement | Test (written before the code) | Evidence |
 |---|---|---|
-| R1 | real failed tx per pattern, expected likely cause and cited facts | pasted test run |
+| R1 | `tests/test_networks.py::test_diagnosis_on_real_failures` (10 real failures covering 8 rules) and `tests/test_diagnosis.py` (each rule's edges; allowance with a fake reader) | T4 done 2026-10-08: 526 passed; live Celo case confirmed (D31) |
 | R2 | a sample failure without reason, replay result or gap | pasted |
 | R3 | `tests/test_reads.py` (balance, paused, replay, archive refusal, unreadable answers; real node recordings) | T3 done 2026-10-08: 450 passed (D30); facts come with T4 |
 | R4 | BRLC call cites file, lines and commit | pasted |

@@ -1,0 +1,523 @@
+{
+ "abi_sources": {
+  "0x7c168119bf754269523AC9728aeEba8e4Eee6100": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0x7c168119bf754269523AC9728aeEba8e4Eee6100 matches selector 0x8412a3b9"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 72116785,
+    "from": "0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250",
+    "gas_limit": "3000000",
+    "gas_used": "87849",
+    "status": "failed",
+    "timestamp": "2026-09-20T16:44:29.000000Z",
+    "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100",
+    "tx_type": 0,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://zksync.blockscout.com/tx/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 72116785 at 2026-09-20T16:44:29.000000Z. From 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100. Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 87849 of limit 3000000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.00000397516725",
+    "parts": {
+     "fee": "0.00000397516725"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "Fee paid: 0.00000397516725 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "batch": 517521,
+    "l1_status": "Sealed on L2"
+   },
+   "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 517521); the explorer lists no L1 transaction for it yet."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "committed": "0x5f15062908c186a7ebce5043c4312d92283c3bef994dfa1d1fb453d05b7b96e7",
+    "executed": "0xbc38234e31f6d129510fa7dc610531d57cf9e5d1d789898c7fd1442778e6ad39",
+    "node_l1_status": "failed",
+    "proven": "0x67bef06dfc403831c860836b89e9f619bf3d5e87880f452190cf3606b129e699"
+   },
+   "id": "E4",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": "zks_getTransactionDetails 0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "The node reports this transaction committed in L1 transaction 0x5f15062908c186a7ebce5043c4312d92283c3bef994dfa1d1fb453d05b7b96e7, proven in L1 transaction 0x67bef06dfc403831c860836b89e9f619bf3d5e87880f452190cf3606b129e699, executed in L1 transaction 0xbc38234e31f6d129510fa7dc610531d57cf9e5d1d789898c7fd1442778e6ad39 (node status 'failed'); the explorer does not list the committed, proven and executed steps yet."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "result": "Bootloader-based tx failed"
+   },
+   "id": "E5",
+   "kind": "revert",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "Explorer reports the failure as: 'Bootloader-based tx failed'."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x8412a3b9"
+   },
+   "id": "E6",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "Called function with selector 0x8412a3b9 on 0x7c168119bf754269523AC9728aeEba8e4Eee6100; not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "matches_explorer_fee": true,
+    "net": 3975167250000,
+    "payers": [
+     "0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250"
+    ],
+    "paymaster": false,
+    "prepaid": 496569006000000,
+    "refunded": 492593838750000
+   },
+   "id": "E7",
+   "kind": "fee_flow",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/token-transfers"
+    }
+   ],
+   "text": "Fee flow: 0.000496569006 ETH prepaid to the fee collector by 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250, 0.00049259383875 ETH refunded; net fee 0.00000397516725 ETH. This matches the explorer's fee."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x000000000000000000000000000000000000800A (Ether) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x0000000000000000000000000000000000000001 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "496569006000000"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) tried to send 0.000496569006 ETH but was undone because a call above it reverted; nothing was transferred."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E16",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7c168119bf754269523AC9728aeEba8e4Eee6100 to 0x0000000000000000000000000000000000008005 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E18",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100 (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E19",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7c168119bf754269523AC9728aeEba8e4Eee6100 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E20",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7c168119bf754269523AC9728aeEba8e4Eee6100 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E21",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0x7c168119bf754269523AC9728aeEba8e4Eee6100 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract) (undone because a call above it reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "system_calls": 54,
+    "value": "0"
+   },
+   "id": "E22",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a/internal-transactions"
+    }
+   ],
+   "text": "54 internal call(s) between the network's system contracts not listed (no value carried)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "level": "single_source",
+    "next_steps": [
+     "Find the reason with a node that can trace the transaction, or ask the contract's developers."
+    ],
+    "reads": [],
+    "rule": "generic_failure"
+   },
+   "id": "E23",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Network software source",
+     "url": "https://github.com/matter-labs/zksync-era/blob/948aeaf5786ebc4e9b7dd947cc08a6a1df9a7e21/core/lib/dal/src/transactions_dal.rs#L663-L670"
+    }
+   ],
+   "text": "'Bootloader-based tx failed' is the text zkSync's node stores for every failed transaction; it carries no reason. Next step: Find the reason with a node that can trace the transaction, or ask the contract's developers."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E24",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  }
+ ],
+ "network": "zksync-era",
+ "status": "failed",
+ "tx_hash": "0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+}
