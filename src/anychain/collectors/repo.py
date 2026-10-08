@@ -26,6 +26,144 @@ GITHUB = re.compile(r"^https://github\.com/([\w.-]+)/([\w.-]+?)(?:\.git)?/?$")
 SHA = re.compile(r"^[0-9a-f]{40}$")
 
 
+class ArtifactIndex:
+    """Compiled ABIs in a repository (PHASE2_5 T3, R3, D40), by contract name.
+
+    Shapes read: Hardhat and Truffle files (`{"contractName": …, "abi": [...]}`), Safe's deployment files
+    (the same, plus `networkAddresses` and `deployments`), hardhat-deploy files (`{"address": …, "abi": …}`,
+    the name is the file's), Foundry files (`out/X.sol/X.json` or `X.0.8.19.json`: the name is the file's,
+    up to its first dot) and plain ABI lists (`abi/X.json`). Hardhat's `build-info/` and `.dbg.json` files
+    are never read; files that are not JSON are skipped.
+
+    A file may list the addresses it was deployed at (per chain, or one address); then a pin is checked
+    against that list (`match`). A name with two different ABIs and no address to choose by is ambiguous.
+    """
+
+    def __init__(self, entries: list["Artifact"]):
+        self.entries: dict[str, list[Artifact]] = {}
+        for e in entries:
+            self.entries.setdefault(e.name, []).append(e)
+
+    @property
+    def ambiguous(self) -> set[str]:
+        return {name for name, found in self.entries.items() if len({_abi_key(e.abi) for e in found}) > 1}
+
+    @classmethod
+    def from_dir(cls, root: Path, globs: list[str]) -> "ArtifactIndex":
+        key = (str(root), tuple(globs))
+        if key not in _ARTIFACTS:
+            _ARTIFACTS[key] = cls(_read_artifacts(root, globs))
+        return _ARTIFACTS[key]
+
+    def find(self, name: str) -> tuple[str, list] | None:
+        """(path, ABI) of the contract `name` when its files agree on one ABI, else None."""
+        found = self.entries.get(name) or []
+        if not found or name in self.ambiguous:
+            return None
+        return found[0].path, found[0].abi
+
+    def match(self, name: str, address: str, chain_id: int) -> "ArtifactMatch | str":
+        """The ABI for a pin of `address` to `name`, or the reason there is none. When the files list where they
+        were deployed, only a file listing this address on this chain is used (`listed`); one listing other
+        addresses means the pin is wrong."""
+        found = self.entries.get(name) or []
+        if not found:
+            return f"its compiled artifacts have no ABI named {name}"
+        with_lists = [e for e in found if e.addresses is not None]
+        if with_lists:
+            here = [e for e in with_lists if address.lower() in e.addresses.get(chain_id, set()) | e.addresses.get(None, set())]
+            if not here:
+                listed = sorted({a for e in with_lists for a in e.addresses.get(chain_id, set()) | e.addresses.get(None, set())})
+                return (f"its artifact for {name} lists " + (", ".join(_checksum(a) for a in listed) if listed else "no address")
+                        + f" on chain {chain_id}, not this one")
+            if len({_abi_key(e.abi) for e in here}) > 1:
+                return f"its compiled artifacts have two different ABIs named {name} for this address"
+            return ArtifactMatch(here[0].path, here[0].abi, listed=True)
+        if name in self.ambiguous:
+            return f"its compiled artifacts have two different ABIs named {name}"
+        return ArtifactMatch(found[0].path, found[0].abi, listed=False)
+
+
+@dataclass(frozen=True)
+class Artifact:
+    path: str
+    name: str
+    abi: list
+    addresses: dict | None  # chain id (None: any chain) -> lowercase addresses; None when the file lists none
+
+
+@dataclass(frozen=True)
+class ArtifactMatch:
+    path: str
+    abi: list
+    listed: bool  # the file itself lists the pinned address for this chain
+
+
+_ARTIFACTS: dict[tuple, ArtifactIndex] = {}  # per (tree, globs): a synced commit never changes
+
+
+def _read_artifacts(root: Path, globs: list[str]) -> list[Artifact]:
+    entries = []
+    for pattern in globs:
+        for p in sorted(root.glob(pattern)):
+            rel = p.relative_to(root)
+            if not p.is_file() or p.name.endswith(".dbg.json") or "build-info" in rel.parts:
+                continue
+            try:
+                data = json.loads(p.read_text(errors="replace"))
+            except (json.JSONDecodeError, OSError):
+                continue
+            abi = data.get("abi") if isinstance(data, dict) else data
+            if not isinstance(abi, list) or not abi or not all(isinstance(e, dict) and "type" in e for e in abi):
+                continue
+            name = data.get("contractName") if isinstance(data, dict) else None
+            name = name if isinstance(name, str) and name else p.name.split(".")[0]
+            entries.append(Artifact(str(rel), name, abi, _addresses(data)))
+    return entries
+
+
+ADDRESS = re.compile(r"^0x[0-9a-fA-F]{40}$")
+
+
+def _addresses(data) -> dict | None:
+    """Where the file says it was deployed: Safe's `networkAddresses` (chain -> a deployment name, a list of
+    them, or an address) with `deployments`; Truffle's `networks` (chain -> {"address"}); hardhat-deploy's
+    top-level `address` (no chain: the folder names the network)."""
+    if not isinstance(data, dict):
+        return None
+    found: dict = {}
+
+    def add(chain, value):
+        if isinstance(value, str) and ADDRESS.match(value):
+            found.setdefault(chain, set()).add(value.lower())
+
+    deployments = data.get("deployments") if isinstance(data.get("deployments"), dict) else {}
+    for chain, value in (data.get("networkAddresses") or {}).items() if isinstance(data.get("networkAddresses"), dict) else []:
+        for v in value if isinstance(value, list) else [value]:
+            named = deployments.get(v) if isinstance(v, str) else None
+            add(_chain(chain), named.get("address") if isinstance(named, dict) else v)
+    for chain, value in (data.get("networks") or {}).items() if isinstance(data.get("networks"), dict) else []:
+        add(_chain(chain), value.get("address") if isinstance(value, dict) else None)
+    add(None, data.get("address"))
+    return found or None
+
+
+def _chain(value) -> int | None:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _abi_key(abi: list) -> tuple:
+    return tuple(sorted(json.dumps(e, sort_keys=True) for e in abi))
+
+
+def _checksum(address: str) -> str:
+    from eth_utils import to_checksum_address
+    return to_checksum_address(address)
+
+
 @dataclass(frozen=True)
 class Repo:
     url: str
@@ -34,9 +172,13 @@ class Repo:
     commit: str
     root: Path  # the extracted source tree
     index: SolidityIndex
+    artifacts: ArtifactIndex = ArtifactIndex([])
 
     def permalink(self, path: str, start: int, end: int) -> str:
         return f"https://github.com/{self.owner}/{self.name}/blob/{self.commit}/{path}#L{start}-L{end}"
+
+    def file_url(self, path: str) -> str:
+        return f"https://github.com/{self.owner}/{self.name}/blob/{self.commit}/{path}"
 
     @property
     def tree_url(self) -> str:
@@ -84,7 +226,8 @@ class RepoCache:
             return None
         owner, name = _parts(cfg.url)
         root = self._dir(cfg, commit)
-        return Repo(cfg.url, owner, name, commit, root, SolidityIndex.from_dir(root, cfg.source_globs))
+        return Repo(cfg.url, owner, name, commit, root, SolidityIndex.from_dir(root, cfg.source_globs),
+                    ArtifactIndex.from_dir(root, cfg.artifact_globs))
 
     # ---- sync (network) ---------------------------------------------------------------------------
 

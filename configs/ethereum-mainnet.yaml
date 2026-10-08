@@ -28,8 +28,17 @@ repos:
   - url: https://github.com/cloudwallk/brlc-token
     ref: 74a5498d04b10dc882e48273a38b98b4275463bd
     source_globs: ["contracts/**/*.sol"]
+  # Safe's official deployments: compiled ABIs only, no Solidity source (PHASE2_5 T3, D40).
+  - url: https://github.com/safe-global/safe-deployments
+    ref: 7b1fb6d615ab2d2999550ec9166554b180e813e5
+    source_globs: []
+    artifact_globs: ["src/assets/v1.4.1/*.json"]
 
-address_map: {}
+# The two Safe addresses are the "canonical" deployments listed in that repo's src/assets/v1.4.1/
+# safe_proxy_factory.json and safe.json at the pinned commit.
+address_map:
+  "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67": { repo: https://github.com/safe-global/safe-deployments, contract: SafeProxyFactory }
+  "0x41675C099F32341bf84BFc5382aF534df5C7461a": { repo: https://github.com/safe-global/safe-deployments, contract: Safe }
 
 abi_strategy:
   order: [explorer, repo_artifacts, repo_source_signatures, signature_db]

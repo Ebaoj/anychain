@@ -57,8 +57,9 @@ def test_a_repo_not_synced_is_a_config_gap(monkeypatch, tmp_path):
     from anychain.collectors import repo as repo_module
     monkeypatch.setattr(repo_module.RepoCache, "__init__", lambda self, _d: setattr(self, "root", tmp_path))
     b = replay_bundle(_eth(), SET_PAUSER, "eth_brlc_set_pauser")
-    [gap] = [g for g in b.gaps if g.what == "Source code"]
-    assert gap.cause == "config_error" and "anychain repos sync" in gap.needed and not _sources(b)
+    gaps = [g for g in b.gaps if g.what == "Source code"]
+    assert len(gaps) == len(_eth().repos) == 2  # each configured repo not synced is said
+    assert all(g.cause == "config_error" and "anychain repos sync" in g.needed for g in gaps) and not _sources(b)
 
 
 def test_only_github_repos():

@@ -61,9 +61,9 @@ def test_urls_come_from_config(eth_cfg):
 
 
 def test_address_labels_are_normalized_and_validated(tmp_path):
-    text = ETH_YAML.replace("address_map: {}", 'address_map: {}\naddress_labels:\n  "0xABCDEF0000000000000000000000000000000001": "Treasury"')
+    text = ETH_YAML.replace("\nabi_strategy:", '\naddress_labels:\n  "0xABCDEF0000000000000000000000000000000001": "Treasury"\nabi_strategy:')
     cfg = load_config(_write(tmp_path, text))
     assert cfg.address_labels == {"0xabcdef0000000000000000000000000000000001": "Treasury"}
-    bad = ETH_YAML.replace("address_map: {}", 'address_map: {}\naddress_labels:\n  "treasury": "x"')
+    bad = ETH_YAML.replace("\nabi_strategy:", '\naddress_labels:\n  "treasury": "x"\nabi_strategy:')
     with pytest.raises(ConfigError, match="address_labels"):
         load_config(_write(tmp_path, bad))

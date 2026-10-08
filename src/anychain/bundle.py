@@ -178,7 +178,8 @@ class BundleBuilder:
         self.rpc_view: RpcView | None = None
         self.repos: list[Repo] | None = None  # configured repos from the local cache, loaded on first use
         self.source_repo: Repo | None = None  # the repo matched to the called contract, if any
-        self.abi_origin: dict[str, tuple] = {}  # address -> (repo_pinned | repo_match, repo, contract) when not the explorer
+        self.abi_origin: dict[str, tuple] = {}  # address -> (repo_pinned | repo_artifact | repo_match, repo, contract or
+        #                                         artifact path) when not the explorer
         self.repo_notes: dict[str, str] = {}  # address -> how the repo ABI was chosen
         self.event_topics_asked: set[str] = set()
         self.signatures = (SignatureDb(cfg.abi_strategy.signature_db, cfg.storage.cache_dir, explorer.client,
@@ -738,7 +739,7 @@ class BundleBuilder:
         decoder = self._decoder_for(to)
         origin = self.abi_origin.get(to.lower(), ("explorer",))[0]
         decoded = decode_revert(replay.revert_data, decoder if origin != "repo_match" else None)
-        if decoded.kind == "custom" and origin == "repo_pinned":
+        if decoded.kind == "custom" and origin in ("repo_pinned", "repo_artifact"):
             sources = sources + [self._abi_provenance(to)[0]]  # the error's meaning comes from the repo
         fact = self.bundle.add("replay", f"Re-run on the node at block {replay.block}, the block before, with the "
                                f"transaction's own call, it reverted with {decoded.text}. The replay is "
@@ -1102,6 +1103,8 @@ class BundleBuilder:
         if kind == "repo_pinned":
             c = repo.index.contracts[contract]
             return Source(kind="repo", label=f"Repository {repo.label}", url=repo.permalink(c.path, c.start, c.end)), None
+        if kind == "repo_artifact":  # `contract` holds the artifact's path
+            return Source(kind="repo", label=f"Repository {repo.label}", url=repo.file_url(contract)), None
         return Source(kind="repo", label=f"Repository {repo.label if repo else 'source signatures'}",
                       url=repo.tree_url if repo else None), "candidate"
 
@@ -1215,26 +1218,15 @@ class BundleBuilder:
         A contract pinned in address_map uses its own ABI from source (single source: the config says which
         contract it is); otherwise every selector the repos declare once is tried, and a match is a candidate."""
         order = self.cfg.abi_strategy.order
-        if not self.cfg.repos or "repo_source_signatures" not in order:
+        repo_sources = [s for s in order if s in ("repo_artifacts", "repo_source_signatures")]
+        if not self.cfg.repos or not repo_sources:
             return None
         repos = self._loaded_repos()
         pin = self.cfg.address_map.get(address.lower())
         if pin is not None:
-            repo = next((r for r in repos if r.url == pin.repo), None)
-            problem = ("the repository is not synced" if repo is None else
-                       f"{pin.contract} is declared in more than one of its files" if pin.contract in repo.index.ambiguous
-                       else f"it has no contract named {pin.contract}" if pin.contract not in repo.index.contracts
-                       else None)
-            abi = repo.index.abi(pin.contract) if problem is None else []
-            if problem is None and not abi:
-                problem = f"no ABI could be built from {pin.contract}'s source (unresolved types or inheritance)"
-            if problem:
-                self._gap("ABI lookup", f"address_map pins {address} to {pin.contract} in {pin.repo}, but {problem}",
-                          "Sync the repo, or fix the contract name in address_map", retryable=False,
-                          cause="config_error")
-                return None
-            self.abi_origin[address.lower()] = ("repo_pinned", repo, pin.contract)
-            return AbiDecoder(abi), f"repository {repo.label}: {pin.contract} (pinned to this address in the config)"
+            return self._pinned_decoder(address, pin, repos, repo_sources)
+        if "repo_source_signatures" not in order:
+            return None
         abi = filter_abi([e for r in repos for e in r.index.abi()])  # ambiguity across repos too
         if not abi:
             return None
@@ -1242,6 +1234,41 @@ class BundleBuilder:
         labels = ", ".join(r.label for r in repos)
         return AbiDecoder(abi), (f"repository {labels} source signatures (a selector match in the repository; "
                                  "which contract this is was not confirmed)")
+
+    def _pinned_decoder(self, address: str, pin, repos: list, repo_sources: list[str]) -> tuple[AbiDecoder, str] | None:
+        """The ABI of the contract address_map pins to `address`: from the repo's compiled artifacts or its source,
+        in the configured order (PHASE2_5 T3, D40). Single source: the config says which contract it is."""
+        repo = next((r for r in repos if r.url == pin.repo), None)
+        if repo is None:
+            problems = ["the repository is not synced"]
+        else:
+            problems = []
+            for kind in repo_sources:
+                if kind == "repo_artifacts":
+                    found = repo.artifacts.match(pin.contract, address, self.cfg.network.chain_id)
+                    if isinstance(found, str):
+                        problems.append(found)
+                        continue
+                    self.abi_origin[address.lower()] = ("repo_artifact", repo, found.path)
+                    why = (f"which lists this address for chain {self.cfg.network.chain_id}" if found.listed
+                           else "pinned to this address in the config")
+                    return AbiDecoder(found.abi), f"repository {repo.label}: compiled ABI {found.path} ({pin.contract}, {why})"
+                else:
+                    problem = (f"{pin.contract} is declared in more than one of its source files"
+                               if pin.contract in repo.index.ambiguous else
+                               f"its source has no contract named {pin.contract}"
+                               if pin.contract not in repo.index.contracts else None)
+                    abi = repo.index.abi(pin.contract) if problem is None else []
+                    if problem is None and not abi:
+                        problem = f"no ABI could be built from {pin.contract}'s source (unresolved types or inheritance)"
+                    if problem is None:
+                        self.abi_origin[address.lower()] = ("repo_pinned", repo, pin.contract)
+                        return AbiDecoder(abi), f"repository {repo.label}: {pin.contract} (pinned to this address in the config)"
+                    problems.append(problem)
+        self._gap("ABI lookup", f"address_map pins {address} to {pin.contract} in {pin.repo}, but " + "; ".join(problems),
+                  "Sync the repo, or fix the contract name in address_map or the repo's artifact_globs", retryable=False,
+                  cause="config_error")
+        return None
 
     def _declare_undecoded(self, topic: str, address: str, what: str, code_owner: str | None = None) -> None:
         """Gap for something we could not decode, saying whether the ABI is missing or just unreachable."""
@@ -1508,7 +1535,7 @@ class BundleBuilder:
                                 {"event": event.name, "args": {a.name: a.value for a in event.args}})
             else:
                 abi_source, confidence = self._abi_provenance(address)
-                text = (f"Event {event.signature} emitted by {self._party(emitter)}{args}." if origin[0] == "repo_pinned"
+                text = (f"Event {event.signature} emitted by {self._party(emitter)}{args}." if origin[0] in ("repo_pinned", "repo_artifact")
                         else f"An event of {self._party(emitter)} matches {event.signature} in a configured repository; "
                              f"decoded with it{args or ' (no arguments)'}. Not confirmed: the repository was matched by "
                              "the event's signature only.")

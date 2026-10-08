@@ -1,0 +1,4 @@
+Subset of https://github.com/safe-global/safe-deployments at commit 7b1fb6d615ab2d2999550ec9166554b180e813e5
+(downloaded on 2026-10-08 with `anychain repos sync`): only src/assets/v1.4.1/, the 12 files the
+Ethereum config's artifact_globs reads, unchanged. A review compared each file byte for byte with
+raw.githubusercontent.com at that commit, and the folder has exactly these 12 files upstream.
