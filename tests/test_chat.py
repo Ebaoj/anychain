@@ -313,3 +313,42 @@ def test_a_continued_conversation_keeps_its_mode(event_log, tmp_path):
     first = client.post("/chat", json={"hash": tx, "message": "x", "mode": "support"}).json()
     other = client.post("/chat", json={"session_id": first["session_id"], "message": "y", "mode": "auditor"})
     assert other.status_code == 422 and "mode" in other.json()["detail"]
+
+
+# ---- review of T4: the chat starts from the facts the page shows ----
+
+def test_a_chat_started_from_an_explain_uses_its_facts(event_log, tmp_path):
+    # the explain is node-only (6 facts, the explorer down); a chat started from it must cite those same facts
+    from anychain.config import load_config as load
+    cfg = load(str(ROOT / "configs" / f"{CELO}.yaml"))
+    _c, tx = _case("celo_fail_balance_rpc_only")
+    calls = {"n": 0}
+
+    def build(h, c):  # the explorer is down for the explain, back for anything after
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return replay_bundle(c, h, "celo_fail_balance_rpc_only", offline_hosts={"celo.blockscout.com"})
+        return replay_bundle(c, h, "celo_fail_balance_confirmed")
+    session = _session()
+    client = TestClient(create_app(cfg, log=event_log, store=BundleCache(tmp_path / "c.db"), build=build,
+                                   finality=lambda: None, backend_factory=lambda: Scripted("It failed [E1]."),
+                                   tools=session.tools), base_url="http://127.0.0.1:8000")
+    explained = client.post("/explain", json={"hash": tx, "write": False}).json()
+    chat = client.post("/chat", json={"run_id": explained["run_id"], "message": "x"}).json()
+    ids = lambda items: [e["id"] + e["text"][:60] for e in items]  # noqa: E731
+    assert ids(chat["evidence"]) == ids(explained["evidence"]) and calls["n"] == 1  # nothing collected again
+
+
+def test_a_chat_started_from_a_hash_returns_its_whole_evidence(event_log, tmp_path):
+    _c, tx = _case("celo_fail_balance_confirmed")
+    client = _app(event_log, tmp_path, Scripted("It failed [E1].", "It failed [E1]."))
+    first = client.post("/chat", json={"hash": tx, "message": "x"}).json()
+    assert first["evidence"] and first["evidence"][0]["id"] == "E1"  # the page replaces its facts with these
+    second = client.post("/chat", json={"session_id": first["session_id"], "message": "y"}).json()
+    assert second["evidence"] is None  # later turns send only what is new
+
+
+def test_a_chat_from_an_unknown_explain_says_so(event_log, tmp_path):
+    client = _app(event_log, tmp_path, Scripted())
+    response = client.post("/chat", json={"run_id": 999999, "message": "x"})
+    assert response.status_code == 404 and "explain" in response.json()["detail"]

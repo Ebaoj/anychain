@@ -11,11 +11,13 @@ an RPC URL can carry the provider's key.
 """
 import shutil
 import time
+from pathlib import Path
 from typing import Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from anychain.bundle import InvalidHashError, build_bundle
@@ -29,6 +31,24 @@ from anychain.service import SKIP, WRITE, Crash, answer_transaction
 from anychain.writer import write_checked
 
 LOCAL_NAMES = ["127.0.0.1", "localhost", "[::1]", "::1"]
+PAGE = Path(__file__).parent / "web" / "index.html"
+
+
+def _page_policy() -> str:
+    """The page loads nothing from elsewhere and talks only to this API; it cannot be framed by another site. Its one
+    inline script and one style block are allowed by their hash, so nothing else inline can run (review of T4)."""
+    import base64
+    import hashlib
+    page = PAGE.read_text(encoding="utf-8")
+
+    def digest(tag: str) -> str:
+        code = page.split(f"<{tag}>", 1)[1].split(f"</{tag}>", 1)[0]
+        return "'sha256-" + base64.b64encode(hashlib.sha256(code.encode()).digest()).decode() + "'"
+    return (f"default-src 'none'; script-src {digest('script')}; style-src {digest('style')}; connect-src 'self'; "
+            "img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+
+
+PAGE_POLICY = _page_policy()
 PROBE_BUDGET_S = 15  # all of /health's probes together
 
 
@@ -44,7 +64,8 @@ class ExplainRequest(BaseModel):
 class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     message: str = Field(..., min_length=1, max_length=2000, description="The reader's question")
-    session_id: str | None = Field(None, description="To continue a conversation; without it, `hash` starts one")
+    session_id: str | None = Field(None, description="To continue a conversation")
+    run_id: int | None = Field(None, description="Start from the facts of this /explain answer (what the page shows)")
     hash: str | None = Field(None, description="The transaction to talk about (starts a conversation)")
     mode: Literal["support", "developer", "auditor"] | None = None
 
@@ -125,11 +146,18 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
     from anychain.chat import ChatSession, Sessions, turn_event
     from anychain.writer import backend_for
     sessions = sessions or Sessions()
+    explained = Recent()  # each /explain's evidence for a while, so a chat starts from the facts the page shows
     backend_factory = backend_factory or (lambda: backend_for(cfg.llm))
 
     def bundle_for(tx_hash: str):
         return cached_bundle(tx_hash.strip(), cfg, store or NoCache(), build, finality)[0]
     tools = tools or chat_tools(cfg, bundle_for)
+
+    @app.get("/", response_class=HTMLResponse)
+    def page() -> HTMLResponse:
+        """The page (PHASE3 T4, R2): one static file, plain JavaScript, talking only to this API."""
+        return HTMLResponse(PAGE.read_text(encoding="utf-8"), headers={"Content-Security-Policy": PAGE_POLICY,
+                                                        "X-Content-Type-Options": "nosniff"})
 
     @app.get("/health")
     def health() -> dict:
@@ -163,6 +191,8 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
                                              node)) from exc
         if result.writer_error:  # the command line prints it on stderr; here it travels with the answer
             out["writer_error"] = no_urls(result.writer_error, node)
+        if result.run_id is not None:
+            explained.put(result.run_id, (result.bundle, mode))
         return out
 
     @app.post("/chat")
@@ -173,9 +203,17 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
             if session is None:
                 raise HTTPException(404, "no such conversation (it ended after an hour without questions): start a "
                                          "new one with the transaction's hash")
-            if request.mode and request.mode != session.mode or request.hash:
+            if request.mode and request.mode != session.mode or request.hash or request.run_id is not None:
                 raise HTTPException(422, f"a conversation keeps the transaction and mode it started with "
                                          f"({session.mode}): start a new one to change them")
+        elif request.run_id is not None:
+            kept = explained.get(request.run_id)
+            if kept is None:
+                raise HTTPException(404, f"no recent explain with run_id {request.run_id}: explain the transaction again, "
+                                         "or start with its hash")
+            bundle, explain_mode = kept
+            session = ChatSession(cfg, bundle.model_copy(deep=True), request.mode or explain_mode, tools)
+            sessions.add(session)
         elif request.hash:
             try:
                 session = ChatSession(cfg, bundle_for(request.hash), request.mode or cfg.assistant.default_mode, tools)
@@ -188,7 +226,7 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
                                                  node)) from exc
             sessions.add(session)
         else:
-            raise HTTPException(422, "give session_id to continue a conversation, or hash to start one")
+            raise HTTPException(422, "give session_id to continue a conversation, or run_id or hash to start one")
         try:
             turn = session.ask(request.message, backend_factory())
         except Exception as exc:  # never a traceback; logged like any crash
@@ -198,7 +236,10 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
                                              node)) from exc
         run_id = record(log, turn_event(session, turn, "chat", _ms(started)))
         added = [e.model_dump() for e in session.bundle.items if e.id in turn.new_facts]
+        started_now = len(session.turns) == 1
         return {"session_id": session.id, "answer": turn.answer, "outcome": turn.outcome, "new_facts": added,
+                # the whole evidence when the conversation starts, so the page cites the same facts as the model
+                "evidence": [e.model_dump() for e in session.bundle.items] if started_now else None,
                 "tool_calls": turn.tool_calls, "problems": turn.problems,
                 "error": no_urls(turn.error, node) if turn.error else None, "run_id": run_id,
                 "questions_left": max(0, MAX_QUESTIONS - len([t for t in session.turns if t.outcome != "refused"]))}
@@ -213,6 +254,26 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
         return {"saved": True}
 
     return app
+
+
+class Recent:
+    """The last `limit` items by key, safe across threads (the API's request threads)."""
+
+    def __init__(self, limit: int = 200):
+        import threading
+        from collections import OrderedDict
+        self.limit, self._items, self._lock = limit, OrderedDict(), threading.Lock()
+
+    def put(self, key, value) -> None:
+        with self._lock:
+            self._items[key] = value
+            self._items.move_to_end(key)
+            while len(self._items) > self.limit:
+                self._items.popitem(last=False)
+
+    def get(self, key):
+        with self._lock:
+            return self._items.get(key)
 
 
 def _record(log, event) -> int | None:

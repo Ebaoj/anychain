@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnyChain Assistant</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #1b1f24; --muted: #5d6670; --line: #dde1e6; --accent: #1f5fbf;
+    --ok: #1e7a3c; --ok-bg: #e5f4ea; --likely: #8a5a00; --likely-bg: #fdf1d8; --unknown: #5d6670; --unknown-bg: #eceff2;
+    --bad: #a3261f; --bad-bg: #fbe7e5; --code-bg: #f1f3f6; --on-accent: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418; --panel: #1a1e24; --ink: #e6e9ed; --muted: #9aa3ad; --line: #2c323a; --accent: #6ea8ff;
+      --ok: #7fd49a; --ok-bg: #16301f; --likely: #f0c46b; --likely-bg: #33290f; --unknown: #aab3bd; --unknown-bg: #262b32;
+      --bad: #ff8f86; --bad-bg: #3a1a18; --code-bg: #20252c; --on-accent: #0b1726;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--panel); border-bottom: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; }
+  .network { font-size: 13px; color: var(--muted); }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 4px 0 10px; background: var(--unknown); }
+  .dot.ok { background: var(--ok); } .dot.down { background: var(--bad); } .dot.wait { background: var(--likely); }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  form.ask { display: flex; gap: 8px; flex-wrap: wrap; }
+  input[type=text], select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  input[type=text] { flex: 1 1 380px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; min-width: 0; }
+  button { font: inherit; border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+  button.plain { background: transparent; color: var(--accent); }
+  button:disabled { opacity: .5; cursor: wait; }
+  label.check { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  .fact, .answer, .card, .gaps, .chat-log, .error, #statusLine, #movements { overflow-wrap: anywhere; }
+  .spaced { margin-top: 16px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  h3 { font-size: 14px; margin: 16px 0 6px; }
+  .status { font-weight: 600; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
+  .CONFIRMED { color: var(--ok); background: var(--ok-bg); } .LIKELY { color: var(--likely); background: var(--likely-bg); }
+  .UNKNOWN { color: var(--unknown); background: var(--unknown-bg); } .heuristic { color: var(--likely); background: var(--likely-bg); }
+  .answer p { margin: 0 0 8px; } .answer ul, .answer ol { margin: 0 0 8px; padding-left: 22px; }
+  .answer code, .fact code { background: var(--code-bg); padding: 1px 4px; border-radius: 4px; font-size: 12.5px; }
+  a.cite { font-size: 12px; font-weight: 600; text-decoration: none; color: var(--accent); }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+  .gaps { border-left: 4px solid var(--likely); background: var(--likely-bg); border-radius: 6px; padding: 8px 12px; }
+  .gaps li { margin: 4px 0; }
+  .error { border-left: 4px solid var(--bad); background: var(--bad-bg); border-radius: 6px; padding: 8px 12px; }
+  .feedback { margin-top: 8px; display: flex; gap: 6px; align-items: center; }
+  .feedback button { padding: 2px 10px; background: transparent; color: var(--ink); border-color: var(--line); }
+  .feedback button.chosen { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+  .fact { border-top: 1px solid var(--line); padding: 8px 0; font-size: 13px; scroll-margin-top: 80px; }
+  .fact.flash { background: var(--likely-bg); }
+  .fact .id { font-weight: 700; margin-right: 6px; }
+  .fact pre { white-space: pre-wrap; word-break: break-word; background: var(--code-bg); padding: 8px; border-radius: 6px; font-size: 12px; max-height: 260px; overflow: auto; margin: 6px 0 0; }
+  .fact .src { margin-top: 4px; }
+  .fact .src a { margin-right: 10px; font-size: 12px; word-break: break-all; }
+  .conf { font-size: 11px; color: var(--muted); }
+  .chat-log .q { font-weight: 600; margin-top: 12px; }
+  .chat-log .tool { font-size: 12px; color: var(--muted); font-family: ui-monospace, Menlo, monospace; }
+  form.chat { display: flex; gap: 8px; margin-top: 12px; }
+  form.chat textarea { flex: 1; min-height: 42px; resize: vertical; }
+  .hidden { display: none; }
+  .wrap { word-break: break-all; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AnyChain Transaction Assistant</h1>
+  <div class="network" id="network">checking the network…</div>
+</header>
+<main>
+  <section class="panel">
+    <form class="ask" id="askForm">
+      <label class="sr" for="hash">Transaction hash</label>
+      <input type="text" id="hash" placeholder="Transaction hash (0x…)" autocomplete="off" spellcheck="false" required>
+      <select id="mode" aria-label="Who the answer is for">
+        <option value="support">Support (non-technical)</option>
+        <option value="developer">Developer</option>
+        <option value="auditor">Auditor</option>
+      </select>
+      <label class="check"><input type="checkbox" id="write" checked> written answer</label>
+      <button type="submit" id="askButton">Explain</button>
+    </form>
+    <p class="muted">Every statement cites a numbered fact with its source. Facts come from the explorer and the node, never from the model.</p>
+  </section>
+
+  <section id="result" class="hidden layout" aria-live="polite">
+    <div>
+      <div class="panel">
+        <h2>Answer</h2>
+        <div id="statusLine"></div>
+        <div id="answer" class="answer"></div>
+        <div id="answerFeedback"></div>
+        <div id="diagnosis"></div>
+        <div id="steps"></div>
+        <div id="security"></div>
+        <div id="gaps"></div>
+      </div>
+      <div class="panel spaced">
+        <h2>Ask a follow-up question</h2>
+        <p class="muted">The assistant can read the contract's state, show a function's code or look at another transaction. What it finds becomes new facts.</p>
+        <div id="chatLog" class="chat-log" aria-live="polite"></div>
+        <form class="chat" id="chatForm">
+          <label class="sr" for="question">Your question</label>
+          <textarea id="question" placeholder="e.g. How much did the recipient hold before?" maxlength="2000"></textarea>
+          <button type="submit" id="chatButton">Ask</button>
+        </form>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Evidence</h2>
+      <div id="movements"></div>
+      <h3>Facts</h3>
+      <div id="facts"></div>
+      <h3>Sources</h3>
+      <div id="sources"></div>
+    </div>
+  </section>
+  <section id="failure" class="hidden panel" role="alert"><div class="error" id="failureText"></div></section>
+</main>
+<script>
+"use strict";
+// Everything shown here comes from the API (our evidence and the model's checked text). Text that came from the
+// chain, a contract or the model is always escaped before it is placed in the page: nothing from them becomes markup.
+const $ = (id) => document.getElementById(id);
+const state = { hash: null, mode: null, runId: null, sessionId: null, evidence: new Map(), generation: 0 };
+
+function esc(text) {
+  return String(text ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+}
+function safeUrl(url) {  // only http(s) links, so a value from the chain cannot become a script link
+  try { const u = new URL(url); return (u.protocol === "https:" || u.protocol === "http:") ? u.href : null; }
+  catch { return null; }
+}
+function inline(text) {  // escaped text with **bold**, `code` and citations [E3] as links to the fact
+  let html = esc(text);
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\[(E\d+(?:\s*,\s*E\d+)*)\]/g, (_m, ids) =>
+    ids.split(/\s*,\s*/).map((id) => `<a class="cite" href="#fact-${id}" data-fact="${id}">[${id}]</a>`).join(""));
+  return html;
+}
+function markdown(text) {  // the model's answer: paragraphs, bullet and numbered lists, headings as bold lines
+  const out = [];
+  let list = null;
+  const close = () => { if (list) { out.push(`</${list}>`); list = null; } };
+  for (const raw of String(text ?? "").split("\n")) {
+    const line = raw.trimEnd();
+    const bullet = line.match(/^\s*[-*]\s+(.*)$/), numbered = line.match(/^\s*\d+[.)]\s+(.*)$/);
+    const heading = line.match(/^#{1,6}\s+(.*)$/);
+    if (bullet || numbered) {
+      const kind = bullet ? "ul" : "ol";
+      if (list !== kind) { close(); out.push(`<${kind}>`); list = kind; }
+      out.push(`<li>${inline((bullet || numbered)[1])}</li>`);
+    } else if (!line.trim()) { close(); }
+    else { close(); out.push(heading ? `<p><strong>${inline(heading[1])}</strong></p>` : `<p>${inline(line)}</p>`); }
+  }
+  close();
+  return out.join("");
+}
+function badge(label) {
+  return label ? `<span class="badge ${esc(label)}">${esc(label)}</span>` : "";
+}
+function sourceUrl(s) {  // the node's address is never a link on the page: an RPC URL can carry a provider's key
+  return s.kind === "rpc" ? null : safeUrl(s.url);
+}
+function factHtml(e) {
+  const multiline = String(e.text).includes("\n");
+  const sources = (e.sources || []).map((s) => {
+    const url = sourceUrl(s);
+    return url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)}</a>`
+               : `<span class="muted">${esc(s.label)}${s.detail ? ": " + esc(s.detail) : ""}</span>`;
+  }).join("");
+  const body = multiline ? (() => { const [first, ...rest] = String(e.text).split("\n");
+    return `${inline(first)}<pre>${esc(rest.join("\n"))}</pre>`; })() : inline(e.text);
+  return `<div class="fact" id="fact-${esc(e.id)}"><span class="id">${esc(e.id)}</span>${body}
+    <div class="conf">${esc(e.kind)} · ${esc(e.confidence)}</div><div class="src">${sources}</div></div>`;
+}
+function renderFacts() {
+  $("facts").innerHTML = [...state.evidence.values()].map(factHtml).join("");
+}
+function feedbackHtml(runId) {
+  if (runId === null || runId === undefined) return "";
+  return `<div class="feedback" data-run="${esc(runId)}"><span class="muted">Was this useful?</span>
+    <button type="button" data-value="up" aria-label="useful" aria-pressed="false">👍</button>
+    <button type="button" data-value="down" aria-label="not useful" aria-pressed="false">👎</button></div>`;
+}
+async function api(path, body) {
+  const response = await fetch(path, {method: body ? "POST" : "GET", headers: {"content-type": "application/json"},
+                                      body: body ? JSON.stringify(body) : undefined});
+  let data = null;
+  try { data = await response.json(); } catch { /* not JSON */ }
+  if (!response.ok) {
+    const detail = data && data.detail;
+    const text = typeof detail === "string" ? detail : Array.isArray(detail)
+      ? detail.map((d) => [(d.loc || []).slice(1).join("."), d.msg].filter(Boolean).join(": ")).join("; ")
+      : `HTTP ${response.status}`;
+    const error = new Error(text);
+    error.status = response.status;
+    throw error;
+  }
+  return data;
+}
+
+async function loadNetwork() {
+  try {
+    const h = await api("/health");
+    const usable = ["ok", "installed", "configured"];
+    const part = (name, s) => `<span title="${esc(s.detail || s.status)}"><span class="dot ${usable.includes(s.status) ? "ok" : "down"}"></span>` +
+      `${name} ${esc(String(s.status).replace("_", " "))}</span>`;
+    $("network").innerHTML = `Network: <strong>${esc(h.network.name)}</strong> (chain ${esc(h.network.chain_id)})` +
+      part("explorer", h.sources.explorer) + part("node", h.sources.node) + part("model", h.sources.model);
+  } catch (err) {
+    $("network").innerHTML = `<span class="dot down"></span>${esc(err.message)}`;
+  }
+}
+
+function renderAnswer(a) {
+  state.evidence = new Map(a.evidence.map((e) => [e.id, e]));
+  const statusWord = {success: "succeeded", failed: "failed", pending: "is pending", dropped: "was dropped"}[a.status] || a.status;
+  const basis = {node_and_explorer_agree: "the node and the explorer agree", node_only: "from the node",
+                 explorer_only: "from the explorer only", node_and_explorer_disagree: "the node and the explorer DISAGREE"};
+  $("statusLine").innerHTML = `<p class="status">The transaction ${esc(statusWord)}.</p>` +
+    `<p class="muted wrap">${esc(a.tx_hash)} · status ${esc(basis[a.confidence.status_basis] || a.confidence.status || "")}</p>`;
+  if (a.summary) {
+    $("answer").innerHTML = markdown(a.summary);
+  } else {
+    const why = {skipped: "No written answer was asked for: the facts are on the right.",
+                 unavailable: `No model could write the answer${a.writer_error ? " (" + a.writer_error + ")" : ""}: the facts are on the right.`,
+                 withheld: "The written answer was withheld: twice it stated things not in the evidence. The facts are on the right.",
+                 no_evidence: "Nothing could be collected about this transaction."}[a.summary_status] || "";
+    $("answer").innerHTML = `<p class="muted">${esc(why)}</p>`;
+  }
+  $("answerFeedback").innerHTML = feedbackHtml(a.run_id);
+  $("diagnosis").innerHTML = a.diagnosis.length ? "<h3>Conclusions</h3>" + a.diagnosis.map((d) =>
+    `<div class="card">${badge(d.label)}${inline(String(d.text).replace(/^(CONFIRMED|LIKELY|UNKNOWN): /, "").split(" Next step for")[0])}` +
+    ` <span class="muted">${d.facts.map((f) => `<a class="cite" href="#fact-${esc(f)}" data-fact="${esc(f)}">[${esc(f)}]</a>`).join("")}</span></div>`).join("") : "";
+  $("steps").innerHTML = a.next_steps.length ? `<h3>Next steps (${a.mode === "support" ? "for a non-technical reader" : "for a developer"})</h3><ol>` +
+    a.next_steps.map((s) => `<li>${inline(s)}</li>`).join("") + "</ol>" : "";
+  $("security").innerHTML = a.security_notes.length ? "<h3>Security notes</h3>" + a.security_notes.map((n) =>
+    `<div class="card"><span class="badge heuristic">HEURISTIC</span>Pattern matches in the code, not an audit and not a finding:` +
+    `<ul>${(n.notes || []).map((x) => `<li>${inline(x.text)}</li>`).join("")}</ul></div>`).join("") : "";
+  $("gaps").innerHTML = a.gaps.length ? `<h3>Missing data</h3><div class="gaps"><ul>` + a.gaps.map((g) =>
+    `<li><strong>${esc(g.what)}</strong>: ${esc(g.why)}. <span class="muted">Needed: ${esc(g.needed)}${g.retryable ? " (worth trying again later)" : ""}</span></li>`).join("") +
+    "</ul></div>" : "";
+  const moved = a.transfers.map((t) => `<li>${inline(t.text)}</li>`).join("");
+  $("movements").innerHTML = moved ? `<h3>Value that moved</h3><ul class="muted">${moved}</ul>` : "";
+  $("sources").innerHTML = a.sources.map((s) => {
+    const url = sourceUrl(s);
+    return url ? `<div class="fact"><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)}</a> <span class="muted">${s.facts.map(esc).join(", ")}</span></div>` : "";
+  }).join("");
+  renderFacts();
+}
+
+$("askForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const hash = $("hash").value.trim(), mode = $("mode").value;
+  const generation = ++state.generation;  // a reply to an older request is dropped
+  $("askButton").disabled = true;
+  $("chatButton").disabled = true;
+  $("askButton").textContent = "Collecting…";
+  $("failure").classList.add("hidden");
+  try {
+    const a = await api("/explain", {hash, mode, write: $("write").checked});
+    if (generation !== state.generation) return;
+    state.hash = hash; state.mode = mode; state.runId = a.run_id; state.sessionId = null;
+    $("chatLog").innerHTML = "";
+    renderAnswer(a);
+    $("result").classList.remove("hidden");
+  } catch (err) {
+    $("failureText").textContent = err.message;
+    $("failure").classList.remove("hidden");
+    $("failure").scrollIntoView({behavior: "smooth", block: "center"});
+  } finally {
+    $("chatButton").disabled = false;
+    $("askButton").disabled = false;
+    $("askButton").textContent = "Explain";
+  }
+});
+
+$("chatForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const message = $("question").value.trim();
+  if (!message || !state.hash) return;
+  const generation = state.generation;
+  $("chatButton").disabled = true;
+  $("askButton").disabled = true;
+  $("chatButton").textContent = "Thinking…";
+  const entry = document.createElement("div");
+  entry.innerHTML = `<div class="q">${esc(message)}</div><div class="muted">…</div>`;
+  $("chatLog").appendChild(entry);
+  try {
+    // a conversation starts from the facts this page shows (the explain's run_id), or from the hash
+    const body = state.sessionId ? {session_id: state.sessionId, message}
+      : state.runId !== null && state.runId !== undefined ? {run_id: state.runId, message}
+      : {hash: state.hash, mode: state.mode, message};
+    const r = await api("/chat", body);
+    if (generation !== state.generation) { entry.remove(); return; }  // another transaction was explained meanwhile
+    state.sessionId = r.session_id;
+    if (r.evidence) state.evidence = new Map(r.evidence.map((e) => [e.id, e]));  // the conversation's own facts
+    for (const f of r.new_facts) state.evidence.set(f.id, f);
+    renderFacts();
+    const tools = r.tool_calls.map((c) => `<div class="tool">[${esc(c.tool || "request")}] ${typeof c.result === "string" ? esc(c.result) : "added " + c.result.map((id) => `<a class="cite" href="#fact-${esc(id)}" data-fact="${esc(id)}">${esc(id)}</a>`).join(", ")}</div>`).join("");
+    const text = r.answer ? `<div class="answer">${markdown(r.answer)}</div>` :
+      `<p class="muted">${esc(r.outcome === "withheld" ? "The answer was withheld: it stated things not in the evidence." : r.error || "No answer.")}</p>`;
+    entry.innerHTML = `<div class="q">${esc(message)}</div>${tools}${text}${feedbackHtml(r.run_id)}`;
+    $("question").value = "";
+  } catch (err) {
+    if (err.status === 404 && (state.sessionId || state.runId !== null)) {  // expired: the next question starts anew
+      state.sessionId = null; state.runId = null;
+      err.message += " The next question starts a new conversation.";
+    }
+    entry.innerHTML = `<div class="q">${esc(message)}</div><div class="error">${esc(err.message)}</div>`;
+  } finally {
+    $("askButton").disabled = false;
+    $("chatButton").disabled = false;
+    $("chatButton").textContent = "Ask";
+  }
+});
+
+document.addEventListener("click", async (event) => {
+  const cite = event.target.closest("a.cite");
+  if (cite) {
+    const fact = $(`fact-${cite.dataset.fact}`);
+    if (fact) { event.preventDefault(); fact.scrollIntoView({behavior: "smooth", block: "center"});
+      fact.classList.add("flash"); setTimeout(() => fact.classList.remove("flash"), 1500); }
+    return;
+  }
+  const button = event.target.closest(".feedback button");
+  if (button) {
+    const box = button.closest(".feedback");
+    try {
+      await api("/feedback", {run_id: Number(box.dataset.run), value: button.dataset.value});
+      box.querySelectorAll("button").forEach((b) => {
+        b.classList.toggle("chosen", b === button);
+        b.setAttribute("aria-pressed", String(b === button));
+      });
+    } catch (err) {
+      box.insertAdjacentHTML("beforeend", `<span class="muted">${esc(err.message)}</span>`);
+    }
+  }
+});
+
+loadNetwork();
+</script>
+</body>
+</html>

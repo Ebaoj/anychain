@@ -74,7 +74,7 @@ No `git push`, no deploy, no auth, no cloud. The production queue and worker sta
 
 - `api.py` (FastAPI): routes over the same `build_bundle` and writer; sessions in memory; the page served as a static file.
 - `chat.py`: the session (evidence bundle that grows), the tool list, the loop. Tool requests use a small JSON protocol the model writes in its answer, run by our code, so it works the same on Claude Code, Anthropic and OpenAI backends (decision D1 below).
-- `web/index.html`: one page, plain JavaScript.
+- `src/anychain/web/index.html`: one page, plain JavaScript, served at `/` by the API.
 - `events.py`: new columns (mode, diagnosis rule, ABI source, tokens, cache hit, feedback), migrated on open as in D28.
 - `eval/cases.yaml`, `eval.py`, `anychain eval` and `anychain metrics`.
 - `cache.py`: bundle and answer cache in SQLite; finality from the node (`eth_getBlockByNumber("finalized")`) or confirmations from config; `anychain batch` built on the acceptance script's resume logic.
@@ -102,6 +102,7 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 - **D2. Missing eval categories.** Find real Ethereum transactions for an allowance revert, an out-of-gas failure and a custom error through the explorer. Proposed: search the explorer's recent failures by reason; if a category has no real case on Ethereum after a bounded search, take it from another network and say so in the report, never a made-up one.
 - **D3. The page.** Proposed: one plain HTML page with vanilla JavaScript served by the API (the original plan), no framework.
 - **D4. Where this spec lives.** Proposed: in the repo (`docs/specs/`), as Phase 2.
+- **Decided on 2026-10-08 (Joabe):** starting a conversation from the reader's problem instead of a hash (find the transaction by the account and its recent transactions) stays in Phase 4, with the original plan's triage (4.5); the page of T4 starts from a hash.
 - **D5. When a transaction is final enough to cache** (requested by Joabe on 2026-10-08). Proposed: the node's `finalized` block where the node supports it (Ethereum and most L2s); otherwise `cache.min_confirmations` in the network config (proposed 64); networks with extra steps (zkSync L1 status) are kept only once those steps are done.
 
 ## 13. Tests and tracing

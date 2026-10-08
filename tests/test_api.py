@@ -183,3 +183,49 @@ def test_a_failure_after_collecting_is_logged_too(event_log, tmp_path):
                      finality=lambda: None, write_fn=broken_writer)
     response = TestClient(app, base_url=LOCAL, raise_server_exceptions=False).post("/explain", json={"hash": tx})
     assert response.status_code == 500 and event_log.recent(1)[0]["outcome"] == "crash"
+
+
+# ---- PHASE3 T4 (R2): the page ----
+
+def test_the_page_is_served_with_its_parts_and_a_strict_policy(event_log, tmp_path):
+    response = _client(event_log, tmp_path).get("/")
+    assert response.status_code == 200 and response.headers["content-type"].startswith("text/html")
+    policy = response.headers["content-security-policy"]
+    assert "connect-src 'self'" in policy and "frame-ancestors 'none'" in policy and "default-src 'none'" in policy
+    page = response.text
+    for part in ('id="network"', 'id="hash"', 'id="mode"', 'id="chatForm"', 'id="gaps"', 'id="diagnosis"',
+                 'id="steps"', 'id="security"', 'id="sources"', 'id="facts"', "/feedback", "/explain", "/chat"):
+        assert part in page, part
+
+
+def test_the_page_loads_nothing_from_elsewhere():
+    import re
+    from anychain.api import PAGE
+    page = PAGE.read_text(encoding="utf-8")
+    assert not re.search(r"<(script|link|img)[^>]+(src|href)=", page)  # no external script, style or image
+    # escaping is proven by running the page's own functions on hostile answers: tests/test_page.py
+
+
+def test_health_counts_a_configured_api_key_as_usable(event_log, tmp_path, monkeypatch):
+    from anychain.api import probe_model
+    cfg = load_config(ETH)
+    cfg.llm.provider = "anthropic"
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-value-not-a-key")
+    assert probe_model(cfg)["status"] == "configured"
+    from anychain.api import PAGE
+    assert '"configured"' in PAGE.read_text(encoding="utf-8")  # the page shows it as usable, not as down
+
+
+def test_the_page_is_read_as_utf8_and_its_policy_hashes_the_inline_code():
+    import base64
+    import hashlib
+    import re
+
+    from anychain.api import PAGE, PAGE_POLICY
+    page = PAGE.read_text(encoding="utf-8")
+    script = re.search(r"<script>(.*?)</script>", page, re.S).group(1)
+    style = re.search(r"<style>(.*?)</style>", page, re.S).group(1)
+    for code in (script, style):
+        digest = base64.b64encode(hashlib.sha256(code.encode()).digest()).decode()
+        assert f"'sha256-{digest}'" in PAGE_POLICY
+    assert "unsafe-inline" not in PAGE_POLICY and "style=" not in page  # no inline attribute styles left
