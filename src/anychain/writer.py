@@ -27,7 +27,10 @@ PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 
 
 class WriterError(Exception):
-    """The LLM could not be used. The caller falls back to the deterministic output."""
+    """The LLM could not be used. The caller falls back to the deterministic output. `usage`: tokens already spent
+    before it failed (a first attempt whose retry failed), else None."""
+
+    usage: dict | None = None
 
 
 def load_prompt(mode: str, language: str) -> str:
@@ -85,6 +88,24 @@ def _sources_for_llm(sources: list[Source]) -> list[dict]:
 
 class LlmBackend(Protocol):
     def complete(self, system: str, user: str) -> str: ...
+    # after complete(): {input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd}, the
+    # values the backend reported (None for one it does not report), or None (PHASE3 T1, D45)
+    last_usage: dict | None
+
+
+def _usage(input_tokens=None, output_tokens=None, cache_read=None, cache_write=None, cost=None) -> dict:
+    as_int = lambda v: v if isinstance(v, int) and not isinstance(v, bool) else None  # noqa: E731
+    return {"input_tokens": as_int(input_tokens), "output_tokens": as_int(output_tokens),
+            "cache_read_tokens": as_int(cache_read), "cache_write_tokens": as_int(cache_write),
+            "cost_usd": cost if isinstance(cost, (int, float)) and not isinstance(cost, bool) else None}
+
+
+def add_usage(a: dict | None, b: dict | None) -> dict | None:
+    """Two attempts' usage added; a value either one did not report stays None. When one attempt reported nothing
+    at all, the other's is returned: a lower bound, the only number there is."""
+    if a is None or b is None:
+        return a or b
+    return {k: (a[k] + b[k]) if a.get(k) is not None and b.get(k) is not None else None for k in a}
 
 
 class ClaudeCodeBackend:
@@ -99,7 +120,7 @@ class ClaudeCodeBackend:
                     "OPENAI_API_KEY")
 
     def __init__(self, llm: LlmConfig, run=subprocess.run):
-        self.llm, self.run = llm, run
+        self.llm, self.run, self.last_usage = llm, run, None
 
     def complete(self, system: str, user: str) -> str:
         binary = shutil.which(self.llm.claude_code_command)
@@ -123,12 +144,17 @@ class ClaudeCodeBackend:
         if not isinstance(out, dict) or out.get("is_error") or not isinstance(out.get("result"), str):
             reason = out.get("result") if isinstance(out, dict) else out
             raise WriterError(f"Claude Code reported an error: {str(reason)[:300]}")
+        # `claude -p --output-format json` reports `usage` and `total_cost_usd` (seen on 2026-10-08, recorded in
+        # tests/fixtures_llm/claude_code_output.json)
+        u = out.get("usage") if isinstance(out.get("usage"), dict) else {}
+        self.last_usage = _usage(u.get("input_tokens"), u.get("output_tokens"), u.get("cache_read_input_tokens"),
+                                 u.get("cache_creation_input_tokens"), out.get("total_cost_usd"))
         return out["result"]
 
 
 class AnthropicBackend:
     def __init__(self, llm: LlmConfig, client=None):
-        self.llm, self.client = llm, client
+        self.llm, self.client, self.last_usage = llm, client, None
 
     def complete(self, system: str, user: str) -> str:
         client = self.client
@@ -140,6 +166,10 @@ class AnthropicBackend:
         msg = client.messages.create(model=self.llm.model, max_tokens=self.llm.max_tokens,
                                      temperature=self.llm.temperature, system=system,
                                      messages=[{"role": "user", "content": user}])
+        u = getattr(msg, "usage", None)  # the Messages API's usage block (no cost: priced by the account)
+        self.last_usage = _usage(getattr(u, "input_tokens", None), getattr(u, "output_tokens", None),
+                                 getattr(u, "cache_read_input_tokens", None),
+                                 getattr(u, "cache_creation_input_tokens", None)) if u is not None else None
         return "".join(block.text for block in msg.content if getattr(block, "type", "") == "text")
 
 
@@ -150,7 +180,7 @@ class OpenAIBackend:
     URL = "https://api.openai.com/v1/chat/completions"
 
     def __init__(self, llm: LlmConfig, client: httpx.Client | None = None):
-        self.llm, self.client = llm, client
+        self.llm, self.client, self.last_usage = llm, client, None
 
     def complete(self, system: str, user: str) -> str:
         key = os.environ.get("OPENAI_API_KEY")
@@ -172,6 +202,13 @@ class OpenAIBackend:
         content = _json_get(response, "choices", 0, "message", "content")
         if not isinstance(content, str):  # null on a refusal or a tool call
             raise WriterError("OpenAI returned no text")
+        # OpenAI's prompt_tokens includes the cached ones (`prompt_tokens_details.cached_tokens`, from its API
+        # reference; not checked on a real response here): stored like Anthropic's, cache reads apart
+        prompt = _json_get(response, "usage", "prompt_tokens")
+        cached = _json_get(response, "usage", "prompt_tokens_details", "cached_tokens")
+        if isinstance(prompt, int) and isinstance(cached, int):
+            prompt -= cached
+        self.last_usage = _usage(prompt, _json_get(response, "usage", "completion_tokens"), cached)
         return content
 
 
@@ -215,6 +252,7 @@ class CheckedAnswer:
     text: str | None  # None: withheld, show the evidence only
     outcome: str  # ok | retried | withheld
     problems: list[str]  # retried: what the first attempt had wrong; withheld: what the last one had
+    usage: dict | None = None  # every attempt's tokens and cost, added (PHASE3 T1)
 
 
 def write_checked(bundle: EvidenceBundle, cfg: AppConfig, mode: str,
@@ -226,11 +264,17 @@ def write_checked(bundle: EvidenceBundle, cfg: AppConfig, mode: str,
     backend = backend or backend_for(cfg.llm)
     evidence, urls, ids = evidence_payload(bundle, cfg), allowed_urls(bundle), evidence_ids(bundle)
     answer = write_explanation(bundle, cfg, mode, backend)
+    usage = getattr(backend, "last_usage", None)
     first = check_answer(answer, evidence, urls, ids)
     if not first:
-        return CheckedAnswer(answer, "ok", [])
-    answer = write_explanation(bundle, cfg, mode, backend, feedback=first)
+        return CheckedAnswer(answer, "ok", [], usage)
+    try:
+        answer = write_explanation(bundle, cfg, mode, backend, feedback=first)
+    except WriterError as exc:  # the first attempt's tokens were spent: they go with the error
+        exc.usage = usage
+        raise
+    usage = add_usage(usage, getattr(backend, "last_usage", None))
     problems = check_answer(answer, evidence, urls, ids)
     if not problems:
-        return CheckedAnswer(answer, "retried", first)
-    return CheckedAnswer(None, "withheld", problems)
+        return CheckedAnswer(answer, "retried", first, usage)
+    return CheckedAnswer(None, "withheld", problems, usage)

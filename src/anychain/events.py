@@ -54,6 +54,18 @@ class RunEvent:
     writer: str | None = None  # written answer: ok | retried | withheld | unavailable | skipped (None: not asked)
     diagnosis: str | None = None  # the failure's conclusion label: CONFIRMED | LIKELY | UNKNOWN (None: no failure)
     cache: str | None = None  # hit | stored | off | "not kept: <reason>" (PHASE3 T0)
+    # PHASE3 T1 (R6, D45): what the metrics need
+    mode: str | None = None  # support | developer | auditor
+    rule: str | None = None  # the failure's own diagnosis rule (e.g. insufficient_balance)
+    abi_source: str | None = None  # where the main call's ABI came from: explorer | repo_artifacts | repo_source |
+    #                                signature_db | raw (None: no contract call)
+    input_tokens: int | None = None  # the written answer's, all attempts, cache reads excluded (None: no model call,
+    output_tokens: int | None = None  #   or not reported)
+    cache_read_tokens: int | None = None  # input read from the provider's prompt cache
+    cache_write_tokens: int | None = None  # input written to it
+    cost_usd: float | None = None  # as Claude Code reports it: list price (costBasis "list"), not what a subscription
+    #                                pays; the APIs report tokens only
+    feedback: str | None = None  # up | down, from the page (set later with set_feedback)
     gaps: tuple[GapEvent, ...] = ()
     checks: tuple[CheckEvent, ...] = ()
     ts: float = field(default_factory=time.time)
@@ -61,14 +73,20 @@ class RunEvent:
     @classmethod
     def from_bundle(cls, bundle: EvidenceBundle, source: str, duration_ms: int,
                     checks: tuple[CheckEvent, ...] = (), ts: float | None = None,
-                    writer: str | None = None, cache: str | None = None) -> "RunEvent":
+                    writer: str | None = None, cache: str | None = None, mode: str | None = None,
+                    usage: dict | None = None) -> "RunEvent":
         gaps = tuple(GapEvent(g.what, g.cause, g.why, g.retryable) for g in bundle.gaps)
         problem = (any(g.cause in PROBLEM_CAUSES for g in gaps) or any(c.status == "fail" for c in checks)
                    or writer in WRITER_PROBLEMS)
         return cls(network=bundle.network, tx_hash=bundle.tx_hash, source=source,
                    outcome="degraded" if problem else "ok", duration_ms=duration_ms, status=bundle.status,
                    facts=len(bundle.items), gaps=gaps, checks=checks, writer=writer,
-                   diagnosis=_diagnosis_label(bundle), cache=cache, **({"ts": ts} if ts else {}))
+                   diagnosis=_diagnosis_label(bundle), cache=cache, mode=mode, rule=_diagnosis_rule(bundle),
+                   abi_source=abi_source_of(bundle), input_tokens=(usage or {}).get("input_tokens"),
+                   output_tokens=(usage or {}).get("output_tokens"),
+                   cache_read_tokens=(usage or {}).get("cache_read_tokens"),
+                   cache_write_tokens=(usage or {}).get("cache_write_tokens"), cost_usd=(usage or {}).get("cost_usd"),
+                   **({"ts": ts} if ts else {}))
 
     @classmethod
     def crash(cls, network: str, tx_hash: str, source: str, duration_ms: int, error: str,
@@ -78,7 +96,7 @@ class RunEvent:
 
 
 class EventLog(Protocol):
-    def record(self, event: RunEvent, replace: bool = False) -> None: ...
+    def record(self, event: RunEvent, replace: bool = False) -> int | None: ...
 
 
 class NullEventLog:
@@ -87,12 +105,15 @@ class NullEventLog:
     def record(self, event: RunEvent, replace: bool = False) -> None:
         return None
 
+    def set_feedback(self, run_id: int, feedback: str) -> bool:
+        return False
+
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY, ts REAL NOT NULL, network TEXT NOT NULL, tx_hash TEXT NOT NULL,
     source TEXT NOT NULL, outcome TEXT NOT NULL, duration_ms INTEGER NOT NULL,
-    status TEXT, facts INTEGER NOT NULL, error TEXT, writer TEXT, diagnosis TEXT, cache TEXT);
+    status TEXT, facts INTEGER NOT NULL, error TEXT);
 CREATE TABLE IF NOT EXISTS gaps (
     run_id INTEGER NOT NULL REFERENCES runs(id), topic TEXT NOT NULL, cause TEXT NOT NULL,
     why TEXT NOT NULL, retryable INTEGER NOT NULL);
@@ -102,6 +123,36 @@ CREATE INDEX IF NOT EXISTS runs_ts ON runs(ts);
 CREATE INDEX IF NOT EXISTS gaps_run ON gaps(run_id);
 CREATE INDEX IF NOT EXISTS checks_run ON checks(run_id);
 """
+
+
+def _diagnosis_rule(bundle: EvidenceBundle) -> str | None:
+    """The failure's own conclusion's rule; a failure answered from the node only has the replay's (as the label
+    does, `_diagnosis_label`)."""
+    rules = [(e.data.get("from_replay", False), e.data.get("rule")) for e in bundle.items if e.kind == "diagnosis"]
+    own = [rule for from_replay, rule in rules if not from_replay]
+    return own[0] if own else rules[0][1] if rules else None
+
+
+ABI_BUCKETS = {"explorer": "explorer", "repo_artifact": "repo_artifacts", "repo_pinned": "repo_source",
+               "repo_match": "repo_candidate"}
+
+
+def abi_source_of(bundle: EvidenceBundle) -> str | None:
+    """Where the ABI of the transaction's own call came from, in the original plan's buckets: explorer;
+    repo_artifacts or repo_source (the contract pinned in address_map); repo_candidate (an unpinned selector match,
+    not confirmed); signature_db (not decoded, signature-database candidates only); raw (not decoded, nothing).
+    None: no contract function was called (a plain transfer, data sent to an account without code or to a
+    precompile, a creation)."""
+    call = next((e for e in bundle.items if e.kind == "call"), None)
+    if call is None:
+        return None
+    if call.data.get("function"):
+        return ABI_BUCKETS.get(call.data.get("abi_origin") or "explorer", "explorer")
+    selector = call.data.get("selector")
+    if not selector:
+        return None
+    candidates = [e for e in bundle.items if e.kind == "candidate" and e.data.get("selector") == selector]
+    return "signature_db" if candidates else "raw"
 
 
 def _diagnosis_label(bundle: EvidenceBundle) -> str | None:
@@ -114,6 +165,14 @@ def _diagnosis_label(bundle: EvidenceBundle) -> str | None:
     if labels:
         return labels[0][1]
     return "UNKNOWN" if bundle.status == "failed" else None
+
+
+RUN_COLUMNS = ["ts", "network", "tx_hash", "source", "outcome", "duration_ms", "status", "facts", "error"]
+# Columns added after the first version, in order; a log without them gets them on open (written ones only).
+ADDED_COLUMNS = [("writer", "TEXT"), ("diagnosis", "TEXT"), ("cache", "TEXT"), ("mode", "TEXT"), ("rule", "TEXT"),
+                 ("abi_source", "TEXT"), ("input_tokens", "INTEGER"), ("output_tokens", "INTEGER"),
+                 ("cost_usd", "REAL"), ("feedback", "TEXT"), ("cache_read_tokens", "INTEGER"),
+                 ("cache_write_tokens", "INTEGER")]
 
 
 class SqliteEventLog:
@@ -130,12 +189,9 @@ class SqliteEventLog:
         with self._connect() as db:
             db.executescript(SCHEMA)
             columns = {row[1] for row in db.execute("PRAGMA table_info(runs)")}
-            if "writer" not in columns:  # logs created before PHASE2 T1
-                db.execute("ALTER TABLE runs ADD COLUMN writer TEXT")
-            if "diagnosis" not in columns:  # logs created before PHASE2_5 T5
-                db.execute("ALTER TABLE runs ADD COLUMN diagnosis TEXT")
-            if "cache" not in columns:  # logs created before PHASE3 T0
-                db.execute("ALTER TABLE runs ADD COLUMN cache TEXT")
+            for name, kind in ADDED_COLUMNS:  # logs created before these columns
+                if name not in columns:
+                    db.execute(f"ALTER TABLE runs ADD COLUMN {name} {kind}")
 
     @contextmanager
     def _connect(self):
@@ -151,8 +207,8 @@ class SqliteEventLog:
             return db.execute("SELECT 1 FROM runs WHERE network = ? AND source = ? AND tx_hash = ? LIMIT 1",
                               (network, source, tx_hash)).fetchone() is not None
 
-    def record(self, event: RunEvent, replace: bool = False) -> None:
-        """Add one answer. `replace`: drop earlier rows for the same (network, source, tx), so a re-run or
+    def record(self, event: RunEvent, replace: bool = False) -> int:
+        """Add one answer; returns its id. `replace`: drop earlier rows for the same (network, source, tx), so a re-run or
         re-check of a canary answer supersedes it instead of being counted twice."""
         with self._connect() as db:
             if replace:
@@ -161,15 +217,21 @@ class SqliteEventLog:
                 for table in ("gaps", "checks"):
                     db.executemany(f"DELETE FROM {table} WHERE run_id = ?", [(i,) for i in old])
                 db.executemany("DELETE FROM runs WHERE id = ?", [(i,) for i in old])
-            run_id = db.execute(
-                "INSERT INTO runs (ts, network, tx_hash, source, outcome, duration_ms, status, facts, error, writer,"
-                " diagnosis, cache) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (event.ts, event.network, event.tx_hash, event.source, event.outcome, event.duration_ms,
-                 event.status, event.facts, event.error, event.writer, event.diagnosis, event.cache)).lastrowid
+            names = RUN_COLUMNS + [name for name, _kind in ADDED_COLUMNS]
+            run_id = db.execute(f"INSERT INTO runs ({', '.join(names)}) VALUES ({', '.join('?' * len(names))})",
+                                [getattr(event, n) for n in names]).lastrowid
             db.executemany("INSERT INTO gaps (run_id, topic, cause, why, retryable) VALUES (?, ?, ?, ?, ?)",
                            [(run_id, g.topic, g.cause, g.why, int(g.retryable)) for g in event.gaps])
             db.executemany("INSERT INTO checks (run_id, name, status, detail) VALUES (?, ?, ?, ?)",
                            [(run_id, c.name, c.status, c.detail) for c in event.checks])
+        return run_id
+
+    def set_feedback(self, run_id: int, feedback: str) -> bool:
+        """The reader's thumbs up or down on one answer. False: no such answer."""
+        if feedback not in ("up", "down"):
+            raise ValueError("feedback is up or down")
+        with self._connect() as db:
+            return db.execute("UPDATE runs SET feedback = ? WHERE id = ?", (feedback, run_id)).rowcount == 1
 
     # ---- queries (used by `anychain log`) --------------------------------
 

@@ -64,13 +64,14 @@ def explain(
         _record(log, RunEvent.crash(cfg.network.name, tx_hash.strip(), "cli", _ms(started),
                                     f"{type(exc).__name__}: {exc}"))
         _fail(f"Unexpected error while collecting data ({type(exc).__name__}: {exc}). Please report it.")
+    mode_name = (mode or Mode(cfg.assistant.default_mode)).value
+
     def event(**kw) -> RunEvent:
-        return RunEvent.from_bundle(bundle, "cli", _ms(started), cache=cache_state, **kw)
+        return RunEvent.from_bundle(bundle, "cli", _ms(started), cache=cache_state, mode=mode_name, **kw)
     if as_evidence:  # (with --json: refused before collecting anything, below)
         _record(log, event())
         print(bundle.model_dump_json(indent=2))
         return
-    mode_name = (mode or Mode(cfg.assistant.default_mode)).value
 
     def as_answer(summary: str | None, status: str) -> None:
         status = {"fail": "withheld"}.get(status, status)  # the writer's outcome names, as the JSON documents them
@@ -91,7 +92,7 @@ def explain(
     try:
         checked = CheckedAnswer(kept[0], "cached", []) if kept else write_checked(bundle, cfg, mode_name)
     except WriterError as exc:
-        _record(log, event(writer="unavailable"))
+        _record(log, event(writer="unavailable", usage=exc.usage))
         print(f"_(LLM unavailable: {exc}. " + ("The answer has no summary.)_" if as_json else
                                                   "Showing the evidence only.)_\n"), file=sys.stderr)
         as_answer(None, "unavailable") if as_json else print(evidence_md)
@@ -99,7 +100,7 @@ def explain(
     # What the model stated outside the evidence, kept for review: "retried" (fixed) or "fail" (withheld).
     check = (CheckEvent("answer_check", "fail" if checked.text is None else "retried", "; ".join(checked.problems)),
              ) if checked.problems else ()
-    _record(log, event(checks=check, writer=checked.outcome))
+    _record(log, event(checks=check, writer=checked.outcome, usage=checked.usage))
     if key and checked.text is not None and not kept:
         try:
             store.put_answer(key, checked.text, checked.outcome)
@@ -284,6 +285,49 @@ def show_log(
                 print(f"    {g['cause']:<20} {g['topic']:<28} {_n(g['answers'], 'answer'):>12} ({share:.1f}%)")
         for f in r["check_failures"]:
             print(f"    check failed       {f['name']:<28} {f['n']:>5}")
+
+
+@app.command("metrics")
+def show_metrics(
+    config: str = typer.Option(None, "--config", help="Network YAML whose storage.sqlite_path holds the log"),
+    hours: float = typer.Option(24 * 30, help="Look back this many hours"),
+) -> None:
+    """Usage metrics from the event log, each printed with the SQL that computes it (PHASE3 T1, R6)."""
+    from anychain.metrics import QUERIES, run_queries
+    try:
+        cfg = load_config(config)
+    except ConfigError as exc:
+        _fail(str(exc))
+    if cfg.storage.event_sink != "sqlite":
+        _fail(f"storage.event_sink is {cfg.storage.event_sink!r}: there is no local log to read")
+    try:
+        log = SqliteEventLog(cfg.storage.sqlite_path, read_only=True)
+    except FileNotFoundError as exc:
+        _fail(f"{exc}. storage.sqlite_path is relative to the directory you run from.")
+    since = time.time() - hours * 3600
+    print(f"Answers given with explain and the API in the last {hours:g} h, all networks in this log "
+          f"({cfg.storage.sqlite_path}); the acceptance run, batches and answers logged before these metrics existed "
+          "are left out.\n")
+    for (title, sql), rows in zip(QUERIES, run_queries(log, since)):
+        print(f"## {title}\n\n```sql\n{sql.strip()}\n```\n")
+        if isinstance(rows, set):
+            print(f"(this log has no {', '.join(sorted(rows))} column yet: it was written before them; the next "
+                  "explain adds it, and answers from then on are counted)\n")
+            continue
+        if not rows:
+            print("(no answers in this period)\n")
+            continue
+        names = list(rows[0])
+        print(" | ".join(names))
+        for row in rows:
+            print(" | ".join(_cell(n, row[n]) for n in names))
+        print()
+
+
+def _cell(name: str, value) -> str:
+    if value is None:
+        return ""
+    return f"{value:.1f}%" if name in ("share", "satisfaction") else str(value)
 
 
 repos_app = typer.Typer(help="Contract repositories cited as source (PHASE2 T6).")

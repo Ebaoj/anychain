@@ -1101,7 +1101,8 @@ class BundleBuilder:
             return
         abi_source, confidence = self._abi_provenance(to.address)
         b.add("call", self._call_text(to.address, decoded, self._party(to)), [source, abi_source],
-              {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}}, confidence=confidence)
+              {"function": decoded.name, "args": {a.name: a.value for a in decoded.args},
+               "abi_origin": self.abi_origin.get(to.address.lower(), ("explorer",))[0]}, confidence=confidence)
 
     def _abi_provenance(self, address: str) -> tuple[Source, str | None]:
         """The ABI's source for a decoded fact, and the confidence it allows (None: follow the sources)."""
@@ -1135,7 +1136,9 @@ class BundleBuilder:
             abi_source, confidence = self._abi_provenance(address)
             self.bundle.add("call", self._call_text(address, decoded, to_text), [source, abi_source],
                             {"function": decoded.name, "args": {a.name: a.value for a in decoded.args},
-                             "native_contract": True}, confidence=confidence)
+                             "native_contract": True,
+                             "abi_origin": self.abi_origin.get(address.lower(), ("explorer",))[0]},
+                            confidence=confidence)
             return
         self.bundle.add("call", f"Called {to_text}, a contract built into the network's node, with selector "
                         f"{data[:10]}; not decoded.", [source], {"selector": data[:10], "native_contract": True})

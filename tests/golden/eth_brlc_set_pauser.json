@@ -67,6 +67,7 @@
   {
    "confidence": "single_source",
    "data": {
+    "abi_origin": "explorer",
     "args": {
      "newPauser": "0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520"
     },
