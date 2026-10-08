@@ -877,6 +877,8 @@ class BundleBuilder:
         if fee is None:
             return
         text = f"Fee paid: {self._fee_text(fee)}."
+        if fee.warnings:
+            text += " This may not be the whole fee (see the Fee gap)."
         for warning in fee.warnings:
             self._gap("Fee", warning, "Check the fee on the explorer page", retryable=False, cause="source_error")
         for token in [p.token for p in fee.parts if p.token and p.token.decimals is None]:

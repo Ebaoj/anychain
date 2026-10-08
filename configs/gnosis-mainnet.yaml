@@ -3,7 +3,8 @@ network:
   chain_id: 100
   native_symbol: XDAI
   native_decimals: 18
-  chain_type: default       # Blockscout CHAIN_TYPE of this explorer
+  chain_type: ethereum      # Blockscout CHAIN_TYPE: its transactions carry the blob fields (blob_gas_used,
+                            # burnt_blob_fee...), seen on tx 0xda8a55bc... (recorded gnosis_blob_fee, 2026-10-08, D54)
 
 explorer:
   type: blockscout

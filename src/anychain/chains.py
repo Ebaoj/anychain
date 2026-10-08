@@ -102,7 +102,16 @@ class ChainProfile:
 
     def fee(self, tx: dict) -> Fee | None:
         total = _int((tx.get("fee") or {}).get("value"))
-        return Fee([FeePart("fee", total)]) if total is not None else None
+        if total is None:
+            return None
+        blob = _int(tx.get("burnt_blob_fee"))
+        if blob and "burnt_blob_fee" not in self.owned_fields:
+            # Blockscout's `fee` leaves the blob fee out (EthereumProfile); a profile that does not add it must not
+            # present the execution part as the whole fee (acceptance 2026-10-08, Gnosis, D54).
+            return Fee([FeePart("fee", total)], warnings=[
+                f"the explorer reports a blob fee ({blob} in raw units) that the configured network type "
+                f"'{self.chain_type}' does not add: the fee shown is the execution part only"])
+        return Fee([FeePart("fee", total)])
 
     def facts(self, tx: dict) -> list[ChainFact]:
         return []

@@ -595,3 +595,25 @@ def test_malformed_revert_data_is_not_called_a_custom_error(data, kind):
     from anychain.decoder import decode_revert
     d = decode_revert(data)
     assert d.kind == kind and "custom error" not in d.text
+
+
+# ---- acceptance 2026-10-08: a blob transaction on Gnosis (D54) ----
+
+GNOSIS_BLOB_TX = "0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+
+
+def test_gnosis_blob_fee_is_part_of_the_fee():
+    # real: the explorer's fee is the execution part (992205000198441); burnt_blob_fee 131072000000000 equals the
+    # node's blobGasUsed 0x20000 * blobGasPrice 0x3b9aca00; the node's total is 1123277000198441
+    b = replay_bundle(_cfg("gnosis-mainnet"), GNOSIS_BLOB_TX, "gnosis_blob_fee")
+    fee = next(e for e in b.items if e.kind == "fee")
+    assert fee.data["fee"] == "0.001123277000198441" and not _gaps(b, "Chain type")
+
+
+def test_a_blob_fee_the_profile_does_not_add_is_never_shown_as_the_whole_fee():
+    cfg = _cfg("gnosis-mainnet")
+    cfg = cfg.model_copy(update={"network": cfg.network.model_copy(update={"chain_type": "default"})})
+    b = replay_bundle(cfg, GNOSIS_BLOB_TX, "gnosis_blob_fee")
+    fee = next(e for e in b.items if e.kind == "fee")
+    assert "may not be the whole fee" in fee.text
+    assert any("131072000000000" in g.why for g in _gaps(b, "Fee"))

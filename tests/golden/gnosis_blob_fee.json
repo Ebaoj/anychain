@@ -1,0 +1,238 @@
+{
+ "abi_sources": {
+  "0x88c430c91Cbb608b41cDB2fCe27604E12233233f": "explorer: verified contract ERC1967Proxy proxy -> DdexSequencer"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 48396570,
+    "from": "0xB5B8164B6026dDD1C45Eb783371FdF9349412E95",
+    "gas_limit": "300000",
+    "gas_used": "198441",
+    "status": "success",
+    "timestamp": "2026-09-23T10:16:25.000000Z",
+    "to": "0x88c430c91Cbb608b41cDB2fCe27604E12233233f",
+    "tx_type": 3,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://gnosisscan.io/tx/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+    }
+   ],
+   "text": "Transaction succeeded in block 48396570 at 2026-09-23T10:16:25.000000Z. From 0xB5B8164B6026dDD1C45Eb783371FdF9349412E95 to 0x88c430c91Cbb608b41cDB2fCe27604E12233233f (ERC1967Proxy). Native value sent: 0 XDAI. Gas used 198441 of limit 300000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.001123277000198441",
+    "parts": {
+     "blob data, burnt": "0.000131072",
+     "execution": "0.000992205000198441"
+    },
+    "token": "XDAI"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+    }
+   ],
+   "text": "Fee paid: 0.001123277000198441 XDAI in total: 0.000992205000198441 XDAI execution + 0.000131072 XDAI blob data, burnt."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "blobs": 1
+   },
+   "id": "E3",
+   "kind": "chain",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+    }
+   ],
+   "text": "Carried 1 blob(s) of data (EIP-4844), using 131072 blob gas."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "abi_origin": "explorer",
+    "args": {
+     "_blobSha2": "0x459cfea289cca04f7fd7d91421973db6aac32568ee4b6715e98782df84abd577",
+     "_commitment": "0x95b9fa536bd19b208724ec1dad7f9b3ce5e65336f6d467e9682550936552aed9cebb37163e42081710e83515b1eeb101",
+     "_imageId": "0xf74017a31dd0880702c598eb947f7f7386d127c3bda518c37ad435090946aac3"
+    },
+    "function": "submitNewBlob"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://gnosisscan.io/api/v2/smart-contracts/0x88c430c91Cbb608b41cDB2fCe27604E12233233f"
+    }
+   ],
+   "text": "Called submitNewBlob(bytes32,bytes,bytes32) on 0x88c430c91Cbb608b41cDB2fCe27604E12233233f (ERC1967Proxy) with _imageId=0xf74017a31dd0880702c598eb947f7f7386d127c3bda518c37ad435090946aac3, _commitment=0x95b9fa536bd19b208724ec1dad7f9b3ce5e65336f6d467e9682550936552aed9cebb37163e42081710e83515b1eeb101, _blobSha2=0x459cfea289cca04f7fd7d91421973db6aac32568ee4b6715e98782df84abd577. ABI source: explorer: verified contract ERC1967Proxy proxy -> DdexSequencer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "DdexSequencer",
+    "function": "submitNewBlob(bytes32,bytes,bytes32)",
+    "lines": [
+     108,
+     114
+    ],
+    "path": "contracts/DdexSequencer.sol",
+    "raise_line": null,
+    "raises": null,
+    "show": []
+   },
+   "id": "E5",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://gnosisscan.io/api/v2/smart-contracts/0x95fD9B321C9371fe111E4f468cA608541A7a6be4"
+    }
+   ],
+   "text": "Code of submitNewBlob(bytes32,bytes,bytes32) in DdexSequencer (contracts/DdexSequencer.sol, lines 108-114), from the verified source of the implementation the explorer lists today for 0x88c430c91Cbb608b41cDB2fCe27604E12233233f (it may have been upgraded since this transaction), as the explorer lists it:\n108 |     function submitNewBlob(\n109 |         bytes32 _imageId,\n110 |         bytes memory _commitment,\n111 |         bytes32 _blobSha2\n112 |     ) external {\n113 |         _submitNewBlob(_imageId, _commitment, _blobSha2, 0);\n114 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E6",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x88c430c91Cbb608b41cDB2fCe27604E12233233f (ERC1967Proxy) to 0x95fD9B321C9371fe111E4f468cA608541A7a6be4 (DdexSequencer)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E7",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0x88d6667e9183571D35650ab19884b7990C228A01 (ERC1967Proxy) to 0xC08Eb68685d4122dA15a9BF38d12b41469EA09e8 (DdexEmitter)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 2
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2/internal-transactions"
+    }
+   ],
+   "text": "2 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "args": {
+     "commitment": "0x95b9fa536bd19b208724ec1dad7f9b3ce5e65336f6d467e9682550936552aed9cebb37163e42081710e83515b1eeb101",
+     "image_id": "0xf74017a31dd0880702c598eb947f7f7386d127c3bda518c37ad435090946aac3"
+    },
+    "event": "NewBlobSubmitted"
+   },
+   "id": "E9",
+   "kind": "event",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: logs",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2/logs"
+    }
+   ],
+   "text": "Event NewBlobSubmitted(bytes,bytes32) emitted by 0x88c430c91Cbb608b41cDB2fCe27604E12233233f (ERC1967Proxy): commitment=0x95b9fa536bd19b208724ec1dad7f9b3ce5e65336f6d467e9682550936552aed9cebb37163e42081710e83515b1eeb101, image_id=0xf74017a31dd0880702c598eb947f7f7386d127c3bda518c37ad435090946aac3."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E10",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://rpc.gnosischain.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  }
+ ],
+ "network": "gnosis-mainnet",
+ "status": "success",
+ "tx_hash": "0xda8a55bc9aff11d9e0c349c3d71756d9bce5796f3df87183cdce94137f867da2"
+}
