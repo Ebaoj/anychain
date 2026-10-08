@@ -576,3 +576,81 @@ def test_an_unreadable_log_from_the_explorer_is_a_source_error(eth_cfg):
     b = replay_bundle(eth_cfg, MAKER_TX, "eth_maker_vat",
                       overrides=mutated("eth_maker_vat", "/logs", drop_emitter))
     assert "source_error" in _causes(b, "Events") and "processing_error" not in _causes(b, "Events")
+
+
+# ---- internal calls: value-moving calls survive the cutoff (C11); parent-reverted wording (C12) ----
+
+CUTOFF_TX = "0xd58d09060a633d461c0d260bfdb4f61bd4ab84a9ba5039b3f5f9ac5effe935a3"  # 122 internal calls
+
+
+def _all_internal_items(fixture: str) -> list[dict]:
+    """Every page of the recorded internal-transactions list (the explorer pages by 50)."""
+    import json
+    from tests.conftest import FIXTURES
+    records = json.loads((FIXTURES / f"{fixture}.json").read_text())
+    pages = [json.loads(v["body"])["items"] for k, v in records.items() if "/internal-transactions" in k]
+    return [it for page in pages for it in page]
+
+
+def test_calls_that_moved_value_are_listed_even_beyond_the_cutoff(eth_cfg):
+    b = replay_bundle(eth_cfg, CUTOFF_TX, "eth_internal_value_beyond_cutoff")
+    items = _all_internal_items("eth_internal_value_beyond_cutoff")
+    moved = [it for it in items if it["type"] != "staticcall" and int(it["value"]) > 0]
+    assert len(moved) == 3  # the explorer's own list: indices 48, 70, 95
+    stated = [e for e in b.items if e.kind == "internal_call" and e.data.get("value") not in (None, "0")
+              and e.data.get("type")]
+    assert sorted(int(e.data["value"]) for e in stated) == sorted(int(it["value"]) for it in moved)
+    [gap] = [g for g in b.gaps if g.what == "Internal calls"]
+    assert "showing 30 of 93 internal calls; every internal call that carried ETH is listed" in gap.why
+
+
+def test_a_call_undone_by_its_parent_is_not_called_failed(eth_cfg):
+    b = replay_bundle(eth_cfg, FAILED_TX, "eth_failed_unverified_bot")
+    items = _all_internal_items("eth_failed_unverified_bot")
+    errors = {it.get("error") for it in items}
+    assert {"Reverted", "Parent reverted"} <= errors  # both kinds are in this real recording
+    texts = [e.text for e in b.items if e.kind == "internal_call"]
+    assert any("(this internal call reverted)" in t for t in texts)
+    assert any("(undone because a call above it reverted)" in t for t in texts)
+    assert not any("(this internal call failed)" in t for t in texts)
+
+
+def test_failure_note_quotes_any_other_explorer_reason():
+    from anychain.bundle import _failure_note
+    from anychain.collectors.types import InternalCall
+    call = lambda error: InternalCall("call", None, None, None, 0, False, error)
+    assert _failure_note(call("out of gas"), short=True) == "this internal call failed: the explorer reports 'out of gas'"
+    assert _failure_note(call(None), short=True) == "this internal call failed"
+
+
+def test_cutoff_keeps_the_explorers_order(eth_cfg):
+    b = replay_bundle(eth_cfg, CUTOFF_TX, "eth_internal_value_beyond_cutoff")
+    items = sorted((it for it in _all_internal_items("eth_internal_value_beyond_cutoff") if it["type"] != "staticcall"),
+                   key=lambda it: it["index"])  # the explorer's order: pages of increasing trace index
+    stated = [e for e in b.items if e.kind == "internal_call" and e.data.get("type")]
+    values = [int(e.data["value"]) for e in stated if e.data["value"] != "0"]
+    assert values == [int(it["value"]) for it in items if int(it["value"]) > 0]
+
+
+def test_cutoff_claim_is_scoped_when_system_calls_carried_value(monkeypatch):
+    # zkSync: calls between system contracts are summed, not listed; if they moved ETH,
+    # the cutoff claim must not cover them.
+    from anychain.collectors.types import InternalCall
+    from tests.test_networks import _cfg
+    from tests.test_golden import _case
+    cfg = _cfg("zksync-era")
+    _config, tx = _case("zksync_paymaster")
+    real = __import__("anychain.collectors.explorer", fromlist=["ExplorerClient"]).ExplorerClient.internal_transactions
+
+    def padded(self, tx_hash):
+        items, truncated = real(self, tx_hash)
+        system = next(it for it in items if it.sender and it.recipient and it.sender.address and it.recipient.address
+                      and int(it.sender.address, 16) <= 0xffff and int(it.recipient.address, 16) <= 0xffff)
+        ordinary = next(it for it in items if it.type == "call" and it is not system
+                        and not (int(it.sender.address, 16) <= 0xffff and int(it.recipient.address, 16) <= 0xffff))
+        filler = [ordinary] * 40  # push past the 30-call cutoff
+        return [InternalCall(system.type, system.sender, system.recipient, None, 5, True)] + filler, truncated
+    monkeypatch.setattr("anychain.collectors.explorer.ExplorerClient.internal_transactions", padded)
+    b = replay_bundle(cfg, tx, "zksync_paymaster")
+    [gap] = [g for g in b.gaps if g.what == "Internal calls"]
+    assert "every internal call outside the system-contract group that carried ETH is listed" in gap.why

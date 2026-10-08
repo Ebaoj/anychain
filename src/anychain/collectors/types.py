@@ -199,13 +199,14 @@ class InternalCall:
     created_contract: AddressRef | None
     value: int  # 0 when absent
     success: bool | None  # None when the explorer does not say
+    error: str | None = None  # explorer's reason, e.g. "Reverted" or "Parent reverted" (seen in recordings)
 
     @classmethod
     def from_api(cls, v: dict) -> "InternalCall":
         success = v.get("success")
         return cls(_str(v.get("type")), AddressRef.from_api(v.get("from")), AddressRef.from_api(v.get("to")),
                    AddressRef.from_api(v.get("created_contract")), to_int(v.get("value")) or 0,
-                   success if isinstance(success, bool) else None)
+                   success if isinstance(success, bool) else None, _str(v.get("error")) or None)
 
 
 @dataclass(frozen=True)

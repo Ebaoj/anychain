@@ -22,7 +22,7 @@
    "needed": "Open the explorer page for the full list",
    "retryable": false,
    "what": "Internal calls",
-   "why": "showing the first 30"
+   "why": "showing 30 of 49 internal calls; every internal call that carried ETH is listed"
   }
  ],
  "items": [
@@ -866,10 +866,10 @@
   },
   {
    "data": {
-    "moves_value": false,
+    "moves_value": true,
     "same_as": null,
     "type": "call",
-    "value": "0"
+    "value": "1"
    },
    "id": "E44",
    "kind": "internal_call",
@@ -881,14 +881,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xaea61c0672217a85a63fbdddc14714b39ffa64baf25a526cf5a9ba74841484d7/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af (UniversalRouter) to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
+   "text": "Internal ETH transfer of 0.000000000000000001 ETH from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor)."
   },
   {
    "data": {
-    "moves_value": false,
+    "moves_value": true,
     "same_as": null,
     "type": "call",
-    "value": "0"
+    "value": "1"
    },
    "id": "E45",
    "kind": "internal_call",
@@ -900,7 +900,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0xaea61c0672217a85a63fbdddc14714b39ffa64baf25a526cf5a9ba74841484d7/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2) to 0xdC035D45d973E3EC169d2276DDab16f1e407384F (ERC1967Proxy)."
+   "text": "Internal ETH transfer of 0.000000000000000001 ETH from 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor) to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
    "data": {

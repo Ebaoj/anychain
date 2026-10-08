@@ -121,7 +121,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (this internal call failed)."
+   "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (this internal call reverted)."
   },
   {
    "data": {
@@ -140,7 +140,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -159,7 +159,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 (this internal call failed)."
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -178,7 +178,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (this internal call failed)."
+   "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -197,7 +197,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -216,7 +216,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -235,7 +235,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 tried to send 0.091541598301954665 ETH but failed; nothing was transferred."
+   "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 tried to send 0.091541598301954665 ETH but was undone because a call above it reverted; nothing was transferred."
   },
   {
    "data": {
@@ -254,7 +254,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) tried to send 0.091541598301954665 ETH but failed; nothing was transferred."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) tried to send 0.091541598301954665 ETH but was undone because a call above it reverted; nothing was transferred."
   },
   {
    "data": {
@@ -273,7 +273,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -292,7 +292,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE (BeamToken) (this internal call failed)."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE (BeamToken) (undone because a call above it reverted)."
   },
   {
    "data": {
@@ -311,7 +311,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (this internal call failed)."
+   "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
    "data": {

@@ -96,8 +96,11 @@ sequenceDiagram
     B->>R: eth_getTransactionByHash + recibo
     R-->>B: cópia independente (ou lacuna)
     alt explorador respondeu
-        B->>E: transferências de token, chamadas internas, eventos
-        B->>E: ABIs dos contratos (proxy -> implementação,<br/>ou contrato delegado via EIP-7702)
+        par em paralelo, cada pedido uma vez só (D26)
+            B->>E: transferências de token, chamadas internas, eventos
+        and
+            B->>E: ABIs do contrato chamado e dos emissores de eventos<br/>(proxy -> implementação, ou contrato delegado via EIP-7702)
+        end
         Note over B: conta sem código hoje?<br/>só diz "sem código" se esta transação desligou a delegação,<br/>senão "não dá para confirmar" + lacuna
         Note over B: cada etapa isolada:<br/>uma parte quebrada = uma lacuna
     else explorador fora do ar ou atrasado
@@ -234,6 +237,7 @@ O canário é o único jeito de pegar o erro silencioso (um fato falso que nada 
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
 - **07/10/2026, objetos tipados (D21):** as respostas do explorador e do nó viram objetos tipados uma única vez, em `collectors/types.py`.
+- **08/10/2026, correções de nível C (D26):** pedidos ao explorador em paralelo e uma vez só; o corte das chamadas internas mantém todas as que moveram valor; reversões descritas como o explorador informa.
 - **07/10/2026, estado na L1 da zkSync (D25):** o estado do explorador nunca é afirmado; o perfil confirma com o nó (`node_facts`); a causa de cada lacuna é obrigatória, com a nova causa `config_error`.
 - **07/10/2026, log de eventos (D24):** cada lacuna ganhou uma causa; cada resposta vira um evento no SQLite local, consultado com `anychain log`; desenho de produção com fila e worker (não construído).
 - **07/10/2026, perfis por tipo de rede (D20):** a configuração declara o CHAIN_TYPE do Blockscout; perfis para seis tipos de rede; rótulos de endereços na configuração.

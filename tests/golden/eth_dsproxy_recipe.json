@@ -16,7 +16,7 @@
    "needed": "Open the explorer page for the full list",
    "retryable": false,
    "what": "Internal calls",
-   "why": "showing the first 30"
+   "why": "showing 30 of 59 internal calls; every internal call that carried ETH is listed"
   },
   {
    "cause": "not_interpretable",
@@ -905,10 +905,10 @@
   },
   {
    "data": {
-    "moves_value": false,
+    "moves_value": true,
     "same_as": null,
-    "type": "delegatecall",
-    "value": "0"
+    "type": "call",
+    "value": "175489683526176713114"
    },
    "id": "E45",
    "kind": "internal_call",
@@ -920,14 +920,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x17a3e39a1aA6d9BA1Ffd80Ae0E388cA064a8D28F (LSVSupply)."
+   "text": "Internal ETH transfer of 175.489683526176713114 ETH from 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) to 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy)."
   },
   {
    "data": {
-    "moves_value": false,
+    "moves_value": true,
     "same_as": null,
     "type": "call",
-    "value": "0"
+    "value": "175489683526176713114"
    },
    "id": "E46",
    "kind": "internal_call",
@@ -939,14 +939,14 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal call from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xa5941F267995553dA9369F04Dc02f9411EEb2F12 (LSVProfitTracker)."
+   "text": "Internal ETH transfer of 175.489683526176713114 ETH from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH)."
   },
   {
    "data": {
-    "moves_value": false,
+    "moves_value": true,
     "same_as": null,
-    "type": "delegatecall",
-    "value": "0"
+    "type": "call",
+    "value": "175489683526176713114"
    },
    "id": "E47",
    "kind": "internal_call",
@@ -958,7 +958,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a/internal-transactions"
     }
    ],
-   "text": "Internal delegatecall from 0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E (DSProxy) to 0xE4D93b8d55D7456e85afc0fcF91AC085aF26bbBA (LSVSell)."
+   "text": "Internal ETH transfer of 175.489683526176713114 ETH from 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 (Wrapped stETH) to 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable)."
   },
   {
    "data": {

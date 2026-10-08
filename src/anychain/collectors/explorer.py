@@ -1,4 +1,6 @@
 """Blockscout API v2 collector. Endpoints: https://docs.blockscout.com/devs/apis/rest"""
+import threading
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import httpx
@@ -24,6 +26,25 @@ class ExplorerClient:
         self.cfg = cfg
         self.client = client or make_client(cfg.timeout_s)
         self.budget = budget
+        # Each list and each contract is fetched once per client (one explanation), also when
+        # prefetched in parallel; a failure is kept too, so it is not paid for twice.
+        self._memo: dict[tuple, tuple[bool, object]] = {}
+        self._lock = threading.Lock()
+
+    def _once(self, key: tuple, fetch: Callable[[], object]):
+        with self._lock:
+            hit = self._memo.get(key)
+        if hit is None:
+            try:
+                hit = (True, fetch())
+            except Exception as exc:
+                hit = (False, exc)
+            with self._lock:
+                self._memo.setdefault(key, hit)
+        ok, value = hit
+        if not ok:
+            raise value
+        return value
 
     def url(self, path: str) -> str:
         return f"{self.cfg.api_base}{path}"
@@ -51,20 +72,38 @@ class ExplorerClient:
         return Transaction.from_api(self._get(f"/transactions/{tx_hash}"))
 
     def logs(self, tx_hash: str) -> tuple[list[Log], bool]:
-        items, truncated = self._items(f"/transactions/{tx_hash}/logs")
-        return [Log.from_api(i) for i in items], truncated
+        def fetch():
+            items, truncated = self._items(f"/transactions/{tx_hash}/logs")
+            return [Log.from_api(i) for i in items], truncated
+        return self._once(("logs", tx_hash), fetch)
 
     def token_transfers(self, tx_hash: str) -> tuple[list[TokenTransfer], bool]:
-        items, truncated = self._items(f"/transactions/{tx_hash}/token-transfers")
-        return [TokenTransfer.from_api(i) for i in items], truncated
+        def fetch():
+            items, truncated = self._items(f"/transactions/{tx_hash}/token-transfers")
+            return [TokenTransfer.from_api(i) for i in items], truncated
+        return self._once(("token-transfers", tx_hash), fetch)
 
     def internal_transactions(self, tx_hash: str) -> tuple[list[InternalCall], bool]:
-        items, truncated = self._items(f"/transactions/{tx_hash}/internal-transactions")
-        return [InternalCall.from_api(i) for i in items], truncated
+        def fetch():
+            items, truncated = self._items(f"/transactions/{tx_hash}/internal-transactions")
+            return [InternalCall.from_api(i) for i in items], truncated
+        return self._once(("internal-transactions", tx_hash), fetch)
 
     def smart_contract(self, address: str) -> dict:
         """Contract metadata: abi (only when verified), name, proxy info."""
-        return self._get(f"/smart-contracts/{address}")
+        return self._once(("smart-contract", address.lower()), lambda: self._get(f"/smart-contracts/{address}"))
+
+    def implementations_of(self, address: str) -> list[str]:
+        """Implementations named in already-fetched contract metadata (no request)."""
+        with self._lock:
+            hit = self._memo.get(("smart-contract", address.lower()))
+        meta = hit[1] if hit and hit[0] and isinstance(hit[1], dict) else {}
+        found = []
+        for impl in meta.get("implementations") or []:
+            impl_address = impl.get("address_hash") or impl.get("address") if isinstance(impl, dict) else None
+            if isinstance(impl_address, str):
+                found.append(impl_address)
+        return found
 
     def abi_for(self, address: str, known_implementations: list[str] | None = None) -> AbiLookup:
         """ABI for an address, following proxies to their implementation.

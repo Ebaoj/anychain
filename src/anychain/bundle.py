@@ -7,6 +7,7 @@ objects (collectors/types.py); network-type specifics come from a profile (chain
 """
 import re
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
 from eth_utils import to_checksum_address
@@ -24,6 +25,7 @@ from anychain.models import EvidenceBundle, GapCause, Source
 
 HASH_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
 MAX_EVENTS = 40
+PREFETCH_WORKERS = 6  # parallel explorer requests while prefetching (D26)
 MAX_INTERNAL = 30
 ZERO_ADDRESS = "0x" + "0" * 40
 
@@ -228,11 +230,75 @@ class BundleBuilder:
 
     # ---- explorer path -----------------------------------------------------
 
+    def _prefetch(self, tx_hash: str, tx: Transaction) -> None:
+        """Fetch in parallel what the steps below will ask for, one by one, so the answer is the same
+        but the explorer's latency is paid once per wave instead of once per request (D26).
+
+        Wave 1: the transaction's lists. Wave 2: contract metadata for the call target and for the
+        emitters of the logs the events step will decode. Wave 3: implementations those name.
+        Failures are kept by the client and surface in the step that needs them, as before.
+        """
+        lists = [self.explorer.token_transfers, self.explorer.logs]
+        if tx.result != "awaiting_internal_transactions":  # _add_internal does not ask in that state
+            lists.append(self.explorer.internal_transactions)
+        with ThreadPoolExecutor(max_workers=PREFETCH_WORKERS) as pool:
+            for future in [pool.submit(fetch, tx_hash) for fetch in lists]:
+                future.exception()  # wait; errors stay in the client's memo
+            if "explorer" not in self.cfg.abi_strategy.order:
+                return
+            primaries, known_impls = self._abi_addresses(tx_hash, tx)
+            wave = {**known_impls, **primaries}  # lowercase -> address as the steps will spell it
+            list(pool.map(lambda a: self._quietly(self.explorer.smart_contract, a), wave.values()))
+            # abi_for follows the implementations named by the looked-up address itself, one level only
+            more = {i.lower(): i for a in primaries.values() for i in self.explorer.implementations_of(a)}
+            list(pool.map(lambda a: self._quietly(self.explorer.smart_contract, a),
+                          [a for k, a in more.items() if k not in wave]))
+
+    @staticmethod
+    def _quietly(fetch: Callable[[str], object], arg: str) -> None:
+        try:
+            fetch(arg)
+        except Exception:
+            pass  # kept in the client's memo; the step that needs it reports it
+
+    def _abi_addresses(self, tx_hash: str, tx: Transaction) -> tuple[dict[str, str], dict[str, str]]:
+        """(looked-up addresses, implementations already named for them) that the call and events steps
+        will ask about, by the same rules as those steps. Keyed by lowercase (one request per contract,
+        also when the payload spells an address in two casings); the value keeps the spelling used."""
+        primaries: list[str] = []
+        impls: list[str] = []
+        to = tx.to
+        if (to is not None and to.address and tx.raw_input not in (None, "0x") and (to.is_contract or to.implementations)
+                and not self._is_native_contract(to.address)
+                and self._delegations_applied(tx).get(to.address.lower()) != ZERO_ADDRESS):
+            primaries.append(to.address)
+            impls += list(to.implementations)
+        try:
+            transfers, _ = self.explorer.token_transfers(tx_hash)
+            logs, _ = self.explorer.logs(tx_hash)
+        except CollectorError:
+            logs, transfers = [], []
+        covered = {t.log_index for t in transfers if t.log_index is not None}
+        for log in [lg for lg in logs if lg.index not in covered][:MAX_EVENTS]:
+            if log.emitter is not None and log.emitter.address:
+                primaries.append(log.emitter.address)
+                impls += list(log.emitter.implementations)
+        first = {}
+        for a in primaries:
+            if isinstance(a, str):
+                first.setdefault(a.lower(), a)
+        named = {}
+        for a in impls:
+            if isinstance(a, str) and a.lower() not in first:
+                named.setdefault(a.lower(), a)
+        return first, named
+
     def _describe_from_explorer(self, tx_hash: str, tx: Transaction, status: str) -> None:
         self.bundle.status = status
         self._safely("Transaction summary", lambda: self._add_overview(tx_hash, tx))
         if self.bundle.status in ("pending", "dropped"):
             return  # nothing below is final yet
+        self._safely("Prefetch", lambda: self._prefetch(tx_hash, tx))
         self._safely("Fee", lambda: self._add_fee(tx_hash, tx))
         self._safely("Network-specific details", lambda: self._add_chain_facts(tx_hash, tx))
         self._safely("Revert reason", lambda: self._add_revert(tx_hash, tx))
@@ -720,7 +786,13 @@ class BundleBuilder:
         reads = [it for it in items if it.type == "staticcall"]
         system = [it for it in items if it.type != "staticcall" and self._between_system_contracts(it)]
         calls = [it for it in items if it.type != "staticcall" and it not in system]
-        for it in calls[:MAX_INTERNAL]:
+        # The cutoff never drops a call that carried value: those first, the rest fill the room left,
+        # all in the explorer's order (real tx 0xd58d0906...: the 3 value calls were at 48, 70, 95).
+        movers = {i for i, it in enumerate(calls) if it.value > 0 and it.type not in VALUE_IS_CONTEXT}
+        room = max(MAX_INTERNAL - len(movers), 0)
+        kept = movers | set([i for i in range(len(calls)) if i not in movers][:room])
+        shown = [it for i, it in enumerate(calls) if i in kept]
+        for it in shown:
             text, moves_value = self._internal_text(it)
             same_as = self._same_native_movement(it)
             if same_as:
@@ -735,9 +807,16 @@ class BundleBuilder:
             text = f"{len(system)} internal call(s) between the network's system contracts not listed"
             text += f" (they carry {self._native_amount(moved)} in total)." if moved else " (no value carried)."
             self.bundle.add("internal_call", text, [source], {"system_calls": len(system), "value": str(moved)})
-        if truncated or len(calls) > MAX_INTERNAL:
-            self._gap("Internal calls", f"showing the first {MAX_INTERNAL}",
+        if len(shown) < len(calls):
+            scope = " outside the system-contract group" if system and any(it.value for it in system) else ""
+            self._gap("Internal calls", f"showing {len(shown)} of {len(calls)} internal calls; every internal call"
+                      f"{scope} that carried {self.cfg.network.native_symbol} is listed"
+                      + (" (among those fetched)" if truncated else ""),
                       "Open the explorer page for the full list", retryable=False, cause="not_interpretable")
+        if truncated:
+            self._gap("Internal calls", f"the explorer's list was cut after {MAX_PAGES} pages, so later internal "
+                      "calls (and any value they carried) are not known", "Open the explorer page for the full list",
+                      retryable=False, cause="not_interpretable")
 
     def _same_native_movement(self, it: InternalCall) -> str | None:
         """Fact id of a native movement already stated with the same sender, recipient and value."""
@@ -765,7 +844,8 @@ class BundleBuilder:
             if it.success is None:
                 return f"Internal {kind} by {creator}; the explorer does not say if the deployment succeeded.", None
             if not ok:
-                return f"Internal {kind} by {creator} failed: nothing was deployed or transferred.", False
+                return f"Internal {kind} by {creator} ({_failure_note(it, short=True)}): nothing was deployed or " \
+                       "transferred.", False
             deployed = (self._party(it.created_contract) if it.created_contract
                         else "a contract whose address the explorer does not report")
             text = f"Internal {kind} by {creator}: deployed {deployed}"
@@ -777,9 +857,10 @@ class BundleBuilder:
                 return f"Internal call {route} with {shown} attached; the explorer does not say if it succeeded.", None
             if ok:
                 return f"Internal {sym} transfer of {shown} {route}.", True
-            return f"Internal call {route} tried to send {shown} but failed; nothing was transferred.", False
+            return (f"Internal call {route} tried to send {shown} {_failure_note(it)}; nothing was transferred.",
+                    False)
 
-        text = f"Internal {kind} {route}" + ("" if ok else " (this internal call failed)")
+        text = f"Internal {kind} {route}" + ("" if ok else f" ({_failure_note(it, short=True)})")
         if value > 0 and kind in VALUE_IS_CONTEXT:
             return f"{text}; no {sym} moved (the value is the caller's own context).", False
         if value > 0:  # e.g. selfdestruct: not yet seen in a real recording, so not interpreted
@@ -950,6 +1031,16 @@ class BundleBuilder:
 
 class UnreadableLog(ValueError):
     """The explorer sent a log this tool cannot read (a source problem, not a defect here)."""
+
+
+def _failure_note(it: InternalCall, short: bool = False) -> str:
+    """Why an internal call has no effect, in the explorer's terms (values seen in real recordings)."""
+    if it.error == "Parent reverted":  # the call itself may have succeeded; a caller above it reverted
+        return "undone because a call above it reverted" if short else "but was undone because a call above it reverted"
+    if it.error == "Reverted":
+        return "this internal call reverted" if short else "but reverted"
+    reason = f": the explorer reports {it.error!r}" if it.error else ""
+    return f"this internal call failed{reason}" if short else f"but failed{reason}"
 
 
 def _source_cause(retryable: bool) -> GapCause:

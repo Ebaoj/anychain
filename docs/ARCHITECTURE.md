@@ -96,8 +96,11 @@ sequenceDiagram
     B->>R: eth_getTransactionByHash + receipt
     R-->>B: independent copy (or gap)
     alt explorer answered
-        B->>E: token transfers, internal calls, logs
-        B->>E: contract ABIs (proxy -> implementation,<br/>or EIP-7702 delegate)
+        par in parallel, each fetched once (D26)
+            B->>E: token transfers, internal calls, logs
+        and
+            B->>E: contract ABIs of the call target and log emitters<br/>(proxy -> implementation, or EIP-7702 delegate)
+        end
         Note over B: target without code today?<br/>only "no code" if this tx cleared its delegation,<br/>otherwise "cannot confirm" + gap
         Note over B: each step isolated:<br/>one broken part = one gap
     else explorer down or lagging
@@ -231,6 +234,7 @@ The canary is the only way to catch the silent kind (a false fact nothing flagge
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-08, level C fixes (D26):** explorer requests in parallel and fetched once; the internal-call cutoff keeps every call that moved value; reverts worded as the explorer reports them.
 - **2026-10-07, zkSync L1 status (D25):** the explorer's status is never asserted; the profile confirms it with the node (`node_facts`); every gap must name its cause, with the new cause `config_error`.
 - **2026-10-07, event log (D24):** every gap has a cause; every answer becomes an event in local SQLite, queried with `anychain log`; production design with a queue and a worker (not built).
 - **2026-10-07, typed objects (D21):** explorer and RPC answers become typed objects once, in `collectors/types.py`.

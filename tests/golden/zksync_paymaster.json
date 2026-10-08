@@ -17,7 +17,7 @@
    "needed": "Open the explorer page for the full list",
    "retryable": false,
    "what": "Internal calls",
-   "why": "showing the first 30"
+   "why": "showing 30 of 66 internal calls; every internal call that carried ETH is listed"
   },
   {
    "cause": "not_interpretable",
@@ -779,10 +779,10 @@
   },
   {
    "data": {
-    "moves_value": false,
-    "same_as": null,
+    "moves_value": true,
+    "same_as": "E6",
     "type": "call",
-    "value": "0"
+    "value": "49775000000000"
    },
    "id": "E39",
    "kind": "internal_call",
@@ -794,7 +794,7 @@
      "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af/internal-transactions"
     }
    ],
-   "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
+   "text": "Internal ETH transfer of 0.000049775 ETH from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds): the same movement as E6, not an additional one."
   },
   {
    "data": {
