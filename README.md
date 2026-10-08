@@ -8,7 +8,8 @@ Explains and troubleshoots EVM transactions on any network. Switching networks m
 
 ```bash
 uv sync
-cp .env.example .env            # add ANTHROPIC_API_KEY for the written explanation
+# The written explanation uses the local Claude Code CLI by default (logged in, no API key).
+# For a deployed service set llm.provider to anthropic or openai and export its API key (D27).
 uv run anychain explain 0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 \
   --config configs/ethereum-mainnet.yaml
 # Same code, another network:

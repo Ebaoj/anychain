@@ -12,7 +12,7 @@ Agreed items for later phases, so they are not lost between sessions. Each item 
 - **Decided:** 2026-10-07, by Joabe.
 
 ## Open questions
-- Anthropic API key for the LLM writer: own key (`ANYCHAIN_ANTHROPIC_API_KEY`) vs the Aulai key.
+- ~~Anthropic API key for the LLM writer~~ Resolved 2026-10-08: the writer runs on Claude Code (D27); a key is needed only for a deployed service.
 - Using the unofficial mirror `cloudwallk/brlc-token` in the demo, with a README note.
 
 ## Backlog: level C findings (decided by Joabe on 2026-10-08)

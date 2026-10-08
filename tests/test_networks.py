@@ -64,7 +64,8 @@ def test_every_shipped_config_loads_with_a_dedicated_profile(config):
 def test_no_network_specific_values_in_code():
     """Portability by config only: no explorer/RPC domains, chain ids, symbols or addresses in src/."""
     src = "\n".join(p.read_text() for p in (ROOT / "src" / "anychain").rglob("*.py"))
-    domains = set(re.findall(r"https?://([a-z0-9.-]+\.[a-z]{2,})", src)) - {"docs.blockscout.com"}
+    # Not network values: Blockscout's docs link, and the OpenAI API endpoint (an LLM provider, D27).
+    domains = set(re.findall(r"https?://([a-z0-9.-]+\.[a-z]{2,})", src)) - {"docs.blockscout.com", "api.openai.com"}
     assert not domains, f"hardcoded hosts: {domains}"
     assert not re.search(r"chain_id\s*(==|!=)\s*\d|chain_id\s+in\s*[\[({]\s*\d", src), "chain id literal"
     assert not re.findall(r"0x[0-9a-fA-F]{40}", src), "hardcoded address"

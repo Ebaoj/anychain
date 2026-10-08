@@ -57,7 +57,7 @@ abi_strategy:
     url: https://www.4byte.directory/api/v1
 
 llm:
-  provider: anthropic
+  provider: claude_code  # claude_code (local CLI, no key) | anthropic | openai (D27)
   model: claude-sonnet-5-5
   max_tokens: 2000
   temperature: 0

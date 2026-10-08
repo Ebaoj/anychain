@@ -40,7 +40,7 @@ flowchart TD
     DIAG --> BUN
 
     BUN["4. Evidence bundle<br/>facts E1, E2... each with a source<br/>gaps: what is missing + retryable?"]
-    BUN --> WRI["5. LLM writer<br/>prompt per mode, cites [E#]"]
+    BUN --> WRI["5. LLM writer<br/>prompt per mode, cites [E#]<br/>Claude Code (default), Anthropic or OpenAI API"]
     BUN --> REN["Deterministic render<br/>works with no LLM"]
     WRI --> VAL["6. Validator<br/>cited ids exist, no invented<br/>addresses, values or hashes"]
     VAL --> OUT
@@ -145,7 +145,7 @@ flowchart LR
 
     subgraph output["Output"]
         render["render.py<br/>markdown, no LLM"]
-        writer["writer.py<br/>LLM call"]
+        writer["writer.py<br/>LLM backends: claude_code,<br/>anthropic, openai"]
         prompts["prompts/*.md<br/>one per mode"]
     end
 
@@ -234,6 +234,7 @@ The canary is the only way to catch the silent kind (a false fact nothing flagge
 ## Changelog of this document
 
 - **2026-10-07, end of phase 1:** first version. Pipeline, call sequence, code map, gap classification.
+- **2026-10-08, LLM backends (D27):** the writer runs on the local Claude Code CLI by default; the Anthropic and OpenAI APIs are config options for a deployed service.
 - **2026-10-08, level C fixes (D26):** explorer requests in parallel and fetched once; the internal-call cutoff keeps every call that moved value; reverts worded as the explorer reports them.
 - **2026-10-07, zkSync L1 status (D25):** the explorer's status is never asserted; the profile confirms it with the node (`node_facts`); every gap must name its cause, with the new cause `config_error`.
 - **2026-10-07, event log (D24):** every gap has a cause; every answer becomes an event in local SQLite, queried with `anychain log`; production design with a queue and a worker (not built).

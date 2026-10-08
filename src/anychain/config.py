@@ -148,10 +148,12 @@ class AbiStrategyConfig(BaseModel):
 
 
 class LlmConfig(BaseModel):
-    provider: str = "anthropic"
+    provider: Literal["claude_code", "anthropic", "openai"] = "claude_code"  # D27
     model: str
-    max_tokens: int = 2000
-    temperature: float = 0
+    max_tokens: int = 2000  # API providers only
+    temperature: float | None = 0  # API providers only; null = the model's default (OpenAI reasoning models)
+    timeout_s: float = 120
+    claude_code_command: str = "claude"
 
 
 class AssistantConfig(BaseModel):

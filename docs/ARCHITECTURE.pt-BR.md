@@ -40,7 +40,7 @@ flowchart TD
     DIAG --> BUN
 
     BUN["4. Pacote de evidências<br/>fatos E1, E2... cada um com fonte<br/>lacunas: o que falta + vale tentar de novo?"]
-    BUN --> WRI["5. Redator com IA<br/>instrução por modo, cita [E#]"]
+    BUN --> WRI["5. Redator com IA<br/>instrução por modo, cita [E#]<br/>Claude Code (padrão), API Anthropic ou OpenAI"]
     BUN --> REN["Saída sem IA<br/>funciona sem o modelo"]
     WRI --> VAL["6. Validador<br/>números citados existem, nenhum endereço,<br/>valor ou hash inventado"]
     VAL --> OUT
@@ -145,7 +145,7 @@ flowchart LR
 
     subgraph output["Saída"]
         render["render.py<br/>markdown, sem IA"]
-        writer["writer.py<br/>chamada à IA"]
+        writer["writer.py<br/>motores de IA: claude_code,<br/>anthropic, openai"]
         prompts["prompts/*.md<br/>uma instrução por modo"]
     end
 
@@ -237,6 +237,7 @@ O canário é o único jeito de pegar o erro silencioso (um fato falso que nada 
 - **07/10/2026, rodadas de revisão da Fase 1:** contratos delegados via EIP-7702 como fonte de ABI; conta sem código hoje nunca é dada como "sem código" no momento da transação (decisão D18); a IA não recebe endereços de API nem do nó.
 - **07/10/2026:** criada esta versão em português.
 - **07/10/2026, objetos tipados (D21):** as respostas do explorador e do nó viram objetos tipados uma única vez, em `collectors/types.py`.
+- **08/10/2026, motores de IA (D27):** o redator usa o Claude Code local por padrão; as APIs da Anthropic e da OpenAI são opções de configuração para um serviço publicado.
 - **08/10/2026, correções de nível C (D26):** pedidos ao explorador em paralelo e uma vez só; o corte das chamadas internas mantém todas as que moveram valor; reversões descritas como o explorador informa.
 - **07/10/2026, estado na L1 da zkSync (D25):** o estado do explorador nunca é afirmado; o perfil confirma com o nó (`node_facts`); a causa de cada lacuna é obrigatória, com a nova causa `config_error`.
 - **07/10/2026, log de eventos (D24):** cada lacuna ganhou uma causa; cada resposta vira um evento no SQLite local, consultado com `anychain log`; desenho de produção com fila e worker (não construído).
