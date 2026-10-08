@@ -283,7 +283,11 @@ def test_rpc_only_contract_creation(eth_cfg):
 
 
 def test_rpc_only_pending(eth_cfg):
-    overrides = _rpc_result("eth_usdc_transfer", RECEIPT, lambda _r: None)
+    # pending on the node: no receipt and no block yet (a mined one without a receipt is "unknown", see
+    # test_degradation's test_a_mined_transaction_without_a_receipt_is_never_called_pending)
+    overrides = (_rpc_result("eth_usdc_transfer", RECEIPT, lambda _r: None)
+                 | _rpc_result("eth_usdc_transfer", RPC_TX, lambda r: {**r, "blockNumber": None, "blockHash": None,
+                                                                        "transactionIndex": None}))
     b = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer", offline_hosts={EXPLORER_HOST}, overrides=overrides)
     assert b.status == "pending" and _gap(b, "Final outcome").retryable
 

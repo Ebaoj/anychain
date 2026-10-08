@@ -1600,6 +1600,19 @@ class BundleBuilder:
         sym, dec = self.cfg.network.native_symbol, self.cfg.network.native_decimals
         value = amount(tx.value or 0, dec)
 
+        if receipt is None and tx.block_number is not None:
+            # Mined (the node names its block) but the node returned no receipt: the outcome is unknown, never
+            # "pending" (real: publicnode gave tx 0xe40d5210… in block 25947205 with a null receipt, acceptance
+            # 2026-10-08).
+            b.status = "unknown"
+            b.add("overview", f"(From RPC only) Transaction was included in block {tx.block_number}. From {tx.sender} "
+                  f"to {tx.to or '(contract creation)'}. Native value sent: {value} {sym}. Its outcome is not known: "
+                  "the node returned no receipt for it.", [source])
+            self._gap("Final outcome", f"the node knows the transaction (block {tx.block_number}) but returned no "
+                      "receipt for it, and the explorer did not answer", "Ask again in a few minutes, or use a node "
+                      "that keeps receipts for older blocks", retryable=True, cause="source_error")
+            return
+
         if receipt is None:
             b.status = "pending"
             b.add("overview", f"(From RPC only) Transaction is pending. From {tx.sender} to "

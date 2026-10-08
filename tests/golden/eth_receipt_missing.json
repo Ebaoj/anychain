@@ -1,0 +1,399 @@
+{
+ "abi_sources": {
+  "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055": "explorer: verified contract ERC1967Proxy proxy -> SingleOwnerMSCA"
+ },
+ "gaps": [],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 25947205,
+    "from": "0x28C6c06298d514Db089934071355E5743bf21d60",
+    "gas_limit": "621384",
+    "gas_used": "146207",
+    "status": "success",
+    "timestamp": "2026-09-10T13:11:47.000000Z",
+    "to": "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "https://eth.blockscout.com/tx/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
+    }
+   ],
+   "text": "Transaction succeeded in block 25947205 at 2026-09-10T13:11:47.000000Z. From 0x28C6c06298d514Db089934071355E5743bf21d60 to 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy). Native value sent: 0 ETH. Gas used 146207 of limit 621384."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000239802808057885",
+    "parts": {
+     "fee": "0.000239802808057885"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
+    }
+   ],
+   "text": "Fee paid: 0.000239802808057885 ETH."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "abi_origin": "explorer",
+    "args": {
+     "calls": "[(0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48, 0, 0xa9059cbb000000000000000000000000b51bd8238638149bb7f9fd67d9dce56e8a1a5d4700000000000000000000000000000000000000000000000000000001210bf8c0), (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48, 0, 0xa9059cbb0000000000000000000000009d94a6737ae9ed5a6ffb06ce416c4279fba45af90000000000000000000000000000000000000000000000000000000017ce5c40), (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48, 0, 0xa9059cbb00000000000000000000000069f0dd8e029e98118c58eba4704b198d5929758700000000000000000000000000000000000000000000000000000000008f6ec0)]"
+    },
+    "function": "executeBatch"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: contract ABI",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055"
+    }
+   ],
+   "text": "Called executeBatch((address,uint256,bytes)[]) on 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) with calls=[(0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48, 0, 0xa9059cbb000000000000000000000000b51bd8238638149bb7f9fd67d9dce56e8a1a5d4700000000000000000000000000000000000000000000000000000001210bf8c0), (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48, 0, 0xa9059cbb0000000000000000000000009d94a6737ae9ed5a6ffb06ce416c4279fba45af90000000000000000000000000000000000000000000000000000000017ce5c40), (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48, 0, 0xa9059cbb00000000000000000000000069f0dd8e029e98118c58eba4704b198d5929758700000000000000000000000000000000000000000000000000000000008f6ec0)]. ABI source: explorer: verified contract ERC1967Proxy proxy -> SingleOwnerMSCA."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "BaseMSCA",
+    "function": "executeBatch((address,uint256,bytes)[])",
+    "lines": [
+     252,
+     260
+    ],
+    "path": "src/msca/6900/v0.7/account/BaseMSCA.sol",
+    "raise_line": null,
+    "raises": null,
+    "show": []
+   },
+   "id": "E4",
+   "kind": "code",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0xD206aC7fEf53d83ED4563E770b28Dba90D0D9eC8"
+    }
+   ],
+   "text": "Code of executeBatch((address,uint256,bytes)[]) in BaseMSCA (src/msca/6900/v0.7/account/BaseMSCA.sol, lines 252-260), from the verified source of the implementation the explorer lists today for 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (it may have been upgraded since this transaction), as the explorer lists it:\n252 |     function executeBatch(Call[] calldata calls)\n253 |         external\n254 |         payable\n255 |         override\n256 |         validateNativeFunction\n257 |         returns (bytes[] memory returnData)\n258 |     {\n259 |         return calls.executeBatch();\n260 |     }"
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
+    "to": "0xB51BD8238638149bb7F9FD67D9DCE56E8a1A5d47",
+    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "token_id": null,
+    "value": 4849400000
+   },
+   "id": "E5",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 4849.4 USDC from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0xB51BD8238638149bb7F9FD67D9DCE56E8a1A5d47."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
+    "to": "0x9d94A6737aE9ED5a6Ffb06CE416C4279FBa45Af9",
+    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "token_id": null,
+    "value": 399400000
+   },
+   "id": "E6",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 399.4 USDC from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0x9d94A6737aE9ED5a6Ffb06CE416C4279FBa45Af9."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
+    "to": "0x69F0dD8E029E98118C58eBa4704B198d59297587",
+    "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "token_id": null,
+    "value": 9400000
+   },
+   "id": "E7",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 9.4 USDC from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0x69F0dD8E029E98118C58eBa4704B198d59297587."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E8",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0xD206aC7fEf53d83ED4563E770b28Dba90D0D9eC8 (SingleOwnerMSCA)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E9",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E10",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E11",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E12",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E13",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E14",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "error": "Reverted",
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E15",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2) (this internal call reverted)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "call",
+    "value": "0"
+   },
+   "id": "E16",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal call from 0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055 (ERC1967Proxy) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "moves_value": false,
+    "same_as": null,
+    "type": "delegatecall",
+    "value": "0"
+   },
+   "id": "E17",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "staticcalls": 3
+   },
+   "id": "E18",
+   "kind": "internal_call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: internal transactions",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957/internal-transactions"
+    }
+   ],
+   "text": "3 read-only staticcall(s) (no state change) not listed."
+  }
+ ],
+ "network": "ethereum-mainnet",
+ "status": "success",
+ "tx_hash": "0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
+}
