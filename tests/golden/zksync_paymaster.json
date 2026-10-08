@@ -43,6 +43,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 72377126,
     "from": "0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6",
@@ -73,6 +74,7 @@
    "text": "Transaction succeeded in block 72377126 at 2026-10-07T19:46:34.000000Z. From 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36. Native value sent: 0 ETH. Gas used 164844 of limit 1100000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000007459191",
     "parts": {
@@ -93,6 +95,7 @@
    "text": "Fee paid: 0.000007459191 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "batch": 518339,
     "l1_status": "Sealed on L2"
@@ -110,6 +113,7 @@
    "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); the explorer lists no L1 transaction for it yet."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "committed": "0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1",
     "node_l1_status": "included",
@@ -123,11 +127,18 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af"
     }
    ],
    "text": "The node reports this transaction committed in L1 transaction 0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1, proven in L1 transaction 0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa (node status 'included'); the explorer does not list the committed and proven steps yet."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0x58893201"
    },
@@ -144,6 +155,7 @@
    "text": "Called function with selector 0x58893201 on 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; not decoded."
   },
   {
+   "confidence": "single_source",
    "data": {
     "matches_explorer_fee": true,
     "net": 7459191000000,
@@ -167,6 +179,7 @@
    "text": "Fee flow: 0.000049775 ETH prepaid to the fee collector by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359, 0.000042315809 ETH refunded; net fee 0.000007459191 ETH. The ETH fee was prepaid by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 (a paymaster), not by the sender. In this transaction the sender paid the paymaster 85.783676209796661425 NODL (net of what it returned). This matches the explorer's fee."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6",
     "to": "0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359",
@@ -187,6 +200,7 @@
    "text": "Token transfer: 598.421180396209706487 NODL from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6",
@@ -207,6 +221,7 @@
    "text": "Token transfer: 210.314775792516402875 NODL from 0x0000000000000000000000000000000000000000 to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359",
     "to": "0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6",
@@ -227,6 +242,7 @@
    "text": "Token transfer: 512.637504186413045062 NODL from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -246,6 +262,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -265,6 +282,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -284,6 +302,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x000000000000000000000000000000000000800A (Ether)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -303,6 +322,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0x0000000000000000000000000000000000000001."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -322,6 +342,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -341,6 +362,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -360,6 +382,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -379,6 +402,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -398,6 +422,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -417,6 +442,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -436,6 +462,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -455,6 +482,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -474,6 +502,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -493,6 +522,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -512,6 +542,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -531,6 +562,7 @@
    "text": "Internal call from 0xa9110F2115461ff677a076dDa011F0f13a4E7Cd6 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -550,6 +582,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -569,6 +602,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -588,6 +622,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x000000000000000000000000000000000000800d."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -607,6 +642,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -626,6 +662,7 @@
    "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x000000000000000000000000000000000000800B (zkSync SystemContext system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -645,6 +682,7 @@
    "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -664,6 +702,7 @@
    "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -683,6 +722,7 @@
    "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000000001."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -702,6 +742,7 @@
    "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -721,6 +762,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -740,6 +782,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -759,6 +802,7 @@
    "text": "Internal call from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -778,6 +822,7 @@
    "text": "Internal call from 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": "E6",
@@ -797,6 +842,7 @@
    "text": "Internal ETH transfer of 0.000049775 ETH from 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359 to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds): the same movement as E6, not an additional one."
   },
   {
+   "confidence": "single_source",
    "data": {
     "system_calls": 61,
     "value": "0"
@@ -814,6 +860,7 @@
    "text": "61 internal call(s) between the network's system contracts not listed (no value carried)."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E41",
    "kind": "event",
@@ -828,6 +875,7 @@
    "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E42",
    "kind": "event",
@@ -842,6 +890,7 @@
    "text": "Event with topic0 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925 emitted by 0xBD4372e44c5eE654dd838304006E1f0f69983154 (Nodle Token); could not decode."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E43",
    "kind": "event",
@@ -856,6 +905,7 @@
    "text": "Event with topic0 0x25b428dfde728ccfaddad7e29e4ac23c24ed7fd1a6e3e3f91894a9a073f5dfff emitted by 0xE629B208046F7A33dE3A43931c9FE505A7Ac3d36; could not decode."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E44",
    "kind": "event",
@@ -870,6 +920,7 @@
    "text": "Event with topic0 0x55cd20b9d3ed641e3f18b6cf6b94daba95f3caae9907ece81cac745021af4610 emitted by 0xA2Aac7bC9725c36ad9B12D2407dF8de6B2B68359; could not decode."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -882,6 +933,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

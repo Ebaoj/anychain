@@ -13,6 +13,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 157898313,
     "from": "0x90502666e33D71483302F81c8349A6185572Db42",
@@ -43,6 +44,7 @@
    "text": "Transaction succeeded in block 157898313 at 2026-10-07T17:50:03.000000Z. From 0x90502666e33D71483302F81c8349A6185572Db42 to 0x90502666e33D71483302F81c8349A6185572Db42. Native value sent: 0 ETH. Gas used 96666 of limit 573686."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.00000017452327854",
     "parts": {
@@ -64,6 +66,7 @@
    "text": "Fee paid: 0.00000017452327854 ETH in total: 0.000000106437385944 ETH L2 execution + 0.000000068085892596 ETH L1 data."
   },
   {
+   "confidence": "single_source",
    "data": {
     "applied": true,
     "authority": "0xd58c92d715363FE8fc697f68C0A9c1E90723A737",
@@ -84,6 +87,7 @@
    "text": "Code delegation set by this transaction: from here on, 0xd58c92d715363FE8fc697f68C0A9c1E90723A737 runs the code of 0xec15C4d466296454865652b0056D03e5A359BbfC (EIP-7702)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "applied": true,
     "authority": "0x90502666e33D71483302F81c8349A6185572Db42",
@@ -104,6 +108,7 @@
    "text": "Code delegation set by this transaction: from here on, 0x90502666e33D71483302F81c8349A6185572Db42 runs the code of 0xec15C4d466296454865652b0056D03e5A359BbfC (EIP-7702)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0x3f707e6b"
    },
@@ -120,6 +125,7 @@
    "text": "Called function with selector 0x3f707e6b on 0x90502666e33D71483302F81c8349A6185572Db42; not decoded."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xd58c92d715363FE8fc697f68C0A9c1E90723A737",
     "to": "0x0bCa65bf4b4c8803d2f0B49353ed57CAAF3d66Dc",
@@ -140,6 +146,7 @@
    "text": "Token transfer: 10 USDT0 from 0xd58c92d715363FE8fc697f68C0A9c1E90723A737 to 0x0bCa65bf4b4c8803d2f0B49353ed57CAAF3d66Dc (TransparentUpgradeableProxy)."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -152,6 +159,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.optimism.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x86aec918026c7099a71e63d616ccba848a5bb1a03e39c6f5314a615c04733923"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

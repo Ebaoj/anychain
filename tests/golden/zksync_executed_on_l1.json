@@ -13,6 +13,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 60000000,
     "from": "0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B",
@@ -43,6 +44,7 @@
    "text": "Transaction succeeded in block 60000000 at 2025-05-06T00:44:47.000000Z. From 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken). Native value sent: 0 ETH. Gas used 85332 of limit 174538."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000003861273",
     "parts": {
@@ -63,6 +65,7 @@
    "text": "Fee paid: 0.000003861273 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "batch": 499177,
     "committed": "0x7a8fa83f5c6b9142550e6f89a81bf5ed57c307e746d335853173a673591f2b3e",
@@ -83,6 +86,7 @@
    "text": "Status on L1, as reported by the explorer: 'Executed on L1' (batch 499177); committed in L1 transaction 0x7a8fa83f5c6b9142550e6f89a81bf5ed57c307e746d335853173a673591f2b3e, proven in L1 transaction 0xf7b5edf731b466dbfa13a41de7157788597faf60ecc4ee82d86d483d044a776f, executed in L1 transaction 0x7b254d9232f7ad0d23cdb251187c4f97afc0e932cdb7677e45623a8c58fcdd13."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0xa9059cbb"
    },
@@ -99,6 +103,7 @@
    "text": "Called function with selector 0xa9059cbb on 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken); not decoded."
   },
   {
+   "confidence": "single_source",
    "data": {
     "matches_explorer_fee": true,
     "net": 3861273000000,
@@ -122,6 +127,7 @@
    "text": "Fee flow: 0.0000078978445 ETH prepaid to the fee collector by 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B, 0.0000040365715 ETH refunded; net fee 0.000003861273 ETH. This matches the explorer's fee."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B",
     "to": "0x7cCeE03D496cA86C3def8Cff1Bb81b9Ecd14Ff89",
@@ -142,6 +148,7 @@
    "text": "Token transfer: 0.23834975 STORJ from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0x7cCeE03D496cA86C3def8Cff1Bb81b9Ecd14Ff89."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -161,6 +168,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -180,6 +188,7 @@
    "text": "Internal call from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -199,6 +208,7 @@
    "text": "Internal call from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0x000000000000000000000000000000000000800A (Ether)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -218,6 +228,7 @@
    "text": "Internal call from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0x0000000000000000000000000000000000000001."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -237,6 +248,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -256,6 +268,7 @@
    "text": "Internal call from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": "E5",
@@ -275,6 +288,7 @@
    "text": "Internal ETH transfer of 0.0000078978445 ETH from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds): the same movement as E5, not an additional one."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -294,6 +308,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -313,6 +328,7 @@
    "text": "Internal call from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -332,6 +348,7 @@
    "text": "Internal call from 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken) to 0x0000000000000000000000000000000000008002."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -351,6 +368,7 @@
    "text": "Internal call from 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken) to 0x1Eb710030273e529A6aD7E1e14D4e601765Ba3c6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -370,6 +388,7 @@
    "text": "Internal delegatecall from 0x303EDCD8DbE1607fe512D45CC15d3E41fa4db44B to 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -389,6 +408,7 @@
    "text": "Internal call from 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -408,6 +428,7 @@
    "text": "Internal call from 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -427,6 +448,7 @@
    "text": "Internal call from 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken) to 0x0000000000000000000000000000000000008010 (zkSync Keccak256 system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -446,6 +468,7 @@
    "text": "Internal call from 0xA0806DA7835a4E63dB2CE44A2b622eF8b73B5DB5 (StorjToken) to 0x000000000000000000000000000000000000800d."
   },
   {
+   "confidence": "single_source",
    "data": {
     "system_calls": 49,
     "value": "0"
@@ -463,6 +486,7 @@
    "text": "49 internal call(s) between the network's system contracts not listed (no value carried)."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -475,6 +499,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x669f390346545904cb53a9934f6140d054675fe5463f3dc71624bb3e4f351a21"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

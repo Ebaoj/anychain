@@ -36,6 +36,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 72377006,
     "from": "0xd297fA914353c44B2e33EBE05F21846f1048CFeB",
@@ -66,6 +67,7 @@
    "text": "Transaction succeeded in block 72377006 at 2026-10-07T19:28:45.000000Z. From 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF. Native value sent: 0 ETH. Gas used 280909 of limit 2000000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000072129471362576",
     "parts": {
@@ -86,6 +88,7 @@
    "text": "Fee paid: 0.000072129471362576 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "priority": true
    },
@@ -102,6 +105,7 @@
    "text": "Priority transaction (zkSync type 255): submitted through L1 and executed on L2."
   },
   {
+   "confidence": "single_source",
    "data": {
     "batch": 518339,
     "l1_status": "Sealed on L2"
@@ -119,6 +123,7 @@
    "text": "Status on L1, as reported by the explorer: 'Sealed on L2' (batch 518339); the explorer lists no L1 transaction for it yet."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "committed": "0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1",
     "node_l1_status": "included",
@@ -132,11 +137,18 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4"
     }
    ],
    "text": "The node reports this transaction committed in L1 transaction 0xe063a6b1fca6a7f931434910f56fcf107d6f84e9330ddd9fc8a8bd4242815ff1, proven in L1 transaction 0x8f9d33c1bc0c3f9ed542cff0322858dae63d5ad9d891dbf8d2adb419204f64aa (node status 'included'); the explorer does not list the committed and proven steps yet."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0x493a4f84"
    },
@@ -153,6 +165,7 @@
    "text": "Called function with selector 0x493a4f84 on 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF; not decoded."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -172,6 +185,7 @@
    "text": "Internal call from 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -191,6 +205,7 @@
    "text": "Internal call from 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -210,6 +225,7 @@
    "text": "Internal delegatecall from 0xd297fA914353c44B2e33EBE05F21846f1048CFeB to 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -229,6 +245,7 @@
    "text": "Internal call from 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF to 0x000000000000000000000000000000000000800d."
   },
   {
+   "confidence": "single_source",
    "data": {
     "system_calls": 24,
     "value": "0"
@@ -246,6 +263,7 @@
    "text": "24 internal call(s) between the network's system contracts not listed (no value carried)."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E12",
    "kind": "event",
@@ -260,6 +278,7 @@
    "text": "Event with topic0 0xc86ba04c55bc5eb2f2876b91c438849a296dbec7b08751c3074d92e04f0a77af emitted by 0xE0B015E54d54fc84a6cB9B666099c46adE9335FF; could not decode."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E13",
    "kind": "event",
@@ -274,6 +293,7 @@
    "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E14",
    "kind": "event",
@@ -288,6 +308,7 @@
    "text": "Event with topic0 0x0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885 emitted by 0x000000000000000000000000000000000000800A (Ether); could not decode."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E15",
    "kind": "event",
@@ -302,6 +323,7 @@
    "text": "Event with topic0 0x27fe8c0b49f49507b9d4fe5968c9f49edfe5c9df277d433a07a0717ede97638d emitted by 0x0000000000000000000000000000000000008008 (zkSync L1Messenger system contract); could not decode."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -314,6 +336,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xd44240d0afcdf47a8bb91ed59abb1b273e749e83d5b5cac514f7dda802c3b0e4"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

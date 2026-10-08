@@ -6,6 +6,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26142322,
     "from": "0xF8fF3e62E94807a5C687f418Fe36942dD3a24524",
@@ -36,6 +37,7 @@
    "text": "Transaction succeeded in block 26142322 at 2026-10-07T18:32:23.000000Z. From 0xF8fF3e62E94807a5C687f418Fe36942dD3a24524 to 0xE28cAc160C2a79dFA1fbd2169AC5fa5d061cf186 (TransparentUpgradeableProxy). Native value sent: 0 ETH. Gas used 135263 of limit 270526."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000107480202645626",
     "parts": {
@@ -57,6 +59,7 @@
    "text": "Fee paid: 0.000107480202645626 ETH in total: 0.000097062677942394 ETH execution + 0.000010417524703232 ETH blob data, burnt."
   },
   {
+   "confidence": "single_source",
    "data": {
     "blobs": 2
    },
@@ -73,6 +76,7 @@
    "text": "Carried 2 blob(s) of data (EIP-4844), using 262144 blob gas."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "_chainAddress": "0x0583Ef2B6416cb7B287406438B940E4d99680C5B",
@@ -101,6 +105,7 @@
    "text": "Called commitBatchesSharedBridge(address,uint256,uint256,bytes) on 0xE28cAc160C2a79dFA1fbd2169AC5fa5d061cf186 (TransparentUpgradeableProxy) with _chainAddress=0x0583Ef2B6416cb7B287406438B940E4d99680C5B, _processBatchFrom=15428, _processBatchTo=15428, arg3=0x030000000000000000000000000000000000000000000000000000000000003c439f594a97a1d1034cb37dde6dbe93aa26cdaed7b7bcc9f4da82fe865f20b808f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a4700000000000000000000000000000000000000000000000000000000000000000692f35c99f9c698852289ffecf07f6dd45770904521149d79aa85aae598fa3750000000000000000000000000000000000000000000000000000000000000000e9b74cfdd80f6172687b11ba7c57c4dc8f483aa330b621aa8840e490bd0289b20000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000003c44c5be773e1aa6cd6f7c348187607bcba166680592ad8064224e402f7a299a10b40000000000000000000000000000000000000000000000000000000000000000c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a4700000000000000000000000000000000000000000000000000000000000000000692f35c99f9c698852289ffecf07f6dd45770904521149d79aa85aae598fa37500000000000000000000000000000000000000000000000000000000000000040763935a3f200adc78ce8b5538b86024d15387cda3baa8f12077233788fd9ca1000000000000000000000000000000000000000000000000000000006ac68ac30000000000000000000000000000000000000000000000000000000000184547000000000000000000000000000000000000000000000000000000006ac68c430000000000000000000000000000000000000000000000000000000000184602000000000000000000000000000000000000000000000000000000000000902400000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000. ABI source: explorer: verified contract TransparentUpgradeableProxy proxy -> ValidatorTimelock."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -120,6 +125,7 @@
    "text": "Internal delegatecall from 0xE28cAc160C2a79dFA1fbd2169AC5fa5d061cf186 (TransparentUpgradeableProxy) to 0x6CB28384f21B18924FA312AA2E10D4E813e66263 (ValidatorTimelock)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -139,6 +145,7 @@
    "text": "Internal call from 0xE28cAc160C2a79dFA1fbd2169AC5fa5d061cf186 (TransparentUpgradeableProxy) to 0x0583Ef2B6416cb7B287406438B940E4d99680C5B (DiamondProxy)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -158,6 +165,7 @@
    "text": "Internal delegatecall from 0x0583Ef2B6416cb7B287406438B940E4d99680C5B (DiamondProxy) to 0x56767eB2E3197A1dfa030faaD4A65cF38E807c81 (ExecutorFacet)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -177,6 +185,7 @@
    "text": "Internal delegatecall from 0x08A1D2962fC29AA46e869A1E7561112cc1026EfA (TransparentUpgradeableProxy) to 0x721e27269ce348F71bdAAd7B7b033Afa60e404e0 (ZKsyncOSChainTypeManager)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -196,6 +205,7 @@
    "text": "Internal call from 0x0583Ef2B6416cb7B287406438B940E4d99680C5B (DiamondProxy) to 0xFB630a206E6D7485cB9DFa929859E1a977F0a211 (BlobsL1DAValidatorZKsyncOS)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "staticcalls": 1
    },
@@ -212,6 +222,7 @@
    "text": "1 read-only staticcall(s) (no state change) not listed."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "batchNumber": "15428",
@@ -233,6 +244,7 @@
    "text": "Event ReportCommittedBatchRangeZKsyncOS(uint64,uint64,uint64) emitted by 0x0583Ef2B6416cb7B287406438B940E4d99680C5B (DiamondProxy): batchNumber=15428, firstBlockNumber=1590599, lastBlockNumber=1590786."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "batchHash": "0xc5be773e1aa6cd6f7c348187607bcba166680592ad8064224e402f7a299a10b4",
@@ -254,6 +266,7 @@
    "text": "Event BlockCommit(uint256,bytes32,bytes32) emitted by 0x0583Ef2B6416cb7B287406438B940E4d99680C5B (DiamondProxy): batchNumber=15428, batchHash=0xc5be773e1aa6cd6f7c348187607bcba166680592ad8064224e402f7a299a10b4, commitment=0x669baf294804af40c33fba13f00ae097885689f98a07a7145eb1fac805c48ac4."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -266,6 +279,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x77215ad174af1162134ff6f99bd9e118bf87ca2927db8e341aa394d7ce1728b6"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

@@ -13,6 +13,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 48639300,
     "from": "0x202600F312dC1dC44ca46d9eF7Fd134995038fd0",
@@ -43,6 +44,7 @@
    "text": "Transaction failed (reverted) in block 48639300 at 2026-10-07T18:44:20.000000Z. From 0x202600F312dC1dC44ca46d9eF7Fd134995038fd0 to 0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44 (FROSTCoordinator). Native value attached: 0 XDAI, not transferred because the transaction reverted. Gas used 42150 of limit 250000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.00000000000046365",
     "parts": {
@@ -63,6 +65,7 @@
    "text": "Fee paid: 0.00000000000046365 XDAI. The fee is charged even though the transaction failed."
   },
   {
+   "confidence": "single_source",
    "data": {
     "revert_reason": {
      "raw": "0x"
@@ -81,6 +84,7 @@
    "text": "The transaction reverted without any revert data: no reason text and no custom error (e.g. a bare revert(), a failed assert in old Solidity, or a call to code that does not exist)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0x4ba77e21"
    },
@@ -97,6 +101,7 @@
    "text": "Called function with selector 0x4ba77e21 on 0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44 (FROSTCoordinator); not decoded."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "failed"
@@ -109,6 +114,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://rpc.gnosischain.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xf354bf88343e794ca6f4574416778ef41bd06a51f32fb5c1ddfc1e71404ab6d1"
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."

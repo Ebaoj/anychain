@@ -5,6 +5,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141501,
     "from": "0xCA62C34d54b445283121905F19193416212117c4",
@@ -35,6 +36,7 @@
    "text": "Transaction succeeded in block 26141501 at 2026-10-07T15:47:47.000000Z. From 0xCA62C34d54b445283121905F19193416212117c4 to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC). Native value sent: 0 ETH. Gas used 40360 of limit 45758."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.00008537619972948",
     "parts": {
@@ -55,6 +57,7 @@
    "text": "Fee paid: 0.00008537619972948 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "to": "0x74AA5387681505c806FF1E972B12cdfd01406828",
@@ -81,6 +84,7 @@
    "text": "Called transfer(address,uint256) on 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) with to=0x74AA5387681505c806FF1E972B12cdfd01406828, value=69348400. ABI source: explorer: verified contract FiatTokenProxy proxy -> FiatTokenV2_2."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xCA62C34d54b445283121905F19193416212117c4",
     "to": "0x74AA5387681505c806FF1E972B12cdfd01406828",
@@ -101,6 +105,7 @@
    "text": "Token transfer: 69.3484 USDC from 0xCA62C34d54b445283121905F19193416212117c4 to 0x74AA5387681505c806FF1E972B12cdfd01406828."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -120,6 +125,7 @@
    "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -132,6 +138,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

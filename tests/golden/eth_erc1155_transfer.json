@@ -5,6 +5,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141646,
     "from": "0xff7a3205aE437d5F2232D14Ab3ec4F42FA7EF7AF",
@@ -35,6 +36,7 @@
    "text": "Transaction succeeded in block 26141646 at 2026-10-07T16:16:47.000000Z. From 0xff7a3205aE437d5F2232D14Ab3ec4F42FA7EF7AF to 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 (Trinkets). Native value sent: 0 ETH. Gas used 71187 of limit 72052."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000359131625468688",
     "parts": {
@@ -55,6 +57,7 @@
    "text": "Fee paid: 0.000359131625468688 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "amount": "1",
@@ -82,6 +85,7 @@
    "text": "Called airdrop(address[],uint256,uint256) on 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 (Trinkets) with recipients=[0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF], id=16, amount=1. ABI source: explorer: verified contract Trinkets."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF",
@@ -102,6 +106,7 @@
    "text": "Token transfer: 1 x 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 token #16 from 0x0000000000000000000000000000000000000000 to 0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -121,6 +126,7 @@
    "text": "Internal call from 0xDF402d540A0aE8B866181590fcfcbBC56d2b25e8 (Trinkets) to 0xFDBbE7ACAE6cAa050D1c0B29dE51b6e11Ce81bEF."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -133,6 +139,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x2017b9004ee61d547e8d6d480a4ad0cc4d6658dfeba38268b24e63e77014cdaa"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

@@ -25,6 +25,7 @@
  ],
  "items": [
   {
+   "confidence": "confirmed",
    "data": {
     "from": "0xca62c34d54b445283121905f19193416212117c4",
     "status": "success",
@@ -43,6 +44,7 @@
    "text": "(From RPC only) Transaction succeeded in block 26141501. From 0xca62c34d54b445283121905f19193416212117c4 to 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48. Native value: 0 ETH. Gas used 40360 of limit 45758."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "selector": "0xa9059cbb"
    },
@@ -59,6 +61,7 @@
    "text": "Called function with selector 0xa9059cbb on 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48; not decoded."
   },
   {
+   "confidence": "confirmed",
    "data": {},
    "id": "E3",
    "kind": "receipt",

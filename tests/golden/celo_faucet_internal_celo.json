@@ -5,6 +5,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 79502260,
     "from": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483",
@@ -35,6 +36,7 @@
    "text": "Transaction succeeded in block 79502260 at 2026-10-07T19:56:58.000000Z. From 0x1eb8252168d7521123CFf57446Ec30BF5a91a483 to 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy). Native value sent: 0 CELO. Gas used 126239 of limit 130579."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.025374039",
     "parts": {
@@ -55,6 +57,7 @@
    "text": "Fee paid: 0.025374039 CELO."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "_user": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483"
@@ -80,6 +83,7 @@
    "text": "Called topWallet(address) on 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) with _user=0x1eb8252168d7521123CFf57446Ec30BF5a91a483. ABI source: explorer: verified contract ERC1967Proxy proxy -> Faucet."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84",
     "to": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483",
@@ -98,6 +102,7 @@
    "text": "Native CELO movement of 0.0265776 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483 (the explorer also lists it as a token transfer of the native-token contract; it is not a second asset)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84",
     "to": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483",
@@ -116,6 +121,7 @@
    "text": "Native CELO movement of 0.189223 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483 (the explorer also lists it as a token transfer of the native-token contract; it is not a second asset)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -135,6 +141,7 @@
    "text": "Internal delegatecall from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x08fdf766694C353401350c225cAEB9C631dC3288 (Faucet)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -154,6 +161,7 @@
    "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -173,6 +181,7 @@
    "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -192,6 +201,7 @@
    "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -211,6 +221,7 @@
    "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -230,6 +241,7 @@
    "text": "Internal delegatecall from 0x0F5dB7a64A6a64052693676CA898EC7F7A94FF4e (ERC1967Proxy) to 0xeD9C5987e7109BB43A8a1A40A726B275E4Eb4Ace (NameService)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -249,6 +261,7 @@
    "text": "Internal delegatecall from 0xC361A6E67822a0EDc17D899227dd9FC50BD62F42 (ERC1967Proxy) to 0x0ecc03f4E3fa94fa6e2098428A3ad393b65933c9 (IdentityV4)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": "E5",
@@ -268,6 +281,7 @@
    "text": "Internal CELO transfer of 0.189223 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483: the same movement as E5, not an additional one."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": "E4",
@@ -287,6 +301,7 @@
    "text": "Internal CELO transfer of 0.0265776 CELO from 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy) to 0x1eb8252168d7521123CFf57446Ec30BF5a91a483: the same movement as E4, not an additional one."
   },
   {
+   "confidence": "single_source",
    "data": {
     "staticcalls": 7
    },
@@ -303,6 +318,7 @@
    "text": "7 read-only staticcall(s) (no state change) not listed."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "account": "0x1eb8252168d7521123CFf57446Ec30BF5a91a483",
@@ -325,6 +341,7 @@
    "text": "Event WalletTopped(address,uint256,address,address) emitted by 0x4F93Fa058b03953C851eFaA2e4FC5C34afDFAb84 (ERC1967Proxy): account=0x1eb8252168d7521123CFf57446Ec30BF5a91a483, amount=189223000000000000, whitelistedRoot=0x1eb8252168d7521123CFf57446Ec30BF5a91a483, relayerOrWhitelisted=0x1eb8252168d7521123CFf57446Ec30BF5a91a483."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -337,6 +354,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://forno.celo.org"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

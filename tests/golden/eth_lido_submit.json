@@ -5,6 +5,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141730,
     "from": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE",
@@ -35,6 +36,7 @@
    "text": "Transaction succeeded in block 26141730 at 2026-10-07T16:33:35.000000Z. From 0x940b2f530e7f1F456905D6A39A047f05bebee5AE to 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable). Native value sent: 0.04665119 ETH. Gas used 76983 of limit 131601."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.00023600391086427",
     "parts": {
@@ -55,6 +57,7 @@
    "text": "Fee paid: 0.00023600391086427 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "_referral": "0x11d00000000000000000000000000000000011d0"
@@ -80,6 +83,7 @@
    "text": "Called submit(address) on 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable) with _referral=0x11d00000000000000000000000000000000011d0. ABI source: explorer: verified contract AppProxyUpgradeable proxy -> Lido."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x940b2f530e7f1F456905D6A39A047f05bebee5AE",
@@ -100,6 +104,7 @@
    "text": "Token transfer: 0.046651189999999999 STETH from 0x0000000000000000000000000000000000000000 to 0x940b2f530e7f1F456905D6A39A047f05bebee5AE."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -119,6 +124,7 @@
    "text": "Internal call from 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable) to 0xb8FFC3Cd6e7Cf5a098A1c92F48009765B24088Dc (KernelProxy)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -138,6 +144,7 @@
    "text": "Internal delegatecall from 0xb8FFC3Cd6e7Cf5a098A1c92F48009765B24088Dc (KernelProxy) to 0x2b33CF282f867A7FF693A66e11B0FcC5552e4425 (Kernel)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -157,6 +164,7 @@
    "text": "Internal delegatecall from 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable) to 0x028271E30a695c0527A0C50cA30603feD004cDb0 (Lido); no ETH moved (the value is the caller's own context)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "amount": "46651190000000000",
@@ -178,6 +186,7 @@
    "text": "Event Submitted(address,uint256,address) emitted by 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable): sender=0x940b2f530e7f1F456905D6A39A047f05bebee5AE, amount=46651190000000000, referral=0x11d00000000000000000000000000000000011d0."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "from": "0x0000000000000000000000000000000000000000",
@@ -199,6 +208,7 @@
    "text": "Event TransferShares(address,address,uint256) emitted by 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 (AppProxyUpgradeable): from=0x0000000000000000000000000000000000000000, to=0x940b2f530e7f1F456905D6A39A047f05bebee5AE, sharesValue=37447215419557630."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -211,6 +221,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x1a6e713214c8d5910c1ea8f8c9b61087cdeaff042c132a03222107b9e1abb36b"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

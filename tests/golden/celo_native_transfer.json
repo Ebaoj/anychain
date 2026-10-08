@@ -3,6 +3,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 79501505,
     "from": "0x721BC1633350F86Fd88b9e2cDE1688A20929bdDd",
@@ -33,6 +34,7 @@
    "text": "Transaction succeeded in block 79501505 at 2026-10-07T19:44:23.000000Z. From 0x721BC1633350F86Fd88b9e2cDE1688A20929bdDd to 0x7D089516813ee47ED182df7aE48E74FDDB53BFD6. Native value sent: 0.01278614 CELO. Gas used 21000 of limit 21000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.0042525",
     "parts": {
@@ -53,6 +55,7 @@
    "text": "Fee paid: 0.0042525 CELO."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E3",
    "kind": "call",
@@ -67,6 +70,7 @@
    "text": "Plain CELO transfer (no call data) to 0x7D089516813ee47ED182df7aE48E74FDDB53BFD6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x721BC1633350F86Fd88b9e2cDE1688A20929bdDd",
     "to": "0x7D089516813ee47ED182df7aE48E74FDDB53BFD6",
@@ -85,6 +89,7 @@
    "text": "Native CELO movement of 0.01278614 CELO from 0x721BC1633350F86Fd88b9e2cDE1688A20929bdDd to 0x7D089516813ee47ED182df7aE48E74FDDB53BFD6 (the explorer also lists it as a token transfer of the native-token contract; it is not a second asset)."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -97,6 +102,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://forno.celo.org"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x64f5270ef3b298a6d2ddefdba4f2c83faab12123020136915b173aef0c5526f3"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

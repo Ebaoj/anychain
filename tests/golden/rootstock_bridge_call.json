@@ -34,6 +34,7 @@
  ],
  "items": [
   {
+   "confidence": "confirmed",
    "data": {
     "from": "0x23a7ae069a7bebbece1403d318c4118218e9c121",
     "status": "success",
@@ -52,6 +53,7 @@
    "text": "(From RPC only) Transaction succeeded in block 9305514. From 0x23a7ae069a7bebbece1403d318c4118218e9c121 to 0x0000000000000000000000000000000001000006. Native value: 0 RBTC. Gas used 69072 of limit 69072."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "native_contract": true,
     "selector": "0x0c5a9990"
@@ -69,6 +71,7 @@
    "text": "Called 0x0000000000000000000000000000000001000006 (Rootstock Bridge (BTC peg), native contract), a contract built into the network's node, with selector 0x0c5a9990; not decoded."
   },
   {
+   "confidence": "confirmed",
    "data": {},
    "id": "E3",
    "kind": "receipt",

@@ -11,6 +11,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 138149038,
     "from": "0x93a4Adece97e85e58ab8aC0C6A953a0089943fD0",
@@ -41,6 +42,7 @@
    "text": "Transaction succeeded in block 138149038 at 2025-07-07T14:00:53.000000Z. From 0x93a4Adece97e85e58ab8aC0C6A953a0089943fD0 to 0x0000000000000000000000000000000000000100. Native value sent: 0 ETH. Gas used 26314 of limit 26657."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000000061636548622",
     "parts": {
@@ -62,6 +64,7 @@
    "text": "Fee paid: 0.000000061636548622 ETH in total: 0.000000026337235262 ETH L2 execution + 0.00000003529931336 ETH L1 data."
   },
   {
+   "confidence": "single_source",
    "data": {
     "data_bytes": 196,
     "had_code": null
@@ -79,6 +82,7 @@
    "text": "Sent 196 bytes of data to 0x0000000000000000000000000000000000000100. The explorer lists it as having no contract code today; this tool cannot confirm the account's code at the moment the transaction ran, so it does not say whether this was a function call."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -91,6 +95,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.optimism.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x0032185da44673d9610ea7c0fee89b04845c21cb29c7e7c247797496961be40a"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

@@ -13,6 +13,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141518,
     "from": "0xd05E8724aD399Bb618497b1bf66a4A24Ab156351",
@@ -43,6 +44,7 @@
    "text": "Transaction failed (reverted) in block 26141518 at 2026-10-07T15:51:11.000000Z. From 0xd05E8724aD399Bb618497b1bf66a4A24Ab156351 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2. Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 133145 of limit 600000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000294067451118215",
     "parts": {
@@ -63,6 +65,7 @@
    "text": "Fee paid: 0.000294067451118215 ETH. The fee is charged even though the transaction failed."
   },
   {
+   "confidence": "single_source",
    "data": {
     "revert_reason": {
      "method_call": "Error(string reason)",
@@ -89,6 +92,7 @@
    "text": "Explorer reports the revert reason: Error(string reason) with reason='INSUFFICIENT_OUTPUT_AMOUNT'."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0x70521ae9"
    },
@@ -105,6 +109,7 @@
    "text": "Called function with selector 0x70521ae9 on 0x278d858f05b94576C1E6f73285886876ff6eF8D2; not decoded."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -124,6 +129,7 @@
    "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (this internal call reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -143,6 +149,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -162,6 +169,7 @@
    "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -181,6 +189,7 @@
    "text": "Internal delegatecall from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x617E169f98F966D520946282De52340b94b59A7c (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -200,6 +209,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -219,6 +229,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -238,6 +249,7 @@
    "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x278d858f05b94576C1E6f73285886876ff6eF8D2 tried to send 0.091541598301954665 ETH but was undone because a call above it reverted; nothing was transferred."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -257,6 +269,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) tried to send 0.091541598301954665 ETH but was undone because a call above it reverted; nothing was transferred."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -276,6 +289,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -295,6 +309,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE (BeamToken) (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -314,6 +329,7 @@
    "text": "Internal call from 0x278d858f05b94576C1E6f73285886876ff6eF8D2 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) (undone because a call above it reverted)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "staticcalls": 4
    },
@@ -330,6 +346,7 @@
    "text": "4 read-only staticcall(s) (no state change) not listed."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "failed"
@@ -342,6 +359,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."

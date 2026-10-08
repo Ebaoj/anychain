@@ -3,6 +3,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 72376526,
     "from": "0xE924c204FDE000f2b684d720213248027C74EdAE",
@@ -33,6 +34,7 @@
    "text": "Transaction succeeded in block 72376526 at 2026-10-07T18:19:15.000000Z. From 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x8d9e5FA918BcdDC873ee6886ebB3a53e3667c5Da. Native value sent: 0.0001 ETH. Gas used 108202 of limit 180110."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.0000048961405",
     "parts": {
@@ -53,6 +55,7 @@
    "text": "Fee paid: 0.0000048961405 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "batch": null,
     "l1_status": "Processed on L2"
@@ -70,6 +73,7 @@
    "text": "Status on L1, as reported by the explorer: 'Processed on L2'; the explorer lists no L1 transaction for it yet."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "committed": "0xadae72c3d1b3a693813c6d07a1842d1557bdc8b1e0230631b6bb8e973f28edac",
     "node_l1_status": "included",
@@ -83,11 +87,18 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xe212432a6d3f26d21c1240c1f376d605b173d6be0b2c2f01444d0d296e57a9c3"
     }
    ],
    "text": "The node reports this transaction committed in L1 transaction 0xadae72c3d1b3a693813c6d07a1842d1557bdc8b1e0230631b6bb8e973f28edac, proven in L1 transaction 0xb9e2cfd6cc4b1b38e595f7d1fb2375e2ccc42437a77d080bced7cec7d2b42ce2 (node status 'included'); the explorer does not list the committed and proven steps yet."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E5",
    "kind": "call",
@@ -102,6 +113,7 @@
    "text": "Plain ETH transfer (no call data) to 0x8d9e5FA918BcdDC873ee6886ebB3a53e3667c5Da."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xE924c204FDE000f2b684d720213248027C74EdAE",
     "to": "0x8d9e5FA918BcdDC873ee6886ebB3a53e3667c5Da",
@@ -120,6 +132,7 @@
    "text": "Native ETH movement of 0.0001 ETH from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x8d9e5FA918BcdDC873ee6886ebB3a53e3667c5Da (the explorer also lists it as a token transfer of the native-token contract; it is not a second asset)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "matches_explorer_fee": true,
     "net": 4896140500000,
@@ -143,6 +156,7 @@
    "text": "Fee flow: 0.000011002469625 ETH prepaid to the fee collector by 0xE924c204FDE000f2b684d720213248027C74EdAE, 0.000006106329125 ETH refunded; net fee 0.0000048961405 ETH. This matches the explorer's fee."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -162,6 +176,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xE924c204FDE000f2b684d720213248027C74EdAE."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -181,6 +196,7 @@
    "text": "Internal call from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x0000000000000000000000000000000000008003 (zkSync NonceHolder system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -200,6 +216,7 @@
    "text": "Internal call from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x000000000000000000000000000000000000800A (Ether)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -219,6 +236,7 @@
    "text": "Internal call from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x0000000000000000000000000000000000000001."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -238,6 +256,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xE924c204FDE000f2b684d720213248027C74EdAE."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -257,6 +276,7 @@
    "text": "Internal call from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": "E7",
@@ -276,6 +296,7 @@
    "text": "Internal ETH transfer of 0.000011002469625 ETH from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds): the same movement as E7, not an additional one."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -295,6 +316,7 @@
    "text": "Internal call from 0x0000000000000000000000000000000000008001 (zkSync bootloader: collects fees and pays refunds) to 0xE924c204FDE000f2b684d720213248027C74EdAE."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -314,6 +336,7 @@
    "text": "Internal call from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x0000000000000000000000000000000000008009 (zkSync MsgValueSimulator system contract)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": "E6",
@@ -333,6 +356,7 @@
    "text": "Internal ETH transfer of 0.0001 ETH from 0xE924c204FDE000f2b684d720213248027C74EdAE to 0x8d9e5FA918BcdDC873ee6886ebB3a53e3667c5Da: the same movement as E6, not an additional one."
   },
   {
+   "confidence": "single_source",
    "data": {
     "system_calls": 57,
     "value": "0"
@@ -350,6 +374,7 @@
    "text": "57 internal call(s) between the network's system contracts not listed (no value carried)."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -362,6 +387,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://mainnet.era.zksync.io"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xe212432a6d3f26d21c1240c1f376d605b173d6be0b2c2f01444d0d296e57a9c3"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

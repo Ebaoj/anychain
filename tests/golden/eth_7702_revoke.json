@@ -3,6 +3,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141769,
     "from": "0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4",
@@ -33,6 +34,7 @@
    "text": "Transaction succeeded in block 26141769 at 2026-10-07T16:41:23.000000Z. From 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4 to 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4. Native value sent: 0 ETH. Gas used 36800 of limit 60000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.0001279950935088",
     "parts": {
@@ -53,6 +55,7 @@
    "text": "Fee paid: 0.0001279950935088 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "applied": true,
     "authority": "0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4",
@@ -73,6 +76,7 @@
    "text": "Code delegation cleared by this transaction: 0x4269D7f3e812FF9cDB73577b089458b3f42BFdC4 stops running delegated code (EIP-7702)."
   },
   {
+   "confidence": "single_source",
    "data": {},
    "id": "E4",
    "kind": "call",
@@ -87,6 +91,7 @@
    "text": "No call data and no value were sent; the transaction carries 1 EIP-7702 authorization(s), listed as delegation facts."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -99,6 +104,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x86b6c6345d9fe5c6145218b5e926be2f65ffa4234b440cdf82cacadecfc4d1a9"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

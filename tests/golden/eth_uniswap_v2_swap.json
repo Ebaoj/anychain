@@ -6,6 +6,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141518,
     "from": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b",
@@ -36,6 +37,7 @@
    "text": "Transaction succeeded in block 26141518 at 2026-10-07T15:51:11.000000Z. From 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02). Native value sent: 0.2 ETH. Gas used 131767 of limit 300000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.000294808567110131",
     "parts": {
@@ -56,6 +58,7 @@
    "text": "Fee paid: 0.000294808567110131 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "amountOutMin": "0",
@@ -84,6 +87,7 @@
    "text": "Called swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256) on 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) with amountOutMin=0, path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa], to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b, deadline=1791388271. ABI source: explorer: verified contract UniswapV2Router02."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
@@ -104,6 +108,7 @@
    "text": "Token transfer: 0.2 WETH from 0x0000000000000000000000000000000000000000 to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     "to": "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3",
@@ -124,6 +129,7 @@
    "text": "Token transfer: 0.2 WETH from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3",
     "to": "0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b",
@@ -144,6 +150,7 @@
    "text": "Token transfer: 12118418.517751063 BUNKER from 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2) to 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": null,
@@ -163,6 +170,7 @@
    "text": "Internal ETH transfer of 0.2 ETH from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -182,6 +190,7 @@
    "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -201,6 +210,7 @@
    "text": "Internal call from 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) to 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -220,6 +230,7 @@
    "text": "Internal call from 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2) to 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa (Bunker Mode)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "staticcalls": 7
    },
@@ -236,6 +247,7 @@
    "text": "7 read-only staticcall(s) (no state change) not listed."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "reserve0": "8492451845051793135",
@@ -256,6 +268,7 @@
    "text": "Event Sync(uint112,uint112) emitted by 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2): reserve0=8492451845051793135, reserve1=503968916733373231."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "amount0In": "200000000000000000",
@@ -280,6 +293,7 @@
    "text": "Event Swap(address,uint256,uint256,uint256,uint256,address) emitted by 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 (Uniswap V2): sender=0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, amount0In=200000000000000000, amount1In=0, amount0Out=0, amount1Out=12118418517751063, to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -292,6 +306,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

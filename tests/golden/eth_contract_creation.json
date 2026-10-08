@@ -18,6 +18,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 10000835,
     "from": "0x9C33eaCc2F50E39940D3AfaF2c7B8246B681A374",
@@ -48,6 +49,7 @@
    "text": "Transaction succeeded in block 10000835 at 2020-05-04T16:34:02.000000Z. From 0x9C33eaCc2F50E39940D3AfaF2c7B8246B681A374 to (contract creation of 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f (UniswapV2Factory)). Native value sent: 0 ETH. Gas used 3049335 of limit 3049335."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.0609867",
     "parts": {
@@ -68,6 +70,7 @@
    "text": "Fee paid: 0.0609867 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "created": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
    },

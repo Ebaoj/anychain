@@ -45,7 +45,8 @@ def evidence_payload(bundle: EvidenceBundle, cfg: AppConfig | None = None) -> st
             "tx_hash": bundle.tx_hash,
             "status": bundle.status,
             "evidence": [
-                {"id": e.id, "kind": e.kind, "fact": e.text, "sources": _sources_for_llm(e.sources)}
+                {"id": e.id, "kind": e.kind, "fact": e.text, "confidence": e.confidence,
+                 "sources": _sources_for_llm(e.sources)}
                 for e in bundle.items
             ],
             "gaps": [{k: _without_urls(v, hidden) if isinstance(v, str) else v for k, v in g.model_dump().items()}

@@ -3,6 +3,7 @@
  "gaps": [],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 9305355,
     "from": "0x0000000000000000000000000000000000000000",
@@ -33,6 +34,7 @@
    "text": "Transaction succeeded in block 9305355 at 2026-10-07T18:48:07.000000Z. From 0x0000000000000000000000000000000000000000 to 0x0000000000000000000000000000000001000008 (Rootstock REMASC (block rewards), native contract). Native value sent: 0 RBTC. Gas used 0 of limit 0."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0",
     "parts": {
@@ -53,6 +55,7 @@
    "text": "Fee paid: 0 RBTC."
   },
   {
+   "confidence": "single_source",
    "data": {
     "remasc": true
    },
@@ -69,6 +72,7 @@
    "text": "The explorer classifies this as Rootstock's REMASC transaction: the per-block distribution of mining rewards, a system transaction."
   },
   {
+   "confidence": "single_source",
    "data": {
     "system": true
    },
@@ -85,6 +89,7 @@
    "text": "System transaction: sent from the zero address, which no one can sign for, to 0x0000000000000000000000000000000001000008 (Rootstock REMASC (block rewards), native contract). It carries no call data."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -97,6 +102,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://public-node.rsk.co"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0xc56d7cb6e5acdadf71898c8a6c11a0c74d42d0d172eae3bb3b48d874ef521bee"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

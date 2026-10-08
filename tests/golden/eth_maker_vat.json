@@ -27,6 +27,7 @@
  ],
  "items": [
   {
+   "confidence": "single_source",
    "data": {
     "block": 26141827,
     "from": "0xc912027E7143B98ae64aEdaa8f60CEcb641bC247",
@@ -57,6 +58,7 @@
    "text": "Transaction succeeded in block 26141827 at 2026-10-07T16:52:59.000000Z. From 0xc912027E7143B98ae64aEdaa8f60CEcb641bC247 to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09. Native value sent: 0 ETH. Gas used 514359 of limit 771539."
   },
   {
+   "confidence": "single_source",
    "data": {
     "fee": "0.002133562980091887",
     "parts": {
@@ -77,6 +79,7 @@
    "text": "Fee paid: 0.002133562980091887 ETH."
   },
   {
+   "confidence": "single_source",
    "data": {
     "selector": "0x085c8c5e"
    },
@@ -93,6 +96,7 @@
    "text": "Called function with selector 0x085c8c5e on 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09; not decoded."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x78f66519DB98d799770d91f47D005Ddc8Aaf03e5",
     "to": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
@@ -113,6 +117,7 @@
    "text": "Token transfer: 5000 USDC from 0x78f66519DB98d799770d91f47D005Ddc8Aaf03e5 to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
     "to": "0xA188EEC8F81263234dA3622A406892F3D630f98c",
@@ -133,6 +138,7 @@
    "text": "Token transfer: 5000.000001 USDC from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xA188EEC8F81263234dA3622A406892F3D630f98c",
     "to": "0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341",
@@ -153,6 +159,7 @@
    "text": "Token transfer: 5000.000001 USDC from 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper) to 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xf6e72Db5454dd049d0788e411b06CfAF16853042",
     "to": "0xA188EEC8F81263234dA3622A406892F3D630f98c",
@@ -173,6 +180,7 @@
    "text": "Token transfer: 5000.000001 DAI from 0xf6e72Db5454dd049d0788e411b06CfAF16853042 (DssLitePsm) to 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xA188EEC8F81263234dA3622A406892F3D630f98c",
     "to": "0x0000000000000000000000000000000000000000",
@@ -193,6 +201,7 @@
    "text": "Token transfer: 5000.000001 DAI from 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper) to 0x0000000000000000000000000000000000000000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x0000000000000000000000000000000000000000",
     "to": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
@@ -213,6 +222,7 @@
    "text": "Token transfer: 5000.000001 USDS from 0x0000000000000000000000000000000000000000 to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
     "to": "0x000000000004444c5dc75cB358380D2e3dE08A90",
@@ -233,6 +243,7 @@
    "text": "Token transfer: 5000.000001 USDS from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x000000000004444c5dc75cB358380D2e3dE08A90",
     "to": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
@@ -253,6 +264,7 @@
    "text": "Token transfer: 5001.070771 USDT from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
     "to": "0xB7131fC8Cdc43060A6210257f537DBA5FcaE6aEd",
@@ -273,6 +285,7 @@
    "text": "Token transfer: 5001.07077 USDT from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0xB7131fC8Cdc43060A6210257f537DBA5FcaE6aEd (SafeProxy)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0xB7131fC8Cdc43060A6210257f537DBA5FcaE6aEd",
     "to": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
@@ -293,6 +306,7 @@
    "text": "Token transfer: 21798.845600873493366 SYRUP from 0xB7131fC8Cdc43060A6210257f537DBA5FcaE6aEd (SafeProxy) to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
     "to": "0x78f66519DB98d799770d91f47D005Ddc8Aaf03e5",
@@ -313,6 +327,7 @@
    "text": "Token transfer: 21732.964503790735139667 SYRUP from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0x78f66519DB98d799770d91f47D005Ddc8Aaf03e5."
   },
   {
+   "confidence": "single_source",
    "data": {
     "from": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
     "to": "0xB666Fd9B55572a3cF6d42b16Fb550787670a000f",
@@ -333,6 +348,7 @@
    "text": "Token transfer: 65.883906536070438679 SYRUP from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0xB666Fd9B55572a3cF6d42b16Fb550787670a000f."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -352,6 +368,7 @@
    "text": "Internal call from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -371,6 +388,7 @@
    "text": "Internal call from 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor) to 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -390,6 +408,7 @@
    "text": "Internal call from 0x000000000022D473030F116dDEE9F6B43aC78BA3 (Permit2) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -409,6 +428,7 @@
    "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -428,6 +448,7 @@
    "text": "Internal call from 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor) to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -447,6 +468,7 @@
    "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -466,6 +488,7 @@
    "text": "Internal call from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -485,6 +508,7 @@
    "text": "Internal call from 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -504,6 +528,7 @@
    "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -523,6 +548,7 @@
    "text": "Internal call from 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper) to 0xf6e72Db5454dd049d0788e411b06CfAF16853042 (DssLitePsm)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -542,6 +568,7 @@
    "text": "Internal call from 0xf6e72Db5454dd049d0788e411b06CfAF16853042 (DssLitePsm) to 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -561,6 +588,7 @@
    "text": "Internal delegatecall from 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDC) to 0x43506849D7C04F9138D1A2050bbF3A0c054402dd (FiatTokenV2_2)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -580,6 +608,7 @@
    "text": "Internal call from 0xf6e72Db5454dd049d0788e411b06CfAF16853042 (DssLitePsm) to 0x6B175474E89094C44Da98b954EedeAC495271d0F (Dai)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -599,6 +628,7 @@
    "text": "Internal call from 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper) to 0x9759A6Ac90977b93B58547b4A71c78317f391A28 (DaiJoin)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -618,6 +648,7 @@
    "text": "Internal call from 0x9759A6Ac90977b93B58547b4A71c78317f391A28 (DaiJoin) to 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B (Vat)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -637,6 +668,7 @@
    "text": "Internal call from 0x9759A6Ac90977b93B58547b4A71c78317f391A28 (DaiJoin) to 0x6B175474E89094C44Da98b954EedeAC495271d0F (Dai)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -656,6 +688,7 @@
    "text": "Internal call from 0xA188EEC8F81263234dA3622A406892F3D630f98c (UsdsPsmWrapper) to 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB (UsdsJoin)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -675,6 +708,7 @@
    "text": "Internal call from 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB (UsdsJoin) to 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B (Vat)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -694,6 +728,7 @@
    "text": "Internal call from 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB (UsdsJoin) to 0xdC035D45d973E3EC169d2276DDab16f1e407384F (ERC1967Proxy)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -713,6 +748,7 @@
    "text": "Internal delegatecall from 0xdC035D45d973E3EC169d2276DDab16f1e407384F (ERC1967Proxy) to 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102 (Usds)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -732,6 +768,7 @@
    "text": "Internal delegatecall from 0xdC035D45d973E3EC169d2276DDab16f1e407384F (ERC1967Proxy) to 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102 (Usds)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -751,6 +788,7 @@
    "text": "Internal delegatecall from 0xdC035D45d973E3EC169d2276DDab16f1e407384F (ERC1967Proxy) to 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102 (Usds)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -770,6 +808,7 @@
    "text": "Internal call from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af (UniversalRouter)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -789,6 +828,7 @@
    "text": "Internal call from 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -808,6 +848,7 @@
    "text": "Internal call from 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) to 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af (UniversalRouter)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -827,6 +868,7 @@
    "text": "Internal call from 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -846,6 +888,7 @@
    "text": "Internal call from 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af (UniversalRouter) to 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": false,
     "same_as": null,
@@ -865,6 +908,7 @@
    "text": "Internal delegatecall from 0xdC035D45d973E3EC169d2276DDab16f1e407384F (ERC1967Proxy) to 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102 (Usds)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": null,
@@ -884,6 +928,7 @@
    "text": "Internal ETH transfer of 0.000000000000000001 ETH from 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09 to 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor)."
   },
   {
+   "confidence": "single_source",
    "data": {
     "moves_value": true,
     "same_as": null,
@@ -903,6 +948,7 @@
    "text": "Internal ETH transfer of 0.000000000000000001 ETH from 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor) to 0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09."
   },
   {
+   "confidence": "single_source",
    "data": {
     "staticcalls": 10
    },
@@ -919,6 +965,7 @@
    "text": "10 read-only staticcall(s) (no state change) not listed."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "fee": "0",
@@ -940,6 +987,7 @@
    "text": "Event SellGem(address,uint256,uint256) emitted by 0xf6e72Db5454dd049d0788e411b06CfAF16853042 (DssLitePsm): owner=0xA188EEC8F81263234dA3622A406892F3D630f98c, value=5000000001, fee=0."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "arg1": "0x0000000000000000000000009759a6ac90977b93b58547b4a71c78317f391a28",
@@ -963,6 +1011,7 @@
    "text": "Event LogNote(bytes4,bytes32,bytes32,bytes32,bytes) (anonymous event) emitted by 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B (Vat): sig=0xbb35783b, arg1=0x0000000000000000000000009759a6ac90977b93b58547b4a71c78317f391a28, arg2=0x000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c, arg3=0x0000000000000000000000036bcfc11c37a2ebc47977229ddbaa568000000000, data=0xbb35783b0000000000000000000000009759a6ac90977b93b58547b4a71c78317f391a28000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c0000000000000000000000036bcfc11c37a2ebc47977229ddbaa56800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "arg1": "0x000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c",
@@ -986,6 +1035,7 @@
    "text": "Event LogNote(bytes4,address,bytes32,bytes32,bytes) (anonymous event) emitted by 0x9759A6Ac90977b93B58547b4A71c78317f391A28 (DaiJoin): sig=0x3b4da69f, usr=0xA188EEC8F81263234dA3622A406892F3D630f98c, arg1=0x000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c, arg2=0x00000000000000000000000000000000000000000000010f0cf065c62dc51000, data=0x3b4da69f000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c00000000000000000000000000000000000000000000010f0cf065c62dc51000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "arg1": "0x000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c",
@@ -1009,6 +1059,7 @@
    "text": "Event LogNote(bytes4,bytes32,bytes32,bytes32,bytes) (anonymous event) emitted by 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B (Vat): sig=0xbb35783b, arg1=0x000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c, arg2=0x0000000000000000000000003c0f895007ca717aa01c8693e59df1e8c3777feb, arg3=0x0000000000000000000000036bcfc11c37a2ebc47977229ddbaa568000000000, data=0xbb35783b000000000000000000000000a188eec8f81263234da3622a406892f3d630f98c0000000000000000000000003c0f895007ca717aa01c8693e59df1e8c3777feb0000000000000000000000036bcfc11c37a2ebc47977229ddbaa56800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "caller": "0xA188EEC8F81263234dA3622A406892F3D630f98c",
@@ -1030,6 +1081,7 @@
    "text": "Event Exit(address,address,uint256) emitted by 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB (UsdsJoin): caller=0xA188EEC8F81263234dA3622A406892F3D630f98c, usr=0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09, wad=5000000001000000000000."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "amount0": "5001070771",
@@ -1056,6 +1108,7 @@
    "text": "Event Swap(bytes32,address,int128,int128,uint160,uint128,int24,uint24) emitted by 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager): id=0x3b1b1f2e775a6db1664f8e7d59ad568605ea2406312c11aef03146c0cf89d5b9, sender=0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af, amount0=5001070771, amount1=-5000000001000000000000, sqrtPriceX96=79219446657302660054912273993272264, liquidity=50021461281192726929237, tick=276321, fee=6."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "eventId": "54960155708611390198571333492932865500"
@@ -1075,6 +1128,7 @@
    "text": "Event BebopOrder(uint128) emitted by 0xbbbbbBB520d69a9775E85b458C58c648259FAD5F (BebopSettlement): eventId=54960155708611390198571333492932865500."
   },
   {
+   "confidence": "single_source",
    "data": {
     "args": {
      "filler": "0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09",
@@ -1097,6 +1151,7 @@
    "text": "Event Fill(bytes32,address,address,uint256) emitted by 0x00000011F84B9aa48e5f8aA8B9897600006289Be (V2DutchOrderReactor): orderHash=0x02e73e54b01dc5569aa6cf0259e227e7d24880c44b195b3179bccca4a4a41ddb, filler=0x52B335fD4d229C4B4FFa6190526e4b5Fb8e3Fb09, swapper=0x78f66519DB98d799770d91f47D005Ddc8Aaf03e5, nonce=1993355142695102229251612304405325997465614892514332075166034588199354349074."
   },
   {
+   "confidence": "confirmed",
    "data": {
     "agrees": true,
     "rpc_status": "success"
@@ -1109,6 +1164,12 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://ethereum-rpc.publicnode.com"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xaea61c0672217a85a63fbdddc14714b39ffa64baf25a526cf5a9ba74841484d7"
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."

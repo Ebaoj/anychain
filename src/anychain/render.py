@@ -13,6 +13,10 @@ def _source_text(source: Source) -> str:
     return text
 
 
+CONFIDENCE_TEXT = {"confirmed": "confirmed by the node", "single_source": "explorer only",
+                   "candidate": "candidate: inferred, not confirmed"}
+
+
 def render_markdown(bundle: EvidenceBundle) -> str:
     lines = [
         f"# Transaction {bundle.tx_hash}",
@@ -22,7 +26,7 @@ def render_markdown(bundle: EvidenceBundle) -> str:
     ]
     for ev in bundle.items:
         links = " ".join(_source_text(s) for s in ev.sources)
-        lines.append(f"- **[{ev.id}]** {ev.text}  \n  _Sources:_ {links}")
+        lines.append(f"- **[{ev.id}]** {ev.text} _({CONFIDENCE_TEXT[ev.confidence]})_  \n  _Sources:_ {links}")
     if bundle.abi_sources:
         lines += ["", "## ABI sources"] + [f"- `{a}`: {s}" for a, s in bundle.abi_sources.items()]
     if bundle.gaps:

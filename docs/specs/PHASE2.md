@@ -43,7 +43,7 @@ A failed or hard-to-read transaction gets a sourced diagnosis and decoding from 
 - **R3.** WHEN a likely cause depends on chain state that a standard read can check (ERC-20 allowance and balance, `paused()`, a deadline against the block time), THE SYSTEM SHALL read it with `eth_call` at the parent block and state the value with its block. **Accept:** the balance in R1 is read and shown with block number and source; the "paused" case reads `paused()`.
 - **R4.** WHEN a configured repo contains the called contract (matched by verified source hash, or by address in config), THE SYSTEM SHALL cite the function's source with a permalink to the pinned commit and lines. **Accept:** a BRLC transaction on Ethereum (proxy 0xAC17…) cites `cloudwallk/brlc-token@74a5498` file and lines of the called function.
 - **R5.** THE SYSTEM SHALL decode calls, events and custom errors through the configured ABI order: explorer, repo artifacts, signatures computed from repo source, signature database. A signature-database match SHALL be stated as a candidate ("selector matches `transfer(address,uint256)` in 4byte; not confirmed"), never as the decoded call.
-- **R6.** THE SYSTEM SHALL mark every fact's confidence: `confirmed` (from the source of record, or two sources agree), `single_source` (one source, not cross-checked), `candidate` (inferred, e.g. a signature match). The rendered output and the LLM payload SHALL show it.
+- **R6.** THE SYSTEM SHALL mark every fact's confidence: `confirmed` (every source is the node, the source of record; or the fact is a check of the explorer against the node), `single_source` (one source, not cross-checked), `candidate` (inferred, e.g. a signature match). The rendered output and the LLM payload SHALL show it.
 - **R7.** WHEN the LLM returns an answer, THE SYSTEM SHALL check it before showing it: every `[E#]` exists; every address, hash and number with 4+ digits appears in the evidence; IF a check fails, THEN it SHALL retry once with the list of problems, and IF it fails again, show the evidence-only output with a note.
 - **R8.** IF any source is missing or fails (explorer, RPC, repo clone, signature database, LLM, time budget), THEN THE SYSTEM SHALL still answer with what it has and say what is missing and what would fix it (existing gap rules), and the event log SHALL record the cause.
 
@@ -106,7 +106,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 | R3 | balance and `paused()` reads pinned to the parent block, from recordings | pasted |
 | R4 | BRLC call cites file, lines and commit | pasted |
 | R5 | unverified contract decoded from repo; 4byte match stated as candidate | pasted |
-| R6 | every fact has a confidence; a candidate never reads as confirmed | pasted |
+| R6 | `tests/test_confidence.py` (all 41 recordings: confidence follows the sources; candidate only on purpose; shown to reader and model) | T2 done 2026-10-08: 442 passed (D29) |
 | R7 | `tests/test_validator.py` (real answers pass; tampered numbers, hex, links and citations caught; retry and withhold flow; event log) | T1 done 2026-10-08: 374 passed; live: support ok, developer fixed on retry (D28) |
 | R8 | one case per missing source | pasted |
 

@@ -425,8 +425,9 @@ class BundleBuilder:
         for item in self.profile.node_facts(tx_hash, tx.raw, self.rpc.call):
             if isinstance(item, ChainGap):
                 self._gap(item.what, item.why, item.needed, retryable=item.cause == "source_behind", cause=item.cause)
-            else:
-                self.bundle.add(item.kind, item.text, [self._rpc_source(item.rpc_method or "node")], item.data)
+            else:  # the node's view compared with the explorer's: cites both, confirmed by the node
+                self.bundle.add(item.kind, item.text, [self._rpc_source(item.rpc_method or "node"),
+                                                       self._tx_source(tx_hash)], item.data, confidence="confirmed")
 
     def _add_chain_facts(self, tx_hash: str, tx: Transaction) -> None:
         """Facts only this network type has, plus a check that the config's chain_type fits the payload."""
@@ -612,8 +613,9 @@ class BundleBuilder:
         decoder = self._decoder_for(address) if self.explorer_answered else None
         decoded = decoder.decode_call(data) if decoder else None
         if decoded:
+            abi_source = self._api_source(f"/smart-contracts/{address}", "Explorer API: contract ABI")
             self.bundle.add("call", f"Called {decoded.signature} on {to_text}{with_args(decoded.args)}. "
-                            f"ABI source: {self.abi_notes[address.lower()]}.", [source],
+                            f"ABI source: {self.abi_notes[address.lower()]}.", [source, abi_source],
                             {"function": decoded.name, "args": {a.name: a.value for a in decoded.args},
                              "native_contract": True})
             return
@@ -998,9 +1000,10 @@ class BundleBuilder:
             return
         decoder = self._decoder_for(to) if self.explorer_answered else None
         decoded = decoder.decode_call(data) if decoder else None
-        if decoded:
+        if decoded:  # calldata from the node, its meaning from the explorer's ABI
+            abi_source = self._api_source(f"/smart-contracts/{to}", "Explorer API: contract ABI")
             self.bundle.add("call", f"Called {decoded.signature} on {to}{with_args(decoded.args)}. "
-                            f"ABI source: {self.abi_notes[to.lower()]}.", [source],
+                            f"ABI source: {self.abi_notes[to.lower()]}.", [source, abi_source],
                             {"function": decoded.name, "args": {a.name: a.value for a in decoded.args}})
             return
         self.bundle.add("call", f"Called function with selector {data[:10]} on {to}; not decoded.", [source],
@@ -1021,8 +1024,10 @@ class BundleBuilder:
         agree = receipt.status == self.bundle.status
         text = f"RPC receipt independently reports status {receipt.status}"
         text += ", matching the explorer." if agree else f", but the explorer says {self.bundle.status}."
-        source = self._rpc_source(f"eth_getTransactionReceipt [{self.bundle.tx_hash}]")
-        self.bundle.add("cross_check", text, [source], {"rpc_status": receipt.status, "agrees": agree})
+        sources = [self._rpc_source(f"eth_getTransactionReceipt [{self.bundle.tx_hash}]"),
+                   self._tx_source(self.bundle.tx_hash)]  # the check compares both: it cites both
+        self.bundle.add("cross_check", text, sources, {"rpc_status": receipt.status, "agrees": agree},
+                        confidence="confirmed")
         if not agree:
             self._gap("Status disagreement", "explorer and RPC report different statuses",
                       "Treat the RPC receipt as authoritative and re-check the explorer index", retryable=True,
