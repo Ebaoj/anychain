@@ -1,0 +1,10 @@
+{
+ "GET https://rootstock.blockscout.com/api/v2/stats": {
+  "body": "{\"average_block_time\":31409.0,\"coin_image\":\"https://coin-images.coingecko.com/coins/images/5070/small/rBTC_primary_symbol_256x256_%281%29.png?1779524021\",\"coin_price\":\"81407\",\"coin_price_change_percentage\":-2.24,\"gas_price_updated_at\":\"2026-10-08T19:17:06.178971Z\",\"gas_prices\":{\"slow\":0.03,\"average\":0.04,\"fast\":0.04},\"gas_prices_update_in\":25537,\"gas_used_today\":\"362675691\",\"market_cap\":\"98493729.755107000918654845\",\"network_utilization_percentage\":1.5298864,\"rootstock_locked_btc\":\"1209892635216959240835\",\"secondary_coin_image\":null,\"secondary_coin_price\":null,\"static_gas_price\":null,\"total_addresses\":\"4508803\",\"total_blocks\":\"9308029\",\"total_transactions\":\"21551917\",\"transactions_today\":\"6488\",\"tvl\":null}",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_chainId []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x1e\"}\n",
+  "status": 200
+ }
+}

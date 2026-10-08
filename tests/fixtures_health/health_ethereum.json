@@ -1,0 +1,10 @@
+{
+ "GET https://eth.blockscout.com/api/v2/stats": {
+  "body": "{\"average_block_time\":12242.0,\"coin_image\":\"https://coin-images.coingecko.com/coins/images/279/small/ethereum.png?1696501628\",\"coin_price\":\"2443.42\",\"coin_price_change_percentage\":-4.53,\"gas_price_updated_at\":\"2026-10-08T19:17:06.717940Z\",\"gas_prices\":{\"slow\":1.72,\"average\":2.34,\"fast\":3.58},\"gas_prices_update_in\":27290,\"gas_used_today\":\"216718636842\",\"market_cap\":\"298381014798.4001563430\",\"network_utilization_percentage\":48.31417901422381,\"secondary_coin_image\":null,\"secondary_coin_price\":null,\"static_gas_price\":null,\"total_addresses\":\"738001372\",\"total_blocks\":\"26149602\",\"total_transactions\":\"3791755388\",\"transactions_today\":\"1960230\",\"tvl\":null}",
+  "status": 200
+ },
+ "POST https://ethereum-rpc.publicnode.com eth_chainId []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"result\":\"0x1\",\"id\":1}\n",
+  "status": 200
+ }
+}

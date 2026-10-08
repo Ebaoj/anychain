@@ -9,12 +9,12 @@ from dotenv import load_dotenv
 
 from anychain.answer import structured_answer
 from anychain.bundle import InvalidHashError, build_bundle
-from anychain.cache import BundleCache, NoCache, answer_key, cached_bundle
+from anychain.cache import BundleCache, NoCache, cached_bundle
 from anychain.collectors.rpc import RpcClient
 from anychain.config import ConfigError, load_config
-from anychain.events import PROBLEM_CAUSES, CheckEvent, NullEventLog, RunEvent, SqliteEventLog, event_log_for
+from anychain.events import PROBLEM_CAUSES, NullEventLog, RunEvent, SqliteEventLog, event_log_for
 from anychain.render import render_markdown
-from anychain.writer import CheckedAnswer, WriterError, write_checked
+from anychain.writer import write_checked
 
 app = typer.Typer(help="Explain and troubleshoot EVM transactions on any configured network.", no_args_is_help=True)
 
@@ -46,76 +46,44 @@ def explain(
     fresh: bool = typer.Option(False, "--fresh", help="Fetch everything again, ignoring the cache"),
 ) -> None:
     """Explain what a transaction did, with a cited source for each fact."""
+    from anychain.service import NONE, SKIP, WRITE, Crash, answer_transaction
     if as_json and as_evidence:
         _fail("Use either --json (the structured answer) or --evidence (the evidence bundle), not both.")
     try:
         cfg = load_config(config)
     except ConfigError as exc:
         _fail(str(exc))
-    log = _open_log(cfg)
-    started = time.monotonic()
-    store = cache_for(cfg)
+    mode_name = (mode or Mode(cfg.assistant.default_mode)).value
     try:
-        bundle, cache_state = cached_bundle(tx_hash.strip(), cfg, store, build_bundle, lambda: finality_rpc_for(cfg),
-                                            fresh)
+        result = answer_transaction(
+            tx_hash, cfg, mode_name, write=NONE if as_evidence else SKIP if no_llm else WRITE, fresh=fresh,
+            source="cli", log=_open_log(cfg), store=cache_for(cfg), build=build_bundle, write_fn=write_checked,
+            finality=lambda: finality_rpc_for(cfg), record=_record)
     except InvalidHashError as exc:
         _fail(str(exc))
-    except Exception as exc:  # last line of defence: never a stack trace for the user
-        _record(log, RunEvent.crash(cfg.network.name, tx_hash.strip(), "cli", _ms(started),
-                                    f"{type(exc).__name__}: {exc}"))
-        _fail(f"Unexpected error while collecting data ({type(exc).__name__}: {exc}). Please report it.")
-    mode_name = (mode or Mode(cfg.assistant.default_mode)).value
-
-    def event(**kw) -> RunEvent:
-        return RunEvent.from_bundle(bundle, "cli", _ms(started), cache=cache_state, mode=mode_name, **kw)
-    if as_evidence:  # (with --json: refused before collecting anything, below)
-        _record(log, event())
-        print(bundle.model_dump_json(indent=2))
+    except Crash as exc:
+        _fail(f"Unexpected error while collecting data ({exc}). Please report it.")
+    for note in result.notes:
+        print(note, file=sys.stderr)
+    if as_evidence:
+        print(result.bundle.model_dump_json(indent=2))
         return
-
-    def as_answer(summary: str | None, status: str) -> None:
-        status = {"fail": "withheld"}.get(status, status)  # the writer's outcome names, as the JSON documents them
-        print(json.dumps(structured_answer(bundle, summary, status, mode_name), indent=2, ensure_ascii=False))
-    evidence_md = render_markdown(bundle)
-    if no_llm or not bundle.items:
-        _record(log, event(writer="skipped"))
-        as_answer(None, "skipped" if no_llm else "no_evidence") if as_json else print(evidence_md)
-        return
-    final = cache_state in ("hit", "stored")  # a written answer is kept only for evidence that cannot change
-    key = answer_key(bundle, cfg, mode_name) if final else None
-    kept = None
-    if key and not fresh:
-        try:
-            kept = store.get_answer(key)
-        except Exception:  # a cache that cannot be read is skipped
-            kept = None
-    try:
-        checked = CheckedAnswer(kept[0], "cached", []) if kept else write_checked(bundle, cfg, mode_name)
-    except WriterError as exc:
-        _record(log, event(writer="unavailable", usage=exc.usage))
-        print(f"_(LLM unavailable: {exc}. " + ("The answer has no summary.)_" if as_json else
-                                                  "Showing the evidence only.)_\n"), file=sys.stderr)
-        as_answer(None, "unavailable") if as_json else print(evidence_md)
-        return
-    # What the model stated outside the evidence, kept for review: "retried" (fixed) or "fail" (withheld).
-    check = (CheckEvent("answer_check", "fail" if checked.text is None else "retried", "; ".join(checked.problems)),
-             ) if checked.problems else ()
-    _record(log, event(checks=check, writer=checked.outcome, usage=checked.usage))
-    if key and checked.text is not None and not kept:
-        try:
-            store.put_answer(key, checked.text, checked.outcome)
-        except Exception as exc:
-            print(f"(cache unavailable: {type(exc).__name__}: {exc})", file=sys.stderr)
+    if result.writer_error:
+        print(f"_(LLM unavailable: {result.writer_error}. " + ("The answer has no summary.)_" if as_json else
+                                                               "Showing the evidence only.)_\n"), file=sys.stderr)
     if as_json:
-        as_answer(checked.text, checked.outcome)
+        print(json.dumps(structured_answer(result.bundle, result.text, result.summary_status, mode_name), indent=2,
+                         ensure_ascii=False))
         return
-    if checked.text is None:
-        listed = "; ".join(checked.problems[:3])
+    evidence_md = render_markdown(result.bundle)
+    if result.summary_status == "withheld":
+        listed = "; ".join(result.problems[:3])
         print(f"_(The written explanation was withheld: twice it stated things not in the evidence ({listed}). "
               "Showing the evidence only.)_\n")
+    if result.text is None:
         print(evidence_md)
         return
-    print(checked.text + "\n\n---\n" + evidence_md)
+    print(result.text + "\n\n---\n" + evidence_md)
 
 
 def cache_for(cfg):
@@ -219,10 +187,10 @@ def _open_log(cfg):
         return NullEventLog()
 
 
-def _record(log, event: RunEvent) -> None:
-    """Logging must never cost the user an answer."""
+def _record(log, event: RunEvent) -> int | None:
+    """Logging must never cost the user an answer. Returns the row's id (None: not logged)."""
     try:
-        log.record(event)
+        return log.record(event)
     except Exception as exc:
         print(f"(event log unavailable: {type(exc).__name__}: {exc})", file=sys.stderr)
 
@@ -285,6 +253,45 @@ def show_log(
                 print(f"    {g['cause']:<20} {g['topic']:<28} {_n(g['answers'], 'answer'):>12} ({share:.1f}%)")
         for f in r["check_failures"]:
             print(f"    check failed       {f['name']:<28} {f['n']:>5}")
+
+
+LOCAL_HOSTS = ("127.0.0.1", "localhost", "::1")
+
+
+@app.command()
+def serve(
+    config: str = typer.Option(None, "--config", help="Path to network YAML (or set ANYCHAIN_CONFIG)"),
+    host: str = typer.Option("127.0.0.1", help="Address to listen on: this machine only"),
+    port: int = typer.Option(8000, min=1, max=65535),
+) -> None:
+    """Run the local API (PHASE3 T2): /health, /explain, /feedback. It has no authentication, so it only listens on
+    this machine."""
+    import uvicorn
+
+    from anychain.api import create_app
+    if host not in LOCAL_HOSTS:
+        _fail(f"The API has no authentication, so it only listens on this machine: use 127.0.0.1, not {host}.")
+    try:
+        cfg = load_config(config)
+    except ConfigError as exc:
+        _fail(str(exc))
+    import socket
+    family = socket.AF_INET6 if ":" in host else socket.AF_INET
+    with socket.socket(family) as listening:  # someone answering on it: another program
+        listening.settimeout(1)
+        if listening.connect_ex((host, port)) == 0:
+            _fail(f"Port {port} on {host} is taken: another program is listening on it. Pick another with --port.")
+    with socket.socket(family) as probe:  # not listening, but not free yet: a server stopped moments ago
+        try:
+            probe.bind((host, port))
+        except OSError as exc:
+            _fail(f"Port {port} on {host} cannot be used yet ({exc.strerror}): it was released moments ago, or "
+                  "another program holds it. Try again in a minute, or pick another with --port.")
+    app_ = create_app(cfg, log=_open_log(cfg), store=cache_for(cfg), build=build_bundle, write_fn=write_checked,
+                      finality=lambda: finality_rpc_for(cfg), record=_record)
+    shown = f"[{host}]" if ":" in host else host
+    print(f"AnyChain API for {cfg.network.name} on http://{shown}:{port} (Ctrl+C to stop)")
+    uvicorn.run(app_, host=host, port=port, log_level="warning")
 
 
 @app.command("metrics")

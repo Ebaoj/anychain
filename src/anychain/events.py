@@ -105,7 +105,7 @@ class NullEventLog:
     def record(self, event: RunEvent, replace: bool = False) -> None:
         return None
 
-    def set_feedback(self, run_id: int, feedback: str) -> bool:
+    def set_feedback(self, run_id: int, feedback: str, source: str | None = None) -> bool:
         return False
 
 
@@ -226,12 +226,16 @@ class SqliteEventLog:
                            [(run_id, c.name, c.status, c.detail) for c in event.checks])
         return run_id
 
-    def set_feedback(self, run_id: int, feedback: str) -> bool:
-        """The reader's thumbs up or down on one answer. False: no such answer."""
+    def set_feedback(self, run_id: int, feedback: str, source: str | None = None) -> bool:
+        """The reader's thumbs up or down on one answer (not a crash). `source`: only on an answer from there (the
+        API passes "api"). False: no such answer."""
         if feedback not in ("up", "down"):
             raise ValueError("feedback is up or down")
+        where, args = "id = ? AND outcome != 'crash'", [run_id]
+        if source:
+            where, args = where + " AND source = ?", args + [source]
         with self._connect() as db:
-            return db.execute("UPDATE runs SET feedback = ? WHERE id = ?", (feedback, run_id)).rowcount == 1
+            return db.execute(f"UPDATE runs SET feedback = ? WHERE {where}", [feedback] + args).rowcount == 1
 
     # ---- queries (used by `anychain log`) --------------------------------
 

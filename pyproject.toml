@@ -14,6 +14,8 @@ dependencies = [
     "eth-hash[pycryptodome]>=0.7",
     "anthropic>=0.40",
     "python-dotenv>=1.0",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
 ]
 
 [project.scripts]
