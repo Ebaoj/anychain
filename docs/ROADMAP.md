@@ -13,7 +13,8 @@ Agreed items for later phases, so they are not lost between sessions. Each item 
 
 ## Open questions
 - ~~Anthropic API key for the LLM writer~~ Resolved 2026-10-08: the writer runs on Claude Code (D27); a key is needed only for a deployed service.
-- Using the unofficial mirror `cloudwallk/brlc-token` in the demo, with a README note.
+- ~~Using the unofficial mirror `cloudwallk/brlc-token` in the demo~~ Approved by Joabe on 2026-10-08, with a README note that it is an unofficial mirror (pinned commit 74a5498).
+- Re-run of the 1,800-transaction acceptance after D26: deferred by Joabe on 2026-10-08. Until it runs, the measured rates in docs/acceptance-report.md describe the code before D26 (C11 and C12 changed internal-call facts on every network; D26 re-checked them on the 40 recordings and by review, not on the sample).
 
 ## Backlog: level C findings (decided by Joabe on 2026-10-08)
 
