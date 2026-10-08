@@ -44,6 +44,7 @@ def explain(
     as_evidence: bool = typer.Option(False, "--evidence", help="Print the evidence bundle as JSON"),
     no_llm: bool = typer.Option(False, "--no-llm", help="Skip the LLM; print the evidence only"),
     fresh: bool = typer.Option(False, "--fresh", help="Fetch everything again, ignoring the cache"),
+    question: str = typer.Option(None, "--question", help="Your question about it, answered first"),
 ) -> None:
     """Explain what a transaction did, with a cited source for each fact."""
     from anychain.service import NONE, SKIP, WRITE, Crash, answer_transaction
@@ -58,7 +59,7 @@ def explain(
         result = answer_transaction(
             tx_hash, cfg, mode_name, write=NONE if as_evidence else SKIP if no_llm else WRITE, fresh=fresh,
             source="cli", log=_open_log(cfg), store=cache_for(cfg), build=build_bundle, write_fn=write_checked,
-            finality=lambda: finality_rpc_for(cfg), record=_record)
+            finality=lambda: finality_rpc_for(cfg), record=_record, question=question)
     except InvalidHashError as exc:
         _fail(str(exc))
     except Crash as exc:
@@ -72,7 +73,8 @@ def explain(
         print(f"_(LLM unavailable: {result.writer_error}. " + ("The answer has no summary.)_" if as_json else
                                                                "Showing the evidence only.)_\n"), file=sys.stderr)
     if as_json:
-        print(json.dumps(structured_answer(result.bundle, result.text, result.summary_status, mode_name), indent=2,
+        print(json.dumps({**structured_answer(result.bundle, result.text, result.summary_status, mode_name),
+                          "question": result.question}, indent=2,
                          ensure_ascii=False))
         return
     evidence_md = render_markdown(result.bundle)

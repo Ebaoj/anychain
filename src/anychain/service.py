@@ -31,13 +31,15 @@ class Answered:
     writer_error: str | None = None  # why no model could write it
     run_id: int | None = None  # the event log row, for feedback
     notes: list[str] = field(default_factory=list)  # side problems to tell the user (the answer is still given)
+    question: str | None = None  # the reader's question given with the hash (R12)
 
     def structured(self) -> dict:
-        return {**structured_answer(self.bundle, self.text, self.summary_status, self.mode), "run_id": self.run_id}
+        return {**structured_answer(self.bundle, self.text, self.summary_status, self.mode),
+                "question": self.question, "run_id": self.run_id}
 
 
 def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool, source: str, log, store,
-                       build, write_fn, finality, record) -> Answered:
+                       build, write_fn, finality, record, question: str | None = None) -> Answered:
     """Raises InvalidHashError for a malformed hash, Crash for anything unexpected (already logged)."""
     from anychain.bundle import InvalidHashError
     started = time.monotonic()
@@ -49,7 +51,8 @@ def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool,
     except Exception as exc:  # last line of defence: never a stack trace for the user
         record(log, RunEvent.crash(cfg.network.name, tx_hash, source, _ms(started), f"{type(exc).__name__}: {exc}"))
         raise Crash(f"{type(exc).__name__}: {exc}") from exc
-    result = Answered(bundle, mode, cache_state)
+    question = " ".join((question or "").split()) or None
+    result = Answered(bundle, mode, cache_state, question=question)
 
     def event(**kw) -> RunEvent:
         return RunEvent.from_bundle(bundle, source, _ms(started), cache=cache_state, mode=mode, **kw)
@@ -61,7 +64,7 @@ def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool,
         result.run_id = record(log, event(writer="skipped"))
         return result
     final = cache_state in ("hit", "stored")  # a written answer is kept only for evidence that cannot change
-    key = answer_key(bundle, cfg, mode) if final else None
+    key = answer_key(bundle, cfg, mode, question) if final else None
     kept = None
     if key and not fresh:
         try:
@@ -69,7 +72,8 @@ def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool,
         except Exception:  # a cache that cannot be read is skipped
             kept = None
     try:
-        checked = CheckedAnswer(kept[0], "cached", []) if kept else write_fn(bundle, cfg, mode)
+        checked = CheckedAnswer(kept[0], "cached", []) if kept else (write_fn(bundle, cfg, mode, question=question) if question
+                                                                     else write_fn(bundle, cfg, mode))
     except WriterError as exc:
         result.summary_status, result.writer_error = "unavailable", str(exc)
         result.run_id = record(log, event(writer="unavailable", usage=exc.usage))

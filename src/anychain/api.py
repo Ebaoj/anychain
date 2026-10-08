@@ -59,6 +59,7 @@ class ExplainRequest(BaseModel):
     mode: Literal["support", "developer", "auditor"] | None = Field(None, description="Default: the config's")
     fresh: bool = Field(False, description="Fetch everything again, ignoring the cache")
     write: bool = Field(True, description="Write the summary with the model (false: evidence only)")
+    question: str | None = Field(None, max_length=500, description="The reader's question, answered first (R12)")
 
 
 class ChatRequest(BaseModel):
@@ -177,7 +178,8 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
         try:
             result = answer_transaction(request.hash, cfg, mode, write=WRITE if request.write else SKIP,
                                         fresh=request.fresh, source="api", log=log, store=store, build=build,
-                                        write_fn=write_fn, finality=finality, record=record)
+                                        write_fn=write_fn, finality=finality, record=record,
+                                        question=request.question)
             out = result.structured()
         except InvalidHashError as exc:
             raise HTTPException(400, str(exc)) from exc
