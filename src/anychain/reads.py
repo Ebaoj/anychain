@@ -59,6 +59,33 @@ class Replay:
     message: str  # the node's own words
 
 
+@dataclass(frozen=True)
+class TokenUnits:
+    decimals: int
+    symbol: str | None
+    decimals_read: Read
+    symbol_read: Read | None
+
+    @property
+    def reads(self) -> list[Read]:
+        return [self.decimals_read] + ([self.symbol_read] if self.symbol_read else [])
+
+    def amount(self, raw: int) -> str:
+        """The raw amount in units, with the symbol when it is plain enough to write after a number ("0.03354 USD₮")."""
+        from anychain.units import in_units, plain_symbol
+        return (f"{in_units(raw, self.decimals)} {self.symbol}" if plain_symbol(self.symbol)
+                else f"{in_units(raw, self.decimals)} tokens")
+
+    @property
+    def described(self) -> str:
+        """Where the units came from, with the symbol said to be the token's own claim."""
+        from anychain.units import SYMBOL_CLAIM, plain_symbol
+        text = f"decimals() = {self.decimals}"
+        if plain_symbol(self.symbol):
+            text += f" and symbol() = {self.symbol!r} ({SYMBOL_CLAIM})"
+        return text
+
+
 class StateReader:
     def __init__(self, rpc: RpcClient):
         self.rpc = rpc
@@ -112,6 +139,26 @@ class StateReader:
         if isinstance(value, bytes):
             value = "0x" + value.hex()
         return Read(signature, contract, args, block, value, raw)
+
+    def token_units(self, token: str, block: int) -> "TokenUnits":
+        """The token's decimals() and symbol() at `block` (PHASE3, D49). The symbol is read as a string, else as
+        bytes32 (older tokens); None when neither reads. Raises UnreadableState when decimals() does not."""
+        decimals = self.view(token, "decimals()", (), "uint256", block)
+        if not isinstance(decimals.value, int) or not 0 <= decimals.value <= 77:
+            raise UnreadableState(f"decimals() on {token} answered {decimals.value!r}, not a number of decimals")
+        symbol = None
+        try:
+            symbol = self.view(token, "symbol()", (), "string", block)
+        except (UnreadableState, CollectorError):
+            try:
+                raw = self.view(token, "symbol()", (), "bytes32", block)
+                text = bytes.fromhex(str(raw.value)[2:]).rstrip(b"\x00").decode("utf-8")
+                symbol = Read(raw.signature, raw.contract, raw.args, raw.block, text, raw.raw) if text.isprintable() and text else None
+            except (UnreadableState, CollectorError, ValueError):
+                symbol = None
+        if symbol is not None and not (isinstance(symbol.value, str) and symbol.value.isprintable() and 0 < len(symbol.value) <= 20):
+            symbol = None
+        return TokenUnits(decimals.value, symbol.value if symbol else None, decimals, symbol)
 
     def paused(self, contract: str, block: int) -> Read:
         return self._read(contract, "paused()", (), [], "bool", block)

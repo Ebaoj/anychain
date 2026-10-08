@@ -508,14 +508,35 @@ def _compare_read(ctx: Context, rule: str, text: str, steps: list[str], amount: 
         read = read_fn(ctx.reader, ctx.block - 1)
     except (CollectorError, UnreadableState) as exc:
         return Finding(rule, "single_source", base, steps, missing=[_failed_read(f"the {what}", exc)])
+    units, missing = _units(ctx, token, read.block)  # the token's own decimals and symbol, at the same block (D49)
+    had = f"{read.value} raw units" + (f" ({units.amount(read.value)})" if units else "")
+    asked = f"{amount} raw units" + (f" ({units.amount(amount)})" if units else "")
+    scale = f" The amounts in the token's units use its {units.described}, read at block {read.block}." if units else ""
+    reads = [read] + (units.reads if units else [])
     if read.value < amount:
         return Finding(rule, "confirmed",
                        f"Cause confirmed: at block {read.block}, the block before this transaction, the {what} of "
-                       f"{holder} for token {token} was {read.value} (raw units), less than the {amount} the call "
-                       f"asked for. {base}", steps, [read])
+                       f"{holder} for token {token} was {had}, less than the {asked} the call asked for. {base}{scale}",
+                       steps, reads, missing=missing)
     return Finding(rule, "single_source",
                    f"{base} The read does not explain it: at block {read.block} the {what} of {holder} for token "
-                   f"{token} was {read.value} (raw units), enough for the {amount} asked. Possible reasons: it changed "
+                   f"{token} was {had}, enough for the {asked} asked. Possible reasons: it changed "
                    "earlier in this transaction's own block; the token checks more than this value (locked or frozen "
-                   "amounts, a transfer fee); or another transfer inside the call is the one that failed.",
-                   steps, [read], label="LIKELY")
+                   f"amounts, a transfer fee); or another transfer inside the call is the one that failed.{scale}",
+                   steps, reads, missing=missing, label="LIKELY")
+
+
+def _units(ctx: Context, token: str, block: int):
+    """(the token's decimals and symbol, what is missing). When they cannot be read the raw amounts stand alone; a
+    failure of the node (not a token without decimals()) is a gap, so the answer without units is not cached."""
+    reader = ctx.reader
+    if reader is None or not hasattr(reader, "token_units"):  # a test's minimal reader
+        return None, []
+    try:
+        return reader.token_units(token, block), []
+    except UnreadableState:
+        return None, []
+    except CollectorError as exc:
+        return None, [Missing(f"the token's decimals() could not be read, so the amounts are in raw units only: {exc}",
+                              "Try again in a few minutes" if exc.retryable else "A node that answers eth_call at that block",
+                              "source_unavailable" if exc.retryable else "source_error", exc.retryable)]

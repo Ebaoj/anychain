@@ -178,6 +178,42 @@
   {
    "confidence": "confirmed",
    "data": {
+    "call": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e decimals() at block 78962883",
+    "value": "6"
+   },
+   "id": "E8",
+   "kind": "state_read",
+   "sources": [
+    {
+     "detail": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e decimals() at block 78962883",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "At block 78962883, decimals on 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e returned 6."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "call": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e symbol() at block 78962883",
+    "value": "USD₮"
+   },
+   "id": "E9",
+   "kind": "state_read",
+   "sources": [
+    {
+     "detail": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e symbol() at block 78962883",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "At block 78962883, symbol on 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e returned USD₮."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
     "computed": {},
     "label": "CONFIRMED",
     "level": "confirmed",
@@ -191,11 +227,13 @@
      ]
     },
     "reads": [
-     "E7"
+     "E7",
+     "E8",
+     "E9"
     ],
     "rule": "insufficient_balance"
    },
-   "id": "E8",
+   "id": "E10",
    "kind": "diagnosis",
    "sources": [
     {
@@ -209,9 +247,21 @@
      "kind": "rpc",
      "label": "JSON-RPC",
      "url": "https://forno.celo.org"
+    },
+    {
+     "detail": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e decimals() at block 78962883",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    },
+    {
+     "detail": "eth_call 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e symbol() at block 78962883",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
     }
    ],
-   "text": "CONFIRMED: Cause confirmed: at block 78962883, the block before this transaction, the balance of 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 for token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e was 1445 (raw units), less than the 106500 the call asked for. The reason is the standard ERC-20 message 'ERC20: transfer amount exceeds balance'. Next step for a non-technical reader: The operation tried to move more of a token than the account it comes from held. Check the amount and that balance before trying again. Next step for a developer: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step for a developer: If the balance was expected, check for an earlier transaction that spent it."
+   "text": "CONFIRMED: Cause confirmed: at block 78962883, the block before this transaction, the balance of 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 for token 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e was 1445 raw units (0.001445 USD₮), less than the 106500 raw units (0.1065 USD₮) the call asked for. The reason is the standard ERC-20 message 'ERC20: transfer amount exceeds balance'. The amounts in the token's units use its decimals() = 6 and symbol() = 'USD₮' (the name the contract gives itself, not a proof of which token it is), read at block 78962883. Next step for a non-technical reader: The operation tried to move more of a token than the account it comes from held. Check the amount and that balance before trying again. Next step for a developer: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step for a developer: If the balance was expected, check for an earlier transaction that spent it."
   },
   {
    "confidence": "single_source",
@@ -227,7 +277,7 @@
     "raises": "ERC20: transfer amount exceeds balance",
     "show": []
    },
-   "id": "E9",
+   "id": "E11",
    "kind": "code",
    "sources": [
     {
@@ -247,7 +297,7 @@
     ],
     "reason": "ERC20: transfer amount exceeds balance"
    },
-   "id": "E10",
+   "id": "E12",
    "kind": "source",
    "sources": [
     {

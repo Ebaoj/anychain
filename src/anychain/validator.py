@@ -129,6 +129,7 @@ def _check(answer: str, evidence: str, allowed_urls: set[str], ids: set[str]) ->
             problems.append(f"the date {m.group(0)} is not in the evidence")
     rest = DATE.sub(" ", rest)
 
+    problems += _unit_problems(rest, evidence)
     known = _numbers(evidence) + code_lines
     for m in NUMBER.finditer(rest):
         sign, token, scale = m.group(1), m.group(2), (m.group(3) or "").lower()
@@ -142,6 +143,25 @@ def _check(answer: str, evidence: str, allowed_urls: set[str], ids: set[str]) ->
             continue
         if not any(_matches(value, unit, bool(sign), known) for value, unit in readings):
             problems.append(f"the number {m.group(0).strip()} is not in the evidence")
+    return problems
+
+
+SYMBOL_IN_EVIDENCE = re.compile(r"symbol\(\) = '([^'\s\d]{1,12})'")
+AMOUNT_BEFORE = r"(\d{1,3}(?:[" + SPACES + r".,]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?)[" + SPACES + r"]?"
+
+
+def _unit_problems(answer: str, evidence: str) -> list[str]:
+    """A number written before a token's symbol must be that token's converted amount in the evidence (D49): the raw
+    amount with the symbol overstates it by 10**decimals, and a non-zero amount rounded to 0 hides it."""
+    problems = []
+    for symbol in set(SYMBOL_IN_EVIDENCE.findall(evidence)):
+        converted = [Decimal(v) for v in re.findall(r"(\d+(?:\.\d+)?) " + re.escape(symbol) + r"(?![\w])", evidence)]
+        for m in re.finditer(AMOUNT_BEFORE + re.escape(symbol) + r"(?![\w])", answer):
+            readings = _readings(m.group(1), "")
+            fits = [(v, u) for v, u in readings if _matches(v, u, False, converted)]
+            if not fits or all(v == 0 for v, _u in fits) and not any(c == 0 for c in converted):
+                problems.append(f"{m.group(0).strip()} is not the amount in the token's units the evidence gives "
+                                f"(those are {', '.join(str(c) for c in converted) or 'none'} {symbol})")
     return problems
 
 

@@ -423,7 +423,7 @@ def test_l1_node_on_the_wrong_chain_is_not_asked():
 DIAGNOSIS_CASES = [
     # fixture, network, rule, level, words the finding must say
     ("celo_fail_balance_confirmed", "celo-mainnet", "insufficient_balance", "confirmed",
-     ["Cause confirmed", "was 1445 (raw units), less than the 106500"]),
+     ["Cause confirmed", "was 1445 raw units (0.001445 USD₮), less than the 106500 raw units (0.1065 USD₮)"]),
     ("rootstock_fail_paused", "rootstock-mainnet", "paused", "confirmed", ["paused() returned true"]),
     ("op_fail_deadline", "optimism-mainnet", "deadline", "candidate",  # unverified contract: words only
      ["Possible cause", "'block number deadline'"]),

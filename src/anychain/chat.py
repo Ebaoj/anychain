@@ -26,6 +26,7 @@ from anychain.collectors.http import CollectorError
 from anychain.models import EvidenceBundle, Source
 from anychain.reads import Read, StateReader, UnreadableState
 from anychain.redact import no_urls
+from anychain.units import is_amount
 from anychain.validator import allowed_urls, check_answer, evidence_ids
 from anychain.writer import WriterError, add_usage, evidence_payload, load_prompt
 
@@ -98,13 +99,22 @@ class Tools:
         except (CollectorError, UnreadableState) as exc:
             raise Refused(f"the node could not read it: {exc}") from exc
         value = _capped(read.value)
+        units, unit_text = None, ""
+        if is_amount(signature) and out.startswith("uint") and isinstance(read.value, int):
+            try:  # the token's own decimals and symbol at the same block: the converted amount is data (D49)
+                units = StateReader(self.rpc_factory()).token_units(contract, block)
+            except (CollectorError, UnreadableState):
+                units = None
+            if units is not None:
+                unit_text = f" That is {units.amount(read.value)}, with the token's {units.described} at the same block."
         # The arguments and the block were chosen in the chat: the answer check never takes them as evidence
         # (kind chat_read, validator.py); only what the node returned counts.
         fact = bundle.add("chat_read", f"Asked in the chat: {signature.split('(')[0]}"
                           f"({', '.join(_capped(_shown(a)) for a in args)}) on {to_checksum_address(contract)} at "
                           f"block {read.block}. The node returned {value}, decoded as {out}, the type the chat asked "
-                          f"for (not read from the contract's ABI); raw answer {_capped(read.raw or '')}.",
-                          [Source(kind="rpc", label="RPC eth_call", detail=read.detail)],
+                          f"for (not read from the contract's ABI); raw answer {_capped(read.raw or '')}.{unit_text}",
+                          [Source(kind="rpc", label="RPC eth_call", detail=r.detail)
+                           for r in [read] + (units.reads if units else [])],
                           {"call": read.detail, "value": str(value), "returns": out, "from_chat": True})
         return [fact.id]
 
