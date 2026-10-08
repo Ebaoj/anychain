@@ -1,0 +1,10 @@
+{
+ "POST https://public-node.rsk.co eth_blockNumber []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x8e0541\"}\n",
+  "status": 200
+ },
+ "POST https://public-node.rsk.co eth_call [{\"data\": \"0x5c975abb\", \"to\": \"0x2acc95758f8b5f583470ba265eb685a8f45fc9d5\"}, \"0x8e0541\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32015,\"message\":\"VM Exception while processing transaction: transaction reverted\",\"data\":\"0x\"}}\n",
+  "status": 200
+ }
+}

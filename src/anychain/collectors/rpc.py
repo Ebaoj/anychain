@@ -15,6 +15,30 @@ class RpcBusyError(CollectorError):
     """The node answered but asked us to slow down."""
 
 
+class CallReverted(CollectorError):
+    """eth_call ran and the contract reverted. `data` is the revert data (may be "0x" or None)."""
+
+    def __init__(self, message: str, data: str | None):
+        super().__init__(message, retryable=False)
+        self.data = data
+
+
+# How nodes say an eth_call reverted, each seen live on 2026-10-08 (all six configured nodes):
+#   reth/op-reth/Tenderly/zkSync: code 3, "execution reverted" or "execution reverted: <reason>"
+#   rskj (Rootstock): code -32015, "VM Exception while processing transaction: revert <reason>"
+#                     or "... transaction reverted" when there is no reason
+# The code alone is not proof: Gnosis's node (Tenderly) also uses code 3 for "intrinsic gas too low".
+# So a revert needs the words. Note: zkSync answers "execution reverted" for an out-of-gas call too.
+RPC_VM_EXCEPTION = "vm exception while processing transaction:"
+
+
+def _is_revert(code: object, message: str) -> bool:
+    text = message.lower()
+    if text.startswith("execution reverted"):
+        return True
+    return code == -32015 and text.startswith(RPC_VM_EXCEPTION) and "revert" in text[len(RPC_VM_EXCEPTION):]
+
+
 class RpcClient:
     def __init__(self, cfg: RpcConfig, client: httpx.Client | None = None, budget: Budget | None = None):
         self.cfg = cfg
@@ -48,6 +72,10 @@ class RpcClient:
             code = error.get("code") if isinstance(error, dict) else None
             if code in BUSY_RPC_CODES:
                 raise RpcBusyError(f"RPC {method} busy: {error}")
+            message = str(error.get("message", "")) if isinstance(error, dict) else str(error)
+            if method == "eth_call" and _is_revert(code, message):
+                data = error.get("data") if isinstance(error, dict) else None
+                raise CallReverted(f"the call reverted: {message}", data if isinstance(data, str) else None)
             raise CollectorError(f"RPC {method} error: {error}", retryable=False)
         if "result" not in payload:
             raise CollectorError(f"RPC {method} answered without a result", retryable=False)
@@ -67,6 +95,22 @@ class RpcClient:
         if not isinstance(value, str):
             raise CollectorError(f"RPC eth_getCode returned {value!r}", retryable=False)
         return value
+
+    def eth_call(self, to: str, data: str, block: int | str, sender: str | None = None, value: int = 0) -> str:
+        """Read-only call as of `block` (a number or "latest"). Returns the raw result.
+
+        Raises CallReverted when the contract reverts, CollectorError for anything else the node says
+        (e.g. a public node refusing old blocks: "Archive requests require a personal token").
+        """
+        call = {"to": to, "data": data}
+        if sender:
+            call["from"] = sender
+        if value:
+            call["value"] = hex(value)
+        result = self.call("eth_call", [call, hex(block) if isinstance(block, int) else block])
+        if not isinstance(result, str) or not result.startswith("0x"):
+            raise CollectorError(f"RPC eth_call returned {result!r}", retryable=False)
+        return result
 
     def chain_id(self) -> int:
         """The node's chain id. The standard is a hex string; some nodes send a plain number."""

@@ -1,0 +1,10 @@
+{
+ "POST https://forno.celo.org eth_blockNumber []": {
+  "body": "{\"jsonrpc\":\"2.0\",\"result\":\"0x4be07c2\",\"id\":1}\n",
+  "status": 200
+ },
+ "POST https://forno.celo.org eth_call [{\"data\": \"0x\", \"from\": \"0x9695b8367fd1bb4800667ff5f35b0cf142f410a0\", \"to\": \"0x0000000000000000000000000000000000000002\", \"value\": \"0xd3c21bcecceda1000000\"}, \"0x4be07c2\"]": {
+  "body": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"err: insufficient funds for gas * price + value: address 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 have 44823038727950679264 want 1000000000000000000000000 (supplied gas 50000000)\"},\"id\":1}\n",
+  "status": 200
+ }
+}

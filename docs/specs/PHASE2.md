@@ -103,7 +103,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 |---|---|---|
 | R1 | real failed tx per pattern, expected likely cause and cited facts | pasted test run |
 | R2 | a sample failure without reason, replay result or gap | pasted |
-| R3 | balance and `paused()` reads pinned to the parent block, from recordings | pasted |
+| R3 | `tests/test_reads.py` (balance, paused, replay, archive refusal, unreadable answers; real node recordings) | T3 done 2026-10-08: 450 passed (D30); facts come with T4 |
 | R4 | BRLC call cites file, lines and commit | pasted |
 | R5 | unverified contract decoded from repo; 4byte match stated as candidate | pasted |
 | R6 | `tests/test_confidence.py` (all 41 recordings: confidence follows the sources; candidate only on purpose; shown to reader and model) | T2 done 2026-10-08: 442 passed (D29) |
