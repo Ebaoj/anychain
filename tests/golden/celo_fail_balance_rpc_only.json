@@ -1,0 +1,159 @@
+{
+ "abi_sources": {
+  "0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e": "none (explorer unavailable)"
+ },
+ "gaps": [
+  {
+   "cause": "source_unavailable",
+   "needed": "Explorer API reachable and indexing this transaction",
+   "retryable": true,
+   "what": "Explorer transaction data",
+   "why": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817 failed after 3 attempts: ConnectError: simulated outage of celo.blockscout.com"
+  },
+  {
+   "cause": "source_unavailable",
+   "needed": "The explorer reachable and indexing this transaction, or a node that can trace it",
+   "retryable": true,
+   "what": "Revert reason",
+   "why": "the explorer is unavailable, and the node's receipt does not carry the reason a transaction reverted"
+  },
+  {
+   "cause": "source_unavailable",
+   "needed": "Explorer API reachable, or the contract ABI in a configured repo",
+   "retryable": true,
+   "what": "Call decoding",
+   "why": "explorer unavailable, so no ABI could be fetched"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "confirmed",
+   "data": {
+    "from": "0x9695b8367fd1bb4800667ff5f35b0cf142f410a0",
+    "status": "failed",
+    "to": "0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "(From RPC only) Transaction failed (reverted) in block 78962884. From 0x9695b8367fd1bb4800667ff5f35b0cf142f410a0 to 0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e. Native value attached: 0 CELO, not transferred because the transaction reverted. Gas used 33839 of limit 100000."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "block": 78962883,
+    "reason": "ERC20: transfer amount exceeds balance",
+    "revert_data": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+    "revert_kind": "error_string",
+    "reverted": true
+   },
+   "id": "E2",
+   "kind": "replay",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817 from 0x9695b8367fd1bb4800667ff5f35b0cf142f410a0 with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "Re-run on the node at block 78962883, the block before, with the transaction's own call, it reverted with the reason 'ERC20: transfer amount exceeds balance'. The replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends), so this may differ from what happened in the original transaction."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "from_replay": true,
+    "level": "candidate",
+    "next_steps": [
+     "Check the balance of the account the tokens are moved from before sending, and move at most that.",
+     "If the balance was expected, check for an earlier transaction that spent it."
+    ],
+    "reads": [],
+    "replay": "E2",
+    "rule": "replay"
+   },
+   "id": "E3",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817 from 0x9695b8367fd1bb4800667ff5f35b0cf142f410a0 with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "Possible cause, from the replay (E2): the replay reverted with the reason 'ERC20: transfer amount exceeds balance', the standard ERC-20 message for a transfer larger than the balance it moves from. If the original transaction failed the same way, that is its cause. Next step: Check the balance of the account the tokens are moved from before sending, and move at most that. Next step: If the balance was expected, check for an earlier transaction that spent it."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "selector": "0xa9059cbb"
+   },
+   "id": "E4",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "Called function with selector 0xa9059cbb on 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e; not decoded."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "fitting": [
+     "transfer(address,uint256)",
+     "workMyDirefulOwner(uint256,uint256)"
+    ],
+    "selector": "0xa9059cbb",
+    "signatures": [
+     "transfer(address,uint256)",
+     "many_msg_babbage(bytes1)",
+     "transfer(bytes4[9],bytes5[6],int48[11])",
+     "func_2093253501(bytes)",
+     "join_tg_invmru_haha_fd06787(address,bool)",
+     "workMyDirefulOwner(uint256,uint256)"
+    ]
+   },
+   "id": "E5",
+   "kind": "candidate",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "signature_db",
+     "label": "Signature database www.4byte.directory",
+     "url": "https://www.4byte.directory/api/v1/signatures/?hex_signature=0xa9059cbb"
+    }
+   ],
+   "text": "The call's selector 0xa9059cbb matches several signatures in the public signature database www.4byte.directory that all fit the data: transfer(address,uint256); or workMyDirefulOwner(uint256,uint256). Which one, if any, is not known. Anyone can add entries there and different signatures can share a selector, so this is not confirmed."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {},
+   "id": "E6",
+   "kind": "receipt",
+   "sources": [
+    {
+     "detail": "eth_getTransactionByHash + eth_getTransactionReceipt [0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "https://forno.celo.org"
+    }
+   ],
+   "text": "Receipt has 0 log(s)."
+  }
+ ],
+ "network": "celo-mainnet",
+ "status": "failed",
+ "tx_hash": "0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+}

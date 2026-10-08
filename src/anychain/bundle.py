@@ -558,7 +558,7 @@ class BundleBuilder:
         if finding.rule in REPLAY_WHEN and ctx.reader is not None:
             self._add_replay(tx_hash, tx, ctx)
 
-    def _add_replay(self, tx_hash: str, tx: Transaction, ctx: Context) -> None:
+    def _add_replay(self, tx_hash: str, tx: Transaction | None, ctx: Context) -> None:
         """No reason from the explorer: run the call again on the node at the parent block (PHASE2 T5, R2, D32).
         What the node answers is a fact about the replay; as a cause of the original failure it is a candidate."""
         skip = self._replay_skip(tx)
@@ -571,10 +571,13 @@ class BundleBuilder:
             # the node's own transaction: the replay's inputs then come from the node, like its answer
             sender, to, data, value, gas = node_tx.sender, node_tx.to, node_tx.input, node_tx.value or 0, node_tx.gas
             sources = [self._rpc_source(f"eth_call replay of {tx_hash} from {sender} with its gas limit")]
-        else:
+        elif tx is not None:
             sender, to, data, value, gas = ctx.sender, ctx.to, tx.raw_input, tx.value or 0, tx.gas_limit
             sources = [self._rpc_source(f"eth_call replay of {tx_hash} from {sender}"), self._tx_source(tx_hash)]
-        block = tx.block_number
+        else:
+            sender = to = data = None
+            value, gas, sources = 0, None, []
+        block = tx.block_number if tx is not None else (node_tx.block_number if node_tx else None)
         if not sender or not to or data is None or block is None:
             self._gap("Replay", "the call was not re-run: its sender, target, data or block is not known",
                       "The transaction's details from the explorer or the node", retryable=False, cause="not_interpretable")
@@ -621,14 +624,18 @@ class BundleBuilder:
             return  # nothing more to say than the replay fact
         self._add_replay_finding(ctx, decoded, fact, sources)
 
-    def _replay_skip(self, tx: Transaction) -> str | None:
-        """Why a replay of this transaction would not reproduce its call (None: it can be tried)."""
-        if tx.to is None or not address_of(tx.to):
+    def _replay_skip(self, tx: Transaction | None) -> str | None:
+        """Why a replay of this transaction would not reproduce its call (None: it can be tried). Read from the
+        explorer's copy, or from the node's when the explorer is unavailable."""
+        node_tx = self.rpc_view.tx if self.rpc_view is not None else None
+        creation = (tx.to is None or not address_of(tx.to)) if tx is not None else (node_tx is None or not node_tx.to)
+        tx_type = to_int(tx.raw.get("type")) if tx is not None else (node_tx.tx_type if node_tx else None)
+        if creation:
             return "it is a contract creation, which a call cannot repeat"
-        if to_int(tx.raw.get("type")) in DEPOSIT_TX_TYPES:
+        if tx_type in DEPOSIT_TX_TYPES:
             return ("it is a deposit from L1, whose funds the network adds as it runs; a replay cannot include "
                     "that")
-        if tx.authorizations or (self.rpc_view is not None and self.rpc_view.tx.delegates):
+        if (tx is not None and tx.authorizations) or (node_tx is not None and node_tx.delegates):
             return "it set account code (EIP-7702), which a replay cannot include"
         return None
 
@@ -1429,6 +1436,17 @@ class BundleBuilder:
               f"From {tx.sender} to {target}. {value_text} "
               f"Gas used {receipt.gas_used} of limit {tx.gas}.",
               [source], {"status": b.status, "from": tx.sender, "to": tx.to})
+        if b.status == "failed":
+            # The node's receipt says only that it reverted; the reason comes from the explorer (or a trace).
+            self._gap("Revert reason", "the explorer is " + ("behind" if self.explorer_answered else "unavailable")
+                      + ", and the node's receipt does not carry the reason a transaction reverted",
+                      "The explorer reachable and indexing this transaction, or a node that can trace it",
+                      retryable=True, cause="source_behind" if self.explorer_answered else "source_unavailable")
+            if self.rpc_verified:
+                ctx = Context(reason=None, result=None, call=None, sender=tx.sender, to=tx.to, to_text=str(tx.to),
+                              block=tx.block_number, gas_used=receipt.gas_used, gas_limit=tx.gas,
+                              reader=StateReader(self.rpc))
+                self._safely("Replay", lambda: self._add_replay(tx_hash, None, ctx))
 
         data, authorizations = tx.input, tx.delegates
         if data is None:

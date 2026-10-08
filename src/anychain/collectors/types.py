@@ -233,13 +233,15 @@ class RpcTransaction:
     block_number: int | None
     gas: int | None
     delegates: tuple[str, ...]  # EIP-7702 targets; the node does not say who signed them
+    tx_type: int | None = None
 
     @classmethod
     def from_rpc(cls, v: dict) -> "RpcTransaction":
         # JSON-RPC always includes `input` ("0x" when empty): absent means unreadable, not empty.
         return cls(_str(v.get("from")), _str(v.get("to")), to_int(v.get("value")), _str(v.get("input")),
                    to_int(v.get("blockNumber")), to_int(v.get("gas")),
-                   tuple(str(a.get("address")) for a in _list(v.get("authorizationList")) if isinstance(a, dict)))
+                   tuple(str(a.get("address")) for a in _list(v.get("authorizationList")) if isinstance(a, dict)),
+                   to_int(v.get("type")))
 
 
 @dataclass(frozen=True)

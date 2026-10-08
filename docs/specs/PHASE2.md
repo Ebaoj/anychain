@@ -108,7 +108,7 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 | R5 | `tests/test_repos.py` repo part (pinned decode single source, unpinned match a candidate, address_map validation); `tests/test_signatures.py` (4byte function match only as candidate and only when the data fits; event signatures proven by hash; failures a gap; disk cache) | T6 part 2 and T7 done 2026-10-08: 602 passed (D34, D35) |
 | R6 | `tests/test_confidence.py` (all 41 recordings: confidence follows the sources; candidate only on purpose; shown to reader and model) | T2 done 2026-10-08: 442 passed (D29) |
 | R7 | `tests/test_validator.py` (real answers pass; tampered numbers, hex, links and citations caught; retry and withhold flow; event log) | T1 done 2026-10-08: 374 passed; live: support ok, developer fixed on retry (D28) |
-| R8 | one case per missing source | pasted |
+| R8 | `tests/test_degradation.py` (16 cases: each source missing, both main sources, budget, LLM, a failure with the explorer down; exact causes; shared contract) plus the cases in test_validator, test_networks and test_bundle | T8 done 2026-10-08: 631 passed (D36) |
 
 ## 14. How to verify
 
