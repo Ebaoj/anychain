@@ -266,7 +266,7 @@ flowchart LR
     end
 
     subgraph core["Núcleo (sem IA)"]
-        bundle["bundle.py<br/>monta os fatos"]
+        bundle["bundle.py + facts/<br/>monta os fatos<br/>(um arquivo por assunto)"]
         diagnosis["diagnosis.py<br/>regras, rótulos, passos"]
         reads["reads.py<br/>leituras no nó"]
         units["units.py<br/>valor na unidade do token"]
@@ -391,6 +391,7 @@ flowchart LR
 
 ## Histórico deste documento
 
+- **09/10/2026, D79:** o construtor de fatos dividido por assunto em `facts/` (mapa do código).
 - **09/10/2026, D72 a D74:** a conversa sobrevive a recarregar a página e a reiniciar o serviço; o chat lembra a conversa; o chat como harness (regras, classificador, roteiros montados pelo código, checagem de afirmações), seção 4.
 - **09/10/2026, depois da Fase 4 (D59 a D67):** rede privada montada como a da CloudWalk (nó local, Blockscout próprio, BRLC atrás de um proxy), lida só com um arquivo de configuração; o modelo e a chave de API escolhidos pelo terminal ou pela página, com o modelo vindo da lista do próprio provedor; modelos menores confiáveis por código (roteiro da resposta montado a partir dos fatos, só os próximos passos do leitor, citações normalizadas, fatos-chave obrigatórios); rede trocada ou adicionada pela página sem reiniciar; a página virou uma conversa em três versões (lojista, desenvolvedor, auditor); linguagem simples para o lojista. Novos no mapa do código: `outline.py`, `networks.py`, `llm_settings.py`.
 - **08/10/2026, Fase 4 (D55 a D58):** triagem com uma pergunta escolhida pelo código; linha do tempo do remetente em volta de uma falha, com padrões ditos só sobre nonces contínuos; notas de gás (heurísticas); Dockerfile, testado num servidor; README final.

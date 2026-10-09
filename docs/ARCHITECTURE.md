@@ -263,7 +263,7 @@ flowchart LR
     end
 
     subgraph core["Core (no AI)"]
-        bundle["bundle.py<br/>builds the facts"]
+        bundle["bundle.py + facts/<br/>builds the facts<br/>(one file per concern)"]
         diagnosis["diagnosis.py<br/>rules, labels, steps"]
         reads["reads.py<br/>reads on the node"]
         units["units.py<br/>amounts in the token's units"]
@@ -388,6 +388,7 @@ flowchart LR
 
 ## Changelog of this document
 
+- **2026-10-09, D79:** the evidence builder split by concern into `facts/` (code map).
 - **2026-10-09, D72 to D74:** the conversation survives a reload and a restart; the chat remembers the conversation; the chat as a harness (rules, a classifier, frames built by code, a statement check), section 4.
 - **2026-10-09, after phase 4 (D59 to D67):** a private network built like CloudWalk's (a local node, a self-hosted Blockscout, BRLC behind a proxy) read with a config only; the model and its API key chosen from the CLI or the page, the model picked from the provider's own list; smaller models made reliable by code (an outline of the answer built from the facts, only the reader's own next steps, citations normalized, key facts enforced); the network switched or added from the page without restarting; the page as a conversation in three versions (merchant, developer, auditor); plain language for a merchant. New in the code map: `outline.py`, `networks.py`, `llm_settings.py`.
 - **2026-10-08, phase 4 (D55 to D58):** triage with one question chosen by code; the sender's timeline around a failure, with patterns said only over unbroken nonces; heuristic gas notes; Dockerfile, run on a server; final README.
