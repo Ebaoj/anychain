@@ -25,7 +25,7 @@ git clone <this repo> anychain && cd anychain
 uv sync
 
 # choose the model (skip if Claude Code is installed and logged in); the key is asked for, not shown
-uv run anychain llm set --provider anthropic            # or: --provider openai --model <model name>
+uv run anychain llm set --provider anthropic            # or openai; then pick the model from the provider's list
 uv run anychain llm test --config configs/ethereum-mainnet.yaml
 
 # CLI: explain a transaction (a USDC transfer on Ethereum)

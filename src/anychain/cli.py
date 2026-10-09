@@ -503,14 +503,28 @@ def llm_show() -> None:
 @llm_app.command("set")
 def llm_set(
     provider: str = typer.Option(..., help="claude_code (local CLI, no key) | anthropic | openai"),
-    model: str = typer.Option(None, help="Model name (Anthropic default: claude-sonnet-5-5; OpenAI: required)"),
+    model: str = typer.Option(None, help="Model id; when left out, pick it from the provider's list"),
 ) -> None:
-    """Choose the model; for anthropic or openai, type the API key when asked (it is not shown)."""
+    """Choose the model; for anthropic or openai, type the API key when asked (it is not shown), then pick the
+    model from the list the provider gives for that key."""
     from anychain import llm_settings
     key = None
     if provider in llm_settings.ENV_KEYS:
         key = typer.prompt(f"{provider} API key (not shown; empty keeps the saved one)", hide_input=True,
                            default="", show_default=False) or None
+        try:
+            models = llm_settings.list_models(provider, key)
+        except llm_settings.ModelListError as exc:
+            _fail(f"Could not list the models: {exc}")
+        if not models:
+            _fail(f"{provider} lists no model for this key.")
+        if model is None:
+            for i, m in enumerate(models, 1):
+                print(f"  {i}. {m['label']}" + (f"  ({m['id']})" if m["label"] != m["id"] else ""))
+            choice = typer.prompt("Model number", type=int)
+            if not 1 <= choice <= len(models):
+                _fail(f"Pick a number from 1 to {len(models)}.")
+            model = models[choice - 1]["id"]
     try:
         llm_settings.save(provider, model, key)
     except ValueError as exc:

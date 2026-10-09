@@ -108,11 +108,11 @@
         <option value="openai">OpenAI (API key)</option>
         <option value="claude_code">Claude Code on this computer (no key)</option>
       </select>
-      <input type="text" id="llmModel" maxlength="100" autocomplete="off" spellcheck="false"
-             placeholder="Model (Anthropic default: claude-sonnet-5-5; OpenAI: required)">
       <input type="password" id="llmKey" maxlength="400" autocomplete="off" spellcheck="false"
              placeholder="API key (empty keeps the saved one)">
-      <button type="submit">Save</button>
+      <button type="button" id="llmLoad">Load models</button>
+      <select id="llmModel" aria-label="Model" disabled><option value="">load the models first</option></select>
+      <button type="submit" id="llmSave" disabled>Save</button>
       <button type="button" id="llmTest">Test</button>
     </form>
     <p id="llmState" class="muted"></p>
@@ -374,20 +374,68 @@ function showLlm(s) {
   $("llmState").textContent = `Chosen: ${s.provider || "the network config's model"}` +
     (s.model ? ` / ${s.model}` : "") + (keys ? ` · ${keys}` : "");
   if (s.provider) $("llmProvider").value = s.provider;
-  $("llmModel").value = s.model || "";
+  state.savedModel = s.model || "";
+  syncLlmForm();
 }
+
+// The model is picked from the list the provider gives for the key: no typed names (D61).
+function syncLlmForm() {
+  const local = $("llmProvider").value === "claude_code";
+  $("llmKey").disabled = local;
+  $("llmLoad").disabled = local;
+  $("llmModel").disabled = local || $("llmModel").options.length < 2;
+  $("llmSave").disabled = !local && !$("llmModel").value;
+}
+
+async function loadModels() {
+  const provider = $("llmProvider").value, key = $("llmKey").value.trim();
+  if (provider === "claude_code") return;
+  $("llmState").textContent = `Asking ${provider} which models this key can use…`;
+  const select = $("llmModel");
+  select.replaceChildren();
+  try {
+    const r = await api("/settings/llm/models", {provider, ...(key ? {api_key: key} : {})});
+    const pick = document.createElement("option");
+    pick.value = ""; pick.textContent = `pick one of ${r.models.length} models`;
+    select.appendChild(pick);
+    for (const m of r.models) {
+      const o = document.createElement("option");
+      o.value = m.id; o.textContent = m.label === m.id ? m.id : `${m.label} (${m.id})`;
+      select.appendChild(o);
+    }
+    if (r.models.some((m) => m.id === state.savedModel)) select.value = state.savedModel;
+    $("llmState").textContent = `${r.models.length} models listed by ${provider} for this key.`;
+  } catch (err) {
+    const o = document.createElement("option");
+    o.value = ""; o.textContent = "no list";
+    select.appendChild(o);
+    $("llmState").textContent = `Could not list the models: ${err.message}`;
+  }
+  syncLlmForm();
+}
+
+$("llmLoad").addEventListener("click", loadModels);
+$("llmModel").addEventListener("change", syncLlmForm);
+$("llmProvider").addEventListener("change", () => {
+  $("llmModel").replaceChildren(Object.assign(document.createElement("option"), {value: "", textContent: "load the models first"}));
+  syncLlmForm();
+});
 
 $("llmToggle").addEventListener("click", async () => {
   $("llmPanel").classList.toggle("hidden");
   if (!$("llmPanel").classList.contains("hidden")) {
-    try { showLlm(await api("/settings/llm")); } catch (err) { $("llmState").textContent = err.message; }
+    try {
+      const s = await api("/settings/llm");
+      showLlm(s);
+      if (s.provider && s.provider !== "claude_code" && s.keys[s.provider]) loadModels();  // a key is saved: list
+    } catch (err) { $("llmState").textContent = err.message; }
   }
 });
 
 $("llmForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const body = {provider: $("llmProvider").value};
-  const model = $("llmModel").value.trim(), key = $("llmKey").value.trim();
+  const model = $("llmProvider").value === "claude_code" ? "" : $("llmModel").value, key = $("llmKey").value.trim();
   if (model) body.model = model;
   if (key) body.api_key = key;
   try {

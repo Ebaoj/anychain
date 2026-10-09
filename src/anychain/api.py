@@ -75,6 +75,12 @@ class Clarified(BaseModel):
 ExplainRequest.model_rebuild()  # resolves the forward reference to Clarified
 
 
+class LlmModelsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    provider: Literal["anthropic", "openai"]
+    api_key: str | None = Field(None, max_length=400)
+
+
 class LlmSettingsRequest(BaseModel):
     """The model the reader picks on the page, and its API key (D61). The key is saved, never returned."""
     model_config = ConfigDict(extra="forbid")
@@ -305,6 +311,16 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
         try:
             return llm_settings.save(body.provider, body.model, body.api_key)
         except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/settings/llm/models")
+    def list_llm_models(body: LlmModelsRequest, request: Request) -> dict:
+        """The models the provider lists for this key (the pasted one, not saved yet, or the saved one)."""
+        same_page_only(request)
+        from anychain import llm_settings
+        try:
+            return {"provider": body.provider, "models": llm_settings.list_models(body.provider, body.api_key)}
+        except llm_settings.ModelListError as exc:
             raise HTTPException(422, str(exc)) from exc
 
     @app.post("/settings/llm/test")

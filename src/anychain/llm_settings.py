@@ -7,13 +7,63 @@ comes before the provider's environment variable (ANTHROPIC_API_KEY, OPENAI_API_
 """
 import json
 import os
+import re
 from pathlib import Path
+
+import httpx
 
 from anychain.config import LlmConfig
 
 PROVIDERS = ("claude_code", "anthropic", "openai")
 ENV_KEYS = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY"}
-DEFAULT_MODELS = {"anthropic": "claude-sonnet-5-5"}  # OpenAI: the reader names the model
+# The providers' own model lists, so a reader picks a model the key can use instead of typing a name:
+#   Anthropic GET /v1/models (x-api-key, anthropic-version 2023-06-01; data[].id, display_name, lifecycle),
+#   checked in its API reference on 2026-10-09; OpenAI GET /v1/models (Bearer; data[].id, created), as the
+#   official openai-python SDK reads it (resources/models.py, types/model.py), checked the same day.
+MODELS_URL = {"anthropic": "https://api.anthropic.com/v1/models", "openai": "https://api.openai.com/v1/models"}
+# OpenAI lists every model of the account; these families do not write chat answers.
+NOT_CHAT = re.compile(r"embedding|whisper|tts|dall-e|moderation|davinci|babbage|transcribe|image|audio|realtime|"
+                      r"search|sora", re.IGNORECASE)
+
+
+class ModelListError(Exception):
+    """The provider's model list could not be read (no key, refused, unreachable). Never carries the key."""
+
+
+def _client() -> httpx.Client:
+    return httpx.Client(timeout=15)
+
+
+def list_models(provider: str, api_key: str | None = None) -> list[dict]:
+    """The models this key can use to write answers, newest first: [{"id", "label"}]."""
+    if provider not in MODELS_URL:
+        raise ModelListError(f"{provider} has no model list here")
+    key = (api_key or "").strip() or key_for(provider)
+    if not key:
+        raise ModelListError(f"no {provider} API key: paste it first")
+    headers = ({"x-api-key": key, "anthropic-version": "2023-06-01"} if provider == "anthropic"
+               else {"Authorization": f"Bearer {key}"})
+    try:
+        with _client() as client:
+            response = client.get(MODELS_URL[provider], headers=headers,
+                                  params={"limit": 1000} if provider == "anthropic" else None)
+    except httpx.HTTPError as exc:
+        raise ModelListError(f"{provider} did not answer ({type(exc).__name__})") from exc
+    if response.status_code in (401, 403):
+        raise ModelListError(f"{provider} refused the key (HTTP {response.status_code}): check it")
+    if response.status_code != 200:  # the body is not shown: a provider's text can echo part of a key
+        raise ModelListError(f"{provider} answered HTTP {response.status_code}")
+    try:
+        data = response.json().get("data") or []
+    except ValueError as exc:
+        raise ModelListError(f"{provider} sent an unreadable list") from exc
+    if provider == "anthropic":
+        return [{"id": m["id"], "label": (m.get("display_name") or m["id"])
+                 + (" (deprecated)" if m.get("lifecycle") == "deprecated" else "")}
+                for m in data if isinstance(m, dict) and m.get("id") and m.get("lifecycle") != "retired"]
+    chat = [m for m in data if isinstance(m, dict) and m.get("id") and not NOT_CHAT.search(m["id"])]
+    chat.sort(key=lambda m: m.get("created") or 0, reverse=True)
+    return [{"id": m["id"], "label": m["id"]} for m in chat]
 
 
 def path() -> Path:
@@ -29,12 +79,20 @@ def load() -> dict:
 
 
 def save(provider: str, model: str | None = None, api_key: str | None = None) -> dict:
-    """Saves the choice (and the key, when given; a key saved earlier for that provider is kept otherwise)."""
+    """Saves the choice (and the key, when given; a key saved earlier for that provider is kept otherwise). For an
+    API provider the model must be one the provider lists for this key (no typed names: no typos)."""
     if provider not in PROVIDERS:
         raise ValueError(f"provider must be one of {', '.join(PROVIDERS)}")
-    model = (model or "").strip() or DEFAULT_MODELS.get(provider)
-    if provider == "openai" and not model:
-        raise ValueError("name the OpenAI model to use")
+    model = (model or "").strip() or None
+    if provider in MODELS_URL:
+        if not model:
+            raise ValueError(f"pick the {provider} model from the list")
+        try:
+            ids = {m["id"] for m in list_models(provider, api_key)}
+        except ModelListError as exc:
+            raise ValueError(f"the model could not be checked: {exc}") from exc
+        if model not in ids:
+            raise ValueError(f"{model!r} is not in the models {provider} lists for this key")
     data = load()
     data["provider"], data["model"] = provider, model
     keys = data.setdefault("keys", {})

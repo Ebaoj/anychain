@@ -52,6 +52,11 @@ RPC_HOST = "ethereum-rpc.publicnode.com"
 def llm_settings_file(monkeypatch, tmp_path):
     """Tests never read or write the reader's saved model and key (D61): each test gets its own empty file."""
     monkeypatch.setenv("ANYCHAIN_LLM_SETTINGS", str(tmp_path / "llm.json"))
+    from anychain import llm_settings
+
+    def offline(request):
+        raise httpx.ConnectError("tests never call a model provider", request=request)
+    monkeypatch.setattr(llm_settings, "_client", lambda: httpx.Client(transport=httpx.MockTransport(offline)))
 
 
 @pytest.fixture(autouse=True)

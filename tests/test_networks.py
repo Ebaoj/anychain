@@ -66,7 +66,7 @@ def test_no_network_specific_values_in_code():
     src = "\n".join(p.read_text() for p in (ROOT / "src" / "anychain").rglob("*.py"))
     # Not network values: Blockscout's docs link, the OpenAI API endpoint (an LLM provider, D27), and
     # source links for chain-type behaviour, which live in chain profiles only (D31).
-    allowed = {"docs.blockscout.com", "api.openai.com"}
+    allowed = {"docs.blockscout.com", "api.openai.com", "api.anthropic.com"}
     domains = set(re.findall(r"https?://([a-z0-9.-]+\.[a-z]{2,})", src)) - allowed
     # Source links (github.com) for behaviour a rule relies on are allowed only where rules live, and
     # repo.py downloads configured GitHub repositories (the host, not a network value).

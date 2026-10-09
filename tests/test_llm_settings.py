@@ -5,6 +5,7 @@ import os
 import stat
 
 import httpx
+import pytest
 from fastapi.testclient import TestClient
 from typer.testing import CliRunner
 
@@ -17,10 +18,35 @@ from tests.test_api import LOCAL, make_transport
 
 ETH = str(ROOT / "configs" / "ethereum-mainnet.yaml")
 KEY = "sk-test-not-a-real-key-0000a1b2"
+# The providers' list shapes as their references give them (D61); the ids are test values, not real models.
+ANTHROPIC_LIST = {"data": [
+    {"type": "model", "id": "claude-test-new", "display_name": "Claude Test New", "lifecycle": "active"},
+    {"type": "model", "id": "claude-test-old", "display_name": "Claude Test Old", "lifecycle": "deprecated"},
+    {"type": "model", "id": "claude-test-gone", "display_name": "Claude Test Gone", "lifecycle": "retired"}],
+    "has_more": False}
+OPENAI_LIST = {"object": "list", "data": [
+    {"id": "gpt-test-chat", "object": "model", "created": 200, "owned_by": "openai"},
+    {"id": "gpt-test-older", "object": "model", "created": 100, "owned_by": "openai"},
+    {"id": "text-embedding-test", "object": "model", "created": 300, "owned_by": "openai"},
+    {"id": "whisper-test", "object": "model", "created": 300, "owned_by": "openai"}]}
+
+
+@pytest.fixture(autouse=True)
+def providers(monkeypatch):
+    """The providers' model lists, answered locally; `seen` records the auth headers sent."""
+    seen = []
+
+    def handler(request):
+        seen.append(dict(request.headers))
+        if request.headers.get("x-api-key") == "bad" or request.headers.get("authorization") == "Bearer bad":
+            return httpx.Response(401, json={"error": {"message": "invalid key bad"}})
+        return httpx.Response(200, json=ANTHROPIC_LIST if "anthropic" in request.url.host else OPENAI_LIST)
+    monkeypatch.setattr(llm_settings, "_client", lambda: httpx.Client(transport=httpx.MockTransport(handler)))
+    return seen
 
 
 def test_saving_writes_a_private_file_and_never_shows_the_key(tmp_path):
-    llm_settings.save("anthropic", "claude-sonnet-5-5", KEY)
+    llm_settings.save("anthropic", "claude-test-new", KEY)
     path = llm_settings.path()
     assert stat.S_IMODE(os.stat(path).st_mode) == 0o600
     shown = llm_settings.describe()
@@ -31,15 +57,15 @@ def test_saving_writes_a_private_file_and_never_shows_the_key(tmp_path):
 def test_the_saved_choice_overrides_the_config():
     cfg = load_config(ETH)
     assert cfg.llm.provider == "claude_code"
-    llm_settings.save("openai", "gpt-test-model", KEY)
+    llm_settings.save("openai", "gpt-test-chat", KEY)
     llm = llm_settings.effective(cfg.llm)
-    assert (llm.provider, llm.model) == ("openai", "gpt-test-model")
+    assert (llm.provider, llm.model) == ("openai", "gpt-test-chat")
     assert isinstance(backend_for(cfg.llm), OpenAIBackend)
 
 
 def test_the_saved_key_reaches_the_backend(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    llm_settings.save("openai", "gpt-test-model", KEY)
+    llm_settings.save("openai", "gpt-test-chat", KEY)
     sent = {}
 
     def handler(request):
@@ -52,7 +78,7 @@ def test_the_saved_key_reaches_the_backend(monkeypatch):
 
 def test_an_anthropic_key_is_passed_to_the_sdk(monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    llm_settings.save("anthropic", "claude-sonnet-5-5", KEY)
+    llm_settings.save("anthropic", "claude-test-new", KEY)
     made = {}
 
     class Fake:
@@ -68,8 +94,10 @@ def test_an_anthropic_key_is_passed_to_the_sdk(monkeypatch):
 
 
 def test_the_cli_asks_for_the_key_hidden_and_never_prints_it():
-    out = CliRunner().invoke(cli.app, ["llm", "set", "--provider", "anthropic"], input=KEY + "\n")
+    out = CliRunner().invoke(cli.app, ["llm", "set", "--provider", "anthropic"], input=KEY + "\n1\n")
     assert out.exit_code == 0 and KEY not in out.output and "a1b2" in out.output
+    assert "1. Claude Test New" in out.output and "Claude Test Gone" not in out.output
+    assert llm_settings.describe()["model"] == "claude-test-new"
     shown = CliRunner().invoke(cli.app, ["llm", "show"])
     assert "anthropic" in shown.output and KEY not in shown.output
     CliRunner().invoke(cli.app, ["llm", "clear"])
@@ -85,7 +113,7 @@ def _client(event_log):
 
 def test_the_page_saves_the_key_and_gets_back_only_its_end(event_log):
     c = _client(event_log)
-    r = c.post("/settings/llm", json={"provider": "anthropic", "model": "claude-sonnet-5-5", "api_key": KEY},
+    r = c.post("/settings/llm", json={"provider": "anthropic", "model": "claude-test-new", "api_key": KEY},
                headers={"X-AnyChain-Request": "1"})
     assert r.status_code == 200 and KEY not in r.text and "a1b2" in r.text
     assert KEY not in c.get("/settings/llm").text
@@ -100,6 +128,36 @@ def test_another_site_cannot_save_a_key(event_log):
     assert c.post("/settings/llm", json=body, headers={"X-AnyChain-Request": "1",
                                                        "Origin": "https://evil.example"}).status_code == 403
     assert llm_settings.describe()["provider"] is None
+
+
+def test_the_models_come_from_the_providers_list(providers):
+    anthropic = llm_settings.list_models("anthropic", KEY)
+    assert [m["id"] for m in anthropic] == ["claude-test-new", "claude-test-old"]  # retired left out
+    assert anthropic[1]["label"].endswith("(deprecated)")
+    assert providers[-1]["x-api-key"] == KEY and providers[-1]["anthropic-version"] == "2023-06-01"
+    openai = llm_settings.list_models("openai", KEY)
+    assert [m["id"] for m in openai] == ["gpt-test-chat", "gpt-test-older"]  # no embeddings or audio, newest first
+
+
+def test_a_model_not_in_the_list_is_refused():
+    with pytest.raises(ValueError, match="not in the models"):
+        llm_settings.save("openai", "gpt-typo", KEY)
+    assert llm_settings.describe()["provider"] is None
+
+
+def test_a_refused_key_says_so_without_echoing_the_providers_text():
+    with pytest.raises(llm_settings.ModelListError) as exc:
+        llm_settings.list_models("anthropic", "bad")
+    assert "refused the key (HTTP 401)" in str(exc.value) and "invalid key" not in str(exc.value)
+
+
+def test_the_page_lists_the_models_for_a_pasted_key(event_log):
+    c = _client(event_log)
+    r = c.post("/settings/llm/models", json={"provider": "openai", "api_key": KEY}, headers={"X-AnyChain-Request": "1"})
+    assert r.status_code == 200 and [m["id"] for m in r.json()["models"]] == ["gpt-test-chat", "gpt-test-older"]
+    assert KEY not in r.text
+    assert c.post("/settings/llm/models", json={"provider": "openai", "api_key": KEY}).status_code == 403
+    assert llm_settings.describe()["provider"] is None  # listing saves nothing
 
 
 def test_an_openai_choice_needs_a_model(event_log):
