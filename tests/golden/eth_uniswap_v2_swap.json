@@ -91,6 +91,39 @@
    "confidence": "single_source",
    "data": {
     "contract": "UniswapV2Router02",
+    "defined_in": "UniswapV2Router02",
+    "in_repo": true,
+    "lines": [
+     356,
+     378
+    ],
+    "path": "contracts/UniswapV2Router02.sol",
+    "repo": "Uniswap/v2-periphery@ed24991",
+    "same_as_verified": true,
+    "selector": "0xb6f9de95"
+   },
+   "id": "E4",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository Uniswap/v2-periphery@ed24991",
+     "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L356-L378"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "In the configured repository Uniswap/v2-periphery@ed24991, swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256) of UniswapV2Router02 is defined in UniswapV2Router02 (contracts/UniswapV2Router02.sol, lines 356-378). Its text is the same in the contract's verified source on the explorer (comments and spacing aside)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "UniswapV2Router02",
     "function": "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)",
     "lines": [
      356,
@@ -101,7 +134,7 @@
     "raises": null,
     "show": []
    },
-   "id": "E4",
+   "id": "E5",
    "kind": "code",
    "sources": [
     {
@@ -122,7 +155,7 @@
     "token_id": null,
     "value": 200000000000000000
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "token_transfer",
    "sources": [
     {
@@ -143,7 +176,7 @@
     "token_id": null,
     "value": 200000000000000000
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "token_transfer",
    "sources": [
     {
@@ -164,7 +197,7 @@
     "token_id": null,
     "value": 12118418517751063
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "token_transfer",
    "sources": [
     {
@@ -184,7 +217,7 @@
     "type": "call",
     "value": "200000000000000000"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "internal_call",
    "sources": [
     {
@@ -204,7 +237,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -224,7 +257,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "internal_call",
    "sources": [
     {
@@ -244,7 +277,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "internal_call",
    "sources": [
     {
@@ -261,7 +294,7 @@
    "data": {
     "staticcalls": 7
    },
-   "id": "E12",
+   "id": "E13",
    "kind": "internal_call",
    "sources": [
     {
@@ -282,7 +315,7 @@
     },
     "event": "Sync"
    },
-   "id": "E13",
+   "id": "E14",
    "kind": "event",
    "sources": [
     {
@@ -307,7 +340,7 @@
     },
     "event": "Swap"
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "event",
    "sources": [
     {
@@ -325,7 +358,7 @@
     "agrees": true,
     "rpc_status": "success"
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "cross_check",
    "sources": [
     {
@@ -349,7 +382,7 @@
     "limit": 300000,
     "used": 131767
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "gas_note",
    "sources": [
     {

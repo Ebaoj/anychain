@@ -1,0 +1,2 @@
+Real files from github.com/Uniswap/v2-periphery at commit ed24991304291297c3b4a52818d02f46a17aa9a2 (GPL-3.0, LICENSE
+copied alongside), unchanged: contracts/UniswapV2Router02.sol, the one file the Ethereum config's source_globs select.

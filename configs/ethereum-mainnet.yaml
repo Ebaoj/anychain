@@ -28,6 +28,12 @@ repos:
   - url: https://github.com/cloudwallk/brlc-token
     ref: 74a5498d04b10dc882e48273a38b98b4275463bd
     source_globs: ["contracts/**/*.sol"]
+  # Uniswap's official V2 router source (GPL-3.0), pinned to the master commit of 2026-04-02 checked with the GitHub API
+  # on 2026-10-09. Only the router's file: its interfaces (IERC20, IWETH) would make every token call a "selector
+  # found in a repository" candidate, and contracts/test/ defines a WETH9 that is not the deployed WETH9.
+  - url: https://github.com/Uniswap/v2-periphery
+    ref: ed24991304291297c3b4a52818d02f46a17aa9a2
+    source_globs: ["contracts/UniswapV2Router02.sol"]
   # Safe's official deployments: compiled ABIs only, no Solidity source (PHASE2_5 T3, D40).
   - url: https://github.com/safe-global/safe-deployments
     ref: 7b1fb6d615ab2d2999550ec9166554b180e813e5

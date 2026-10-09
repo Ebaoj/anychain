@@ -117,6 +117,39 @@
    "confidence": "single_source",
    "data": {
     "contract": "UniswapV2Router02",
+    "defined_in": "UniswapV2Router02",
+    "in_repo": true,
+    "lines": [
+     252,
+     266
+    ],
+    "path": "contracts/UniswapV2Router02.sol",
+    "repo": "Uniswap/v2-periphery@ed24991",
+    "same_as_verified": true,
+    "selector": "0x7ff36ab5"
+   },
+   "id": "E5",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository Uniswap/v2-periphery@ed24991",
+     "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L252-L266"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "In the configured repository Uniswap/v2-periphery@ed24991, swapExactETHForTokens(uint256,address[],address,uint256) of UniswapV2Router02 is defined in UniswapV2Router02 (contracts/UniswapV2Router02.sol, lines 252-266). Its text is the same in the contract's verified source on the explorer (comments and spacing aside)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "UniswapV2Router02",
     "function": "swapExactETHForTokens(uint256,address[],address,uint256)",
     "lines": [
      252,
@@ -127,7 +160,7 @@
     "raises": null,
     "show": []
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "code",
    "sources": [
     {
@@ -163,7 +196,7 @@
     "reads": [],
     "rule": "deadline"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "diagnosis",
    "sources": [
     {
@@ -185,13 +218,20 @@
    "confidence": "single_source",
    "data": {
     "places": [
+     "Uniswap/v2-periphery@ed24991 contracts/UniswapV2Router02.sol, line 19",
      "the verified source contracts/UniswapV2Router02.sol, line 19"
     ],
     "reason": "UniswapV2Router: EXPIRED"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "source",
    "sources": [
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository Uniswap/v2-periphery@ed24991",
+     "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L19-L19"
+    },
     {
      "detail": null,
      "kind": "explorer_api",
@@ -199,7 +239,7 @@
      "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
     }
    ],
-   "text": "The reason 'UniswapV2Router: EXPIRED' is written in the verified source contracts/UniswapV2Router02.sol, line 19."
+   "text": "The reason 'UniswapV2Router: EXPIRED' is written in Uniswap/v2-periphery@ed24991 contracts/UniswapV2Router02.sol, line 19; the verified source contracts/UniswapV2Router02.sol, line 19."
   },
   {
    "confidence": "confirmed",
@@ -207,7 +247,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "cross_check",
    "sources": [
     {
@@ -308,7 +348,7 @@
      }
     ]
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "timeline",
    "sources": [
     {
@@ -325,7 +365,7 @@
    "data": {
     "pattern": "retried_ok"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "timeline",
    "sources": [
     {
@@ -343,7 +383,7 @@
     "limit": 300000,
     "used": 25320
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "gas_note",
    "sources": [
     {
@@ -359,7 +399,7 @@
      "url": "https://eth.blockscout.com/api/v2/addresses/0x79D6C25dE86bC4A858d7e383A474667aB109FeD0/transactions?filter=from"
     }
    ],
-   "text": "Gas notes (heuristic, not a finding): Gas used 25320 of the 300000 limit (8.4%). The same call succeeded at nonce 53 using 119837 gas, with a limit of 300000 (E9); this transaction had a limit of 300000."
+   "text": "Gas notes (heuristic, not a finding): Gas used 25320 of the 300000 limit (8.4%). The same call succeeded at nonce 53 using 119837 gas, with a limit of 300000 (E10); this transaction had a limit of 300000."
   }
  ],
  "network": "ethereum-mainnet",

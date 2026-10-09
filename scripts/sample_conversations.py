@@ -32,6 +32,8 @@ SAMPLES = [
     ("The private demo network: a BRLC call decoded from the configured repository, and the cause the explorer did "
      "not give recovered by replaying the call on the node, developer mode", "devnet_fail_access", "developer", None,
      None),
+    ("An auditor's review, in English: a security note on the called function's code (heuristic, not an audit)",
+     "eth_swaprouter02_multicall", "auditor", None, None, "en"),
 ]
 
 
@@ -50,9 +52,11 @@ def _sources(text: str, bundle) -> list[str]:
     return out
 
 
-def run(fixture: str, mode: str, question, clarified=None):
+def run(fixture: str, mode: str, question, clarified=None, language=None):
     config, tx = _case(fixture)
     cfg = load_config(str(ROOT / "configs" / f"{config}.yaml"))
+    if language:  # one sample in another language, as a reader would choose it on the page (D64)
+        cfg = cfg.model_copy(update={"assistant": cfg.assistant.model_copy(update={"language": language})})
     return answer_transaction(tx, cfg, mode, write=WRITE, fresh=True, source="sample", log=None, store=None,
                               build=lambda h, c: replay_bundle(c, h, fixture), write_fn=write_checked,
                               finality=lambda: None, record=lambda log, e: None, question=question,
@@ -72,9 +76,11 @@ def main() -> None:
            "from their recordings, answered by the configured model through the same path as `explain` and the API "
            "(triage, writer, answer check). Not edited by hand. Each `[E#]` is a numbered fact; the full evidence of "
            "each is printed by `anychain explain <hash> --evidence`.", ""]
-    for title, fixture, mode, question, answer in SAMPLES:
-        first, cfg, tx = run(fixture, mode, question)
-        out += [f"## {title}", "", f"Network `{cfg.network.name}`, transaction `{tx}`, mode `{mode}`.", ""]
+    for title, fixture, mode, question, answer, *rest in SAMPLES:
+        language = rest[0] if rest else None
+        first, cfg, tx = run(fixture, mode, question, language=language)
+        out += [f"## {title}", "", f"Network `{cfg.network.name}`, transaction `{tx}`, mode `{mode}`"
+                + (f", answer language `{language}`." if language else "."), ""]
         if question:
             out += [f"**Reader:** {question}", ""]
         result = first
@@ -85,7 +91,7 @@ def main() -> None:
                 kind, value = answer
                 shown = next((o.label for o in c.options if o.id == value), value)
                 out += [f"**Reader answers:** {shown}", ""]
-                result, _cfg, _tx = run(fixture, mode, question, {"kind": kind, "answer": value})
+                result, _cfg, _tx = run(fixture, mode, question, {"kind": kind, "answer": value}, language)
         out += ["**Assistant:**", "", result.text or f"_(no written answer: {result.summary_status})_", ""]
         sources = _sources(result.text, result.bundle)
         if sources:

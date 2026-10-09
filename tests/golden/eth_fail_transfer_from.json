@@ -118,6 +118,39 @@
    "confidence": "single_source",
    "data": {
     "contract": "UniswapV2Router02",
+    "defined_in": "UniswapV2Router02",
+    "in_repo": true,
+    "lines": [
+     379,
+     400
+    ],
+    "path": "contracts/UniswapV2Router02.sol",
+    "repo": "Uniswap/v2-periphery@ed24991",
+    "same_as_verified": true,
+    "selector": "0x791ac947"
+   },
+   "id": "E5",
+   "kind": "source",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository Uniswap/v2-periphery@ed24991",
+     "url": "https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L379-L400"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: verified source",
+     "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    }
+   ],
+   "text": "In the configured repository Uniswap/v2-periphery@ed24991, swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256) of UniswapV2Router02 is defined in UniswapV2Router02 (contracts/UniswapV2Router02.sol, lines 379-400). Its text is the same in the contract's verified source on the explorer (comments and spacing aside)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "contract": "UniswapV2Router02",
     "function": "swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)",
     "lines": [
      379,
@@ -128,7 +161,7 @@
     "raises": null,
     "show": []
    },
-   "id": "E5",
+   "id": "E6",
    "kind": "code",
    "sources": [
     {
@@ -149,7 +182,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E6",
+   "id": "E7",
    "kind": "internal_call",
    "sources": [
     {
@@ -170,7 +203,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E7",
+   "id": "E8",
    "kind": "internal_call",
    "sources": [
     {
@@ -191,7 +224,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E8",
+   "id": "E9",
    "kind": "internal_call",
    "sources": [
     {
@@ -212,7 +245,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E9",
+   "id": "E10",
    "kind": "internal_call",
    "sources": [
     {
@@ -233,7 +266,7 @@
     "type": "call",
     "value": "0"
    },
-   "id": "E10",
+   "id": "E11",
    "kind": "internal_call",
    "sources": [
     {
@@ -250,7 +283,7 @@
    "data": {
     "staticcalls": 3
    },
-   "id": "E11",
+   "id": "E12",
    "kind": "internal_call",
    "sources": [
     {
@@ -267,7 +300,7 @@
    "data": {
     "computed": {
      "cites": [
-      "E10"
+      "E11"
      ]
     },
     "label": "LIKELY",
@@ -283,7 +316,7 @@
     "reads": [],
     "rule": "out_of_gas"
    },
-   "id": "E12",
+   "id": "E13",
    "kind": "diagnosis",
    "sources": [
     {
@@ -293,7 +326,7 @@
      "url": "https://eth.blockscout.com/api/v2/transactions/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832"
     }
    ],
-   "text": "LIKELY: An internal call ran out of gas: the internal call from 0x57563479E1C05A712d6c646b9D511000c7Dd4dE2 (Uniswap V2) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) failed with 'out of gas', as the explorer's trace reports (E10), and the transaction used 168382 of its 172298 gas limit; the reason 'TransferHelper: TRANSFER_FROM_FAILED' at the top is the outer call failing because of it. Next step for a non-technical reader: The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction. Next step for a developer: Look at which inner call failed and how much gas it was given (a token that runs its own code on transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that estimate and a margin."
+   "text": "LIKELY: An internal call ran out of gas: the internal call from 0x57563479E1C05A712d6c646b9D511000c7Dd4dE2 (Uniswap V2) to 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) failed with 'out of gas', as the explorer's trace reports (E11), and the transaction used 168382 of its 172298 gas limit; the reason 'TransferHelper: TRANSFER_FROM_FAILED' at the top is the outer call failing because of it. Next step for a non-technical reader: The operation stopped because it ran out of gas (the limit on the work it may do). Try again from the app and let it set that limit, or contact its support with the link to this transaction. Next step for a developer: Look at which inner call failed and how much gas it was given (a token that runs its own code on transfer, a fee or a swap, needs more); estimate the gas for the whole call and send it with that estimate and a margin."
   },
   {
    "confidence": "single_source",
@@ -303,7 +336,7 @@
     ],
     "reason": "TransferHelper: TRANSFER_FROM_FAILED"
    },
-   "id": "E13",
+   "id": "E14",
    "kind": "source",
    "sources": [
     {
@@ -321,7 +354,7 @@
     "agrees": true,
     "rpc_status": "failed"
    },
-   "id": "E14",
+   "id": "E15",
    "kind": "cross_check",
    "sources": [
     {
@@ -411,7 +444,7 @@
      }
     ]
    },
-   "id": "E15",
+   "id": "E16",
    "kind": "timeline",
    "sources": [
     {
@@ -428,7 +461,7 @@
    "data": {
     "pattern": "retried_ok"
    },
-   "id": "E16",
+   "id": "E17",
    "kind": "timeline",
    "sources": [
     {
@@ -446,7 +479,7 @@
     "limit": 172298,
     "used": 168382
    },
-   "id": "E17",
+   "id": "E18",
    "kind": "gas_note",
    "sources": [
     {
@@ -462,7 +495,7 @@
      "url": "https://eth.blockscout.com/api/v2/addresses/0x449ed53a5600A0336069C9de52A8E322f977fDc4/transactions?filter=from"
     }
    ],
-   "text": "Gas notes (heuristic, not a finding): Gas used 168382 of the 172298 limit (97.7%). The same call succeeded at nonce 424 using 129233 gas, with a limit of 172298 (E15); this transaction had a limit of 172298."
+   "text": "Gas notes (heuristic, not a finding): Gas used 168382 of the 172298 limit (97.7%). The same call succeeded at nonce 424 using 129233 gas, with a limit of 172298 (E16); this transaction had a limit of 172298."
   }
  ],
  "network": "ethereum-mainnet",
