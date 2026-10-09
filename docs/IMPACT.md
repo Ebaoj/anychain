@@ -57,7 +57,7 @@ A rollback is a flag in the support tool: the answer stops being shown, recordin
 
 ## 7. Unit economics: when does it pay for itself
 
-Measured here: a written answer costs about **US$ 0.027** with Claude Sonnet (US$ 0.2954 for the 11 answers of the official eval, as the backend reports it) and takes about 10 seconds; the facts alone (no model) cost nothing but the explorer's and the node's requests. The OpenAI backend reports tokens, not cost.
+Measured here: a written answer costs about **US$ 0.027** with Claude Sonnet (US$ 0.2973 for the 11 answers of the official eval, as the backend reports it) and takes about 10 seconds; the facts alone (no model) cost nothing but the explorer's and the node's requests. The OpenAI backend reports tokens, not cost.
 
 The numbers below are **assumptions to replace with CloudWalk's own**, written so the reasoning can be checked:
 
