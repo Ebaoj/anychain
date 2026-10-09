@@ -9,7 +9,7 @@ As cores mostram o que já existe:
 - **Cinza**: fases seguintes
 - Caixas brancas são só agrupamentos.
 
-Estado atual: **fim da Fase 3** (08/10/2026): cache, métricas, API, chat, página, avaliação, página de impacto (`docs/IMPACT.md`), a pergunta do usuário junto com o hash, a demonstração gravada (`docs/demo/`) e a aceitação de 1.800 transações.
+Estado atual: **Fase 4** (08/10/2026): triagem (uma pergunta antes de responder, escolhida pelo código), linha do tempo do remetente em volta de uma falha, notas de gás, Dockerfile e README final prontos; a rede privada de demonstração é o último item.
 
 ---
 
@@ -45,7 +45,8 @@ Os mesmos passos, com as peças de cada um.
 
 ```mermaid
 flowchart TD
-    IN["Entrada<br/>hash + modo (lojista, desenvolvedor, auditor)"] --> CACHE
+    IN["Entrada<br/>hash + modo (lojista, desenvolvedor, auditor)<br/>+ pergunta opcional"] --> TRI{"Triagem<br/>não é hash? 'não recebi'?<br/>palavras emprestadas?<br/>(no máximo 1 pergunta)"}
+    TRI --> CACHE
     CACHE{"Já respondida antes?<br/>cache por rede e hash<br/>(só transações finalizadas e completas)"} -->|sim| BUN
     CACHE -->|não| COL
     CFG["Configuração (YAML)<br/>explorador, nó, repositórios,<br/>modelo de IA, tipo de rede<br/>um arquivo por rede"] --> COL
@@ -60,6 +61,8 @@ flowchart TD
     DEC --> PRO["Perfil do tipo de rede<br/>taxas, estado na L1, depósitos"]
     DEC --> CODE["Código da função chamada<br/>e notas de segurança (heurísticas)"]
     DEC --> DIAG["3. Diagnóstico (seção 2)<br/>só se falhou"]
+    DIAG --> TL["Linha do tempo do remetente<br/>e notas de gás<br/>(no fim, sem renumerar fatos)"]
+    TL --> BUN
     PRO --> BUN
     CODE --> BUN
     DIAG --> BUN
@@ -78,7 +81,7 @@ flowchart TD
     EVAL["anychain eval<br/>10 casos reais, medidos"] -.usa.-> BUN
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
-    class IN,CACHE,CFG,EXP,RPC,REPO,DEC,PRO,CODE,DIAG,BUN,WRI,VAL,OUT,CLI,API,PAGE,LOG,MET,EVAL done
+    class IN,TRI,TL,CACHE,CFG,EXP,RPC,REPO,DEC,PRO,CODE,DIAG,BUN,WRI,VAL,OUT,CLI,API,PAGE,LOG,MET,EVAL done
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
 
@@ -88,7 +91,7 @@ flowchart TD
 | 2 (pronta) | diagnóstico de falhas, leituras de estado, repositórios, cascata de ABI, confiança de cada fato, checagem da resposta |
 | 2.5 (pronta) | código da função, notas de segurança, ABIs de artefatos, controle de acesso, prazo pelo parâmetro, rótulos, passos por leitor, resposta estruturada |
 | 3 (pronta) | cache e lote, métricas, API, chat com ferramentas, página, conversão para a unidade do token, avaliação, diagnóstico pela origem da falha, pergunta do usuário, página de impacto, demonstração gravada |
-| 4 | triagem (começar pelo problema, sem hash), linha do tempo entre transações, notas de gás, trace do nó, rede privada de demonstração, Dockerfile, README final |
+| 4 | **pronto:** triagem (endereço em vez de hash, "não recebi", palavras emprestadas de outro contrato), linha do tempo do remetente com padrões (tentou de novo e deu certo, aprovou e deu certo, falhas seguidas), notas de gás, Dockerfile, README final com conversas reais. **Por último:** rede privada de demonstração. **Fica para depois:** trace do nó |
 
 ---
 
@@ -358,6 +361,7 @@ flowchart LR
 
 ## Histórico deste documento
 
+- **08/10/2026, Fase 4 (D55 a D58):** triagem com uma pergunta escolhida pelo código; linha do tempo do remetente em volta de uma falha, com padrões ditos só sobre nonces contínuos; notas de gás (heurísticas); Dockerfile, testado num servidor; README final.
 - **08/10/2026, Fase 3 até a T5 (D44 a D51):** seção 0 em linguagem simples; cache por rede e hash e lote; métricas com SQL; API local e página; chat com ferramentas executadas pelo nosso código; valores na unidade do token, lidos do próprio token; avaliação com 10 casos reais; diagnóstico que parte da origem da falha e diz todo sinal que a conclusão não explica. Novas seções: como o diagnóstico decide, o chat com ferramentas, como a qualidade é medida.
 - **08/10/2026, fim da Fase 2.5 (D38 a D43):** código da função como fato, notas de segurança, ABI de artefatos, controle de acesso, prazo pelo parâmetro, rótulos, passos por leitor, resposta estruturada.
 - **07/10/2026, fim da Fase 1:** primeira versão. Linha de montagem, sequência de um `explain`, mapa do código, classificação das lacunas.

@@ -9,7 +9,7 @@ Living document: updated at the end of every phase. Colors show what exists. A P
 
 View the diagrams in VS Code (extension "Markdown Preview Mermaid Support") or on GitHub, which renders them natively.
 
-Current state: **end of phase 3** (2026-10-08): cache, metrics, API, chat, web page, evaluation, production impact page (`docs/IMPACT.md`), the reader's question with the hash, the recorded demo (`docs/demo/`) and the 1,800-transaction acceptance run.
+Current state: **phase 4** (2026-10-08): triage (one question before answering, chosen by code), the sender's timeline around a failure, gas notes, the Dockerfile and the final README are done; the private demo network is the last item.
 
 ---
 
@@ -43,7 +43,8 @@ Why this way:
 
 ```mermaid
 flowchart TD
-    IN["Input<br/>hash + mode (support, developer, auditor)<br/>+ optional question"] --> CACHE
+    IN["Input<br/>hash + mode (support, developer, auditor)<br/>+ optional question"] --> TRI{"Triage<br/>not a hash? 'did not receive'?<br/>borrowed words?<br/>(one question at most)"}
+    TRI --> CACHE
     CACHE{"Answered before?<br/>cache by network and hash<br/>(final and complete transactions only)"} -->|yes| BUN
     CACHE -->|no| COL
     CFG["Configuration (YAML)<br/>explorer, node, repos,<br/>AI model, network type<br/>one file per network"] --> COL
@@ -58,6 +59,8 @@ flowchart TD
     DEC --> PRO["Network-type profile<br/>fees, L1 status, deposits"]
     DEC --> CODE["Called function's code<br/>and security notes (heuristic)"]
     DEC --> DIAG["3. Diagnosis (section 2)<br/>only when it failed"]
+    DIAG --> TL["The sender's timeline<br/>and gas notes<br/>(last: no fact renumbered)"]
+    TL --> BUN
     PRO --> BUN
     CODE --> BUN
     DIAG --> BUN
@@ -76,7 +79,7 @@ flowchart TD
     EVAL["anychain eval<br/>10 real cases, measured"] -.uses.-> BUN
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
-    class IN,CACHE,CFG,EXP,RPC,REPO,DEC,PRO,CODE,DIAG,BUN,WRI,VAL,OUT,CLI,API,PAGE,LOG,MET,EVAL done
+    class IN,TRI,TL,CACHE,CFG,EXP,RPC,REPO,DEC,PRO,CODE,DIAG,BUN,WRI,VAL,OUT,CLI,API,PAGE,LOG,MET,EVAL done
     style COL fill:#ffffff,stroke:#90a4ae,color:#263238
 ```
 
@@ -86,7 +89,7 @@ flowchart TD
 | 2 (done) | failure diagnosis, state reads, repos, ABI cascade, confidence per fact, answer check |
 | 2.5 (done) | function code, security notes, ABIs from artifacts, access control, deadline parameter, labels, steps per reader, structured answer |
 | 3 (done) | cache and batch, metrics, API, chat with tools, web page, amounts in the token's units, evaluation, origin-first diagnosis, the reader's question, impact page, recorded demo |
-| 4 | triage (start from the problem, no hash), multi-transaction timeline, gas notes, node trace, private demo network, Dockerfile, final README |
+| 4 | **done:** triage (an address instead of a hash, "did not receive it", words borrowed from another contract), the sender's timeline with patterns (retried and succeeded, approved then succeeded, repeated failures), gas notes, Dockerfile, final README with real conversations. **Last:** private demo network. **Later:** node trace |
 
 ---
 
@@ -354,6 +357,7 @@ flowchart LR
 
 ## Changelog of this document
 
+- **2026-10-08, phase 4 (D55 to D58):** triage with one question chosen by code; the sender's timeline around a failure, with patterns said only over unbroken nonces; heuristic gas notes; Dockerfile, run on a server; final README.
 - **2026-10-08, end of phase 3 (D44 to D53):** a one-minute overview; cache by network and hash and batch; metrics with SQL; local API and page; chat with tools run by our code; amounts in the token's units, read from the token itself; evaluation with 10 real cases; diagnosis that starts from the failure's origin and says every signal its conclusion leaves unexplained; the reader's question; a mined transaction without a receipt is "unknown", never "pending". New sections: how the diagnosis decides, the chat with tools, how quality is measured.
 - **2026-10-08, end of phase 2.5 (D38 to D43):** the model gets the called function's code (and the reason's line when the code pins it down); heuristic security notes; ABIs from repo artifacts, the address checked against the file's own list; access-control and deadline-parameter rules; CONFIRMED / LIKELY / UNKNOWN labels on each conclusion and in the log; steps for a merchant and for a developer; structured answer (`--json`). Header and code map brought up to date (phase 2 modules were missing).
 - **2026-10-08, repos and signatures (D33 to D35, PHASE2 T6 and T7):** configured repos synced to a cache, cited and compared with the verified source, used to decode unverified contracts; public signature database as candidates, event signatures proven by hash.
