@@ -20,7 +20,9 @@
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         display: flex; flex-direction: column; }
   a { color: var(--accent); }
   .hidden { display: none !important; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
@@ -28,10 +30,9 @@
   .wrap { word-break: break-all; }
   .grow { flex: 1; }
   h2 { font-size: 17px; margin: 0 0 6px; letter-spacing: -.01em; }
-  h3 { font-size: 12px; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
-  /* header */
-  header.top { position: sticky; top: 0; z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
-               padding: 10px 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  h3 { font-size: 12px; margin: 16px 0 8px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  header.top { background: var(--panel); border-bottom: 1px solid var(--line); padding: 10px 18px; display: flex; gap: 12px;
+               align-items: center; flex-wrap: wrap; flex: none; }
   .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; text-decoration: none; color: var(--ink); }
   .brand .logo { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: var(--on-accent);
                  display: grid; place-items: center; font-size: 14px; }
@@ -43,28 +44,25 @@
   .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--unknown); }
   .dot.ok { background: var(--ok); } .dot.down { background: var(--bad); } .dot.wait { background: var(--likely); }
   .spacer { flex: 1; }
-  /* controls */
   input[type=text], input[type=password], input[type=number], input[type=url], select, textarea { font: inherit; color: var(--ink);
        background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
   input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   button { font: inherit; border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent);
            border-radius: 10px; padding: 10px 18px; cursor: pointer; font-weight: 600; }
   button.plain { background: var(--panel); color: var(--ink); border-color: var(--line); font-weight: 500; }
+  button.link { background: none; border: 0; color: var(--accent); padding: 0; font-weight: 600; }
   button:disabled { opacity: .5; cursor: not-allowed; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .chips button { background: var(--panel); color: var(--ink); border: 1px solid var(--line); font-weight: 500; font-size: 13px;
-                  padding: 7px 12px; border-radius: 999px; }
+                  padding: 7px 12px; border-radius: 999px; text-align: left; }
   .chips button:hover { border-color: var(--accent); color: var(--accent); }
-  /* page */
-  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; display: grid; gap: 16px; }
-  body[data-persona="developer"] main, body[data-persona="auditor"] main { max-width: 1200px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
-  /* landing: three ways to use it */
-  .landing { text-align: center; padding: 20px 0 8px; }
+  #landing { overflow: auto; flex: 1; }
+  .landing-inner { max-width: 900px; margin: 0 auto; padding: 28px 16px 40px; }
+  .landing { text-align: center; padding: 10px 0 8px; }
   .landing h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -.02em; }
   .landing p { color: var(--muted); margin: 0 auto 24px; max-width: 620px; }
-  .personas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; text-align: left; }
+  .personas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
   .persona { display: block; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--line);
              border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); transition: border-color .15s, transform .15s; }
   .persona:hover { border-color: var(--accent); transform: translateY(-2px); }
@@ -72,90 +70,85 @@
   .persona strong { display: block; font-size: 17px; margin: 8px 0 4px; }
   .persona span { color: var(--muted); font-size: 14px; }
   .persona ul { margin: 10px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
-  .how { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 18px; text-align: left; }
-  .how div { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; font-size: 13px; }
-  .how strong { display: block; color: var(--accent); }
-  /* the composer */
-  .composer h2 { font-size: 20px; }
-  .composer .lead { color: var(--muted); margin: 0 0 14px; }
-  #hash { width: 100%; font-family: ui-monospace, Menlo, monospace; font-size: 14px; padding: 13px 14px; }
-  #hash.invalid { border-color: var(--bad); }
-  .hint { font-size: 13px; min-height: 20px; margin: 4px 2px 8px; color: var(--muted); }
+  #app { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  body[data-persona="developer"] #app, body[data-persona="auditor"] #app { grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr); }
+  @media (max-width: 920px) { body[data-persona] #app { grid-template-columns: minmax(0, 1fr); } }
+  .convo { display: flex; flex-direction: column; min-height: 0; }
+  #thread { flex: 1; overflow: auto; padding: 22px 16px 10px; }
+  .thread-inner { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .msg { display: flex; gap: 10px; align-items: flex-start; }
+  .msg .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid;
+                 place-items: center; font-size: 14px; flex: none; }
+  .msg .bubble { background: var(--panel); border: 1px solid var(--line); border-radius: 4px 16px 16px 16px; padding: 14px 16px;
+                 box-shadow: var(--shadow); max-width: 100%; min-width: 0; overflow-wrap: anywhere; }
+  .msg.me { justify-content: flex-end; }
+  .msg.me .bubble { background: var(--accent); color: var(--on-accent); border-color: var(--accent); border-radius: 16px 4px 16px 16px;
+                    max-width: 80%; box-shadow: none; }
+  .msg .bubble p { margin: 0 0 10px; } .msg .bubble p:last-child { margin-bottom: 0; }
+  .msg .bubble ul, .msg .bubble ol { margin: 0 0 10px; padding-left: 22px; }
+  .bubble .chips { margin-top: 10px; }
+  .msg .tool { font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+  .typing .steps-list { margin: 0; }
+  .composer { flex: none; background: var(--panel); border-top: 1px solid var(--line); padding: 12px 16px 14px; }
+  .composer-inner { max-width: 820px; margin: 0 auto; }
+  form.chat { display: flex; gap: 8px; align-items: flex-end; }
+  form.chat textarea { flex: 1; min-height: 48px; max-height: 160px; resize: none; }
+  .hint { font-size: 12px; min-height: 18px; margin: 4px 2px 0; color: var(--muted); }
   .hint.bad { color: var(--bad); } .hint.good { color: var(--ok); }
-  #readerQuestion { width: 100%; margin-bottom: 12px; }
-  .composer .actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  #askButton { margin-left: auto; min-width: 140px; padding: 12px 22px; }
-  .examples { margin-top: 16px; }
-  label.check { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
-  /* waiting */
-  .steps-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
-  .steps-list li { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+  #suggestions { margin-bottom: 8px; }
+  label.check { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .steps-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
+  .steps-list li { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 14px; }
   .steps-list li.now { color: var(--ink); font-weight: 600; }
   .steps-list li.done { color: var(--ok); }
-  .steps-list .mark { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; flex: none; }
+  .steps-list .mark { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 11px; flex: none; }
   .steps-list li.now .mark { border-color: var(--accent); border-top-color: transparent; animation: spin .8s linear infinite; }
   .steps-list li.done .mark { border-color: var(--ok); background: var(--ok); color: var(--on-accent); }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .steps-list li.now .mark { animation: none; } }
-  /* the result */
-  .result-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; margin-top: 16px; }
-  .result-main { display: grid; gap: 16px; }
-  body[data-persona="developer"] .result-grid, body[data-persona="auditor"] .result-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
-  @media (max-width: 920px) { body[data-persona] .result-grid { grid-template-columns: minmax(0, 1fr); } }
-  .glance { display: flex; gap: 16px; align-items: flex-start; border-radius: var(--radius); padding: 18px 20px; }
-  .glance .big { font-size: 34px; line-height: 1; }
-  .glance .head { font-size: 19px; font-weight: 700; margin: 0 0 4px; }
+  .glance { display: flex; gap: 14px; align-items: flex-start; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  .glance .big { font-size: 28px; line-height: 1; }
+  .glance .head { font-size: 17px; font-weight: 700; margin: 0 0 2px; }
   .glance.success { background: var(--ok-bg); } .glance.success .head { color: var(--ok); }
   .glance.failed { background: var(--bad-bg); } .glance.failed .head { color: var(--bad); }
   .glance.pending, .glance.unknown, .glance.dropped { background: var(--unknown-bg); }
-  .facts-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .kv { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; font-size: 13px; }
-  .kv .k { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
-  .meta { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .facts-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .kv { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 5px 9px; font-size: 13px; color: var(--ink); }
+  .kv .k { display: block; font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
   .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
   .CONFIRMED { color: var(--ok); background: var(--ok-bg); } .LIKELY { color: var(--likely); background: var(--likely-bg); }
   .UNKNOWN { color: var(--unknown); background: var(--unknown-bg); } .heuristic { color: var(--likely); background: var(--likely-bg); }
-  .answer { font-size: 15.5px; }
-  .answer p { margin: 0 0 12px; } .answer ul, .answer ol { margin: 0 0 12px; padding-left: 22px; }
-  .answer code, .fact code { background: var(--code-bg); padding: 1px 4px; border-radius: 4px; font-size: 12.5px; }
+  .bubble code, .fact code { background: var(--code-bg); padding: 1px 4px; border-radius: 4px; font-size: 12.5px; }
   a.cite { font-size: 11px; font-weight: 700; text-decoration: none; color: var(--accent); background: var(--accent-soft);
            border-radius: 4px; padding: 0 5px; margin-left: 2px; vertical-align: 1px; }
-  .box { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 8px 0; }
-  ol.todo { margin: 0; padding-left: 20px; } ol.todo li { margin: 4px 0; }
+  .answer-foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .feedback { display: flex; gap: 6px; align-items: center; }
+  .feedback button { padding: 2px 10px; background: transparent; color: var(--ink); border-color: var(--line); font-weight: 400; }
+  .feedback button.chosen { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+  .box { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 8px 0; }
+  ol.todo { margin: 0; padding-left: 20px; }
   .gaps { border-left: 4px solid var(--likely); background: var(--likely-bg); border-radius: 10px; padding: 10px 14px; }
   .gaps ul { margin: 0; padding-left: 18px; } .gaps li { margin: 4px 0; }
-  .error { border-left: 4px solid var(--bad); background: var(--bad-bg); border-radius: 10px; padding: 12px 14px; }
-  .feedback { margin-top: 12px; display: flex; gap: 6px; align-items: center; }
-  .feedback button { padding: 3px 12px; background: transparent; color: var(--ink); border-color: var(--line); font-weight: 400; }
-  .feedback button.chosen { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
-  .fact, .answer, .box, .gaps, .chat-log, .error, #statusLine, #movements { overflow-wrap: anywhere; }
-  details.evidence > summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 8px; }
-  details.evidence > summary::-webkit-details-marker { display: none; }
-  details.evidence > summary::before { content: "▸"; color: var(--muted); }
-  details.evidence[open] > summary::before { content: "▾"; }
-  body[data-persona="developer"] .evidence-col, body[data-persona="auditor"] .evidence-col { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow: auto; }
-  .fact { border-top: 1px solid var(--line); padding: 10px 0; font-size: 13px; scroll-margin-top: 90px; }
+  .error { border-left: 4px solid var(--bad); background: var(--bad-bg); border-radius: 10px; padding: 10px 12px; }
+  .proof { background: var(--panel); border-left: 1px solid var(--line); overflow: auto; padding: 18px; min-height: 0; }
+  body[data-persona="support"] .proof { position: fixed; inset: 0 0 0 auto; width: min(480px, 100vw); z-index: 18;
+                                         box-shadow: -8px 0 28px rgba(0, 0, 0, .15); }
+  .proof.closed { display: none; }
+  body[data-persona="developer"] .proof-close, body[data-persona="auditor"] .proof-close { display: none; }
+  @media (max-width: 920px) { body[data-persona] .proof { position: fixed; inset: 0 0 0 auto; width: min(480px, 100vw); z-index: 18; }
+                              body[data-persona] .proof-close { display: inline-block; } }
+  .proof .bar { display: flex; align-items: center; }
+  .fact, .box, .gaps, .error, #statusLine, #movements { overflow-wrap: anywhere; }
+  .fact { border-top: 1px solid var(--line); padding: 10px 0; font-size: 13px; scroll-margin-top: 20px; }
   .fact.flash { background: var(--likely-bg); }
   .fact .id { font-weight: 700; margin-right: 6px; color: var(--accent); }
   .fact pre { white-space: pre-wrap; word-break: break-word; background: var(--code-bg); padding: 8px; border-radius: 8px; font-size: 12px; max-height: 240px; overflow: auto; margin: 6px 0 0; }
   .fact .src { margin-top: 4px; } .fact .src a { margin-right: 10px; font-size: 12px; word-break: break-all; }
   .conf { font-size: 11px; color: var(--muted); }
-  /* conversation */
-  .chat-log .q { margin: 16px 0 8px auto; max-width: 85%; width: fit-content; background: var(--accent); color: var(--on-accent);
-                 padding: 8px 12px; border-radius: 14px 14px 4px 14px; }
-  .chat-log .a { background: var(--bg); border-radius: 14px 14px 14px 4px; padding: 10px 14px; max-width: 95%; }
-  .chat-log .tool { font-size: 12px; color: var(--muted); margin: 4px 0; }
-  #suggestions { margin-top: 12px; }
-  form.chat { display: flex; gap: 8px; margin-top: 12px; }
-  form.chat textarea { flex: 1; min-height: 46px; resize: vertical; }
-  .clarify-options { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
-  .clarify-options button { text-align: left; overflow-wrap: anywhere; background: var(--panel); color: var(--ink); border-color: var(--line); font-weight: 500; }
-  .clarify-options button:hover { border-color: var(--accent); }
-  /* what each way of using it shows */
   body[data-persona="support"] .dev-only { display: none; }
-  body[data-persona="auditor"] .answer-card { display: flex; flex-direction: column; }
+  body[data-persona="auditor"] .proof-sections { display: flex; flex-direction: column; }
   body[data-persona="auditor"] #security { order: -1; }
-  /* settings drawer */
   .scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .3); z-index: 15; }
   .drawer { position: fixed; inset: 0 0 0 auto; width: min(460px, 100vw); background: var(--panel); border-left: 1px solid var(--line);
             z-index: 20; overflow: auto; overflow-x: hidden; padding: 20px; box-shadow: -8px 0 28px rgba(0, 0, 0, .15); }
@@ -166,7 +159,6 @@
   .drawer .row { flex-wrap: nowrap; } .drawer .row > * { flex: 1 1 0; min-width: 0; }
   .drawer label.field { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
   .result-line { font-size: 13px; }
-  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 16px 30px; }
 </style>
 </head>
 <body data-persona="">
@@ -185,6 +177,7 @@
   <span class="health" id="health"><span class="dot wait"></span><span id="healthText">…</span></span>
   <div class="network" id="network"></div>
   <span class="spacer"></span>
+  <button type="button" id="newChat" class="plain hidden" data-i18n="newChat">Nova conversa</button>
   <button type="button" id="settingsToggle" class="plain" aria-controls="settings">⚙ <span data-i18n="settings">Configurações</span></button>
 </header>
 
@@ -244,11 +237,11 @@
   </section>
 </aside>
 
-<main>
-  <section id="landing" class="hidden">
+<section id="landing" class="hidden">
+  <div class="landing-inner">
     <div class="landing">
       <h1 data-i18n="landingTitle">O que aconteceu com a transação?</h1>
-      <p data-i18n="landingLead">Cole o código de uma transação e receba a explicação, com a prova de cada afirmação. Escolha como você vai usar:</p>
+      <p data-i18n="landingLead">Converse com o assistente: mande o código de uma transação e pergunte o que quiser. Cada resposta traz a prova do que diz. Escolha como você vai usar:</p>
     </div>
     <div class="personas">
       <a class="persona" href="#/lojista"><span class="icon">🛍️</span><strong data-i18n="personaSupport">Lojista</strong>
@@ -256,88 +249,52 @@
         <ul><li data-i18n="personaSupport1">Resposta em linguagem simples</li><li data-i18n="personaSupport2">O que fazer agora</li><li data-i18n="personaSupport3">Provas guardadas, se quiser ver</li></ul></a>
       <a class="persona" href="#/desenvolvedor"><span class="icon">💻</span><strong data-i18n="personaDeveloper">Desenvolvedor</strong>
         <span data-i18n="personaDeveloperLead">Para depurar uma chamada que falhou.</span>
-        <ul><li data-i18n="personaDeveloper1">Chamada decodificada e código</li><li data-i18n="personaDeveloper2">Fatos e fontes sempre à vista</li><li data-i18n="personaDeveloper3">Leituras no nó pelo chat</li></ul></a>
+        <ul><li data-i18n="personaDeveloper1">Chamada decodificada e código</li><li data-i18n="personaDeveloper2">Fatos e fontes sempre à vista</li><li data-i18n="personaDeveloper3">Leituras no nó pela conversa</li></ul></a>
       <a class="persona" href="#/auditor"><span class="icon">🔍</span><strong data-i18n="personaAuditor">Auditor</strong>
         <span data-i18n="personaAuditorLead">Para revisar risco e permissões.</span>
         <ul><li data-i18n="personaAuditor1">Notas de segurança primeiro</li><li data-i18n="personaAuditor2">Quem pode chamar a função</li><li data-i18n="personaAuditor3">O que não foi possível verificar</li></ul></a>
     </div>
-    <div class="how">
-      <div><strong data-i18n="how1t">1. Cole o código</strong><span data-i18n="how1">O hash da transação, ou o endereço da carteira.</span></div>
-      <div><strong data-i18n="how2t">2. A gente confere</strong><span data-i18n="how2">No explorador e no próprio nó da rede, sem IA.</span></div>
-      <div><strong data-i18n="how3t">3. Você recebe a explicação</strong><span data-i18n="how3">Cada frase aponta o fato de onde veio.</span></div>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <section id="composer" class="card composer hidden">
-    <h2 id="composerTitle"></h2>
-    <p class="lead" id="composerLead"></p>
-    <form id="askForm">
-      <label class="sr" for="hash">Transaction hash</label>
-      <input type="text" id="hash" autocomplete="off" spellcheck="false" required data-i18n-ph="hashPh" placeholder="0x…">
-      <div class="hint" id="hashHint"></div>
-      <label class="sr" for="readerQuestion">Your question</label>
-      <input type="text" id="readerQuestion" maxlength="500" autocomplete="off" data-i18n-ph="questionPh" placeholder="">
-      <select id="mode" hidden><option value="support">support</option><option value="developer">developer</option><option value="auditor">auditor</option></select>
-      <div class="actions">
+<div id="app" class="hidden">
+  <div class="convo">
+    <div id="thread"><div class="thread-inner" id="threadInner"></div></div>
+    <div class="composer">
+      <div class="composer-inner">
+        <div class="chips" id="suggestions"></div>
+        <form class="chat" id="chatForm">
+          <label class="sr" for="question">Message</label>
+          <textarea id="question" maxlength="2000" rows="1" data-i18n-ph="chatPh" placeholder=""></textarea>
+          <button type="submit" id="chatButton" data-i18n="send">Enviar</button>
+        </form>
+        <div class="hint" id="hashHint"></div>
         <label class="check dev-only"><input type="checkbox" id="factsOnly"> <span data-i18n="factsOnly">só os fatos, sem IA</span></label>
-        <button type="submit" id="askButton" data-i18n="explain">Explicar</button>
+        <input type="hidden" id="hash">
+        <select id="mode" hidden><option value="support">support</option><option value="developer">developer</option><option value="auditor">auditor</option></select>
       </div>
-    </form>
-    <div class="examples chips" id="examples"></div>
-  </section>
-
-  <section id="loading" class="card hidden" aria-live="polite">
-    <strong data-i18n="working">Conferindo a transação…</strong> <span class="muted" id="loadingTime"></span>
-    <ul class="steps-list" id="loadingSteps"></ul>
-  </section>
-
-  <section id="clarify" class="card hidden" aria-live="polite">
-    <h2 data-i18n="oneQuestion">Uma pergunta antes</h2>
-    <p id="clarifyQuestion"></p>
-    <div id="clarifyOptions" class="clarify-options"></div>
-    <form id="clarifyForm" class="row hidden">
-      <input type="text" id="clarifyText" class="grow" maxlength="200" autocomplete="off" spellcheck="false">
-      <button type="submit" data-i18n="answerBtn">Responder</button>
-    </form>
-  </section>
-
-  <section id="result" class="hidden" aria-live="polite">
-    <div id="statusLine"></div>
-    <div class="result-grid">
-      <div class="result-main">
-        <div class="card answer-card">
-          <h3 data-i18n="explanation">Explicação</h3>
-          <div id="answer" class="answer"></div>
-          <div id="answerFeedback"></div>
-          <div id="steps"></div>
-          <div id="diagnosis"></div>
-          <div id="security"></div>
-          <div id="gaps"></div>
-        </div>
-        <div class="card" id="chatCard">
-          <h3 data-i18n="askMore">Pergunte mais</h3>
-          <div id="chatLog" class="chat-log" aria-live="polite"></div>
-          <div class="chips" id="suggestions"></div>
-          <form class="chat" id="chatForm">
-            <label class="sr" for="question">Your question</label>
-            <textarea id="question" maxlength="2000" data-i18n-ph="chatPh" placeholder=""></textarea>
-            <button type="submit" id="chatButton" data-i18n="ask">Perguntar</button>
-          </form>
-        </div>
-      </div>
-      <details class="card evidence evidence-col" id="evidenceBox">
-        <summary><span data-i18n="evidence">Ver as provas</span> <span class="muted" id="evidenceCount"></span></summary>
-        <div id="movements"></div>
-        <h3 data-i18n="facts">Fatos</h3>
-        <div id="facts"></div>
-        <h3 data-i18n="sources">Fontes</h3>
-        <div id="sources"></div>
-      </details>
     </div>
-  </section>
-  <section id="failure" class="hidden card" role="alert"><div class="error" id="failureText"></div></section>
-</main>
-<footer data-i18n="footer">Os fatos vêm do explorador de blocos e do nó da rede. O modelo só escreve, e uma checagem recusa qualquer coisa que ele acrescente.</footer>
+  </div>
+  <aside class="proof closed" id="proof" aria-label="Proof">
+    <div class="bar"><h2 data-i18n="evidence">As provas</h2><span class="spacer"></span>
+      <button type="button" class="plain proof-close" id="proofClose" aria-label="Close">✕</button></div>
+    <p class="muted" data-i18n="proofLead">De onde veio cada afirmação: os fatos numerados, com as fontes.</p>
+    <div id="statusLine"></div>
+    <div class="proof-sections">
+      <div id="steps"></div>
+      <div id="diagnosis"></div>
+      <div id="security"></div>
+      <div id="gaps"></div>
+      <div id="movements"></div>
+      <h3 data-i18n="facts">Fatos</h3>
+      <div id="facts"><p class="muted" data-i18n="noFactsYet">Os fatos aparecem aqui quando uma transação é explicada.</p></div>
+      <h3 data-i18n="sources">Fontes</h3>
+      <div id="sources"></div>
+    </div>
+  </aside>
+  <div id="answer" hidden></div>
+  <div id="answerFeedback" hidden></div>
+</div>
 <script>
 "use strict";
 // Everything shown here comes from the API (our evidence and the model's checked text). Text that came from the
@@ -348,47 +305,49 @@ const state = { hash: null, mode: null, runId: null, sessionId: null, evidence: 
 function esc(text) {
   return String(text ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 }
-// The page's own words, in the language chosen for the answers (D64, D65); the model's text and the facts are not
+// The page's own words, in the language chosen for the answers (D64 to D66); the model's text and the facts are not
 // translated here.
 const STRINGS = {
   "pt-BR": {
-    useAs: "Uso", network: "Rede", settings: "Configurações", personaSupport: "Lojista", personaDeveloper: "Desenvolvedor",
-    personaAuditor: "Auditor", landingTitle: "O que aconteceu com a transação?",
-    landingLead: "Cole o código de uma transação e receba a explicação, com a prova de cada afirmação. Escolha como você vai usar:",
+    useAs: "Uso", network: "Rede", settings: "Configurações", newChat: "Nova conversa", personaSupport: "Lojista",
+    personaDeveloper: "Desenvolvedor", personaAuditor: "Auditor", landingTitle: "O que aconteceu com a transação?",
+    landingLead: "Converse com o assistente: mande o código de uma transação e pergunte o que quiser. Cada resposta traz a prova do que diz. Escolha como você vai usar:",
     personaSupportLead: "Para entender um pagamento sem termos técnicos.", personaSupport1: "Resposta em linguagem simples",
     personaSupport2: "O que fazer agora", personaSupport3: "Provas guardadas, se quiser ver",
     personaDeveloperLead: "Para depurar uma chamada que falhou.", personaDeveloper1: "Chamada decodificada e código",
-    personaDeveloper2: "Fatos e fontes sempre à vista", personaDeveloper3: "Leituras no nó pelo chat",
+    personaDeveloper2: "Fatos e fontes sempre à vista", personaDeveloper3: "Leituras no nó pela conversa",
     personaAuditorLead: "Para revisar risco e permissões.", personaAuditor1: "Notas de segurança primeiro",
     personaAuditor2: "Quem pode chamar a função", personaAuditor3: "O que não foi possível verificar",
-    how1t: "1. Cole o código", how1: "O hash da transação, ou o endereço da carteira.", how2t: "2. A gente confere",
-    how2: "No explorador e no próprio nó da rede, sem IA.", how3t: "3. Você recebe a explicação",
-    how3: "Cada frase aponta o fato de onde veio.",
-    titleSupport: "O que aconteceu com o seu pagamento?", leadSupport: "Cole o código da transação (começa com 0x). Se tiver só o endereço da carteira, cole ele: a gente lista as transações.",
-    titleDeveloper: "Depurar uma transação", leadDeveloper: "Hash da transação ou endereço. A resposta traz a chamada decodificada, o código e cada leitura feita no nó.",
-    titleAuditor: "Revisar uma transação", leadAuditor: "Hash da transação ou endereço. Notas de segurança, permissões e o que não pôde ser verificado.",
-    hashPh: "0x… código da transação ou endereço", questionPh: "O que você quer saber? (opcional) Ex.: por que meu pagamento não passou?",
-    factsOnly: "só os fatos, sem IA", explain: "Explicar", working: "Conferindo a transação…",
+    welcomeSupport: "Oi! Me conta o que aconteceu e me manda o código da transação (começa com 0x). Se tiver só o endereço da carteira, pode mandar: eu procuro as transações.",
+    welcomeDeveloper: "Me mande o hash da transação (ou um endereço) e o que você quer entender. Trago a chamada decodificada, o código e as leituras feitas no nó, cada coisa com a sua fonte.",
+    welcomeAuditor: "Me mande o hash da transação (ou um endereço). Mostro as notas de segurança, as permissões e o que não deu para verificar.",
+    tryExample: "Ou experimente uma transação real:", chatPh: "Escreva aqui… ex.: meu pagamento 0x… não passou",
+    send: "Enviar", factsOnly: "só os fatos, sem IA",
+    askForCode: "Para eu verificar, preciso do código da transação: começa com 0x e tem 66 caracteres. Se tiver só o endereço da carteira (0x e 40 caracteres), pode mandar que eu procuro.",
+    pickTx: "Esse é um endereço. Qual destas transações você quer que eu explique?",
+    noTxFound: "Não encontrei transações desse endereço no explorador. Pode me mandar o código da transação?",
+    whichPayment: "Qual pagamento você esperava? Escolha abaixo, ou me mande o endereço que deveria ter recebido.",
+    whatDoing: "O que você estava tentando fazer? A mensagem de erro é de uma verificação conhecida, mas o código desse contrato é que decide o que ela quer dizer.",
+    optSwap: "Trocar ou negociar tokens", optOther: "Outra coisa",
     step1: "Lendo o explorador e o nó da rede", step2: "Diagnosticando e lendo o código do contrato", step3: "Escrevendo a resposta e conferindo cada frase",
-    oneQuestion: "Uma pergunta antes", answerBtn: "Responder", explanation: "Explicação", askMore: "Pergunte mais",
-    chatPh: "Escreva sua pergunta…", ask: "Perguntar", evidence: "Ver as provas", facts: "Fatos", sources: "Fontes",
-    footer: "Os fatos vêm do explorador de blocos e do nó da rede. O modelo só escreve, e uma checagem recusa qualquer coisa que ele acrescente.",
-    hintTx: "Código de transação válido.", hintAddress: "Isso é um endereço: vamos listar as transações dele para você escolher.",
-    hintShort: "Ainda incompleto: um código de transação tem 0x e mais 64 caracteres.", hintBad: "Isso não parece um código de transação (0x…).",
-    tryExample: "Experimente uma transação real:", headSuccess: "Deu certo", headFailed: "Não deu certo",
-    headPending: "Ainda está pendente", headDropped: "Foi descartada", headUnknown: "Resultado ainda desconhecido",
-    kvMoved: "Valor movido", kvFee: "Taxa", kvWhen: "Quando", kvNothing: "Nada se moveu",
+    thinking: "Pensando…", evidence: "As provas", proofLead: "De onde veio cada afirmação: os fatos numerados, com as fontes.",
+    facts: "Fatos", sources: "Fontes", noFactsYet: "Os fatos aparecem aqui quando uma transação é explicada.",
+    seeProof: "Ver as provas", factsCount: "fatos",
+    hintTx: "Código de transação: eu explico essa.", hintAddress: "Endereço: eu listo as transações dele.",
+    hintShort: "Código incompleto: tem 0x e mais 64 caracteres.",
+    headSuccess: "Deu certo", headFailed: "Não deu certo", headPending: "Ainda está pendente", headDropped: "Foi descartada",
+    headUnknown: "Resultado ainda desconhecido", kvMoved: "Valor movido", kvFee: "Taxa", kvWhen: "Quando", kvNothing: "Nada se moveu",
     basis_node_and_explorer_agree: "o nó e o explorador concordam", basis_node_only: "segundo o nó",
     basis_explorer_only: "segundo o explorador", basis_node_and_explorer_disagree: "o nó e o explorador DISCORDAM",
     basis_outcome_unknown: "nenhuma fonte deu o resultado", openExplorer: "abrir no explorador",
-    noSummary_skipped: "Você pediu só os fatos: eles estão nas provas.",
+    noSummary_skipped: "Você pediu só os fatos: estão nas provas.",
     noSummary_unavailable: "Nenhum modelo conseguiu escrever a resposta. Escolha um modelo em Configurações; os fatos estão nas provas.",
-    noSummary_withheld: "A resposta escrita foi retida: duas vezes ela trouxe algo que não está nos fatos. Os fatos estão nas provas.",
-    noSummary_no_evidence: "Não foi possível coletar nada sobre essa transação.",
+    noSummary_withheld: "Segurei a resposta escrita: duas vezes ela trouxe algo que não está nos fatos. Os fatos estão nas provas.",
+    noSummary_no_evidence: "Não consegui coletar nada sobre essa transação.",
     todo: "O que fazer", conclusions: "Conclusão", security: "Notas de segurança (heurísticas, não auditoria)",
-    missing: "O que não conseguimos ver", needed: "Precisa de", retry: "vale tentar de novo mais tarde",
+    missing: "O que não deu para ver", needed: "Precisa de", retry: "vale tentar de novo mais tarde",
     label_CONFIRMED: "CONFIRMADO", label_LIKELY: "PROVÁVEL", label_UNKNOWN: "DESCONHECIDO", heuristic: "HEURÍSTICA",
-    useful: "Isso ajudou?", factsCount: "fatos", moved: "Valor que se moveu",
+    useful: "Ajudou?", moved: "Valor que se moveu",
     healthOk: "Tudo funcionando", healthDegraded: "Funcionando em parte", healthDown: "Fontes fora do ar", healthModelMissing: "sem modelo",
     language: "Idioma", model: "Modelo que escreve as respostas", loadModels: "Carregar modelos", save: "Salvar", test: "Testar",
     keyPh: "Chave da API (vazio mantém a salva)",
@@ -398,48 +357,51 @@ const STRINGS = {
     netType: "Tipo de rede (CHAIN_TYPE do Blockscout)", netExplorer: "Explorador Blockscout", netRpc: "Nó da rede (JSON-RPC)",
     netCheck: "Testar conexão", netSave: "Salvar e usar", netChecking: "Testando…", netExplorerOk: "explorador respondeu",
     netNodeOk: "nó respondeu, na chain certa", netSaved: "Rede salva e em uso.", netActive: "Em uso",
+    networkSwitched: "Mudei para a rede", errorPrefix: "Não consegui:",
     sugSupport: ["Por que foi cobrada uma taxa?", "O dinheiro voltou para mim?", "O que eu faço agora?"],
     sugDeveloper: ["Mostre o código da função chamada", "Qual era o saldo do remetente antes?", "Quais eventos foram emitidos?"],
     sugAuditor: ["Quem pode chamar essa função?", "Quais modificadores protegem a função?", "Mostre o código da função chamada"],
   },
   "en": {
-    useAs: "Use as", network: "Network", settings: "Settings", personaSupport: "Merchant", personaDeveloper: "Developer",
-    personaAuditor: "Auditor", landingTitle: "What happened to the transaction?",
-    landingLead: "Paste a transaction's code and get the explanation, with the proof of every statement. Choose how you will use it:",
+    useAs: "Use as", network: "Network", settings: "Settings", newChat: "New conversation", personaSupport: "Merchant",
+    personaDeveloper: "Developer", personaAuditor: "Auditor", landingTitle: "What happened to the transaction?",
+    landingLead: "Talk to the assistant: send a transaction's code and ask what you want. Every answer brings the proof of what it says. Choose how you will use it:",
     personaSupportLead: "To understand a payment without technical terms.", personaSupport1: "An answer in plain words",
     personaSupport2: "What to do now", personaSupport3: "The proof kept aside, if you want it",
     personaDeveloperLead: "To debug a call that failed.", personaDeveloper1: "The decoded call and the code",
-    personaDeveloper2: "Facts and sources always in view", personaDeveloper3: "Reads on the node from the chat",
+    personaDeveloper2: "Facts and sources always in view", personaDeveloper3: "Reads on the node from the conversation",
     personaAuditorLead: "To review risk and permissions.", personaAuditor1: "Security notes first",
     personaAuditor2: "Who may call the function", personaAuditor3: "What could not be checked",
-    how1t: "1. Paste the code", how1: "The transaction hash, or the wallet's address.", how2t: "2. We check it",
-    how2: "On the explorer and on the network's own node, with no AI.", how3t: "3. You get the explanation",
-    how3: "Every sentence points to the fact it came from.",
-    titleSupport: "What happened to your payment?", leadSupport: "Paste the transaction's code (it starts with 0x). If you only have the wallet's address, paste it: we list its transactions.",
-    titleDeveloper: "Debug a transaction", leadDeveloper: "A transaction hash or an address. The answer brings the decoded call, the code and every read made on the node.",
-    titleAuditor: "Review a transaction", leadAuditor: "A transaction hash or an address. Security notes, permissions and what could not be checked.",
-    hashPh: "0x… transaction hash or address", questionPh: "What do you want to know? (optional) E.g. why didn't my payment go through?",
-    factsOnly: "facts only, no AI", explain: "Explain", working: "Checking the transaction…",
+    welcomeSupport: "Hi! Tell me what happened and send me the transaction's code (it starts with 0x). If you only have the wallet's address, send it: I will look for its transactions.",
+    welcomeDeveloper: "Send me the transaction hash (or an address) and what you want to understand. I bring the decoded call, the code and the reads made on the node, each with its source.",
+    welcomeAuditor: "Send me the transaction hash (or an address). I show the security notes, the permissions and what could not be checked.",
+    tryExample: "Or try a real transaction:", chatPh: "Write here… e.g. my payment 0x… did not go through",
+    send: "Send", factsOnly: "facts only, no AI",
+    askForCode: "To check it I need the transaction's code: it starts with 0x and has 66 characters. If you only have the wallet's address (0x and 40 characters), send it and I will look.",
+    pickTx: "That is an address. Which of these transactions should I explain?",
+    noTxFound: "I found no transaction of that address on the explorer. Can you send me the transaction's code?",
+    whichPayment: "Which payment did you expect? Pick it below, or send me the address that should have received it.",
+    whatDoing: "What were you trying to do? The error message is a known check's, but this contract's own code decides what it means.",
+    optSwap: "Swap or trade tokens", optOther: "Something else",
     step1: "Reading the explorer and the network's node", step2: "Diagnosing and reading the contract's code", step3: "Writing the answer and checking each sentence",
-    oneQuestion: "One question first", answerBtn: "Answer", explanation: "Explanation", askMore: "Ask more",
-    chatPh: "Write your question…", ask: "Ask", evidence: "See the proof", facts: "Facts", sources: "Sources",
-    footer: "The facts come from the block explorer and the network's node. The model only writes, and a check refuses anything it adds.",
-    hintTx: "A valid transaction code.", hintAddress: "That is an address: we will list its transactions for you to pick.",
-    hintShort: "Not complete yet: a transaction code is 0x and 64 more characters.", hintBad: "That does not look like a transaction code (0x…).",
-    tryExample: "Try a real transaction:", headSuccess: "It worked", headFailed: "It did not go through",
-    headPending: "Still pending", headDropped: "It was dropped", headUnknown: "Outcome not known yet",
-    kvMoved: "Value moved", kvFee: "Fee", kvWhen: "When", kvNothing: "Nothing moved",
+    thinking: "Thinking…", evidence: "The proof", proofLead: "Where each statement came from: the numbered facts, with their sources.",
+    facts: "Facts", sources: "Sources", noFactsYet: "The facts appear here when a transaction is explained.",
+    seeProof: "See the proof", factsCount: "facts",
+    hintTx: "A transaction code: I will explain it.", hintAddress: "An address: I will list its transactions.",
+    hintShort: "Incomplete code: it is 0x and 64 more characters.",
+    headSuccess: "It worked", headFailed: "It did not go through", headPending: "Still pending", headDropped: "It was dropped",
+    headUnknown: "Outcome not known yet", kvMoved: "Value moved", kvFee: "Fee", kvWhen: "When", kvNothing: "Nothing moved",
     basis_node_and_explorer_agree: "the node and the explorer agree", basis_node_only: "according to the node",
     basis_explorer_only: "according to the explorer", basis_node_and_explorer_disagree: "the node and the explorer DISAGREE",
     basis_outcome_unknown: "no source gave the outcome", openExplorer: "open on the explorer",
     noSummary_skipped: "You asked for the facts only: they are in the proof.",
     noSummary_unavailable: "No model could write the answer. Choose a model in Settings; the facts are in the proof.",
-    noSummary_withheld: "The written answer was withheld: twice it stated something not in the facts. The facts are in the proof.",
-    noSummary_no_evidence: "Nothing could be collected about this transaction.",
+    noSummary_withheld: "I held the written answer back: twice it stated something not in the facts. The facts are in the proof.",
+    noSummary_no_evidence: "I could not collect anything about this transaction.",
     todo: "What to do", conclusions: "Conclusion", security: "Security notes (heuristics, not an audit)",
-    missing: "What we could not see", needed: "Needs", retry: "worth trying again later",
+    missing: "What I could not see", needed: "Needs", retry: "worth trying again later",
     label_CONFIRMED: "CONFIRMED", label_LIKELY: "LIKELY", label_UNKNOWN: "UNKNOWN", heuristic: "HEURISTIC",
-    useful: "Was this useful?", factsCount: "facts", moved: "Value that moved",
+    useful: "Did it help?", moved: "Value that moved",
     healthOk: "All working", healthDegraded: "Partly working", healthDown: "Sources down", healthModelMissing: "no model",
     language: "Language", model: "The model that writes the answers", loadModels: "Load models", save: "Save", test: "Test",
     keyPh: "API key (empty keeps the saved one)",
@@ -449,6 +411,7 @@ const STRINGS = {
     netType: "Network type (Blockscout CHAIN_TYPE)", netExplorer: "Blockscout explorer", netRpc: "Network node (JSON-RPC)",
     netCheck: "Test the connection", netSave: "Save and use", netChecking: "Testing…", netExplorerOk: "explorer answered",
     netNodeOk: "node answered, on the right chain", netSaved: "Network saved and in use.", netActive: "In use",
+    networkSwitched: "Switched to the network", errorPrefix: "I could not do it:",
     sugSupport: ["Why was a fee charged?", "Did the money come back to me?", "What do I do now?"],
     sugDeveloper: ["Show the called function's code", "What was the sender's balance before?", "Which events were emitted?"],
     sugAuditor: ["Who may call this function?", "Which modifiers guard the function?", "Show the called function's code"],
@@ -509,7 +472,6 @@ function factHtml(e) {
 }
 function renderFacts() {
   $("facts").innerHTML = [...state.evidence.values()].map(factHtml).join("");
-  $("evidenceCount").innerHTML = `${esc(state.evidence.size)} ${esc(t("factsCount"))}`;
 }
 function feedbackHtml(runId) {
   if (runId === null || runId === undefined) return "";
@@ -530,14 +492,19 @@ function glanceHtml(a) {  // the answer at a glance: did it work, how much moved
   const kv = (k, v) => `<span class="kv"><span class="k">${esc(k)}</span>${esc(v)}</span>`;
   const page = overview && (overview.sources || []).find((s) => s.kind === "explorer_ui");
   const url = page && safeUrl(page.url);
-  const basis = t("basis_" + a.confidence.status_basis);
   return `<div class="glance ${esc(a.status)}"><div class="big">${icon}</div><div>` +
     `<p class="head">${esc(head)}</p>` + (a.diagnosis.length ? badge(a.diagnosis[0].label) : "") +
     `<div class="facts-row">${moved ? kv(t("kvMoved"), moved) : (a.status === "success" ? "" : kv(t("kvMoved"), t("kvNothing")))}` +
     `${feeText ? kv(t("kvFee"), feeText) : ""}${when ? kv(t("kvWhen"), `${when[1]} ${when[2]} UTC`) : ""}</div>` +
-    `<div class="meta wrap">${esc(a.tx_hash)}${a.confidence.status_basis ? " · " + esc(basis) : ""}` +
+    `<div class="meta wrap">${esc(a.tx_hash)}${a.confidence.status_basis ? " · " + esc(t("basis_" + a.confidence.status_basis)) : ""}` +
     `${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t("openExplorer"))}</a>` : ""}</div>` +
     `</div></div>`;
+}
+function messageHtml(a) {  // the assistant's message for one explained transaction
+  const body = a.summary ? markdown(a.summary)
+    : `<p class="muted">${esc(t("noSummary_" + a.summary_status))}${a.writer_error ? " (" + esc(a.writer_error) + ")" : ""}</p>`;
+  return glanceHtml(a) + body + `<div class="answer-foot"><button type="button" class="link see-proof">🔎 ${esc(t("seeProof"))}` +
+    ` (${esc((a.evidence || []).length)} ${esc(t("factsCount"))})</button>${feedbackHtml(a.run_id)}</div>`;
 }
 async function api(path, body) {
   // the custom header lets the API refuse requests that did not come from this page (D61)
@@ -578,26 +545,19 @@ async function loadNetwork() {
   }
 }
 
-function renderAnswer(a) {
+function renderAnswer(a) {  // the proof panel, and the message (kept in #answer for the conversation to show)
   state.evidence = new Map(a.evidence.map((e) => [e.id, e]));
+  $("answer").innerHTML = messageHtml(a);
   $("statusLine").innerHTML = glanceHtml(a);
-  if (a.summary) {
-    $("answer").innerHTML = markdown(a.summary);
-  } else {
-    const why = t("noSummary_" + a.summary_status);
-    $("answer").innerHTML = `<p class="muted">${esc(why)}${a.writer_error ? " (" + esc(a.writer_error) + ")" : ""}</p>`;
-  }
-  $("answerFeedback").innerHTML = feedbackHtml(a.run_id);
-  // the written answer already says what to do, from what happened next (D63); the rule's own steps are shown only
-  // when there is no written answer, so the two never contradict each other
+  $("answerFeedback").innerHTML = "";
   $("steps").innerHTML = a.next_steps.length && !a.summary ? `<h3>${esc(t("todo"))}</h3><ol class="todo">` +
     a.next_steps.map((s) => `<li>${inline(s)}</li>`).join("") + "</ol>" : "";
-  $("diagnosis").innerHTML = a.diagnosis.length ? `<div class="dev-only"><h3>${esc(t("conclusions"))}</h3>` + a.diagnosis.map((d) =>
+  $("diagnosis").innerHTML = a.diagnosis.length ? `<h3>${esc(t("conclusions"))}</h3>` + a.diagnosis.map((d) =>
     `<div class="box">${badge(d.label)}${inline(String(d.text).replace(/^(CONFIRMED|LIKELY|UNKNOWN): /, "").split(" Next step for")[0])}` +
-    ` <span class="muted">${d.facts.map((f) => `<a class="cite" href="#fact-${esc(f)}" data-fact="${esc(f)}">${esc(f)}</a>`).join("")}</span></div>`).join("") + "</div>" : "";
-  $("security").innerHTML = a.security_notes.length ? `<div class="dev-only"><h3>${esc(t("security"))}</h3>` + a.security_notes.map((n) =>
+    ` <span class="muted">${d.facts.map((f) => `<a class="cite" href="#fact-${esc(f)}" data-fact="${esc(f)}">${esc(f)}</a>`).join("")}</span></div>`).join("") : "";
+  $("security").innerHTML = a.security_notes.length ? `<h3>${esc(t("security"))}</h3>` + a.security_notes.map((n) =>
     `<div class="box"><span class="badge heuristic">${esc(t("heuristic"))}</span>` +
-    `<ul>${(n.notes || []).map((x) => `<li>${inline(x.text)}</li>`).join("")}</ul></div>`).join("") + "</div>" : "";
+    `<ul>${(n.notes || []).map((x) => `<li>${inline(x.text)}</li>`).join("")}</ul></div>`).join("") : "";
   $("gaps").innerHTML = a.gaps.length ? `<h3>${esc(t("missing"))}</h3><div class="gaps"><ul>` + a.gaps.map((g) =>
     `<li><strong>${esc(g.what)}</strong>: ${esc(g.why)}. <span class="muted">${esc(t("needed"))}: ${esc(g.needed)}${g.retryable ? " (" + esc(t("retry")) + ")" : ""}</span></li>`).join("") +
     "</ul></div>" : "";
@@ -609,13 +569,199 @@ function renderAnswer(a) {
   }).join("");
   renderFacts();
 }
+// ---- end of the rendering functions ----
 
-$("askForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const question = $("readerQuestion").value.trim();
-  explain({hash: $("hash").value.trim(), mode: $("mode").value, write: !$("factsOnly").checked,
-           ...(question ? {question} : {})});
+// ---- the conversation (D66): the reader writes as they like; a code in the message starts an explanation, anything
+// else is a follow-up question on the transaction being discussed ----
+const HASH = /0x[0-9a-fA-F]{64}(?![0-9a-fA-F])/, ADDRESS = /0x[0-9a-fA-F]{40}(?![0-9a-fA-F])/;
+
+function say(who, html, extraClass) {  // adds a message; `html` is already escaped markup
+  const row = document.createElement("div");
+  row.className = `msg ${who}${extraClass ? " " + extraClass : ""}`;
+  row.innerHTML = who === "me" ? `<div class="bubble">${html}</div>` : `<div class="avatar">◆</div><div class="bubble">${html}</div>`;
+  $("threadInner").appendChild(row);
+  $("thread").scrollTop = $("thread").scrollHeight;
+  return row;
+}
+function sayText(text) { return say("bot", `<p>${esc(text)}</p>`); }
+function chipsInto(row, items) {  // [{label, onClick}] as buttons inside a message
+  const box = document.createElement("div");
+  box.className = "chips";
+  for (const item of items) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = item.label;
+    b.title = item.title || "";
+    b.addEventListener("click", item.onClick);
+    box.appendChild(b);
+  }
+  row.querySelector(".bubble").appendChild(box);
+}
+
+let ticker = null;
+function typing(withSteps) {  // the assistant's "typing" message; steps marked as time passes when collecting
+  const row = say("bot", withSteps ? `<ul class="steps-list"></ul>` : `<p class="muted">${esc(t("thinking"))}</p>`, "typing");
+  clearInterval(ticker);
+  if (withSteps) {
+    const started = Date.now();
+    const tick = () => {
+      const s = Math.round((Date.now() - started) / 1000);
+      const now = s < 4 ? 0 : s < 9 ? 1 : 2;
+      row.querySelector(".steps-list").innerHTML = ["step1", "step2", "step3"].map((k, i) =>
+        `<li class="${i < now ? "done" : i === now ? "now" : ""}"><span class="mark">${i < now ? "✓" : ""}</span>${esc(t(k))}</li>`).join("");
+    };
+    tick();
+    ticker = setInterval(tick, 1000);
+  }
+  return {done() { clearInterval(ticker); row.remove(); }};
+}
+
+function welcome() {
+  $("threadInner").replaceChildren();
+  const key = {support: "welcomeSupport", developer: "welcomeDeveloper", auditor: "welcomeAuditor"}[$("mode").value];
+  const row = sayText(t(key));
+  if (state.examples && state.examples.length) {
+    const label = document.createElement("p");
+    label.className = "muted";
+    label.textContent = t("tryExample");
+    row.querySelector(".bubble").appendChild(label);
+    chipsInto(row, state.examples.map((ex) => ({label: ex.label, title: ex.hash, onClick: () => send(ex.hash)})));
+  }
+  showSuggestions(false);
+}
+
+function showSuggestions(on) {
+  const box = $("suggestions");
+  box.replaceChildren();
+  if (!on) return;
+  const key = {support: "sugSupport", developer: "sugDeveloper", auditor: "sugAuditor"}[$("mode").value];
+  for (const q of t(key) || []) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = q;
+    b.addEventListener("click", () => send(q));
+    box.appendChild(b);
+  }
+}
+
+async function send(text) {
+  text = String(text || "").trim();
+  if (!text) return;
+  say("me", esc(text).replace(/\n/g, "<br>"));
+  $("question").value = "";
+  checkHash();
+  const tx = text.match(HASH), address = tx ? null : text.match(ADDRESS);
+  if (tx || address) {
+    const code = (tx || address)[0];
+    const question = text.replace(code, "").trim();
+    return explain({hash: code, mode: $("mode").value, write: !$("factsOnly").checked,
+                    ...(question.length > 3 ? {question} : {})});
+  }
+  if (!state.hash) { sayText(t("askForCode")); return; }
+  return followUp(text);
+}
+
+async function explain(request) {
+  const generation = ++state.generation;  // a reply to an older request is dropped
+  $("chatButton").disabled = true;
+  const wait = typing(true);
+  try {
+    const a = await api("/explain", request);
+    if (generation !== state.generation) return;
+    wait.done();
+    if (a.clarify) { clarify(a.clarify, request); return; }
+    state.hash = request.hash; state.mode = request.mode; state.runId = a.run_id; state.sessionId = null;
+    $("hash").value = request.hash;
+    renderAnswer(a);
+    say("bot", $("answer").innerHTML);
+    showSuggestions(true);
+    $("newChat").classList.remove("hidden");
+  } catch (err) {
+    wait.done();
+    say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(err.message)}</div>`);
+  } finally {
+    $("chatButton").disabled = false;
+    $("question").focus();
+  }
+}
+
+// Triage (D55) as a message: the question in the reader's language, the options as buttons.
+function clarify(c, request) {
+  let text = {expected_receipt: t("whichPayment"), intent: t("whatDoing")}[c.kind];
+  if (c.kind === "which_transaction") text = c.options.length ? t("pickTx") : /address/.test(c.question) ? t("noTxFound") : t("askForCode");
+  const row = sayText(text || c.question);
+  const label = (o) => c.kind === "intent" ? ({swap: t("optSwap"), other: t("optOther")}[o.id] || o.label) : o.label;
+  chipsInto(row, c.options.map((o) => ({label: label(o), title: o.id, onClick: () => {
+    say("me", esc(label(o)));
+    const next = {...request, clarified: {kind: c.kind, answer: o.id}};
+    if (c.kind === "which_transaction") next.hash = o.id;
+    explain(next);
+  }})));
+  state.pendingClarify = c.free_text && c.kind !== "which_transaction" ? {c, request} : null;
+}
+
+async function followUp(message) {
+  if (state.pendingClarify) {  // a typed answer to the clarifying question (an address, for "which payment")
+    const {c, request} = state.pendingClarify;
+    state.pendingClarify = null;
+    return explain({...request, clarified: {kind: c.kind, answer: message}});
+  }
+  const generation = state.generation;
+  $("chatButton").disabled = true;
+  const wait = typing(false);
+  try {
+    // a conversation starts from the facts the answer cited (the explain's run_id), then continues in its session
+    const body = state.sessionId ? {session_id: state.sessionId, message}
+      : state.runId !== null && state.runId !== undefined ? {run_id: state.runId, message}
+      : {hash: state.hash, mode: state.mode, message};
+    const r = await api("/chat", body);
+    wait.done();
+    if (generation !== state.generation) return;  // another transaction was explained meanwhile
+    state.sessionId = r.session_id;
+    if (r.evidence) state.evidence = new Map(r.evidence.map((e) => [e.id, e]));  // the conversation's own facts
+    for (const f of r.new_facts) state.evidence.set(f.id, f);
+    renderFacts();
+    const tools = r.tool_calls.map((c) => `<div class="tool">🔎 ${esc(c.tool || "request")}: ${typeof c.result === "string" ? esc(c.result) : c.result.map((id) => `<a class="cite" href="#fact-${esc(id)}" data-fact="${esc(id)}">${esc(id)}</a>`).join(" ")}</div>`).join("");
+    const text = r.answer ? markdown(r.answer) :
+      `<p class="muted">${esc(r.outcome === "withheld" ? t("noSummary_withheld") : r.error || "—")}</p>`;
+    say("bot", `${tools}${text}<div class="answer-foot">${feedbackHtml(r.run_id)}</div>`);
+  } catch (err) {
+    wait.done();
+    if (err.status === 404) { state.sessionId = null; state.runId = null; }  // expired: the next question starts anew
+    say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(err.message)}</div>`);
+  } finally {
+    $("chatButton").disabled = false;
+    $("question").focus();
+  }
+}
+
+$("chatForm").addEventListener("submit", (event) => { event.preventDefault(); send($("question").value); });
+$("question").addEventListener("keydown", (event) => {  // Enter sends, Shift+Enter breaks the line
+  if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); send($("question").value); }
 });
+
+// What is typed: said at once whether it holds a transaction, an address, or an incomplete code.
+function checkHash() {
+  const v = $("question").value;
+  const hint = $("hashHint");
+  hint.className = "hint";
+  if (HASH.test(v)) { hint.textContent = t("hintTx"); hint.classList.add("good"); }
+  else if (ADDRESS.test(v)) { hint.textContent = t("hintAddress"); hint.classList.add("good"); }
+  else if (/0x[0-9a-fA-F]{41,63}(?![0-9a-fA-F])/.test(v)) { hint.textContent = t("hintShort"); hint.classList.add("bad"); }
+  else hint.textContent = "";
+}
+$("question").addEventListener("input", checkHash);
+
+function newConversation() {
+  ++state.generation;
+  state.hash = null; state.runId = null; state.sessionId = null; state.pendingClarify = null;
+  state.evidence = new Map();
+  ["statusLine", "steps", "diagnosis", "security", "gaps", "movements", "sources"].forEach((id) => { $(id).innerHTML = ""; });
+  $("facts").innerHTML = `<p class="muted">${esc(t("noFactsYet"))}</p>`;
+  $("newChat").classList.add("hidden");
+  welcome();
+}
+$("newChat").addEventListener("click", newConversation);
 
 // ---- three ways of using it, three interfaces: #/lojista, #/desenvolvedor, #/auditor (D65) ----
 const ROUTES = {"#/lojista": "support", "#/merchant": "support", "#/desenvolvedor": "developer", "#/developer": "developer",
@@ -625,154 +771,32 @@ function route() {
   const persona = ROUTES[location.hash] || null;
   document.body.dataset.persona = persona || "";
   $("landing").classList.toggle("hidden", !!persona);
-  $("composer").classList.toggle("hidden", !persona);
+  $("app").classList.toggle("hidden", !persona);
   $("personaChip").classList.toggle("hidden", !persona);
-  if (!persona) { ["result", "clarify", "failure", "loading"].forEach((id) => $(id).classList.add("hidden")); return; }
+  if (!persona) return;
+  const changed = $("mode").value !== persona || !$("threadInner").children.length;
   $("mode").value = persona;
   $("personaSelect").value = persona;
-  const key = {support: "Support", developer: "Developer", auditor: "Auditor"}[persona];
-  $("composerTitle").textContent = t("title" + key);
-  $("composerLead").textContent = t("lead" + key);
-  $("evidenceBox").open = persona !== "support";
   if (persona === "support") $("factsOnly").checked = false;
-  showSuggestions();
+  $("proof").classList.toggle("closed", persona === "support" || window.innerWidth <= 920);
+  if (changed) newConversation();
   try { localStorage.setItem("anychain.persona", persona); } catch { /* storage may be off */ }
 }
 window.addEventListener("hashchange", route);
 $("personaSelect").addEventListener("change", () => { location.hash = PATHS[$("personaSelect").value]; });
 
-function showSuggestions() {
-  const box = $("suggestions");
-  box.replaceChildren();
-  const key = {support: "sugSupport", developer: "sugDeveloper", auditor: "sugAuditor"}[$("mode").value];
-  for (const q of t(key) || []) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = q;
-    b.addEventListener("click", () => { $("question").value = q; $("chatForm").requestSubmit(); });
-    box.appendChild(b);
-  }
-}
+// The proof panel: open from an answer, or always beside the conversation for developers and auditors.
+function openProof(open) { $("proof").classList.toggle("closed", !open); }
+$("proofClose").addEventListener("click", () => openProof(false));
 
 // The page's own words follow the answers' language.
 function applyLanguage() {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
-  route();
-  checkHash();
 }
-
-// The code typed: said at once whether it is a transaction, an address, or not yet complete.
-function checkHash() {
-  const v = $("hash").value.trim();
-  const hint = $("hashHint");
-  hint.className = "hint";
-  $("hash").classList.remove("invalid");
-  if (!v) { hint.textContent = ""; return; }
-  if (/^0x[0-9a-fA-F]{64}$/.test(v)) { hint.textContent = t("hintTx"); hint.classList.add("good"); }
-  else if (/^0x[0-9a-fA-F]{40}$/.test(v)) { hint.textContent = t("hintAddress"); hint.classList.add("good"); }
-  else if (/^0x[0-9a-fA-F]{0,63}$/.test(v)) { hint.textContent = t("hintShort"); }
-  else { hint.textContent = t("hintBad"); hint.classList.add("bad"); $("hash").classList.add("invalid"); }
-}
-$("hash").addEventListener("input", checkHash);
-
-// Waiting: three steps, marked as time passes (collecting takes a few seconds, writing a few more).
-let ticker = null;
-function waiting(on) {
-  clearInterval(ticker);
-  $("loading").classList.toggle("hidden", !on);
-  if (!on) return;
-  const started = Date.now();
-  const tick = () => {
-    const s = Math.round((Date.now() - started) / 1000);
-    const now = s < 4 ? 0 : s < 9 ? 1 : 2;
-    $("loadingSteps").innerHTML = ["step1", "step2", "step3"].map((k, i) =>
-      `<li class="${i < now ? "done" : i === now ? "now" : ""}"><span class="mark">${i < now ? "✓" : ""}</span>${esc(t(k))}</li>`).join("");
-    $("loadingTime").textContent = `${s} s`;
-  };
-  tick();
-  ticker = setInterval(tick, 1000);
-}
-
-async function explain(request) {
-  const hash = request.hash, mode = request.mode;
-  const generation = ++state.generation;  // a reply to an older request is dropped
-  $("askButton").disabled = true;
-  $("chatButton").disabled = true;
-  ["failure", "clarify", "result"].forEach((id) => $(id).classList.add("hidden"));
-  waiting(true);
-  try {
-    const a = await api("/explain", request);
-    if (generation !== state.generation) return;
-    if (a.clarify) { showClarify(a.clarify, request); return; }
-    state.hash = hash; state.mode = mode; state.runId = a.run_id; state.sessionId = null;
-    $("chatLog").innerHTML = "";
-    renderAnswer(a);
-    $("result").classList.remove("hidden");
-    $("result").scrollIntoView({behavior: "smooth", block: "start"});
-  } catch (err) {
-    $("failureText").textContent = err.message;
-    $("failure").classList.remove("hidden");
-  } finally {
-    if (generation === state.generation) waiting(false);
-    $("chatButton").disabled = false;
-    $("askButton").disabled = false;
-  }
-}
-
-// Triage (D55): the API may answer with one clarifying question; the reader's answer goes back with the
-// same request, and no second question is asked.
-function showClarify(c, request) {
-  $("clarifyQuestion").textContent = c.question;
-  const box = $("clarifyOptions");
-  box.replaceChildren();
-  for (const option of c.options) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = option.label;
-    button.addEventListener("click", () => answerClarify(c, request, option.id));
-    box.appendChild(button);
-  }
-  $("clarifyForm").classList.toggle("hidden", !c.free_text);
-  $("clarifyText").value = "";
-  $("clarifyText").placeholder = c.free_text || "";
-  state.pendingClarify = {c, request};
-  $("clarify").classList.remove("hidden");
-}
-
-function answerClarify(c, request, answer) {
-  $("clarify").classList.add("hidden");
-  const next = {...request, clarified: {kind: c.kind, answer}};
-  if (c.kind === "which_transaction") { next.hash = answer; $("hash").value = answer; checkHash(); }
-  explain(next);
-}
-
-$("clarifyForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const typed = $("clarifyText").value.trim();
-  if (typed && state.pendingClarify) answerClarify(state.pendingClarify.c, state.pendingClarify.request, typed);
-});
 
 // ---- the network (D64) and a network added on the page (D65) ----
-function showExamples(examples) {
-  const box = $("examples");
-  box.replaceChildren();
-  if (!examples.length) return;
-  const label = document.createElement("span");
-  label.className = "muted";
-  label.textContent = t("tryExample");
-  box.appendChild(label);
-  for (const ex of examples) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = ex.label;
-    b.title = ex.hash;
-    b.addEventListener("click", () => { $("hash").value = ex.hash; checkHash(); $("askForm").requestSubmit(); });
-    box.appendChild(b);
-  }
-}
-
 async function loadNetworks() {
   try {
     const n = await api("/settings/network");
@@ -788,20 +812,19 @@ async function loadNetworks() {
     }
     const active = n.networks.find((x) => x.active);
     $("networkInfo").textContent = active ? `${t("netActive")}: ${active.name} · chain ${active.chain_id} · ${active.explorer}` : "";
-    showExamples(n.examples || []);
-  } catch (err) { $("networkInfo").textContent = err.message; }
+    const first = !state.examples;
+    state.examples = n.examples || [];
+    if (first && document.body.dataset.persona && !state.hash) welcome();
+    return active;
+  } catch (err) { $("networkInfo").textContent = err.message; return null; }
 }
 
-function networkChanged() {
-  ++state.generation;  // an answer still on its way belongs to the old network
-  state.hash = null; state.runId = null; state.sessionId = null;
-  ["result", "clarify", "failure"].forEach((id) => $(id).classList.add("hidden"));
-  waiting(false);
-  $("hash").value = "";
-  checkHash();
-  $("healthText").textContent = "…";
-  loadNetworks();
+async function networkChanged() {
+  state.examples = null;
+  const active = await loadNetworks();
   loadNetwork();
+  newConversation();
+  if (active) sayText(`${t("networkSwitched")} ${active.name}.`);
 }
 
 $("networkSelect").addEventListener("change", async () => {
@@ -809,8 +832,7 @@ $("networkSelect").addEventListener("change", async () => {
     await api("/settings/network", {name: $("networkSelect").value});
     networkChanged();
   } catch (err) {
-    $("failureText").textContent = err.message;
-    $("failure").classList.remove("hidden");
+    say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(err.message)}</div>`);
     loadNetworks();
   }
 });
@@ -867,11 +889,12 @@ function openSettings(open) {
 $("settingsToggle").addEventListener("click", () => openSettings(true));
 $("settingsClose").addEventListener("click", () => openSettings(false));
 $("scrim").addEventListener("click", () => openSettings(false));
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") openSettings(false); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { openSettings(false); if (document.body.dataset.persona === "support") openProof(false); } });
 
 async function loadAnswers() {
   try {
     const a = await api("/settings/answers");
+    const changed = lang !== a.language;
     lang = a.language;
     const select = $("answerLanguage");
     select.replaceChildren();
@@ -882,6 +905,7 @@ async function loadAnswers() {
       select.appendChild(o);
     }
     applyLanguage();
+    if (changed && document.body.dataset.persona && !state.hash) welcome();
   } catch (err) { $("answersState").textContent = err.message; }
 }
 $("answerLanguage").addEventListener("change", async () => {
@@ -890,7 +914,7 @@ $("answerLanguage").addEventListener("change", async () => {
     lang = r.language;
     applyLanguage();
     loadNetwork();
-    loadNetworks();
+    if (!state.hash) welcome();
     $("answersState").textContent = "✓";
   } catch (err) { $("answersState").textContent = err.message; }
 });
@@ -976,48 +1000,12 @@ $("llmTest").addEventListener("click", async () => {
   } catch (err) { $("llmState").textContent = err.message; }
 });
 
-$("chatForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const message = $("question").value.trim();
-  if (!message || !state.hash) return;
-  const generation = state.generation;
-  $("chatButton").disabled = true;
-  $("askButton").disabled = true;
-  const entry = document.createElement("div");
-  entry.innerHTML = `<div class="q">${esc(message)}</div><div class="a muted">…</div>`;
-  $("chatLog").appendChild(entry);
-  try {
-    // a conversation starts from the facts this page shows (the explain's run_id), or from the hash
-    const body = state.sessionId ? {session_id: state.sessionId, message}
-      : state.runId !== null && state.runId !== undefined ? {run_id: state.runId, message}
-      : {hash: state.hash, mode: state.mode, message};
-    const r = await api("/chat", body);
-    if (generation !== state.generation) { entry.remove(); return; }  // another transaction was explained meanwhile
-    state.sessionId = r.session_id;
-    if (r.evidence) state.evidence = new Map(r.evidence.map((e) => [e.id, e]));  // the conversation's own facts
-    for (const f of r.new_facts) state.evidence.set(f.id, f);
-    renderFacts();
-    const tools = r.tool_calls.map((c) => `<div class="tool">🔎 ${esc(c.tool || "request")}: ${typeof c.result === "string" ? esc(c.result) : c.result.map((id) => `<a class="cite" href="#fact-${esc(id)}" data-fact="${esc(id)}">${esc(id)}</a>`).join(" ")}</div>`).join("");
-    const text = r.answer ? markdown(r.answer) :
-      `<p class="muted">${esc(r.outcome === "withheld" ? t("noSummary_withheld") : r.error || "—")}</p>`;
-    entry.innerHTML = `<div class="q">${esc(message)}</div><div class="a">${tools}${text}${feedbackHtml(r.run_id)}</div>`;
-    $("question").value = "";
-  } catch (err) {
-    if (err.status === 404 && (state.sessionId || state.runId !== null)) {  // expired: the next question starts anew
-      state.sessionId = null; state.runId = null;
-    }
-    entry.innerHTML = `<div class="q">${esc(message)}</div><div class="error">${esc(err.message)}</div>`;
-  } finally {
-    $("askButton").disabled = false;
-    $("chatButton").disabled = false;
-  }
-});
-
 document.addEventListener("click", async (event) => {
+  if (event.target.closest(".see-proof")) { openProof(true); return; }
   const cite = event.target.closest("a.cite");
   if (cite) {
     event.preventDefault();
-    $("evidenceBox").open = true;  // the proof opens where the citation points
+    openProof(true);  // the proof opens where the citation points
     const fact = $(`fact-${cite.dataset.fact}`);
     if (fact) { fact.scrollIntoView({behavior: "smooth", block: "center"});
       fact.classList.add("flash"); setTimeout(() => fact.classList.remove("flash"), 1500); }
@@ -1052,6 +1040,7 @@ document.addEventListener("mouseover", (event) => {
   try { saved = localStorage.getItem("anychain.persona"); } catch { /* storage may be off */ }
   if (!location.hash && saved && PATHS[saved]) location.hash = PATHS[saved];
   applyLanguage();
+  route();
   loadAnswers();
   loadNetwork();
   loadNetworks();

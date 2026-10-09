@@ -68,7 +68,7 @@ const cut = (from, to) => script.slice(script.indexOf(from), script.indexOf(to))
 const elements = {};
 const $ = (id) => elements[id] || (elements[id] = {innerHTML: "", classList: {add() {}, remove() {}}});
 const state = {evidence: new Map()};
-const code = cut("function esc(", "async function api(") + cut("function renderAnswer(", '$("askForm")');
+const code = cut("function esc(", "async function api(") + cut("function renderAnswer(", "// ---- end of the rendering functions ----");
 const render = new Function("$", "state", code + "; return renderAnswer;")($, state);
 const answers = JSON.parse(require("fs").readFileSync(0, "utf8"));
 for (const a of answers) render(a);
