@@ -1,6 +1,6 @@
 # Evaluation report
 
-Run 2026-10-09 13:33, commit 4d3728b, model gpt-4.1-mini. Every case is a real transaction replayed from its recording (eval/cases.yaml).
+Run 2026-10-09 13:33, commit 3a399db, model gpt-4.1-mini. Every case is a real transaction replayed from its recording (eval/cases.yaml).
 
 | Metric | Result |
 |---|---|
