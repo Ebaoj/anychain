@@ -49,6 +49,12 @@ RPC_HOST = "ethereum-rpc.publicnode.com"
 
 
 @pytest.fixture(autouse=True)
+def llm_settings_file(monkeypatch, tmp_path):
+    """Tests never read or write the reader's saved model and key (D61): each test gets its own empty file."""
+    monkeypatch.setenv("ANYCHAIN_LLM_SETTINGS", str(tmp_path / "llm.json"))
+
+
+@pytest.fixture(autouse=True)
 def no_retry_sleep(monkeypatch):
     """Retries wait between attempts; tests should not."""
     monkeypatch.setattr(http_module.time, "sleep", lambda _s: None)

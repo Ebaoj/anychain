@@ -69,6 +69,8 @@
   form.chat { display: flex; gap: 8px; margin-top: 12px; }
   form.chat textarea { flex: 1; min-height: 42px; resize: vertical; }
   .hidden { display: none; }
+  header button.link { margin-left: auto; background: none; border: 1px solid var(--line, #cbd2d9); color: inherit;
+                       border-radius: 6px; padding: 4px 10px; cursor: pointer; }
   .wrap { word-break: break-all; }
 </style>
 </head>
@@ -76,6 +78,7 @@
 <header>
   <h1>AnyChain Transaction Assistant</h1>
   <div class="network" id="network">checking the network…</div>
+  <button type="button" id="llmToggle" class="link">Model</button>
 </header>
 <main>
   <section class="panel">
@@ -93,6 +96,26 @@
       <input type="text" id="readerQuestion" maxlength="500" placeholder="Your question, optional (e.g. why didn't my payment go through?)" autocomplete="off">
     </form>
     <p class="muted">Every statement cites a numbered fact with its source. Facts come from the explorer and the node, never from the model.</p>
+  </section>
+
+  <section id="llmPanel" class="panel hidden" aria-live="polite">
+    <h2>The model that writes the answers</h2>
+    <p class="muted">The key is saved on this computer only (readable by your user), never shown again: the page gets
+      back only its last four characters. Every answer is still checked against the facts, whichever model writes it.</p>
+    <form id="llmForm" class="ask">
+      <select id="llmProvider" aria-label="Provider">
+        <option value="anthropic">Anthropic (API key)</option>
+        <option value="openai">OpenAI (API key)</option>
+        <option value="claude_code">Claude Code on this computer (no key)</option>
+      </select>
+      <input type="text" id="llmModel" maxlength="100" autocomplete="off" spellcheck="false"
+             placeholder="Model (Anthropic default: claude-sonnet-5-5; OpenAI: required)">
+      <input type="password" id="llmKey" maxlength="400" autocomplete="off" spellcheck="false"
+             placeholder="API key (empty keeps the saved one)">
+      <button type="submit">Save</button>
+      <button type="button" id="llmTest">Test</button>
+    </form>
+    <p id="llmState" class="muted"></p>
   </section>
 
   <section id="clarify" class="panel hidden" aria-live="polite">
@@ -207,7 +230,9 @@ function feedbackHtml(runId) {
     <button type="button" data-value="down" aria-label="not useful" aria-pressed="false">👎</button></div>`;
 }
 async function api(path, body) {
-  const response = await fetch(path, {method: body ? "POST" : "GET", headers: {"content-type": "application/json"},
+  // the custom header lets the API refuse requests that did not come from this page (D61)
+  const response = await fetch(path, {method: body ? "POST" : "GET",
+                                      headers: {"content-type": "application/json", "x-anychain-request": "1"},
                                       body: body ? JSON.stringify(body) : undefined});
   let data = null;
   try { data = await response.json(); } catch { /* not JSON */ }
@@ -341,6 +366,44 @@ $("clarifyForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const typed = $("clarifyText").value.trim();
   if (typed && state.pendingClarify) answerClarify(state.pendingClarify.c, state.pendingClarify.request, typed);
+});
+
+// The model and its key (D61): the key goes to the API once and is never read back.
+function showLlm(s) {
+  const keys = Object.entries(s.keys || {}).map(([p, v]) => `${p} key: ${v || "none"}`).join(" · ");
+  $("llmState").textContent = `Chosen: ${s.provider || "the network config's model"}` +
+    (s.model ? ` / ${s.model}` : "") + (keys ? ` · ${keys}` : "");
+  if (s.provider) $("llmProvider").value = s.provider;
+  $("llmModel").value = s.model || "";
+}
+
+$("llmToggle").addEventListener("click", async () => {
+  $("llmPanel").classList.toggle("hidden");
+  if (!$("llmPanel").classList.contains("hidden")) {
+    try { showLlm(await api("/settings/llm")); } catch (err) { $("llmState").textContent = err.message; }
+  }
+});
+
+$("llmForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const body = {provider: $("llmProvider").value};
+  const model = $("llmModel").value.trim(), key = $("llmKey").value.trim();
+  if (model) body.model = model;
+  if (key) body.api_key = key;
+  try {
+    showLlm(await api("/settings/llm", body));
+    $("llmKey").value = "";
+    loadNetwork();
+  } catch (err) { $("llmState").textContent = `Not saved: ${err.message}`; }
+});
+
+$("llmTest").addEventListener("click", async () => {
+  $("llmState").textContent = "Asking the model for one word…";
+  try {
+    const r = await api("/settings/llm/test", {});
+    $("llmState").textContent = r.ok ? `${r.provider} / ${r.model} answered: ${r.reply}`
+                                     : `${r.provider} / ${r.model} did not answer: ${r.error}`;
+  } catch (err) { $("llmState").textContent = err.message; }
 });
 
 $("chatForm").addEventListener("submit", async (event) => {

@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, ConfigDict, Field
@@ -30,7 +30,7 @@ from anychain.config import AppConfig
 from anychain.chat import MAX_QUESTIONS
 from anychain.service import SKIP, WRITE, Crash, answer_transaction
 from anychain.triage import for_input
-from anychain.writer import write_checked
+from anychain.writer import WriterError, write_checked
 
 LOCAL_NAMES = ["127.0.0.1", "localhost", "[::1]", "::1"]
 PAGE = Path(__file__).parent / "web" / "index.html"
@@ -73,6 +73,14 @@ class Clarified(BaseModel):
 
 
 ExplainRequest.model_rebuild()  # resolves the forward reference to Clarified
+
+
+class LlmSettingsRequest(BaseModel):
+    """The model the reader picks on the page, and its API key (D61). The key is saved, never returned."""
+    model_config = ConfigDict(extra="forbid")
+    provider: Literal["claude_code", "anthropic", "openai"]
+    model: str | None = Field(None, max_length=100)
+    api_key: str | None = Field(None, max_length=400)
 
 
 class ChatRequest(BaseModel):
@@ -118,17 +126,17 @@ def probe_node(cfg: AppConfig, client: httpx.Client, budget: Budget | None = Non
 def probe_model(cfg: AppConfig) -> dict:
     """Whether a model can be called, without calling it (each call costs): the Claude Code command is installed
     (logging in is not checked), or the API key is set (not checked against the provider)."""
-    import os
-    provider = cfg.llm.provider
+    from anychain import llm_settings
+    llm = llm_settings.effective(cfg.llm)  # the model the reader saved, or the config's (D61)
+    provider = llm.provider
     if provider == "claude_code":
-        found = shutil.which(cfg.llm.claude_code_command)
-        return {"status": "installed" if found else "missing", "provider": provider, "model": cfg.llm.model,
+        found = shutil.which(llm.claude_code_command)
+        return {"status": "installed" if found else "missing", "provider": provider, "model": llm.model,
                 "detail": "the command is installed; whether it is logged in is known only when it writes" if found
-                else f"{cfg.llm.claude_code_command!r} not found"}
-    key = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY"}.get(provider)
-    present = bool(key and os.environ.get(key))
-    return {"status": "configured" if present else "missing", "provider": provider, "model": cfg.llm.model,
-            **({} if present else {"detail": f"{key} is not set"})}
+                else f"{llm.claude_code_command!r} not found"}
+    present = bool(llm_settings.key_for(provider))
+    return {"status": "configured" if present else "missing", "provider": provider, "model": llm.model,
+            **({} if present else {"detail": "no API key saved or in the environment"})}
 
 
 def chat_tools(cfg: AppConfig, bundle_for):
@@ -273,6 +281,45 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
                 or log.set_feedback(request.run_id, request.value, source="chat")):
             raise HTTPException(404, f"no answer given by this API with run_id {request.run_id}")
         return {"saved": True}
+
+    # ---- the model and its API key (D61) ----
+
+    def same_page_only(request: Request) -> None:
+        """Only this page may change the model: a custom header (a cross-site request cannot send it without a
+        preflight this API never answers) and, when the browser sends one, an Origin on this machine."""
+        if request.headers.get("x-anychain-request") != "1":
+            raise HTTPException(403, "settings can be changed only from this API's own page")
+        origin = request.headers.get("origin")
+        if origin and httpx.URL(origin).host not in LOCAL_NAMES:
+            raise HTTPException(403, "settings can be changed only from this API's own page")
+
+    @app.get("/settings/llm")
+    def get_llm_settings() -> dict:
+        from anychain import llm_settings
+        return {**llm_settings.describe(), "config": {"provider": cfg.llm.provider, "model": cfg.llm.model}}
+
+    @app.post("/settings/llm")
+    def set_llm_settings(body: LlmSettingsRequest, request: Request) -> dict:
+        from anychain import llm_settings
+        same_page_only(request)
+        try:
+            return llm_settings.save(body.provider, body.model, body.api_key)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/settings/llm/test")
+    def test_llm_settings(request: Request) -> dict:
+        """One tiny call to the chosen model (a few tokens), to see that the key and the model work."""
+        same_page_only(request)
+        from anychain import llm_settings
+        llm = llm_settings.effective(cfg.llm)
+        try:
+            reply = backend_factory().complete("Reply with the single word OK.", "Is this model reachable?")
+            return {"ok": True, "provider": llm.provider, "model": llm.model, "reply": (reply or "")[:40]}
+        except WriterError as exc:  # our own message, never the key
+            return {"ok": False, "provider": llm.provider, "model": llm.model, "error": no_urls(str(exc), node)}
+        except Exception as exc:  # a provider's text can echo part of a key: only the kind of error
+            return {"ok": False, "provider": llm.provider, "model": llm.model, "error": type(exc).__name__}
 
     return app
 

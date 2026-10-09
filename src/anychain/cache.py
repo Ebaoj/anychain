@@ -100,11 +100,17 @@ def keep_decision(bundle: EvidenceBundle, rpc, cfg: AppConfig) -> str | None:
     return None
 
 
+def _model(cfg: AppConfig) -> list:
+    from anychain.llm_settings import effective  # the model the reader saved writes the answer (D61)
+    llm = effective(cfg.llm)
+    return [llm.provider, llm.model]
+
+
 def answer_key(bundle: EvidenceBundle, cfg: AppConfig, mode: str, question: str | None = None) -> str:
     """A written answer depends on the evidence, the mode, the language, the question, the prompts and the model."""
     parts = {"evidence": bundle.model_dump(), "mode": mode, "language": cfg.assistant.language,
              "question": question, "prompts": _digest_files(PROMPTS.glob("*.md")) if PROMPTS.exists() else None,
-             "model": [cfg.llm.provider, cfg.llm.model], "code": CODE_DIGEST}
+             "model": _model(cfg), "code": CODE_DIGEST}
     return hashlib.sha256(json.dumps(parts, sort_keys=True, default=str).encode()).hexdigest()
 
 

@@ -135,7 +135,7 @@ def test_api_backends_need_their_key(eth_cfg, monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     bundle = replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer")
     for backend in (OpenAIBackend(eth_cfg.llm), AnthropicBackend(eth_cfg.llm)):
-        with pytest.raises(WriterError, match="API_KEY is not set"):
+        with pytest.raises(WriterError, match="API key: save one with `anychain llm set`"):
             write_explanation(bundle, eth_cfg, "support", backend)
 
 

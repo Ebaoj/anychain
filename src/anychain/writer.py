@@ -159,10 +159,13 @@ class AnthropicBackend:
     def complete(self, system: str, user: str) -> str:
         client = self.client
         if client is None:
-            if not os.environ.get("ANTHROPIC_API_KEY"):
-                raise WriterError("ANTHROPIC_API_KEY is not set")
+            from anychain.llm_settings import key_for
+            key = key_for("anthropic")
+            if not key:
+                raise WriterError("no Anthropic API key: save one with `anychain llm set` or the page's Model panel, "
+                                  "or set ANTHROPIC_API_KEY")
             import anthropic
-            client = anthropic.Anthropic(timeout=self.llm.timeout_s)
+            client = anthropic.Anthropic(api_key=key, timeout=self.llm.timeout_s)
         msg = client.messages.create(model=self.llm.model, max_tokens=self.llm.max_tokens,
                                      temperature=self.llm.temperature, system=system,
                                      messages=[{"role": "user", "content": user}])
@@ -183,9 +186,11 @@ class OpenAIBackend:
         self.llm, self.client, self.last_usage = llm, client, None
 
     def complete(self, system: str, user: str) -> str:
-        key = os.environ.get("OPENAI_API_KEY")
+        from anychain.llm_settings import key_for
+        key = key_for("openai")
         if not key:
-            raise WriterError("OPENAI_API_KEY is not set")
+            raise WriterError("no OpenAI API key: save one with `anychain llm set` or the page's Model panel, or "
+                              "set OPENAI_API_KEY")
         body = {"model": self.llm.model, "max_completion_tokens": self.llm.max_tokens,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
         if self.llm.temperature is not None:  # reasoning models reject any value but their default
@@ -226,6 +231,9 @@ BACKENDS = {"claude_code": ClaudeCodeBackend, "anthropic": AnthropicBackend, "op
 
 
 def backend_for(llm: LlmConfig) -> LlmBackend:
+    """The backend for the model the reader saved (D61), or the config's."""
+    from anychain import llm_settings
+    llm = llm_settings.effective(llm)
     return BACKENDS[llm.provider](llm)
 
 

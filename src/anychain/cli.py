@@ -377,7 +377,9 @@ def run_eval(
         r = run_case(c, write=not no_llm)
         results.append(r)
         print(f"{r.got['status']} {r.got['rule'] or ''} {r.summary_status}")
-    model = "none (--no-llm)" if no_llm else load_config(str(Path("configs") / f"{selected[0]['config']}.yaml")).llm.model
+    from anychain.llm_settings import effective
+    model = "none (--no-llm)" if no_llm else effective(
+        load_config(str(Path("configs") / f"{selected[0]['config']}.yaml")).llm).model
     summary = report(results, model, Path(out))
     print(json.dumps(summary, indent=1))
     print(f"Report: {Path(out) / 'report.md'}")
@@ -478,6 +480,67 @@ def _cell(name: str, value) -> str:
 
 repos_app = typer.Typer(help="Contract repositories cited as source (PHASE2 T6).")
 app.add_typer(repos_app, name="repos")
+
+llm_app = typer.Typer(help="The model that writes the answers, and its API key (saved outside the repository).")
+app.add_typer(llm_app, name="llm")
+
+
+def _show_llm() -> None:
+    from anychain import llm_settings
+    d = llm_settings.describe()
+    print(f"Model: {d['provider'] or 'from the network config'}" + (f" / {d['model']}" if d["model"] else ""))
+    for provider, state in d["keys"].items():
+        print(f"  {provider} key: {state or 'none'}")
+    print(f"Saved in {llm_settings.path()} (readable by you only)")
+
+
+@llm_app.command("show")
+def llm_show() -> None:
+    """Show the chosen model and which keys are saved (never the keys)."""
+    _show_llm()
+
+
+@llm_app.command("set")
+def llm_set(
+    provider: str = typer.Option(..., help="claude_code (local CLI, no key) | anthropic | openai"),
+    model: str = typer.Option(None, help="Model name (Anthropic default: claude-sonnet-5-5; OpenAI: required)"),
+) -> None:
+    """Choose the model; for anthropic or openai, type the API key when asked (it is not shown)."""
+    from anychain import llm_settings
+    key = None
+    if provider in llm_settings.ENV_KEYS:
+        key = typer.prompt(f"{provider} API key (not shown; empty keeps the saved one)", hide_input=True,
+                           default="", show_default=False) or None
+    try:
+        llm_settings.save(provider, model, key)
+    except ValueError as exc:
+        _fail(str(exc))
+    _show_llm()
+
+
+@llm_app.command("test")
+def llm_test(config: str = typer.Option(None, "--config", help="Network YAML (its llm block is the fallback)")) -> None:
+    """One tiny call to the chosen model (a few tokens), to see that the key and the model work."""
+    from anychain.writer import WriterError, backend_for
+    try:
+        cfg = load_config(config)
+    except ConfigError as exc:
+        _fail(str(exc))
+    try:
+        reply = backend_for(cfg.llm).complete("Reply with the single word OK.", "Is this model reachable?")
+    except WriterError as exc:
+        _fail(f"The model did not answer: {exc}")
+    except Exception as exc:  # a provider's text can echo part of a key: only the kind of error
+        _fail(f"The model did not answer: {type(exc).__name__}")
+    print(f"The model answered: {(reply or '').strip()[:40]}")
+
+
+@llm_app.command("clear")
+def llm_clear() -> None:
+    """Forget the chosen model and the saved keys (back to the network config and the environment)."""
+    from anychain import llm_settings
+    llm_settings.clear()
+    print("Cleared: the network config's model and the environment's keys apply.")
 
 
 @repos_app.command("sync")
