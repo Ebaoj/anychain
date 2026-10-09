@@ -484,3 +484,25 @@ A bug hunt with varied real transactions found facts that were well formatted, s
 - **Where the key lives:** one file outside the repository, `~/.config/anychain/llm.json` (or $ANYCHAIN_LLM_SETTINGS), created 0600 in a 0700 folder, written atomically. It is never returned: the API, the page and the CLI show only "saved, ends in …" and its last four characters. Provider errors are shown by kind only (their text can echo part of a key).
 - **Who may change it:** the API listens on 127.0.0.1 only (D46) and its host is checked (DNS rebinding); a settings request also needs the page's custom header `x-anychain-request: 1` (a cross-site request cannot send it without a CORS preflight, which this API never grants) and, when the browser sends an Origin, an origin on this machine. Tests cover both refusals; tests never reach a provider (the provider client is replaced in every test).
 - **Not done:** an OS keychain (one more dependency per platform); native SDK tool use (the chat's JSON tool protocol, D47, works the same with any of the three providers).
+
+## D62. Answers that hold up with a small model (asked by Joabe on 2026-10-09)
+- **Why:** with gpt-4.1-nano the support answer to the Uniswap deadline failure left out what the reader most needed (the same swap succeeded 48 seconds later), mixed the developer's steps into a merchant's answer, and cited few of its sentences. The rule of this project applied: what code can decide is not left to the model.
+- **Measured step by step on the eval (11 real cases), each run kept in `eval/runs/`:**
+
+| Run | Citation coverage | Key values | Key facts cited | Drafts caught | Withheld |
+|---|---|---|---|---|---|
+| nano, the original prompt (baseline) | 72.6% | 100% | 86.7% | 18.2% | 0 |
+| nano, a shorter prompt with a fixed outline per mode | 41.9% | 78.6% | 86.7% | 9.1% | 1 |
+| nano, an outline built per transaction | 55.7% | 87.5% | 80.0% | 0% | 0 |
+| nano, all four layers below | 83.5% / 85.9% (two runs) | 100% | 100% | 0% | 0 |
+| Claude Sonnet 5.5, the original prompt | 76.3% | 100% | 100% | 0% | 0 |
+| Claude Sonnet 5.5, all four layers | 81.6% | 100% | 100% | 0% | 0 |
+
+- **What did not work, and why:** a prompt alone made it worse. Given a fixed list of sections, the small model filled every one, writing sentences no fact supports ("there were no further operations") and claims for sections that did not apply ("the diagnosis confirms" on a success).
+- **The four layers:**
+  1. **An outline built by code for each transaction** (`outline.py`): only the sections a fact is about, in order, each naming its facts ("What happened next: the same call succeeded 48 s later [E10]"). Every sentence ends with its fact's id.
+  2. **The reader's steps only:** in support mode a conclusion reaches the model with the steps for a non-technical reader and without the developer's (and the reverse), so it cannot mix them.
+  3. **Citations normalized:** a small model cites in prose ("conforme E19", "os fatos E5 a E16"); these become [E19] before the check, so the page links them and the check reads them. An id that does not exist is still refused.
+  4. **Key facts enforced:** an answer that does not cite each conclusion and each pattern of the sender's timeline is rewritten once with the exact section and id; if still missing it is given (incomplete is not false), while a value outside the evidence still withholds it.
+- **A defect found on the way (the check, not the model):** a shortened address ("0x52b2…E624", allowed in support mode) was read as a citation of fact E624, which does not exist; the "E624" the earlier reports showed came from this, and here it withheld a correct answer. "E" plus digits after an ellipsis or a dot is no longer a citation (test on the real case).
+- **Still counted as uncited:** sentences about what is missing (the gaps have no ids). They are legitimate; the metric keeps counting them so it stays strict.
