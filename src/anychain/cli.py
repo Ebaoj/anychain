@@ -425,10 +425,19 @@ def serve(
         except OSError as exc:
             _fail(f"Port {port} on {host} cannot be used yet ({exc.strerror}): it was released moments ago, or "
                   "another program holds it. Try again in a minute, or pick another with --port.")
-    app_ = create_app(cfg, log=_open_log(cfg), store=cache_for(cfg), build=build_bundle, write_fn=write_checked,
-                      finality=lambda: finality_rpc_for(cfg), record=_record)
+    import os
+    from pathlib import Path
+    from anychain.networks import NetworkSwitcher, available
+
+    def make_app(net_cfg, switcher):  # one app per network, built when the page first switches to it (D64)
+        return create_app(net_cfg, log=_open_log(net_cfg), store=cache_for(net_cfg), build=build_bundle,
+                          write_fn=write_checked, finality=lambda: finality_rpc_for(net_cfg), record=_record,
+                          networks=switcher)
+    config_dir = Path(config or os.environ.get("ANYCHAIN_CONFIG", "")).resolve().parent
+    app_ = NetworkSwitcher(available(config_dir), cfg, make_app)
     shown = f"[{host}]" if ":" in host else host
-    print(f"AnyChain API for {cfg.network.name} on http://{shown}:{port} (Ctrl+C to stop)")
+    print(f"AnyChain API for {cfg.network.name} on http://{shown}:{port} (Ctrl+C to stop); "
+          f"{len(app_.paths)} networks can be chosen on the page")
     if container:
         print(f"Inside a container: publish the port on the host's 127.0.0.1 only "
               f"(docker run -p 127.0.0.1:{port}:{port} ...), as the API has no authentication.")

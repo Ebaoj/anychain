@@ -52,3 +52,9 @@ assistant:
 storage:
   sqlite_path: data/runs.db
   cache_dir: data/cache
+
+# Real transactions of this network the page offers to try (each one is a recorded fixture, D64).
+examples:
+  - {label: "Token transfer", hash: "0x677c354e740f6bcbbd1ef6f4ea5ed0247c0fd711b85fc9a16798a07473756351"}
+  - {label: "Failure: contract paused", hash: "0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd"}
+  - {label: "Failure: price limit (slippage)", hash: "0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"}

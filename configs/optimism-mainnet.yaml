@@ -58,3 +58,9 @@ assistant:
 storage:
   sqlite_path: data/runs.db
   cache_dir: data/cache
+
+# Real transactions of this network the page offers to try (each one is a recorded fixture, D64).
+examples:
+  - {label: "USDC transfer", hash: "0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921"}
+  - {label: "Deposit from L1", hash: "0x00cadc051b2e3894e3f7c953db6eca56e6853e325a84b5ba25c4db1f80b14be5"}
+  - {label: "Failure: time limit", hash: "0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"}

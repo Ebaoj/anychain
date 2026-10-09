@@ -102,6 +102,23 @@ def save(provider: str, model: str | None = None, api_key: str | None = None) ->
     return describe()
 
 
+LANGUAGES = ("pt-BR", "en", "es")
+
+
+def save_language(language: str) -> None:
+    """The language answers are written in, chosen on the page (D64); the config's applies until then."""
+    if language not in LANGUAGES:
+        raise ValueError(f"language must be one of {', '.join(LANGUAGES)}")
+    data = load()
+    data["language"] = language
+    _write(data)
+
+
+def language(default: str) -> str:
+    chosen = load().get("language")
+    return chosen if chosen in LANGUAGES else default
+
+
 def clear() -> None:
     try:
         path().unlink()

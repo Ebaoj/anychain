@@ -26,7 +26,7 @@ from anychain.events import NullEventLog, RunEvent
 from anychain.redact import no_urls
 from anychain.collectors.explorer import ExplorerClient
 from anychain.collectors.rpc import RpcClient
-from anychain.config import AppConfig
+from anychain.config import AppConfig, ConfigError
 from anychain.chat import MAX_QUESTIONS
 from anychain.service import SKIP, WRITE, Crash, answer_transaction
 from anychain.triage import for_input
@@ -73,6 +73,16 @@ class Clarified(BaseModel):
 
 
 ExplainRequest.model_rebuild()  # resolves the forward reference to Clarified
+
+
+class NetworkRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(..., max_length=100)
+
+
+class AnswersRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    language: str = Field(..., max_length=10)
 
 
 class LlmModelsRequest(BaseModel):
@@ -156,7 +166,7 @@ def chat_tools(cfg: AppConfig, bundle_for):
 
 def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write_checked, finality=None,
                probe_client: httpx.Client | None = None, record=None, backend_factory=None, tools=None,
-               sessions=None, explorer_for=None) -> FastAPI:
+               sessions=None, explorer_for=None, networks=None) -> FastAPI:
     """The app for one network's config. Collaborators are passed in, so tests replay recorded traffic."""
     from contextlib import asynccontextmanager
     client = probe_client or httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True)
@@ -312,6 +322,45 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
             return llm_settings.save(body.provider, body.model, body.api_key)
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
+
+    # ---- the network and the answers' language, from the page (D64) ----
+
+    @app.get("/settings/network")
+    def get_network() -> dict:
+        listed = networks.networks() if networks is not None else [
+            {"name": cfg.network.name, "chain_id": cfg.network.chain_id, "explorer": cfg.explorer.base_url,
+             "active": True}]
+        return {"active": cfg.network.name, "networks": listed,
+                "examples": [e.model_dump() for e in cfg.examples]}
+
+    @app.post("/settings/network")
+    def set_network(body: NetworkRequest, request: Request) -> dict:
+        same_page_only(request)
+        if networks is None:
+            raise HTTPException(422, "this server runs one network only")
+        try:
+            networks.select(body.name)
+        except KeyError as exc:
+            raise HTTPException(422, f"no network called {body.name!r} in the configs") from exc
+        except ConfigError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return {"active": body.name}
+
+    @app.get("/settings/answers")
+    def get_answers() -> dict:
+        from anychain import llm_settings
+        return {"language": llm_settings.language(cfg.assistant.language), "languages": list(llm_settings.LANGUAGES),
+                "default_mode": cfg.assistant.default_mode}
+
+    @app.post("/settings/answers")
+    def set_answers(body: AnswersRequest, request: Request) -> dict:
+        same_page_only(request)
+        from anychain import llm_settings
+        try:
+            llm_settings.save_language(body.language)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return {"language": body.language}
 
     @app.post("/settings/llm/models")
     def list_llm_models(body: LlmModelsRequest, request: Request) -> dict:

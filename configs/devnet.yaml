@@ -56,3 +56,9 @@ storage:
 
 cache:
   enabled: false                # the devnet is reset at will: nothing is kept
+
+# Real transactions of this network the page offers to try (each one is a recorded fixture, D64).
+examples:
+  - {label: "BRLC transfer", hash: "0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"}
+  - {label: "Failure: allowance exceeded", hash: "0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"}
+  - {label: "Failure: not the owner", hash: "0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"}

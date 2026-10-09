@@ -203,6 +203,12 @@ class CacheConfig(BaseModel):
 # Sections accepted now and used from phase 2 on: repos, address_map,
 # abi_strategy (beyond "explorer"), storage. They are validated already, so a
 # typo is caught today rather than when the feature arrives.
+class ExampleTx(BaseModel):
+    """A real transaction of this network the page offers as an example (D64)."""
+    label: str
+    hash: str = Field(pattern=r"^0x[0-9a-fA-F]{64}$")
+
+
 class AppConfig(BaseModel):
     network: NetworkConfig
     explorer: ExplorerConfig
@@ -219,6 +225,8 @@ class AppConfig(BaseModel):
     native_contracts: dict[str, str] = {}
     # Fee tokens the explorer cannot describe, keyed by the address in the fee (Celo adapters).
     fee_tokens: dict[str, FeeTokenConfig] = {}
+    # Real transactions of this network the page offers to try (D64); each one is a recorded fixture.
+    examples: list[ExampleTx] = []
 
     @field_validator("address_labels", "native_contracts", "fee_tokens", "address_map")
     @classmethod

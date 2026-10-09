@@ -68,3 +68,9 @@ assistant:
 storage:
   sqlite_path: data/runs.db
   cache_dir: data/cache
+
+# Real transactions of this network the page offers to try (each one is a recorded fixture, D64).
+examples:
+  - {label: "Payment that failed: balance too low", hash: "0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"}
+  - {label: "Fee paid in a stablecoin", hash: "0x4ca38efad66cf866bbadc1c91ecd3d61c524c747de68eb196d28b882b4b86aca"}
+  - {label: "Native CELO transfer", hash: "0x64f5270ef3b298a6d2ddefdba4f2c83faab12123020136915b173aef0c5526f3"}

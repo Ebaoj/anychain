@@ -289,7 +289,8 @@ def write_explanation(bundle: EvidenceBundle, cfg: AppConfig, mode: str, backend
                  "anything the evidence does not hold.")
     user += question_block(question)
     try:
-        return backend.complete(load_prompt(mode, cfg.assistant.language), user)
+        from anychain.llm_settings import language
+        return backend.complete(load_prompt(mode, language(cfg.assistant.language)), user)
     except WriterError:
         raise
     except Exception as exc:

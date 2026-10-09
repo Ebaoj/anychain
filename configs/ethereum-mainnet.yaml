@@ -61,3 +61,11 @@ assistant:
 storage:
   sqlite_path: data/runs.db
   cache_dir: data/cache
+
+# Real transactions of this network the page offers to try (each one is a recorded fixture, D64).
+examples:
+  - {label: "USDC transfer that succeeded", hash: "0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952"}
+  - {label: "Uniswap swap that succeeded", hash: "0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a"}
+  - {label: "Swap that failed: deadline passed", hash: "0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"}
+  - {label: "Transfer that ran out of gas", hash: "0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"}
+  - {label: "Failure on an unverified contract", hash: "0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9"}

@@ -62,3 +62,9 @@ assistant:
 storage:
   sqlite_path: data/runs.db
   cache_dir: data/cache
+
+# Real transactions of this network the page offers to try (each one is a recorded fixture, D64).
+examples:
+  - {label: "ETH sent", hash: "0x7839f1fd4d85a39d36a56ae7f3ee2988a20330d87480bf975c03a46592a117f4"}
+  - {label: "Fee paid by a paymaster", hash: "0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af"}
+  - {label: "Failure with no reason given", hash: "0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"}

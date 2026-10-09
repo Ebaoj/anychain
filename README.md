@@ -12,7 +12,7 @@ Explains and troubleshoots a transaction on **any EVM network**, for a merchant 
 2. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) section 0 ("What this is, in one minute") and section 2 ("How the diagnosis decides").
 3. Read the code in this order, each a few hundred lines at its core: `src/anychain/service.py` (one answer, end to end), `bundle.py` (`BundleBuilder.build`: how facts are collected), `diagnosis.py` (`diagnose` and the rules list), `validator.py` (the check on the AI's answer), `writer.py` (the prompts and the three model backends).
 4. Skim the sample conversations (section 4) and the evaluation table (section 5).
-5. For any choice that looks odd, search [docs/DECISIONS.md](docs/DECISIONS.md) for its number (D1 to D61): each says why, with the real transaction behind it.
+5. For any choice that looks odd, search [docs/DECISIONS.md](docs/DECISIONS.md) for its number (D1 to D64): each says why, with the real transaction behind it.
 
 ---
 
@@ -40,7 +40,9 @@ uv run anychain explain 0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b
 uv run anychain explain 0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a \
   --config configs/ethereum-mainnet.yaml --mode developer --question "why did it fail?" --json
 
-# API + web page on http://127.0.0.1:8000 (this machine only: the API has no authentication)
+# API + web page on http://127.0.0.1:8000 (this machine only: the API has no authentication).
+# The page switches between the networks in configs/, picks the model and the answers' language (Settings),
+# and offers real example transactions for each network.
 uv run anychain serve --config configs/ethereum-mainnet.yaml
 
 # follow-up questions in the terminal, evaluation, usage metrics, tests (offline, real recordings)
@@ -112,7 +114,7 @@ flowchart LR
 - **Chat with tools:** the model asks for data in JSON (read a contract's state, show a function's code or a repo file, look at another transaction); our code checks and runs the request and adds the result as a new sourced fact.
 - **Storage:** SQLite event log (one row per answer: gaps by cause, label, ABI source, cache, mode, tokens, cost, feedback) and a cache by network and hash for final, complete transactions.
 
-The full diagrams (pipeline, diagnosis, one `explain`, the chat, quality, code map, gap classification, metrics) are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); every decision, with the real case behind it, is in [docs/DECISIONS.md](docs/DECISIONS.md) (D1 to D61).
+The full diagrams (pipeline, diagnosis, one `explain`, the chat, quality, code map, gap classification, metrics) are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); every decision, with the real case behind it, is in [docs/DECISIONS.md](docs/DECISIONS.md) (D1 to D64).
 
 ---
 

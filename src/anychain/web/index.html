@@ -6,103 +6,149 @@
 <title>AnyChain Assistant</title>
 <style>
   :root {
-    --bg: #f6f7f9; --panel: #ffffff; --ink: #1b1f24; --muted: #5d6670; --line: #dde1e6; --accent: #1f5fbf;
-    --ok: #1e7a3c; --ok-bg: #e5f4ea; --likely: #8a5a00; --likely-bg: #fdf1d8; --unknown: #5d6670; --unknown-bg: #eceff2;
-    --bad: #a3261f; --bad-bg: #fbe7e5; --code-bg: #f1f3f6; --on-accent: #ffffff;
+    --bg: #f4f6f9; --panel: #ffffff; --ink: #15191e; --muted: #5d6670; --line: #e1e5ea; --accent: #2457c5;
+    --accent-soft: #e8eefb; --ok: #1e7a3c; --ok-bg: #e5f4ea; --likely: #8a5a00; --likely-bg: #fdf1d8;
+    --unknown: #5d6670; --unknown-bg: #eceff2; --bad: #a3261f; --bad-bg: #fbe7e5; --code-bg: #f1f3f6;
+    --on-accent: #ffffff; --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #111418; --panel: #1a1e24; --ink: #e6e9ed; --muted: #9aa3ad; --line: #2c323a; --accent: #6ea8ff;
-      --ok: #7fd49a; --ok-bg: #16301f; --likely: #f0c46b; --likely-bg: #33290f; --unknown: #aab3bd; --unknown-bg: #262b32;
-      --bad: #ff8f86; --bad-bg: #3a1a18; --code-bg: #20252c; --on-accent: #0b1726;
+      --bg: #0f1216; --panel: #181c22; --ink: #e6e9ed; --muted: #9aa3ad; --line: #2a3038; --accent: #6ea8ff;
+      --accent-soft: #1b2a44; --ok: #7fd49a; --ok-bg: #16301f; --likely: #f0c46b; --likely-bg: #33290f;
+      --unknown: #aab3bd; --unknown-bg: #262b32; --bad: #ff8f86; --bad-bg: #3a1a18; --code-bg: #20252c;
+      --on-accent: #0b1726; --shadow: none;
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  header { background: var(--panel); border-bottom: 1px solid var(--line); padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  header h1 { font-size: 17px; margin: 0; }
-  .network { font-size: 13px; color: var(--muted); }
-  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 4px 0 10px; background: var(--unknown); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  /* header */
+  header { position: sticky; top: 0; z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
+           padding: 10px 16px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .brand { display: flex; align-items: baseline; gap: 8px; }
+  .brand h1 { font-size: 17px; margin: 0; letter-spacing: -.01em; }
+  .brand span { font-size: 12px; color: var(--muted); }
+  .netpick { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .netpick select { font-weight: 600; color: var(--ink); }
+  .network { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--unknown); }
   .dot.ok { background: var(--ok); } .dot.down { background: var(--bad); } .dot.wait { background: var(--likely); }
-  main { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
-  form.ask { display: flex; gap: 8px; flex-wrap: wrap; }
-  input[type=text], select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
-  input[type=text] { flex: 1 1 380px; font-family: ui-monospace, Menlo, monospace; font-size: 13px; min-width: 0; }
-  button { font: inherit; border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
-  button.plain { background: transparent; color: var(--accent); }
-  button:disabled { opacity: .5; cursor: wait; }
-  label.check { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  header .spacer { flex: 1; }
+  /* layout */
+  main { max-width: 1180px; margin: 0 auto; padding: 20px 16px 40px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); }
   .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: start; }
-  @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
-  .fact, .answer, .card, .gaps, .chat-log, .error, #statusLine, #movements { overflow-wrap: anywhere; }
-  .clarify-options { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
-  .clarify-options button { text-align: left; overflow-wrap: anywhere; }
-  .spaced { margin-top: 16px; }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .layout > aside { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow: auto; }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } .layout > aside { position: static; max-height: none; } }
   h2 { font-size: 15px; margin: 0 0 10px; }
-  h3 { font-size: 14px; margin: 16px 0 6px; }
-  .status { font-weight: 600; }
+  h3 { font-size: 13px; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
   .muted { color: var(--muted); font-size: 13px; }
+  .hidden { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .wrap { word-break: break-all; }
+  /* controls */
+  input[type=text], input[type=password], select, textarea { font: inherit; color: var(--ink); background: var(--bg);
+       border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; min-width: 0; }
+  input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button { font: inherit; border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent);
+           border-radius: 8px; padding: 9px 16px; cursor: pointer; font-weight: 600; }
+  button.plain { background: transparent; color: var(--ink); border-color: var(--line); font-weight: 500; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  /* the question */
+  .hero h2 { font-size: 20px; margin-bottom: 4px; letter-spacing: -.01em; }
+  .hero p.lead { margin: 0 0 14px; color: var(--muted); }
+  form.ask { display: grid; gap: 10px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  #hash { flex: 1 1 420px; font-family: ui-monospace, Menlo, monospace; font-size: 14px; padding: 12px 13px; }
+  #readerQuestion { flex: 1 1 420px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; background: transparent; color: var(--ink); font-weight: 500; padding: 8px 12px; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  label.check { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  #askButton { margin-left: auto; min-width: 120px; }
+  .examples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+  .examples button { background: var(--bg); color: var(--ink); border-color: var(--line); font-weight: 500; font-size: 13px; padding: 6px 11px; border-radius: 999px; }
+  .examples button:hover { border-color: var(--accent); color: var(--accent); }
+  /* waiting */
+  .loading { display: flex; gap: 14px; align-items: center; }
+  .spinner { width: 22px; height: 22px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; flex: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  /* the answer */
+  .banner { border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .banner .status { font-weight: 700; font-size: 16px; }
+  .banner.success { background: var(--ok-bg); color: var(--ok); } .banner.failed { background: var(--bad-bg); color: var(--bad); }
+  .banner.pending, .banner.unknown, .banner.dropped { background: var(--unknown-bg); color: var(--unknown); }
+  .banner .meta { color: var(--muted); font-size: 12px; flex-basis: 100%; }
   .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
   .CONFIRMED { color: var(--ok); background: var(--ok-bg); } .LIKELY { color: var(--likely); background: var(--likely-bg); }
   .UNKNOWN { color: var(--unknown); background: var(--unknown-bg); } .heuristic { color: var(--likely); background: var(--likely-bg); }
-  .answer p { margin: 0 0 8px; } .answer ul, .answer ol { margin: 0 0 8px; padding-left: 22px; }
+  .answer p { margin: 0 0 10px; } .answer ul, .answer ol { margin: 0 0 10px; padding-left: 22px; }
   .answer code, .fact code { background: var(--code-bg); padding: 1px 4px; border-radius: 4px; font-size: 12.5px; }
-  a.cite { font-size: 12px; font-weight: 600; text-decoration: none; color: var(--accent); }
-  .card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
-  .gaps { border-left: 4px solid var(--likely); background: var(--likely-bg); border-radius: 6px; padding: 8px 12px; }
-  .gaps li { margin: 4px 0; }
-  .error { border-left: 4px solid var(--bad); background: var(--bad-bg); border-radius: 6px; padding: 8px 12px; }
-  .feedback { margin-top: 8px; display: flex; gap: 6px; align-items: center; }
-  .feedback button { padding: 2px 10px; background: transparent; color: var(--ink); border-color: var(--line); }
+  a.cite { font-size: 11.5px; font-weight: 700; text-decoration: none; color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 0 4px; margin-left: 2px; }
+  .card { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+  .gaps { border-left: 4px solid var(--likely); background: var(--likely-bg); border-radius: 8px; padding: 8px 12px; }
+  .gaps ul { margin: 0; padding-left: 18px; } .gaps li { margin: 4px 0; }
+  .error { border-left: 4px solid var(--bad); background: var(--bad-bg); border-radius: 8px; padding: 10px 12px; }
+  .feedback { margin-top: 10px; display: flex; gap: 6px; align-items: center; }
+  .feedback button { padding: 2px 10px; background: transparent; color: var(--ink); border-color: var(--line); font-weight: 400; }
   .feedback button.chosen { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
-  .fact { border-top: 1px solid var(--line); padding: 8px 0; font-size: 13px; scroll-margin-top: 80px; }
+  .fact, .answer, .card, .gaps, .chat-log, .error, #statusLine, #movements { overflow-wrap: anywhere; }
+  .fact { border-top: 1px solid var(--line); padding: 9px 0; font-size: 13px; scroll-margin-top: 90px; }
   .fact.flash { background: var(--likely-bg); }
-  .fact .id { font-weight: 700; margin-right: 6px; }
-  .fact pre { white-space: pre-wrap; word-break: break-word; background: var(--code-bg); padding: 8px; border-radius: 6px; font-size: 12px; max-height: 260px; overflow: auto; margin: 6px 0 0; }
+  .fact .id { font-weight: 700; margin-right: 6px; color: var(--accent); }
+  .fact pre { white-space: pre-wrap; word-break: break-word; background: var(--code-bg); padding: 8px; border-radius: 6px; font-size: 12px; max-height: 240px; overflow: auto; margin: 6px 0 0; }
   .fact .src { margin-top: 4px; }
   .fact .src a { margin-right: 10px; font-size: 12px; word-break: break-all; }
   .conf { font-size: 11px; color: var(--muted); }
-  .chat-log .q { font-weight: 600; margin-top: 12px; }
-  .chat-log .tool { font-size: 12px; color: var(--muted); font-family: ui-monospace, Menlo, monospace; }
+  .chat-log .q { font-weight: 600; margin-top: 14px; padding: 8px 10px; background: var(--bg); border-radius: 8px; }
+  .chat-log .tool { font-size: 12px; color: var(--muted); font-family: ui-monospace, Menlo, monospace; margin: 6px 0; }
   form.chat { display: flex; gap: 8px; margin-top: 12px; }
-  form.chat textarea { flex: 1; min-height: 42px; resize: vertical; }
-  .hidden { display: none; }
-  header button.link { margin-left: auto; background: none; border: 1px solid var(--line, #cbd2d9); color: inherit;
-                       border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-  .wrap { word-break: break-all; }
+  form.chat textarea { flex: 1; min-height: 44px; resize: vertical; }
+  .clarify-options { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+  .clarify-options button { text-align: left; overflow-wrap: anywhere; background: var(--bg); color: var(--ink); border-color: var(--line); font-weight: 500; }
+  .clarify-options button:hover { border-color: var(--accent); }
+  /* settings drawer */
+  .drawer { position: fixed; inset: 0 0 0 auto; width: min(460px, 100vw); background: var(--panel); border-left: 1px solid var(--line);
+            z-index: 20; overflow: auto; padding: 18px; box-shadow: -8px 0 24px rgba(0, 0, 0, .12); }
+  .scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .25); z-index: 15; }
+  .drawer header { position: static; padding: 0 0 12px; border: 0; background: transparent; }
+  .drawer section { border-top: 1px solid var(--line); padding: 14px 0; }
+  .drawer { overflow-x: hidden; }
+  .drawer form { display: grid; gap: 8px; }
+  .drawer input, .drawer select { width: 100%; }
+  .drawer .row { flex-wrap: nowrap; }
+  .drawer .row > * { flex: 1 1 0; min-width: 0; }
+  .grow { flex: 1; } .spaced { margin-top: 16px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>AnyChain Transaction Assistant</h1>
+  <div class="brand"><h1>AnyChain</h1><span>transaction assistant</span></div>
+  <label class="netpick" for="networkSelect">Network
+    <select id="networkSelect" aria-label="Network"><option>loading…</option></select>
+  </label>
   <div class="network" id="network">checking the network…</div>
-  <button type="button" id="llmToggle" class="link">Model</button>
+  <span class="spacer"></span>
+  <button type="button" id="settingsToggle" class="plain" aria-controls="settings">⚙ Settings</button>
 </header>
-<main>
-  <section class="panel">
-    <form class="ask" id="askForm">
-      <label class="sr" for="hash">Transaction hash</label>
-      <input type="text" id="hash" placeholder="Transaction hash (0x…)" autocomplete="off" spellcheck="false" required>
-      <select id="mode" aria-label="Who the answer is for">
-        <option value="support">Support (non-technical)</option>
-        <option value="developer">Developer</option>
-        <option value="auditor">Auditor</option>
-      </select>
-      <label class="check"><input type="checkbox" id="write" checked> written answer</label>
-      <button type="submit" id="askButton">Explain</button>
-      <label class="sr" for="readerQuestion">Your question (optional)</label>
-      <input type="text" id="readerQuestion" maxlength="500" placeholder="Your question, optional (e.g. why didn't my payment go through?)" autocomplete="off">
-    </form>
-    <p class="muted">Every statement cites a numbered fact with its source. Facts come from the explorer and the node, never from the model.</p>
-  </section>
 
-  <section id="llmPanel" class="panel hidden" aria-live="polite">
-    <h2>The model that writes the answers</h2>
+<div id="scrim" class="scrim hidden"></div>
+<aside id="settings" class="drawer hidden" aria-label="Settings">
+  <header><h2>Settings</h2><span class="spacer"></span><button type="button" id="settingsClose" class="plain" aria-label="Close">✕</button></header>
+  <section>
+    <h3>Network</h3>
+    <p class="muted">Each network is a config file in <code>configs/</code>: changing it here makes the server read
+      that network's explorer and node. The network's other settings live in its file.</p>
+    <p id="networkInfo" class="muted"></p>
+  </section>
+  <section id="llmPanel">
+    <h3>Model that writes the answers</h3>
     <p class="muted">The key is saved on this computer only (readable by your user), never shown again: the page gets
-      back only its last four characters. Every answer is still checked against the facts, whichever model writes it.</p>
-    <form id="llmForm" class="ask">
+      back only its last four characters. Every answer is checked against the facts, whichever model writes it.</p>
+    <form id="llmForm">
       <select id="llmProvider" aria-label="Provider">
         <option value="anthropic">Anthropic (API key)</option>
         <option value="openai">OpenAI (API key)</option>
@@ -110,20 +156,66 @@
       </select>
       <input type="password" id="llmKey" maxlength="400" autocomplete="off" spellcheck="false"
              placeholder="API key (empty keeps the saved one)">
-      <button type="button" id="llmLoad">Load models</button>
-      <select id="llmModel" aria-label="Model" disabled><option value="">load the models first</option></select>
-      <button type="submit" id="llmSave" disabled>Save</button>
-      <button type="button" id="llmTest">Test</button>
+      <div class="row">
+        <button type="button" id="llmLoad" class="plain">Load models</button>
+        <select id="llmModel" aria-label="Model" disabled><option value="">load the models first</option></select>
+      </div>
+      <div class="row">
+        <button type="submit" id="llmSave" disabled>Save</button>
+        <button type="button" id="llmTest" class="plain">Test</button>
+      </div>
     </form>
     <p id="llmState" class="muted"></p>
+  </section>
+  <section>
+    <h3>Answers</h3>
+    <label class="muted" for="answerLanguage">Language of the written answers</label>
+    <div class="row"><select id="answerLanguage" aria-label="Language"></select></div>
+    <p id="answersState" class="muted"></p>
+  </section>
+</aside>
+
+<main>
+  <section class="panel hero">
+    <h2>Explain a transaction</h2>
+    <p class="lead">Paste a transaction hash, or an address to pick one of its transactions. Every statement cites a
+      numbered fact from the explorer and the node; the model only writes, and a check rejects anything it adds.</p>
+    <form class="ask" id="askForm">
+      <div class="row">
+        <label class="sr" for="hash">Transaction hash</label>
+        <input type="text" id="hash" placeholder="0x… transaction hash (or an address)" autocomplete="off" spellcheck="false" required>
+      </div>
+      <div class="row">
+        <label class="sr" for="readerQuestion">Your question (optional)</label>
+        <input type="text" id="readerQuestion" maxlength="500" placeholder="Your question, optional: why didn't my payment go through?" autocomplete="off">
+      </div>
+      <div class="row">
+        <div class="seg" role="group" aria-label="Who the answer is for" id="modeButtons">
+          <button type="button" data-mode="support" aria-pressed="true">Merchant</button>
+          <button type="button" data-mode="developer" aria-pressed="false">Developer</button>
+          <button type="button" data-mode="auditor" aria-pressed="false">Auditor</button>
+        </div>
+        <select id="mode" class="sr" aria-hidden="true" tabindex="-1">
+          <option value="support">support</option><option value="developer">developer</option><option value="auditor">auditor</option>
+        </select>
+        <label class="check"><input type="checkbox" id="write" checked> written answer</label>
+        <button type="submit" id="askButton">Explain</button>
+      </div>
+    </form>
+    <div class="examples" id="examples"></div>
+  </section>
+
+  <section id="loading" class="panel hidden" aria-live="polite">
+    <div class="loading"><div class="spinner"></div><div><strong id="loadingText">Reading the explorer and the node…</strong>
+      <div class="muted" id="loadingTime"></div></div></div>
   </section>
 
   <section id="clarify" class="panel hidden" aria-live="polite">
     <h2>One question first</h2>
     <p id="clarifyQuestion"></p>
     <div id="clarifyOptions" class="clarify-options"></div>
-    <form id="clarifyForm" class="ask hidden">
-      <input type="text" id="clarifyText" maxlength="200" autocomplete="off" spellcheck="false">
+    <form id="clarifyForm" class="row hidden">
+      <input type="text" id="clarifyText" class="grow" maxlength="200" autocomplete="off" spellcheck="false">
       <button type="submit">Answer</button>
     </form>
   </section>
@@ -131,7 +223,6 @@
   <section id="result" class="hidden layout" aria-live="polite">
     <div>
       <div class="panel">
-        <h2>Answer</h2>
         <div id="statusLine"></div>
         <div id="answer" class="answer"></div>
         <div id="answerFeedback"></div>
@@ -142,7 +233,8 @@
       </div>
       <div class="panel spaced">
         <h2>Ask a follow-up question</h2>
-        <p class="muted">The assistant can read the contract's state, show a function's code or look at another transaction. What it finds becomes new facts.</p>
+        <p class="muted">The assistant can read a contract's state, show a function's code or look at another
+          transaction. What it finds becomes new numbered facts.</p>
         <div id="chatLog" class="chat-log" aria-live="polite"></div>
         <form class="chat" id="chatForm">
           <label class="sr" for="question">Your question</label>
@@ -151,14 +243,14 @@
         </form>
       </div>
     </div>
-    <div class="panel">
+    <aside class="panel">
       <h2>Evidence</h2>
       <div id="movements"></div>
       <h3>Facts</h3>
       <div id="facts"></div>
       <h3>Sources</h3>
       <div id="sources"></div>
-    </div>
+    </aside>
   </section>
   <section id="failure" class="hidden panel" role="alert"><div class="error" id="failureText"></div></section>
 </main>
@@ -181,7 +273,7 @@ function inline(text) {  // escaped text with **bold**, `code` and citations [E3
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
   html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\[(E\d+(?:\s*,\s*E\d+)*)\]/g, (_m, ids) =>
-    ids.split(/\s*,\s*/).map((id) => `<a class="cite" href="#fact-${id}" data-fact="${id}">[${id}]</a>`).join(""));
+    ids.split(/\s*,\s*/).map((id) => `<a class="cite" href="#fact-${id}" data-fact="${id}">${id}</a>`).join(""));
   return html;
 }
 function markdown(text) {  // the model's answer: paragraphs, bullet and numbered lists, headings as bold lines
@@ -229,6 +321,12 @@ function feedbackHtml(runId) {
     <button type="button" data-value="up" aria-label="useful" aria-pressed="false">👍</button>
     <button type="button" data-value="down" aria-label="not useful" aria-pressed="false">👎</button></div>`;
 }
+function explorerLink(a) {  // the transaction's page on the explorer, from the overview fact's sources
+  const overview = (a.evidence || []).find((e) => e.kind === "overview");
+  const page = overview && (overview.sources || []).find((s) => s.kind === "explorer_ui");
+  const url = page && safeUrl(page.url);
+  return url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">open on the explorer</a>` : "";
+}
 async function api(path, body) {
   // the custom header lets the API refuse requests that did not come from this page (D61)
   const response = await fetch(path, {method: body ? "POST" : "GET",
@@ -252,29 +350,31 @@ async function loadNetwork() {
   try {
     const h = await api("/health");
     const usable = ["ok", "installed", "configured"];
-    const part = (name, s) => `<span title="${esc(s.detail || s.status)}"><span class="dot ${usable.includes(s.status) ? "ok" : "down"}"></span>` +
+    const part = (name, s) => `<span class="pill" title="${esc(s.detail || s.status)}"><span class="dot ${usable.includes(s.status) ? "ok" : "down"}"></span>` +
       `${name} ${esc(String(s.status).replace("_", " "))}</span>`;
-    $("network").innerHTML = `Network: <strong>${esc(h.network.name)}</strong> (chain ${esc(h.network.chain_id)})` +
-      part("explorer", h.sources.explorer) + part("node", h.sources.node) + part("model", h.sources.model);
+    $("network").innerHTML = `<span class="pill">chain ${esc(h.network.chain_id)}</span>` +
+      part("explorer", h.sources.explorer) + part("node", h.sources.node) +
+      part(`model (${esc(h.sources.model.model || h.sources.model.provider)})`, h.sources.model);
   } catch (err) {
-    $("network").innerHTML = `<span class="dot down"></span>${esc(err.message)}`;
+    $("network").innerHTML = `<span class="pill"><span class="dot down"></span>${esc(err.message)}</span>`;
   }
 }
 
 function renderAnswer(a) {
   state.evidence = new Map(a.evidence.map((e) => [e.id, e]));
-  const statusWord = {success: "succeeded", failed: "failed", pending: "is pending", dropped: "was dropped",
-                      unknown: "has an outcome that is not known yet"}[a.status] || a.status;
+  const statusWord = {success: "The transaction succeeded", failed: "The transaction failed",
+                      pending: "The transaction is pending", dropped: "The transaction was dropped",
+                      unknown: "The outcome is not known yet"}[a.status] || `Status: ${a.status}`;
   const basis = {node_and_explorer_agree: "the node and the explorer agree", node_only: "from the node",
                  explorer_only: "from the explorer only", node_and_explorer_disagree: "the node and the explorer DISAGREE",
                  outcome_unknown: "no source gave the outcome (see missing data)"};
-  $("statusLine").innerHTML = `<p class="status">The transaction ${esc(statusWord)}.</p>` +
-    `<p class="muted wrap">${esc(a.tx_hash)} · status ${esc(basis[a.confidence.status_basis] || a.confidence.status || "")}</p>`;
+  $("statusLine").innerHTML = `<div class="banner ${esc(a.status)}"><span class="status">${esc(statusWord)}</span>` +
+    `<span class="meta wrap">${esc(a.tx_hash)} · status ${esc(basis[a.confidence.status_basis] || a.confidence.status || "")}${explorerLink(a)}</span></div>`;
   if (a.summary) {
     $("answer").innerHTML = markdown(a.summary);
   } else {
     const why = {skipped: "No written answer was asked for: the facts are on the right.",
-                 unavailable: `No model could write the answer${a.writer_error ? " (" + a.writer_error + ")" : ""}: the facts are on the right.`,
+                 unavailable: `No model could write the answer${a.writer_error ? " (" + a.writer_error + ")" : ""}: the facts are on the right. Choose a model in Settings.`,
                  withheld: "The written answer was withheld: twice it stated things not in the evidence. The facts are on the right.",
                  no_evidence: "Nothing could be collected about this transaction."}[a.summary_status] || "";
     $("answer").innerHTML = `<p class="muted">${esc(why)}</p>`;
@@ -282,7 +382,7 @@ function renderAnswer(a) {
   $("answerFeedback").innerHTML = feedbackHtml(a.run_id);
   $("diagnosis").innerHTML = a.diagnosis.length ? "<h3>Conclusions</h3>" + a.diagnosis.map((d) =>
     `<div class="card">${badge(d.label)}${inline(String(d.text).replace(/^(CONFIRMED|LIKELY|UNKNOWN): /, "").split(" Next step for")[0])}` +
-    ` <span class="muted">${d.facts.map((f) => `<a class="cite" href="#fact-${esc(f)}" data-fact="${esc(f)}">[${esc(f)}]</a>`).join("")}</span></div>`).join("") : "";
+    ` <span class="muted">${d.facts.map((f) => `<a class="cite" href="#fact-${esc(f)}" data-fact="${esc(f)}">${esc(f)}</a>`).join("")}</span></div>`).join("") : "";
   $("steps").innerHTML = a.next_steps.length ? `<h3>Next steps (${a.mode === "support" ? "for a non-technical reader" : "for a developer"})</h3><ol>` +
     a.next_steps.map((s) => `<li>${inline(s)}</li>`).join("") + "</ol>" : "";
   $("security").innerHTML = a.security_notes.length ? "<h3>Security notes</h3>" + a.security_notes.map((n) =>
@@ -307,14 +407,32 @@ $("askForm").addEventListener("submit", (event) => {
            ...(question ? {question} : {})});
 });
 
+// Waiting: what is being done, and for how long (collecting takes a few seconds, writing a few more).
+let ticker = null;
+function waiting(on) {
+  clearInterval(ticker);
+  $("loading").classList.toggle("hidden", !on);
+  if (!on) return;
+  const started = Date.now();
+  const tick = () => {
+    const s = Math.round((Date.now() - started) / 1000);
+    $("loadingText").textContent = s < 4 ? "Reading the explorer and the node…"
+      : s < 9 ? "Diagnosing and reading the contract's code…" : "Writing the answer and checking it against the facts…";
+    $("loadingTime").textContent = `${s} s`;
+  };
+  tick();
+  ticker = setInterval(tick, 1000);
+}
+
 async function explain(request) {
   const hash = request.hash, mode = request.mode;
   const generation = ++state.generation;  // a reply to an older request is dropped
   $("askButton").disabled = true;
   $("chatButton").disabled = true;
-  $("askButton").textContent = "Collecting…";
   $("failure").classList.add("hidden");
   $("clarify").classList.add("hidden");
+  $("result").classList.add("hidden");
+  waiting(true);
   try {
     const a = await api("/explain", request);
     if (generation !== state.generation) return;
@@ -323,18 +441,25 @@ async function explain(request) {
     $("chatLog").innerHTML = "";
     renderAnswer(a);
     $("result").classList.remove("hidden");
+    $("result").scrollIntoView({behavior: "smooth", block: "start"});
   } catch (err) {
     $("failureText").textContent = err.message;
     $("failure").classList.remove("hidden");
-    $("failure").scrollIntoView({behavior: "smooth", block: "center"});
   } finally {
+    if (generation === state.generation) waiting(false);
     $("chatButton").disabled = false;
     $("askButton").disabled = false;
-    $("askButton").textContent = "Explain";
   }
 }
 
-// Triage (PHASE4 R1): the API may answer with one clarifying question; the reader's answer goes back with the
+// Who the answer is for: three buttons over the select the request reads.
+function setMode(mode) {
+  $("mode").value = mode;
+  document.querySelectorAll("#modeButtons button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+}
+document.querySelectorAll("#modeButtons button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+// Triage (D55): the API may answer with one clarifying question; the reader's answer goes back with the
 // same request, and no second question is asked.
 function showClarify(c, request) {
   $("clarifyQuestion").textContent = c.question;
@@ -366,6 +491,93 @@ $("clarifyForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const typed = $("clarifyText").value.trim();
   if (typed && state.pendingClarify) answerClarify(state.pendingClarify.c, state.pendingClarify.request, typed);
+});
+
+// The network (D64): the server keeps one app per network config and answers from the chosen one.
+function showExamples(examples) {
+  const box = $("examples");
+  box.replaceChildren();
+  if (!examples.length) return;
+  const label = document.createElement("span");
+  label.className = "muted";
+  label.textContent = "Try a real transaction:";
+  box.appendChild(label);
+  for (const ex of examples) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = ex.label;
+    b.title = ex.hash;
+    b.addEventListener("click", () => { $("hash").value = ex.hash; $("askForm").requestSubmit(); });
+    box.appendChild(b);
+  }
+}
+
+async function loadNetworks() {
+  try {
+    const n = await api("/settings/network");
+    const select = $("networkSelect");
+    select.replaceChildren();
+    for (const net of n.networks) {
+      const o = document.createElement("option");
+      o.value = net.name;
+      o.textContent = `${net.name} (chain ${net.chain_id})`;
+      o.selected = net.active;
+      select.appendChild(o);
+    }
+    const active = n.networks.find((x) => x.active);
+    $("networkInfo").textContent = active ? `Active: ${active.name}, chain ${active.chain_id}, explorer ${active.explorer}.` : "";
+    showExamples(n.examples || []);
+  } catch (err) { $("networkInfo").textContent = err.message; }
+}
+
+$("networkSelect").addEventListener("change", async () => {
+  const name = $("networkSelect").value;
+  try {
+    await api("/settings/network", {name});
+    ++state.generation;  // an answer still on its way belongs to the old network
+    state.hash = null; state.runId = null; state.sessionId = null;
+    ["result", "clarify", "failure"].forEach((id) => $(id).classList.add("hidden"));
+    waiting(false);
+    $("hash").value = "";
+    $("network").textContent = "checking the network…";
+    await loadNetworks();
+    loadNetwork();
+  } catch (err) {
+    $("failureText").textContent = `Could not switch the network: ${err.message}`;
+    $("failure").classList.remove("hidden");
+    loadNetworks();
+  }
+});
+
+// Settings drawer
+function openSettings(open) {
+  $("settings").classList.toggle("hidden", !open);
+  $("scrim").classList.toggle("hidden", !open);
+  if (open) { loadLlmSettings(); loadAnswers(); loadNetworks(); }
+}
+$("settingsToggle").addEventListener("click", () => openSettings(true));
+$("settingsClose").addEventListener("click", () => openSettings(false));
+$("scrim").addEventListener("click", () => openSettings(false));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") openSettings(false); });
+
+async function loadAnswers() {
+  try {
+    const a = await api("/settings/answers");
+    const select = $("answerLanguage");
+    select.replaceChildren();
+    for (const lang of a.languages) {
+      const o = document.createElement("option");
+      o.value = lang; o.textContent = {"pt-BR": "Português (Brasil)", "en": "English", "es": "Español"}[lang] || lang;
+      o.selected = lang === a.language;
+      select.appendChild(o);
+    }
+  } catch (err) { $("answersState").textContent = err.message; }
+}
+$("answerLanguage").addEventListener("change", async () => {
+  try {
+    const r = await api("/settings/answers", {language: $("answerLanguage").value});
+    $("answersState").textContent = `Saved: the next answers are written in ${r.language}.`;
+  } catch (err) { $("answersState").textContent = `Not saved: ${err.message}`; }
 });
 
 // The model and its key (D61): the key goes to the API once and is never read back.
@@ -414,22 +626,19 @@ async function loadModels() {
   syncLlmForm();
 }
 
+async function loadLlmSettings() {
+  try {
+    const s = await api("/settings/llm");
+    showLlm(s);
+    if (s.provider && s.provider !== "claude_code" && s.keys[s.provider]) loadModels();  // a key is saved: list
+  } catch (err) { $("llmState").textContent = err.message; }
+}
+
 $("llmLoad").addEventListener("click", loadModels);
 $("llmModel").addEventListener("change", syncLlmForm);
 $("llmProvider").addEventListener("change", () => {
   $("llmModel").replaceChildren(Object.assign(document.createElement("option"), {value: "", textContent: "load the models first"}));
   syncLlmForm();
-});
-
-$("llmToggle").addEventListener("click", async () => {
-  $("llmPanel").classList.toggle("hidden");
-  if (!$("llmPanel").classList.contains("hidden")) {
-    try {
-      const s = await api("/settings/llm");
-      showLlm(s);
-      if (s.provider && s.provider !== "claude_code" && s.keys[s.provider]) loadModels();  // a key is saved: list
-    } catch (err) { $("llmState").textContent = err.message; }
-  }
 });
 
 $("llmForm").addEventListener("submit", async (event) => {
@@ -518,6 +727,7 @@ document.addEventListener("click", async (event) => {
 });
 
 loadNetwork();
+loadNetworks();
 </script>
 </body>
 </html>

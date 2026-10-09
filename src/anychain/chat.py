@@ -287,7 +287,8 @@ class ChatSession:
 
     def _system(self) -> str:
         from anychain.writer import PROMPTS_DIR
-        return (load_prompt(self.mode, self.cfg.assistant.language) + "\n\n"
+        from anychain.llm_settings import language
+        return (load_prompt(self.mode, language(self.cfg.assistant.language)) + "\n\n"
                 + (PROMPTS_DIR / "chat.md").read_text().replace("{MAX_TOOLS}", str(MAX_TOOLS)))
 
     def _user(self, question: str, turn: Turn, feedback: list[str] | None, nagged: bool = False) -> str:
