@@ -24,9 +24,9 @@ def build(bundle: EvidenceBundle, mode: str) -> list[tuple[str, str, list[str]]]
     failed = bundle.status == "failed"
     out = []
     if mode == "support":
-        out.append(("What happened", "did it work or fail; for a failure, each conclusion with its label (CONFIRMED, "
-                    "LIKELY or UNKNOWN), in plain words but keeping its specifics: the amounts, the names (tokens, "
-                    "contracts) and the words of the reason", overview + diagnosis))
+        out.append(("What happened", "did it work or fail, and why, in plain words; for a failure, each conclusion with "
+                    "its label in the answer's language; then, in parentheses, its specifics for support: the "
+                    "reason's original words, a figure or a name the conclusion gives", overview + diagnosis))
         if triage:
             out.append(("What you told us", "what the reader said and what the facts show about it", triage))
         out.append(("Did the money move?", "yes or no, how much and from whom to whom" if moves else

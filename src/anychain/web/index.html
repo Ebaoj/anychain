@@ -485,18 +485,27 @@ function glanceHtml(a) {  // the answer at a glance: did it work, how much moved
   const ev = a.evidence || [];
   const overview = ev.find((e) => e.kind === "overview");
   const fee = ev.find((e) => e.kind === "fee");
-  const when = overview && String(overview.text).match(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  const when = overview && String(overview.text).match(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}):\d{2}/);
+  const plain = state.mode === "support";  // a merchant: rounded fee, local date, no hash (the proof keeps them)
   const moved = a.transfers && a.transfers.length ? String(a.transfers[0].text).replace(/^Token transfer: /, "").split(" from ")[0] : null;
-  const feeText = fee ? String(fee.text).replace(/^Fee paid: /, "").split(". ")[0].replace(/\.$/, "") : null;
+  let feeText = fee ? String(fee.text).replace(/^Fee paid: /, "").split(". ")[0].replace(/\.$/, "") : null;
+  const feeParts = feeText && feeText.match(/^([0-9.]+) (\S+)$/);
+  if (plain && feeParts) feeText = `≈ ${Number(feeParts[1]).toLocaleString(lang, {maximumSignificantDigits: 2})} ${feeParts[2]}`;
+  let whenText = when ? `${when[1]} ${when[2]} UTC` : null;
+  if (plain && when) {
+    const d = new Date(`${when[1]}T${when[2]}:00Z`);
+    if (!isNaN(d)) whenText = d.toLocaleString(lang, {dateStyle: "medium", timeStyle: "short"});
+  }
   const kv = (k, v) => `<span class="kv"><span class="k">${esc(k)}</span>${esc(v)}</span>`;
   const page = overview && (overview.sources || []).find((s) => s.kind === "explorer_ui");
   const url = page && safeUrl(page.url);
   return `<div class="glance ${esc(a.status)}"><div>` +
     `<p class="head">${esc(head)}</p>` + (a.diagnosis.length ? badge(a.diagnosis[0].label) : "") +
     `<div class="facts-row">${moved ? kv(t("kvMoved"), moved) : (a.status === "success" ? "" : kv(t("kvMoved"), t("kvNothing")))}` +
-    `${feeText ? kv(t("kvFee"), feeText) : ""}${when ? kv(t("kvWhen"), `${when[1]} ${when[2]} UTC`) : ""}</div>` +
-    `<div class="meta">${esc(a.tx_hash)}${a.confidence.status_basis ? " · " + esc(t("basis_" + a.confidence.status_basis)) : ""}` +
-    `${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t("openExplorer"))}</a>` : ""}</div>` +
+    `${feeText ? kv(t("kvFee"), feeText) : ""}${whenText ? kv(t("kvWhen"), whenText) : ""}</div>` +
+    (plain ? (url ? `<div class="meta"><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t("openExplorer"))}</a></div>` : "")
+      : `<div class="meta">${esc(a.tx_hash)}${a.confidence.status_basis ? " · " + esc(t("basis_" + a.confidence.status_basis)) : ""}` +
+        `${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t("openExplorer"))}</a>` : ""}</div>`) +
     `</div></div>`;
 }
 function messageHtml(a) {  // the assistant's message for one explained transaction
