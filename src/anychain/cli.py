@@ -385,6 +385,12 @@ def run_eval(
 LOCAL_HOSTS = ("127.0.0.1", "localhost", "::1")
 
 
+def in_container() -> bool:
+    """Running inside a Docker container (Docker creates /.dockerenv in every container)."""
+    from pathlib import Path
+    return Path("/.dockerenv").exists()
+
+
 @app.command()
 def serve(
     config: str = typer.Option(None, "--config", help="Path to network YAML (or set ANYCHAIN_CONFIG)"),
@@ -396,8 +402,10 @@ def serve(
     import uvicorn
 
     from anychain.api import create_app
-    if host not in LOCAL_HOSTS:
-        _fail(f"The API has no authentication, so it only listens on this machine: use 127.0.0.1, not {host}.")
+    container = host == "0.0.0.0" and in_container()  # 127.0.0.1 inside a container is unreachable from its host
+    if host not in LOCAL_HOSTS and not container:
+        _fail(f"The API has no authentication, so it only listens on this machine: use 127.0.0.1, not {host}"
+              " (0.0.0.0 is allowed only inside a container).")
     try:
         cfg = load_config(config)
     except ConfigError as exc:
@@ -418,6 +426,9 @@ def serve(
                       finality=lambda: finality_rpc_for(cfg), record=_record)
     shown = f"[{host}]" if ":" in host else host
     print(f"AnyChain API for {cfg.network.name} on http://{shown}:{port} (Ctrl+C to stop)")
+    if container:
+        print(f"Inside a container: publish the port on the host's 127.0.0.1 only "
+              f"(docker run -p 127.0.0.1:{port}:{port} ...), as the API has no authentication.")
     uvicorn.run(app_, host=host, port=port, log_level="warning")
 
 

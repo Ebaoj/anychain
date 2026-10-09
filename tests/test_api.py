@@ -230,3 +230,20 @@ def test_the_page_is_read_as_utf8_and_its_policy_hashes_the_inline_code():
         digest = base64.b64encode(hashlib.sha256(code.encode()).digest()).decode()
         assert f"'sha256-{digest}'" in PAGE_POLICY
     assert "unsafe-inline" not in PAGE_POLICY and "style=" not in page  # no inline attribute styles left
+
+
+def test_serve_listens_on_every_interface_only_inside_a_container(monkeypatch):
+    # PHASE4 T4 (D58): inside a container 127.0.0.1 is unreachable from the host, so 0.0.0.0 is allowed there,
+    # and the host publishes the port on its own 127.0.0.1 only (docker run -p 127.0.0.1:8000:8000)
+    started = []
+    monkeypatch.setattr("uvicorn.run", lambda app, host, port, **kw: started.append((host, port)))
+    monkeypatch.setattr(cli, "in_container", lambda: True)
+    import socket
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        free = s.getsockname()[1]
+    ok = CliRunner().invoke(cli.app, ["serve", "--config", ETH, "--host", "0.0.0.0", "--port", str(free)])
+    assert ok.exit_code == 0 and started == [("0.0.0.0", free)]
+    assert "127.0.0.1" in ok.output  # says how to publish it
+    monkeypatch.setattr(cli, "in_container", lambda: False)
+    assert CliRunner().invoke(cli.app, ["serve", "--config", ETH, "--host", "0.0.0.0"]).exit_code != 0
