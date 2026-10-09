@@ -1,27 +1,27 @@
 {
- "date": "2026-10-08 21:23",
- "commit": "3827d6c",
+ "date": "2026-10-08 22:49",
+ "commit": "a4a8dc1",
  "model": "claude-sonnet-5-5",
  "summary": {
-  "cases": 10,
+  "cases": 11,
   "status_accuracy": 100.0,
   "diagnosis_accuracy": 100.0,
   "abi_source_accuracy": 100.0,
   "degradation_declared": 100.0,
-  "written": 10,
-  "citation_coverage": 77.2,
-  "hallucination_rate": 10.0,
+  "written": 11,
+  "citation_coverage": 81.2,
+  "hallucination_rate": 9.1,
   "hallucinated_items": 1,
   "withheld": 0,
   "entities_found": 100.0,
-  "seconds_per_case": 11.7,
+  "seconds_per_case": 8.8,
   "tokens": {
-   "input_tokens": 22,
-   "output_tokens": 10301,
-   "cache_read_tokens": 14490,
-   "cache_write_tokens": 43804
+   "input_tokens": 24,
+   "output_tokens": 11110,
+   "cache_read_tokens": 17408,
+   "cache_write_tokens": 45229
   },
-  "cost_usd": 0.2812
+  "cost_usd": 0.2955
  },
  "cases": [
   {
@@ -42,21 +42,21 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 13,
-   "cited": 11,
+   "sentences": 12,
+   "cited": 12,
    "entities_found": [
     true,
     true
    ],
-   "seconds": 28.8,
+   "seconds": 6.4,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 578,
+    "output_tokens": 641,
     "cache_read_tokens": 1434,
-    "cache_write_tokens": 2269,
-    "cost_usd": 0.0151468
+    "cache_write_tokens": 2267,
+    "cost_usd": 0.0157688
    },
-   "answer": "**O que aconteceu:** a transação deu certo e o dinheiro foi movido. Foram enviados 69,3484 USDC do endereço 0xCA62…17c4 para o endereço 0x74AA…6828 [E5]. A rede (nó) confirmou de forma independente que o status foi de sucesso [E7].\n\n**Como foi feito:** a transação chamou a função de transferência do contrato do USDC, passando o destinatário e o valor [E3]. Pelo código mostrado, essa função só executa a transferência se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver numa lista de bloqueio. Depois disso, ela faz a transferência [E4]. Esse código é da versão que o explorador lista hoje, e o contrato pode ter sido atualizado desde a transação [E4]. Nenhum ETH foi enviado junto, só o USDC [E1].\n\n**Taxa cobrada:** 0,00008537619972948 ETH, pagos pela rede para processar a operação [E2]. Foram usados 40360 de um limite de 45758 de gás, ou seja, a taxa ficou dentro do limite previsto [E1][E8].\n\n**O que fazer agora:** não há nada a corrigir, pois a transação foi concluída [E7]. Se o pagamento era esperado, confira se o destinatário 0x74AA…6828 é o endereço certo e se o valor de 69,3484 USDC está correto [E5]. Você pode consultar os detalhes na página do explorador: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 [E1].",
+   "answer": "## O que aconteceu\n\nA transação foi concluída com sucesso. [E1] A rede Ethereum confirmou esse resultado de forma independente. [E7]\n\n## O dinheiro se moveu?\n\nSim. Foram transferidos 69,3484 USDC da carteira 0xCA62C34d54b445283121905F19193416212117c4 para a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828. [E5] A transação chamou a função \"transfer\" do contrato do USDC, que é a função de enviar tokens. [E3]\n\nEm termos simples, o código mostrado dessa função faz o seguinte: ela só funciona se o contrato não estiver pausado, verifica se quem envia e quem recebe não estão em uma lista de bloqueio e, então, faz a transferência. [E4] Esse código vem do contrato listado hoje pelo explorador, que pode ter sido atualizado depois desta transação. [E4]\n\n## Taxa cobrada\n\nA taxa paga foi de 0,00008537619972948 ETH. [E2] Nenhum ETH foi enviado como valor da transação, ou seja, a taxa foi o único custo em ETH. [E1] Foram usados 40360 de um limite de 45758 de gás. [E1]\n\n## O que fazer\n\n- Não há nada a corrigir: a transferência foi concluída com sucesso. [E7]\n- Se você esperava receber esse pagamento, confira se a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 é a sua e se o valor de 69,3484 USDC corresponde ao pedido. [E5]\n- Você pode consultar os detalhes na página da transação no explorador: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 [E1]",
    "error": null
   },
   {
@@ -77,21 +77,21 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 29,
+   "sentences": 30,
    "cited": 27,
    "entities_found": [
     true,
     true
    ],
-   "seconds": 11.0,
+   "seconds": 11.5,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 1595,
-    "cache_read_tokens": 0,
-    "cache_write_tokens": 5593,
-    "cost_usd": 0.038326
+    "output_tokens": 1746,
+    "cache_read_tokens": 1484,
+    "cache_write_tokens": 4110,
+    "cost_usd": 0.0342008
    },
-   "answer": "# Resumo\n\nA transação foi bem-sucedida no bloco 26141518 [E1]. O RPC confirma o status de sucesso, de forma independente do explorer [E15]. Foi um swap de 0.2 ETH por BUNKER via UniswapV2Router02 [E1][E3].\n\n# Chamada decodificada\n\n- Função: `swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)` em 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) [E3].\n- Argumentos: `amountOutMin=0`, `path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa]`, `to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b`, `deadline=1791388271` [E3].\n- Fonte da ABI: contrato verificado UniswapV2Router02 no explorer [E3].\n- Remetente: 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b; valor nativo enviado: 0.2 ETH [E1].\n\n# O que a função faz (código mostrado)\n\n- Usa o modificador `ensure(deadline)` (apenas citado, seu comportamento não está no código fornecido) [E4].\n- Exige que `path[0] == WETH`, senão reverte com `'UniswapV2Router: INVALID_PATH'` [E4].\n- Deposita `msg.value` em WETH com `IWETH(WETH).deposit` [E4].\n- Transfere o WETH para o par calculado por `UniswapV2Library.pairFor(factory, path[0], path[1])`, dentro de um `assert` [E4].\n- Lê o `balanceOf(to)` do token final, chama `_swapSupportingFeeOnTransferTokens(path, to)` e exige que o saldo recebido seja `>= amountOutMin`, senão reverte com `'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'` [E4].\n- Aqui `amountOutMin=0`, então a checagem de saída mínima não impôs nenhum limite [E3][E4].\n\n# Transferências de token\n\n- 0.2 WETH de 0x0000000000000000000000000000000000000000 para o Router (0x7a25…488D) [E5].\n- 0.2 WETH do Router para o par Uniswap V2 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 [E6].\n- 12118418.517751063 BUNKER do par 0x8df7…19c3 para 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b [E7].\n\n# Chamadas internas\n\n- Transferência de 0.2 ETH do Router para 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) [E8].\n- Chamada do Router para o WETH9 [E9].\n- Chamada do Router para o par 0x8df7…19c3 [E10].\n- Chamada do par para 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa (Bunker Mode) [E11].\n- Há 7 chamadas staticcall somente leitura, não listadas [E12].\n\n# Eventos\n\n- `Sync(uint112,uint112)` no par 0x8df7…19c3: `reserve0=8492451845051793135`, `reserve1=503968916733373231` [E13].\n- `Swap(...)` no mesmo par: `sender=0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D`, `amount0In=200000000000000000`, `amount1In=0`, `amount0Out=0`, `amount1Out=12118418517751063`, `to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b` [E14].\n\n# Gás e taxa\n\n- Gás usado: 131767 de um limite de 300000 [E1].\n- Taxa paga: 0.000294808567110131 ETH [E2].\n- A nota heurística de gás diz que o limite foi mais que o dobro do gás usado (43,9%) [E16].\n\n# Notas de segurança e lacunas\n\n- Não há evidência de notas de segurança. Nenhum padrão listado foi encontrado no código mostrado da função chamada, o que não significa que seja segura.\n- Não há lacunas declaradas na evidência [E1].",
+   "answer": "# Resumo\n\nA transação foi bem-sucedida no bloco 26141518 [E1]. O receipt via RPC confirma o status success, igual ao do explorer [E15]. Foi um swap de 0.2 ETH por BUNKER pelo UniswapV2Router02 [E1][E3].\n\n# Chamada decodificada\n\n- Função: `swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)` em 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D (UniswapV2Router02) [E3].\n- Argumentos: `amountOutMin=0`, `path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa]`, `to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b`, `deadline=1791388271` [E3].\n- Fonte do ABI: contrato verificado UniswapV2Router02 no explorer [E3].\n- Remetente: 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b, com valor nativo de 0.2 ETH [E1].\n\n# O que a função faz (linhas 356-378)\n\n- Exige `ensure(deadline)` como modificador (o código mostra apenas o nome) [E4].\n- Exige que `path[0] == WETH`, senão reverte com `'UniswapV2Router: INVALID_PATH'` (linha 368) [E4].\n- Usa `msg.value` como `amountIn` e chama `IWETH(WETH).deposit{value: amountIn}()` [E4].\n- Transfere o WETH para o endereço retornado por `UniswapV2Library.pairFor(factory, path[0], path[1])` e usa `assert` sobre o resultado [E4].\n- Lê o saldo do token de saída em `to`, chama `_swapSupportingFeeOnTransferTokens(path, to)` e exige que o aumento de saldo seja `>= amountOutMin`, senão `'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'` [E4].\n- Aqui `amountOutMin=0`, então a checagem de saída mínima aceita qualquer quantidade [E3][E4].\n\n# Transferências de token\n\n- 0.2 WETH de 0x0000000000000000000000000000000000000000 para o Router (0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) [E5].\n- 0.2 WETH do Router para o par Uniswap V2 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 [E6].\n- 12118418.517751063 BUNKER do par 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 para 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b [E7].\n\n# Chamadas internas\n\n- Transferência interna de 0.2 ETH do Router para WETH9 (0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2) [E8].\n- Chamada do Router para WETH9 [E9].\n- Chamada do Router para o par 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 [E10].\n- Chamada do par para Bunker Mode (0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa) [E11].\n- Outras 7 chamadas staticcall, somente leitura, não foram listadas [E12].\n\n# Eventos\n\n- `Sync(uint112,uint112)` no par: `reserve0=8492451845051793135`, `reserve1=503968916733373231` [E13].\n- `Swap(...)` no par: `sender=0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D`, `amount0In=200000000000000000`, `amount1In=0`, `amount0Out=0`, `amount1Out=12118418517751063`, `to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b` [E14].\n\n# Gás e taxa\n\n- Gás usado: 131767 de um limite de 300000 [E1].\n- Taxa paga: 0.000294808567110131 ETH [E2].\n- A nota de gás (heurística, não um achado) indica que o limite foi mais que o dobro do gás usado (43,9%) [E16].\n\n# Notas de segurança e lacunas\n\n- Não há evidência de notas de segurança, então nada é afirmado sobre segurança. Não foi listado nenhum padrão, o que não significa que o código seja seguro.\n- Não há lacunas informadas na evidência [E1].\n\nLink do explorer: https://eth.blockscout.com/tx/0x08b39d3ae20b5c09294209ad4c0bf8e6d14bf660f81ffa6696c455911aa46c6a",
    "error": null
   },
   {
@@ -112,21 +112,21 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 22,
-   "cited": 17,
+   "sentences": 23,
+   "cited": 22,
    "entities_found": [
     true,
     true
    ],
-   "seconds": 9.1,
+   "seconds": 8.7,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 1284,
+    "output_tokens": 1204,
     "cache_read_tokens": 1484,
-    "cache_write_tokens": 3711,
-    "cost_usd": 0.0279848
+    "cache_write_tokens": 3709,
+    "cost_usd": 0.0271768
    },
-   "answer": "## Resumo\n\nA transação **falhou** (revert) no bloco 26149091, em 2026-10-08T17:11:47Z. Foi enviada de 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0 para o UniswapV2Router02 (0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) [E1]. O RPC confirma o status de falha [E8]. O motivo informado pelo explorer é `Error(string)` com `'UniswapV2Router: EXPIRED'` [E3].\n\n## Chamada decodificada\n\n- Função: `swapExactETHForTokens(uint256,address[],address,uint256)` [E4].\n- `amountOutMin` = 0 [E4].\n- `path` = [0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48] [E4].\n- `to` = 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0 [E4].\n- `deadline` = 2400 [E4].\n- Fonte do ABI: explorer, contrato verificado UniswapV2Router02 [E4].\n- Valor nativo anexado: 0.045 ETH, não transferido por causa do revert [E1].\n\nTransferências de tokens, chamadas internas e eventos: não há nenhum na evidência fornecida.\n\n## O que a função faz\n\nSegundo o código mostrado (`contracts/UniswapV2Router02.sol`, linhas 252-266) [E5]:\n- Ela é `payable` e usa o modificador `ensure(deadline)` (apenas nomeado no código, sem corpo exibido) [E5].\n- Exige `path[0] == WETH`, senão `'UniswapV2Router: INVALID_PATH'` (linha 260) [E5].\n- Calcula `amounts` com `UniswapV2Library.getAmountsOut(factory, msg.value, path)` (linha 261) [E5].\n- Exige que a última saída seja `>= amountOutMin`, senão `'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'` (linha 262) [E5].\n- Chama `IWETH(WETH).deposit`, transfere o WETH para o par e executa `_swap(amounts, path, to)` (linhas 263-265) [E5].\n\n## Causa\n\n- **CONFIRMED:** o `deadline` da chamada é 2400 (1970-01-01T00:40:00Z), enquanto o tempo do bloco é 1791479507 (2026-10-08T17:11:47Z). O prazo já havia expirado quando a transação foi incluída [E6].\n- A razão `'UniswapV2Router: EXPIRED'` está escrita em `contracts/UniswapV2Router02.sol`, linha 19, e é o mais provável de ter sido levantada ali [E7].\n\n## Próximos passos (desenvolvedor)\n\n- Verifique o preço atual e reenvie com um novo `deadline`, além de uma taxa alta o bastante para inclusão a tempo [E6].\n- Contexto: a mesma chamada foi bem-sucedida 48 segundos depois (nonce 53), usando 119837 de gás [E10][E11].\n\n## Gás e taxa\n\n- Gás usado: 25320 de um limite de 300000 (8.4%) [E1][E11].\n- Taxa paga: 0.00011683874115936 ETH, cobrada mesmo com a falha [E2].\n\n## Notas de segurança\n\nNão há evidência do tipo `security_note`. Não foi listado nenhum padrão no código mostrado da função chamada, o que não significa que seja seguro.",
+   "answer": "## Resumo\n\nA transação falhou (revert) no bloco 26149091 [E1]. A causa é **CONFIRMED**: o prazo (`deadline`) já tinha expirado quando a transação foi incluída [E6]. O RPC confirma de forma independente o status \"failed\" [E8].\n\n## Chamada decodificada\n\n- De `0x79D6C25dE86bC4A858d7e383A474667aB109FeD0` para `0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D` (UniswapV2Router02) [E1].\n- Função: `swapExactETHForTokens(uint256,address[],address,uint256)` [E4].\n- Argumentos: `amountOutMin=0`, `path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48]`, `to=0x79D6C25dE86bC4A858d7e383A474667aB109FeD0`, `deadline=2400` [E4].\n- Fonte do ABI: explorer, contrato verificado UniswapV2Router02 [E4].\n- Valor nativo anexado: 0.045 ETH, não transferido porque houve revert [E1].\n\n## Motivo do revert\n\n- O explorer informa `Error(string reason)` com `reason='UniswapV2Router: EXPIRED'` [E3].\n- O `deadline` é 2400 (1970-01-01T00:40:00Z) e o horário do bloco é 1791479507 (2026-10-08T17:11:47Z), então o prazo já havia passado [E6].\n- A mensagem está escrita no código-fonte verificado, `contracts/UniswapV2Router02.sol`, linha 19 [E7].\n\n## O que a função faz (linhas 252-266)\n\n- O modificador `ensure(deadline)` aparece na assinatura (linha 257); o código mostrado não detalha o que ele faz [E5].\n- Exige `path[0] == WETH`, senão `'UniswapV2Router: INVALID_PATH'` (linha 260) [E5].\n- Calcula `amounts` com `UniswapV2Library.getAmountsOut(factory, msg.value, path)` (linha 261) [E5].\n- Exige que o último valor de `amounts` seja `>= amountOutMin`, senão `'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'` (linha 262) [E5].\n- Chama `IWETH(WETH).deposit`, transfere o WETH para o par e executa `_swap(amounts, path, to)` (linhas 263-265) [E5].\n\n## Transferências, chamadas internas e eventos\n\nO evidence não lista transferências de token, chamadas internas nem eventos para esta transação [E1].\n\n## Custo\n\n- Gás usado: 25320 de um limite de 300000 [E1].\n- Taxa paga: 0.00011683874115936 ETH, cobrada mesmo com a falha [E2].\n\n## Contexto\n\n- A mesma chamada teve sucesso 48 segundos depois (nonce 53), usando 119837 de gás [E10][E11].\n- Esta transação é o nonce 52 do remetente [E9].\n\n## Próximo passo (desenvolvedor)\n\n- Verifique o preço atual e reenvie com um novo `deadline`, com taxa suficiente para inclusão a tempo [E6].\n\n## Notas de segurança\n\nNão há evidência de notas de segurança para este código.",
    "error": null
   },
   {
@@ -147,21 +147,21 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 17,
-   "cited": 13,
+   "sentences": 20,
+   "cited": 14,
    "entities_found": [
     true,
     true
    ],
-   "seconds": 7.1,
+   "seconds": 7.7,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 644,
+    "output_tokens": 732,
     "cache_read_tokens": 1434,
-    "cache_write_tokens": 4869,
-    "cost_usd": 0.026206800000000002
+    "cache_write_tokens": 4867,
+    "cost_usd": 0.0270788
    },
-   "answer": "**O que aconteceu:** a transação falhou. Ela tentava trocar um token por ETH usando o Uniswap V2 (UniswapV2Router02) [E1][E4]. A rede também confirma que a transação falhou [E14].\n\n**O dinheiro se moveu?** A troca não foi concluída. O valor em ETH anexado era 0, e nada foi transferido porque a transação foi revertida [E1].\n\n**Quanto foi cobrado:** a taxa foi de 0.000256612236995224 ETH. Ela é cobrada mesmo quando a transação falha [E2].\n\n**Por que falhou:**\n- O explorador mostra a mensagem \"TransferHelper: TRANSFER_FROM_FAILED\", que indica que a transferência do token para a troca não deu certo [E3].\n- LIKELY (provável, não é certo): a causa foi falta de gas, que é o limite de trabalho permitido para a operação. Uma chamada interna ao contrato WETH9 falhou com \"out of gas\" [E10]. A transação usou 168382 do limite de 172298 [E12].\n- O gas usado ficou em 97,7% do limite [E17]. Uma tentativa igual, feita depois, usou 129233 de gas e deu certo [E17].\n\n**O que fazer:**\n- Uma nova tentativa da mesma operação funcionou 24 segundos depois (nonce 424) [E16]. Veja se ela já cobriu o que você queria fazer, para não repetir a troca à toa [E15].\n- Se precisar tentar de novo, deixe o aplicativo definir o limite de gas por conta própria [E12].\n- Se o problema continuar, fale com o suporte do aplicativo e envie o link desta transação: https://eth.blockscout.com/tx/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832 [E12].",
+   "answer": "**O que aconteceu:** a transação falhou. Era uma troca (swap) de um token por ETH na Uniswap, e ela foi revertida no bloco 26149987 [E1]. A rede confirmou de forma independente que o status é \"falhou\" [E14].\n\n**O dinheiro se moveu?** Não. A troca foi desfeita, então nem os tokens nem o ETH mudaram de mãos por causa dela. O valor de ETH anexado era 0 [E1]. O explorador mostra a mensagem \"TransferHelper: TRANSFER_FROM_FAILED\", que indica que a transferência dos tokens para a troca não foi concluída [E3].\n\n**Quanto foi cobrado:** a taxa foi de 0,000256612236995224 ETH. Ela é cobrada mesmo quando a transação falha [E2].\n\n**Causa provável (LIKELY):** o gás acabou. O gás é o limite de trabalho que a transação pode fazer. Uma chamada interna ao WETH9 falhou por \"out of gas\" [E10]. A transação usou 168382 de um limite de 172298 [E1]. A mensagem de erro no topo seria apenas consequência disso [E12]. Esta é uma hipótese, não uma certeza [E12].\n\n**Um indício a favor:** 24 segundos depois, a mesma operação foi repetida e deu certo, usando 129233 de gás, com o mesmo limite de 172298 [E15][E17]. Ou seja, a tentativa que falhou ficou muito perto do limite e a seguinte precisou de menos [E17].\n\n**O que fazer:**\n- Como a tentativa seguinte (nonce 424) deu certo, confira no seu histórico se a venda já foi concluída [E16].\n- Se precisar repetir, tente de novo pelo aplicativo e deixe que ele defina o limite de gás [E12].\n- Se o problema continuar, fale com o suporte do aplicativo e envie o link desta transação [E12]: https://eth.blockscout.com/tx/0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832 [E1]",
    "error": null
   },
   {
@@ -191,15 +191,15 @@
    "entities_found": [
     true
    ],
-   "seconds": 13.9,
+   "seconds": 14.4,
    "usage": {
     "input_tokens": 4,
-    "output_tokens": 1330,
+    "output_tokens": 1407,
     "cache_read_tokens": 2868,
-    "cache_write_tokens": 6102,
-    "cost_usd": 0.0382896
+    "cache_write_tokens": 6104,
+    "cost_usd": 0.039067599999999994
    },
-   "answer": "**O que aconteceu:** a transação falhou e o dinheiro não se moveu. [E1] Ela tentava fazer uma transferência (`transfer`) de 10000 unidades de um token no contrato TetherToken, para o endereço 0xd47a298C3A5d2F6d7B6EdB93c924eB979408E624. [E4] A transferência não foi concluída porque a transação reverteu. [E1]\n\n**Motivo:** o explorador informa que a falha foi \"out of gas\". [E3] Isso quer dizer que a transação usou todo o limite de trabalho permitido, 60000 de 60000, e ele não bastou. [E1] O nó da rede concorda com o status de falha. [E7] CONFIRMADO: ficou sem gas. [E6]\n\n**Taxa cobrada:** 0.00002899040274 ETH. A taxa é cobrada mesmo com a falha. [E2]\n\n**Repetição:** a mesma chamada falhou 4 vezes seguidas, nos nonces 9652, 9653, 9654 e 9655, sem outra transação do remetente no meio. [E9] Todas falharam por \"out of gas\". [E8] Ou seja, é provável que cada nova tentativa tenha gerado outra taxa. [E2]\n\n**O que fazer agora:**\n- Tente de novo pelo aplicativo e deixe que ele defina o limite de gas. [E6]\n- Se continuar falhando, fale com o suporte do aplicativo e envie o link desta transação: https://eth.blockscout.com/tx/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81 [E6]\n\n**Lacuna:** o remetente enviou mais de 150 transações depois desta, e as que vieram logo em seguida não aparecem. Para vê-las, abra a página do remetente no explorador. [E8]",
+   "answer": "**O que aconteceu:** a transação falhou e não foi concluída. [E1] O motivo informado é \"out of gas\", ou seja, o limite de trabalho (gas) definido para a operação era baixo demais. [E3]\n\n**O dinheiro se moveu?** Não. A transação tentava enviar 10000 unidades do token (TetherToken) para o endereço 0xd47a298C3A5d2F6d7B6EdB93c924eB979408E624, mas, como falhou, essa transferência não ocorreu. [E4] O valor em ETH anexado era 0 ETH. [E1]\n\n**Quanto foi cobrado:** a taxa foi de 0.00002899040274 ETH, e ela é cobrada mesmo com a falha. [E2]\n\n**Por que falhou:** a transação usou todo o limite de 60000 de gas e acabou sem gás. [E1] O nó da rede confirma que todo o gas da transação foi usado. [E6] A rede também confirma que o status é falha, igual ao que o explorador mostra. [E7]\n\n**Problema repetido:** a mesma chamada (transfer) falhou pelo menos 4 vezes seguidas, nos nonces 9652, 9653, 9654 e 9655, sem outra transação do remetente entre elas. [E9] Todas falharam com \"out of gas\". [E8] Isso indica que cada tentativa pode ter pago taxa sem resultado. Eu não consigo ver as transações enviadas depois desta, pois o histórico completo não foi mostrado. [E8]\n\n**O que fazer agora:**\n- Tente de novo pelo aplicativo e deixe que ele defina o limite de gas automaticamente. [E6]\n- Se continuar falhando, entre em contato com o suporte do aplicativo e envie o link desta transação: https://eth.blockscout.com/tx/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81 [E6]\n- Para ver o que ocorreu depois desta transação, abra a página do remetente no explorador. [E8]",
    "error": null
   },
   {
@@ -223,20 +223,20 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 34,
-   "cited": 20,
+   "sentences": 35,
+   "cited": 24,
    "entities_found": [
     true
    ],
-   "seconds": 11.1,
+   "seconds": 11.3,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 1442,
+    "output_tokens": 1491,
     "cache_read_tokens": 1484,
-    "cache_write_tokens": 5230,
-    "cost_usd": 0.0356408
+    "cache_write_tokens": 5228,
+    "cost_usd": 0.0361228
    },
-   "answer": "# Transação falhou: `INSUFFICIENT_OUTPUT_AMOUNT`\n\n**Status:** a transação reverteu no bloco 26141518. Foi de 0xd05E8724aD399Bb618497b1bf66a4A24Ab156351 para 0x278d858f05b94576C1E6f73285886876ff6eF8D2, com 133145 de gas usado de um limite de 600000 [E1]. O RPC confirma independentemente o status \"failed\" [E18]. A taxa de 0.000294067451118215 ETH foi cobrada mesmo com a falha [E2].\n\n**Chamada decodificada:** não foi possível decodificar. O seletor é `0x70521ae9` em 0x278d858f05b94576C1E6f73285886876ff6eF8D2 [E4]. Nenhuma ABI corresponde ao seletor; seria necessário um contrato verificado no explorer ou a ABI em um repositório configurado [gaps]. A consulta ao banco de assinaturas também falhou e pode ser repetida em alguns minutos [gaps]. Sem ABI, não há argumentos decodificados.\n\n**Motivo do revert:** o explorer reporta `Error(string reason)` com reason='INSUFFICIENT_OUTPUT_AMOUNT' [E3].\n\n**Chamadas internas (todas desfeitas pelo revert):**\n- Um delegatecall de 0x278d…F8D2 para 0x617E169f98F966D520946282De52340b94b59A7c reverteu [E5]. Outro delegatecall para o mesmo endereço foi desfeito [E8].\n- Há chamadas entre 0x278d…F8D2 e o PoolManager (0x000000000004444c5dc75cB358380D2e3dE08A90), nos dois sentidos [E6][E7][E9][E10][E13][E15].\n- O PoolManager tentou enviar 0.091541598301954665 ETH para 0x278d…F8D2, mas foi desfeito e nada foi transferido [E11].\n- 0x278d…F8D2 tentou enviar 0.091541598301954665 ETH para WETH9 (0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), também desfeito [E12].\n- Uma chamada para BeamToken (0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE) foi desfeita [E14].\n- 4 chamadas staticcall somente leitura não foram listadas [E16].\n\n**Transferências de tokens e eventos:** a evidência não traz nenhum.\n\n**Diagnóstico:**\n- LIKELY: causa possível é a verificação de slippage. A mensagem usa as palavras dos routers da Uniswap (o swap daria menos que o mínimo de saída definido pelo remetente). Este contrato pode usá-las com o mesmo sentido, mas o código dele é que decide [E17]. Não há código-fonte do contrato na evidência, então não é possível apontar a linha que gerou o erro.\n- Próximo passo (dev): verificar o preço atual antes de reenviar. Aumentar a tolerância de slippage permite o swap a um preço pior e expõe a perdas por front-running (sandwich); é preferível esperar o preço se estabilizar ou fazer um trade menor [E17].\n- Próximo passo (dev): para swaps grandes, dividir a operação ou usar um pool mais profundo [E17].\n\n**Contexto (timeline do remetente):**\n- A mesma chamada `0x70521ae9` falhou duas vezes seguidas (nonces 10344 e 10345) [E21].\n- Teve sucesso 372 segundos depois (nonce 10346) [E20]. Nos nonces ao redor, há uma mistura de falhas e sucessos [E19].\n- Nota heurística de gas: usou 22.2% do limite de 600000. A mesma chamada teve sucesso no nonce 10343 com 151535 de gás [E22]. O gás não parece ser a causa, já que a falha foi um revert com motivo [E3].\n\n**Segurança:** não há evidência de notas de segurança nem código disponível. Isso não significa que o contrato seja seguro.",
+   "answer": "## Resumo\n\nA transação falhou (reverteu) no bloco 26141518, de `0xd05E8724aD399Bb618497b1bf66a4A24Ab156351` para `0x278d858f05b94576C1E6f73285886876ff6eF8D2`. Foram usados 133145 de gás, com limite de 600000 [E1]. O status \"failed\" foi confirmado de forma independente pelo recibo RPC [E18]. A taxa de 0.000294067451118215 ETH foi cobrada mesmo com a falha [E2].\n\n## Chamada decodificada\n\n- O seletor chamado é `0x70521ae9` em `0x278d858f05b94576C1E6f73285886876ff6eF8D2`, e não foi decodificado [E4].\n- Não há ABI que corresponda ao seletor. Seria preciso um contrato verificado no explorer ou o ABI em um repositório configurado [E4].\n- A consulta ao banco de assinaturas também falhou. Ela pode ser tentada de novo em alguns minutos [E4].\n- Sem ABI, os argumentos não estão disponíveis na evidência.\n\n## Motivo do revert\n\n- O explorer reporta `Error(string reason)` com reason='INSUFFICIENT_OUTPUT_AMOUNT' [E3].\n- **LIKELY:** esta é uma causa possível, não certa. A mensagem usa as mesmas palavras da verificação de slippage dos routers da Uniswap, ou seja, o swap daria menos que a saída mínima definida [E17]. O código do contrato é que decide o significado real, e ele não foi fornecido [E17].\n- Não há evidência de código nem de linha onde o motivo é gerado.\n\n## Chamadas internas\n\n- A chamada interna que reverteu foi um delegatecall de `0x278d…F8D2` para `0x617E169f98F966D520946282De52340b94b59A7c` [E5].\n- As demais chamadas foram desfeitas porque uma chamada acima delas reverteu:\n  - Chamadas de `0x278d…F8D2` para o PoolManager `0x000000000004444c5dc75cB358380D2e3dE08A90` [E6][E9][E10][E13][E15].\n  - Uma chamada do PoolManager de volta para `0x278d…F8D2` [E7].\n  - Outro delegatecall para `0x617E…9A7c` [E8].\n  - Uma chamada para BeamToken `0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE` [E14].\n- O PoolManager tentou enviar 0.091541598301954665 ETH para `0x278d…F8D2`, mas nada foi transferido [E11].\n- `0x278d…F8D2` tentou enviar 0.091541598301954665 ETH para WETH9 `0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`, mas nada foi transferido [E12].\n- Houve 4 chamadas staticcall somente leitura, não listadas [E16].\n\n## Transferências de tokens e eventos\n\nA evidência não traz transferências de token nem eventos decodificados.\n\n## Contexto do remetente\n\n- O mesmo seletor `0x70521ae9` falhou duas vezes seguidas, nos nonces 10344 e 10345 [E21].\n- Ele teve sucesso 372 segundos depois, no nonce 10346 [E20].\n- Nesse sucesso foram usados 129820 de gás, com o mesmo limite de 600000 [E22].\n- Pela nota heurística de gás, esta transação usou 22.2% do limite [E22].\n\n## Notas de segurança\n\nNão há evidência de código nem de notas de segurança. Nada pode ser dito sobre a segurança do contrato.\n\n## Próximos passos (desenvolvedor)\n\n- Verifique o preço atual antes de reenviar. Uma tolerância de slippage maior deixa o swap passar a um preço pior e o expõe a perdas por front-running (sandwich). Prefira esperar o preço se estabilizar ou fazer uma operação menor [E17].\n- Em swaps grandes, divida a operação ou use um pool mais profundo [E17].\n- Para confirmar a causa, obtenha o ABI ou o código verificado de `0x278d…F8D2` e de `0x617E…9A7c` [E4][E5].",
    "error": null
   },
   {
@@ -259,20 +259,20 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 28,
-   "cited": 22,
+   "sentences": 31,
+   "cited": 25,
    "entities_found": [
     true
    ],
-   "seconds": 11.2,
+   "seconds": 11.1,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 1463,
+    "output_tokens": 1384,
     "cache_read_tokens": 1484,
-    "cache_write_tokens": 8401,
-    "cost_usd": 0.0485348
+    "cache_write_tokens": 8403,
+    "cost_usd": 0.047752800000000005
    },
-   "answer": "# Transação falhou: SlippageExceeded\n\n**Status:** a transação reverteu no bloco 26150083, de 0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9 para 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA [E1]. O RPC confirma de forma independente o status \"failed\" [E37]. Foram usados 628329 de 777776 de gas [E1]. A taxa paga foi de 0.000245878271661087 ETH, cobrada mesmo com a falha [E2]. O valor nativo anexado era 0 ETH [E1].\n\n**Causa (CONFIRMED):** o contrato reverteu com o erro próprio `SlippageExceeded(uint256 _outputAmount, uint256 _outputAmountMin)` [E3][E36].\n- `_outputAmount` = 14328709197402396616239 [E3].\n- `_outputAmountMin` = 14563846497565974891109 [E3].\n- O valor de saída ficou abaixo do mínimo exigido, ou seja, a verificação de slippage falhou [E3]. O significado exato é definido no código do contrato, que não está na evidência [E36].\n\n**Chamada decodificada:** não foi possível decodificar. O seletor é `0x32bb9270` em 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA [E4]. Nenhum ABI corresponde ao seletor; é preciso um contrato verificado no explorer ou o ABI em um repositório configurado [gap: Call decoding]. A decodificação do erro `SlippageExceeded` vem do explorer [E3].\n\n**Transferências de tokens e eventos:** não há transferências nem eventos na evidência. Todas as chamadas internas listadas foram desfeitas pela reversão.\n\n**Chamadas internas (30 de 63 listadas; 38 staticcalls não listados)** [E35]:\n- Um delegatecall de 0x20E67DC1… para 0x000000003e6B7C98504bEa19cd1A5A064522499b reverteu [E5].\n- Chamadas desfeitas pela reversão de nível superior:\n  - delegatecalls de 0xE3F35754… (ERC1967Proxy) para 0x0000000037f8a8e865354D8316b2eed2BAb1d115 [E6].\n  - chamadas ao USDC (0xA0b86991…), com delegatecall para FiatTokenV2_2 [E11][E12].\n  - delegatecall para MetaSwapHandlerV2 (0x000000034714Cd2778c7FC0f284a89d1116171EE) [E16].\n  - chamada ao AggregatorGuard (0xa929c559…) [E19], que chama o USDC [E20] e 0x22ec88b9… [E22].\n  - 0x22ec88b9… interage com o PoolManager (0x000000000004444c5dc75cB358380D2e3dE08A90) [E23][E24].\n  - o PoolManager chama o LaunchToken (0x75E2Fc69Ff2ac12aF65Ba7D321bBf4f878c535d2) [E34].\n\n**Contexto:**\n- A mesma chamada (`0x32bb9270` para o mesmo contrato) teve sucesso no nonce 3156, cerca de 1 hora depois (4584 s) [E39].\n- Nesse caso foram usados 626697 de gas, com limite de 845338; esta transação tinha limite de 777776 [E40]. Nota heurística de gas, não uma conclusão [E40].\n\n**Segurança:** não há evidência de código nem notas de segurança, então não há o que afirmar sobre isso.\n\n**Próximos passos (desenvolvedor):**\n- Leia o código-fonte do contrato onde esse erro é lançado, ou consulte os desenvolvedores [E36].\n- Não reenvie a mesma transação até que a condição por trás do erro mude [E36].\n- Para analisar mais a fundo, obtenha o ABI verificado e a lista completa de chamadas internas na página do explorer [gaps]: https://eth.blockscout.com/tx/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8",
+   "answer": "# Transação revertida por slippage\n\n**Status:** a transação falhou (revertida) no bloco 26150083, com 628329 de gas usado do limite de 777776 [E1]. O recibo via RPC confirma o status de falha [E37]. A taxa paga foi 0.000245878271661087 ETH, cobrada mesmo com a falha [E2]. O valor nativo anexado era 0 ETH [E1].\n\n**Chamada decodificada:**\n- O remetente 0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9 chamou o contrato 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA com o seletor `0x32bb9270` [E1][E4].\n- A chamada não foi decodificada, porque nenhum ABI do contrato corresponde a esse seletor. É preciso um contrato verificado no explorer ou o ABI em um repositório configurado [E4].\n- Não há argumentos decodificados nem código-fonte nas evidências.\n\n**Motivo do revert (CONFIRMED):**\n- O explorer reporta `SlippageExceeded(uint256 _outputAmount, uint256 _outputAmountMin)` com `_outputAmount='14328709197402396616239'` e `_outputAmountMin='14563846497565974891109'` [E3].\n- O valor de saída ficou abaixo do mínimo exigido [E3].\n- O significado exato é definido no código do contrato, que não foi fornecido, e nenhuma linha de código é citada nas evidências [E36].\n\n**Transferências de token:** nenhuma aparece nas evidências. Todas as chamadas internas listadas foram desfeitas pelo revert [E11][E34].\n\n**Chamadas internas (30 das 63 listadas):**\n- Um delegatecall de 0x20E67DC1… para 0x000000003e6B7C98504bEa19cd1A5A064522499b reverteu [E5].\n- Um delegatecall de 0x20E67DC1… para 0x000000034714Cd2778c7FC0f284a89d1116171EE (MetaSwapHandlerV2) foi desfeito [E16].\n- Chamadas para o USDC (0xA0b86991…eB48) e seu delegatecall para FiatTokenV2_2 foram desfeitas [E11][E12].\n- 0x20E67DC1… chamou o AggregatorGuard (0xa929c559…4dd1) [E19]. Ele chamou o USDC [E20] e 0x22ec88b9…4B86 [E22].\n- 0x22ec88b9… interagiu com o PoolManager (0x000000000004444c5dc75cB358380D2e3dE08A90) [E23][E25].\n- O PoolManager chamou o LaunchToken (0x75E2Fc69…35d2) [E34].\n- Há 38 chamadas staticcall somente leitura não listadas [E35].\n- A lista está incompleta: o restante está na página do explorer [E35].\n\n**Eventos:** nenhum evento está nas evidências.\n\n**Contexto:**\n- A mesma chamada (`0x32bb9270` para o mesmo contrato) teve sucesso cerca de 1 hora depois, no nonce 3156 [E39].\n- Esse sucesso usou 626697 de gas, com limite de 845338 [E40].\n- Esta transação usou 628329 de gas com limite de 777776, ou seja, não esgotou o gás [E40].\n\n**Próximos passos (desenvolvedor):**\n- Leia o código-fonte do contrato onde esse motivo é lançado, ou consulte seus desenvolvedores [E36].\n- Não reenvie a mesma transação até que a condição por trás do motivo mude [E36].\n\n**Notas de segurança:** não há evidências de notas de segurança nem código-fonte da função chamada.\n\n**Fonte:** https://eth.blockscout.com/tx/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8 [E1]",
    "error": null
   },
   {
@@ -295,20 +295,20 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 16,
-   "cited": 13,
+   "sentences": 13,
+   "cited": 10,
    "entities_found": [
     true
    ],
-   "seconds": 6.9,
+   "seconds": 6.5,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 720,
+    "output_tokens": 617,
     "cache_read_tokens": 1434,
-    "cache_write_tokens": 2187,
-    "cost_usd": 0.0162388
+    "cache_write_tokens": 2188,
+    "cost_usd": 0.015212799999999999
    },
-   "answer": "**O que aconteceu:** a transação foi concluída com sucesso no bloco 26141501 [E1]. Foi uma transferência de 69,3484 USDC da carteira 0xCA62C34d54b445283121905F19193416212117c4 para a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].\n\n**O dinheiro se moveu?** Sim. O registro de transferência de tokens mostra os 69,3484 USDC indo da carteira de origem para a de destino [E5]. Nenhum ETH foi enviado como valor da transação (0 ETH) [E1].\n\n**Quanto custou (taxa):** a taxa paga foi de 0,00008537619972948 ETH [E2]. Foram usadas 40360 unidades de gás, de um limite de 45758 [E1].\n\n**Como a transferência funciona:** a chamada foi feita ao contrato do USDC, usando a função \"transfer\" [E3]. Segundo o código mostrado, essa função exige que o contrato não esteja pausado e que nem quem envia nem quem recebe esteja em uma lista de bloqueio. Depois disso, ela executa a transferência e retorna \"verdadeiro\" [E4]. O código exibido é o da versão que o explorador lista hoje, e o contrato pode ter sido atualizado desde essa transação [E4]. O contrato do USDC repassou a execução para um contrato de implementação (FiatTokenV2_2) [E6].\n\n**Lacunas nas informações:** não foi possível consultar os dados diretamente na rede (RPC), pois o servidor estava indisponível. Por isso, as informações acima vêm apenas do explorador de blocos [E1].\n\n**O que fazer agora:**\n- Se você esperava receber esse pagamento, confira se a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 é a sua e se o saldo de 69,3484 USDC aparece nela [E5].\n- Se quiser uma confirmação direta da rede, tente novamente mais tarde, quando o servidor RPC estiver acessível [E1].",
+   "answer": "**O que aconteceu:** a transação foi concluída com sucesso no bloco 26141501 [E1]. O dinheiro se moveu: foram enviados 69,3484 USDC da carteira 0xCA62C34d54b445283121905F19193416212117c4 para a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].\n\n**Como foi feito:** a carteira de origem chamou a função \"transfer\" do contrato do USDC [E3]. Pelo código mostrado, essa função só executa a transferência se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver em lista de bloqueio. Depois disso, ela move o valor e retorna \"verdadeiro\" [E4]. O código exibido é o da versão que o explorador lista hoje, e ela pode ter sido atualizada desde esta transação [E4]. O contrato principal também repassou a execução para outro contrato de implementação (FiatTokenV2_2) [E6].\n\n**Taxa cobrada:** 0,00008537619972948 ETH, paga pela carteira que enviou [E2]. Nenhum ETH foi enviado como valor da transação [E1].\n\n**Lacuna:** não consegui obter os dados diretamente da rede (RPC), porque o servidor estava indisponível [gaps]. As informações vêm só do explorador de blocos, o que é o normal, mas sem a confirmação direta do nó [E1].\n\n**O que fazer:** nada é necessário, pois a transação deu certo. Se quiser confirmar o pagamento, confira no explorador se a carteira de destino é a sua: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 [E1].",
    "error": null
   },
   {
@@ -329,21 +329,21 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 15,
-   "cited": 10,
+   "sentences": 12,
+   "cited": 9,
    "entities_found": [
     true,
     true
    ],
-   "seconds": 6.0,
+   "seconds": 6.2,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 608,
+    "output_tokens": 592,
     "cache_read_tokens": 1434,
     "cache_write_tokens": 2334,
-    "cost_usd": 0.0157068
+    "cost_usd": 0.0155468
    },
-   "answer": "**O que aconteceu:** a transação foi concluída com sucesso na rede Optimism, no bloco 157894754 [E1]. A rede confirmou o mesmo resultado de forma independente [E7].\n\n**O dinheiro foi movido?** Sim. Foram transferidos 199,820981 USDC da carteira 0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a para a carteira 0xe0F95c9180a137C826478cD4827CC53bAB8a6C89 [E5]. A operação chamou a função \"transfer\" do contrato do USD Coin [E3]. Nenhum ETH foi enviado junto, apenas o USDC [E1].\n\n**O que a função faz:** pelo código mostrado, ela só prossegue se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver numa lista de bloqueio. Depois disso, move o valor de uma carteira para a outra [E4]. O explorador avisa que esse código é da versão atual do contrato, que pode ter sido atualizada depois desta transação [E4].\n\n**Taxa cobrada:** 0,000000026584116078 ETH no total. Desse valor, 0,000000000204699728 ETH foi o custo de execução e 0,00000002637941635 ETH foi o custo de registrar os dados na rede principal [E2]. Foram usados 57371 de um limite de 94433 de gás [E1].\n\n**O que fazer:** nada é necessário, pois a transação deu certo. Se você esperava receber esse pagamento, confira se a carteira de destino é a sua (0xe0F95c9180a137C826478cD4827CC53bAB8a6C89) [E5]. Se ela não for sua, verifique o endereço com quem fez o pagamento.",
+   "answer": "## O que aconteceu\n\nA transação deu certo e o dinheiro foi movido. [E1][E7]\n\nForam enviados **199,820981 USDC** da carteira 0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a para a carteira 0xe0F95c9180a137C826478cD4827CC53bAB8a6C89. [E5] Isso foi feito chamando a função \"transfer\" do contrato do USD Coin. [E3]\n\nEm termos simples, o código mostrado dessa função (que pode ter sido atualizado desde a transação) verifica se o contrato não está pausado e se nem quem envia nem quem recebe está em lista de bloqueio. Depois, faz a transferência. [E4]\n\n## Taxa cobrada\n\nA taxa total foi de 0,000000026584116078 ETH. Desse valor, 0,000000000204699728 ETH foram de execução na rede e 0,00000002637941635 ETH foram do registro de dados na rede principal. [E2] Nenhum ETH foi enviado como valor da transação. [E1]\n\nO gás usado foi 57371 de um limite de 94433, ou seja, havia folga suficiente. [E1][E8]\n\n## O que fazer\n\n- Se você esperava receber esse pagamento, confira se a carteira de destino (0xe0F95c9180a137C826478cD4827CC53bAB8a6C89) é a sua. [E5]\n- Para guardar como comprovante, use a página da transação no explorador: https://explorer.optimism.io/tx/0x7db4433fc318dfcf4a8d07022aec6135a5adb69b227f5a82e3092b3a648b0921 [E1]\n\nNão há lacunas nas informações disponíveis.",
    "error": null
   },
   {
@@ -366,20 +366,57 @@
    },
    "summary_status": "ok",
    "first_attempt_problems": [],
-   "sentences": 16,
-   "cited": 12,
+   "sentences": 18,
+   "cited": 15,
    "entities_found": [
     true
    ],
-   "seconds": 11.6,
+   "seconds": 6.8,
    "usage": {
     "input_tokens": 2,
-    "output_tokens": 637,
+    "output_tokens": 717,
     "cache_read_tokens": 1434,
-    "cache_write_tokens": 3108,
-    "cost_usd": 0.0190928
+    "cache_write_tokens": 3122,
+    "cost_usd": 0.0199488
    },
-   "answer": "**O que aconteceu:** a transação falhou (foi revertida) na rede Optimism, no bloco 157785200 [E1]. A rede independente confirma essa falha [E7].\n\n**O dinheiro se moveu?** Não. O valor anexado era 0 ETH e, de qualquer forma, nada foi transferido porque a transação foi revertida [E1].\n\n**Quanto foi cobrado:** a taxa foi de 0,000000001092458893 ETH no total, sendo 0,000000000057384291 ETH de execução e 0,000000001035074602 ETH de dados na L1. A taxa é cobrada mesmo quando a transação falha [E2].\n\n**Por que falhou:** o contrato recusou a operação com a mensagem \"block number deadline\" [E3]. Isso sugere que uma verificação de prazo não foi atendida. Qual prazo exatamente e em que sentido depende do código do contrato, que não temos [E6]. Não foi possível decodificar a chamada porque não há ABI disponível para esse contrato [E4]. Uma base pública de assinaturas sugere, como possibilidade não confirmada, que a função seja \"createPosition\" [E5].\n\n**Contexto:** a mesma chamada, feita pelo mesmo remetente ao mesmo contrato, funcionou nas transações imediatamente antes e depois desta [E8][E9]. Isso indica que a falha pode ter sido pontual, mas a causa exata não está confirmada. A lista de transações posteriores está incompleta [E8].\n\n**O que fazer:**\n- Entre em contato com o suporte do aplicativo e envie o link desta transação antes de tentar de novo [E6].\n- Link: https://explorer.optimism.io/tx/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3 [E1]",
+   "answer": "**O que aconteceu:** a transação falhou (foi revertida) na rede Optimism, no bloco 157785200 [E1]. O resultado foi confirmado de forma independente pela rede [E7].\n\n**O dinheiro se moveu?** Não. O valor anexado era 0 ETH, e nada foi transferido porque a transação foi revertida [E1].\n\n**Quanto foi cobrado:** a taxa foi de 0,000000001092458893 ETH no total (0,000000000057384291 ETH de execução e 0,000000001035074602 ETH de dados). Ela é cobrada mesmo com a falha [E2].\n\n**Por que falhou:** o motivo informado pelo explorador é \"block number deadline\", ou seja, um prazo [E3]. LIKELY: a causa provável é uma verificação de limite de tempo. Qual prazo e em que sentido só o código do contrato define, e esse código não foi fornecido [E6]. Uma base pública de assinaturas sugere, sem confirmação, que a chamada seria \"createPosition(uint256)\" [E5]. A chamada em si não pôde ser decodificada [E4].\n\n**Contexto:** a mesma chamada, feita pelo mesmo remetente, foi bem-sucedida logo depois, no mesmo instante (nonce 951507) [E9]. Outras chamadas do mesmo remetente ao mesmo contrato também tiveram sucesso ou falha em sequência [E8]. Isso indica que a falha pode ter sido pontual, ligada ao prazo [E6].\n\n**O que fazer:**\n- Entre em contato com o suporte do aplicativo e envie o link desta transação antes de tentar de novo [E6].\n- Link: https://explorer.optimism.io/tx/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3 [E1]\n\n**O que falta:** o código verificado do contrato, ou o ABI dele, para confirmar qual prazo foi violado [E4]. Também não aparecem as transações do remetente posteriores a esta [E8].",
+   "error": null
+  },
+  {
+   "id": "allowance_devnet",
+   "category": "allowance revert (ERC20 insufficient allowance), on the private demo network, where the explorer runs without internal transactions and gives no reason; the replay on the node finds it",
+   "network": "anychain-devnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": true,
+   "got": {
+    "status": "failed",
+    "rule": "no_reason",
+    "label": "UNKNOWN",
+    "abi_source": "raw",
+    "gaps": [
+     "not_interpretable",
+     "source_behind"
+    ]
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 14,
+   "cited": 10,
+   "entities_found": [
+    true
+   ],
+   "seconds": 6.2,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 579,
+    "cache_read_tokens": 1434,
+    "cache_write_tokens": 2897,
+    "cost_usd": 0.0176688
+   },
+   "answer": "**O que aconteceu:** a transação falhou (foi revertida) no bloco 58, e a rede independente confirma essa falha [E1][E7]. Ela chamava o contrato BRL Coin [E1]. Como falhou, o valor anexado (0 ETH) não foi transferido [E1]. Como o valor era zero, também não houve movimentação de dinheiro por esse campo [E1].\n\n**Taxa cobrada:** foram pagos 0,000000020219154228 ETH. A taxa é cobrada mesmo quando a transação falha [E2].\n\n**Causa:**\n- UNKNOWN: o explorador não informou o motivo da falha, então a causa oficial não é conhecida [E4].\n- LIKELY: ao reexecutar a transação no bloco anterior, ela foi revertida com a mensagem \"ERC20: insufficient allowance\", que significa tentar mover tokens além do que foi autorizado. Se a transação original falhou do mesmo jeito, essa é a causa. Mas a reexecução pode diferir do que realmente aconteceu [E5][E6].\n\n**Outra falha:** a mesma conta enviou uma segunda transação ao mesmo contrato, 10 segundos depois, e ela também aparece como falha [E8].\n\n**O que fazer:**\n- Entre em contato com o suporte do aplicativo, enviando o link desta transação, antes de tentar de novo. Assim você evita pagar outra taxa pela mesma falha [E4][E6].\n\n**Limitações:** não foi possível decodificar a chamada nem ver as chamadas internas, que ainda estavam sendo indexadas pelo explorador (vale perguntar de novo em alguns minutos) [E3].",
    "error": null
   }
  ]

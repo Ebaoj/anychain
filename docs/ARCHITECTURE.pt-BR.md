@@ -9,7 +9,7 @@ As cores mostram o que já existe:
 - **Cinza**: fases seguintes
 - Caixas brancas são só agrupamentos.
 
-Estado atual: **Fase 4** (08/10/2026): triagem (uma pergunta antes de responder, escolhida pelo código), linha do tempo do remetente em volta de uma falha, notas de gás, Dockerfile e README final prontos; a rede privada de demonstração é o último item.
+Estado atual: **fim da Fase 4** (08/10/2026): triagem (uma pergunta antes de responder, escolhida pelo código), linha do tempo do remetente em volta de uma falha, notas de gás, Dockerfile, README final e a rede privada de demonstração (Anvil + Blockscout próprio + BRLC atrás de um proxy, lida só com `configs/devnet.yaml`).
 
 ---
 
@@ -91,7 +91,7 @@ flowchart TD
 | 2 (pronta) | diagnóstico de falhas, leituras de estado, repositórios, cascata de ABI, confiança de cada fato, checagem da resposta |
 | 2.5 (pronta) | código da função, notas de segurança, ABIs de artefatos, controle de acesso, prazo pelo parâmetro, rótulos, passos por leitor, resposta estruturada |
 | 3 (pronta) | cache e lote, métricas, API, chat com ferramentas, página, conversão para a unidade do token, avaliação, diagnóstico pela origem da falha, pergunta do usuário, página de impacto, demonstração gravada |
-| 4 | **pronto:** triagem (endereço em vez de hash, "não recebi", palavras emprestadas de outro contrato), linha do tempo do remetente com padrões (tentou de novo e deu certo, aprovou e deu certo, falhas seguidas), notas de gás, Dockerfile, README final com conversas reais. **Por último:** rede privada de demonstração. **Fica para depois:** trace do nó |
+| 4 | **pronto:** triagem (endereço em vez de hash, "não recebi", palavras emprestadas de outro contrato), linha do tempo do remetente com padrões (tentou de novo e deu certo, aprovou e deu certo, falhas seguidas), notas de gás, Dockerfile, README final com conversas reais. rede privada de demonstração (`devnet/`). **Fica para depois:** trace do nó |
 
 ---
 

@@ -9,7 +9,7 @@ Living document: updated at the end of every phase. Colors show what exists. A P
 
 View the diagrams in VS Code (extension "Markdown Preview Mermaid Support") or on GitHub, which renders them natively.
 
-Current state: **phase 4** (2026-10-08): triage (one question before answering, chosen by code), the sender's timeline around a failure, gas notes, the Dockerfile and the final README are done; the private demo network is the last item.
+Current state: **end of phase 4** (2026-10-08): triage (one question before answering, chosen by code), the sender's timeline around a failure, gas notes, the Dockerfile, the final README and the private demo network (Anvil + a self-hosted Blockscout + BRLC behind a proxy, read with `configs/devnet.yaml` only).
 
 ---
 
@@ -89,7 +89,7 @@ flowchart TD
 | 2 (done) | failure diagnosis, state reads, repos, ABI cascade, confidence per fact, answer check |
 | 2.5 (done) | function code, security notes, ABIs from artifacts, access control, deadline parameter, labels, steps per reader, structured answer |
 | 3 (done) | cache and batch, metrics, API, chat with tools, web page, amounts in the token's units, evaluation, origin-first diagnosis, the reader's question, impact page, recorded demo |
-| 4 | **done:** triage (an address instead of a hash, "did not receive it", words borrowed from another contract), the sender's timeline with patterns (retried and succeeded, approved then succeeded, repeated failures), gas notes, Dockerfile, final README with real conversations. **Last:** private demo network. **Later:** node trace |
+| 4 | **done:** triage (an address instead of a hash, "did not receive it", words borrowed from another contract), the sender's timeline with patterns (retried and succeeded, approved then succeeded, repeated failures), gas notes, Dockerfile, final README with real conversations. private demo network (`devnet/`). **Later:** node trace |
 
 ---
 
