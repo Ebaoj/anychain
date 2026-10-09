@@ -53,6 +53,8 @@ class CaseResult:
     sentences: int = 0
     cited: int = 0
     entities_found: list[bool] = field(default_factory=list)
+    key_facts: list[str] = field(default_factory=list)  # facts the answer must cite: the conclusions, the timeline
+    key_facts_cited: list[str] = field(default_factory=list)
     seconds: float | None = None
     usage: dict | None = None
     answer: str | None = None
@@ -83,6 +85,7 @@ def run_case(case: dict, write: bool, backend=None) -> CaseResult:
         got["rule"] == expect.get("rule") and got["replay"] == expect.get("replay"), got["label"] == expect.get("label"),
         got["abi_source"] == expect.get("abi_source"),
         expected_gaps <= set(got["gaps"]) if expected_gaps else None, got)
+    result.key_facts = key_facts(bundle)
     if not write:
         return result
     started = time.monotonic()
@@ -100,10 +103,19 @@ def run_case(case: dict, write: bool, backend=None) -> CaseResult:
     if checked.text:
         sentences = factual_sentences(checked.text)
         result.sentences, result.cited = len(sentences), sum(1 for s in sentences if CITE.search(s))
+        cited = set(re.findall(r"E\d+", checked.text))
+        result.key_facts_cited = [f for f in result.key_facts if f in cited]
         lowered = checked.text.lower()
         result.entities_found = [any(alt.lower() in lowered for alt in entity) for entity in expect.get("entities", [])]
     structured_answer(bundle, checked.text, checked.outcome, case.get("mode", "support"))  # the shape stays valid
     return result
+
+
+def key_facts(bundle) -> list[str]:
+    """The facts an answer is not complete without: each conclusion (the failure's own and the replay's) and each
+    pattern of the sender's timeline (a retry that succeeded, repeated failures)."""
+    return [e.id for e in bundle.items
+            if e.kind == "diagnosis" or (e.kind == "timeline" and e.data.get("pattern"))]
 
 
 def factual_sentences(text: str) -> list[str]:
@@ -141,6 +153,7 @@ def summarize(results: list[CaseResult]) -> dict:
         "hallucinated_items": sum(len(r.first_attempt_problems) for r in written),
         "withheld": sum(1 for r in written if r.summary_status == "withheld"),
         "entities_found": pct(sum(entities), len(entities)),
+        "key_facts_cited": pct(sum(len(r.key_facts_cited) for r in written), sum(len(r.key_facts) for r in written)),
         "seconds_per_case": round(sum(r.seconds or 0 for r in written) / len(written), 1) if written else None,
         "tokens": {k: sum((r.usage or {}).get(k) or 0 for r in written)
                    for k in ("input_tokens", "output_tokens", "cache_read_tokens", "cache_write_tokens")},
@@ -161,7 +174,8 @@ def report(results: list[CaseResult], model: str, out_dir: Path) -> dict:
              "abi_source_accuracy": "ABI source accuracy", "degradation_declared": "Degradation declared correctly",
              "citation_coverage": "Citation coverage (factual sentences citing a fact)",
              "hallucination_rate": "First drafts the check caught (a value or citation not in the evidence; rewritten)",
-             "entities_found": "Key values present in the answer"}
+             "entities_found": "Key values present in the answer",
+             "key_facts_cited": "Key facts cited (each conclusion, and what the sender's timeline shows)"}
     for key, name in names.items():
         lines.append(f"| {name} | {'' if summary[key] is None else str(summary[key]) + '%'} |")
     lines += [f"| Delivered answers with a value not in the evidence | 0 (every answer shown passed the check) |",
@@ -170,8 +184,8 @@ def report(results: list[CaseResult], model: str, out_dir: Path) -> dict:
               f"| Time per written answer | {summary['seconds_per_case']} s |",
               f"| Tokens (input, output, cache read, cache write) | {', '.join(str(v) for v in summary['tokens'].values())} |",
               f"| Cost reported by the backend | {summary['cost_usd']} USD |", "",
-              "| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values | Seconds | Tokens in/out |",
-              "|---|---|---|---|---|---|---|---|---|---|---|"]
+              "| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values | Key facts | Seconds | Tokens in/out |",
+              "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     mark = lambda ok: "ok" if ok else "MISS"  # noqa: E731
     for r in results:
         g = r.got
@@ -180,6 +194,7 @@ def report(results: list[CaseResult], model: str, out_dir: Path) -> dict:
                      f"{g['rule'] or '-'} {g['label'] or ''}{replay} | {mark(r.abi_ok)} {g['abi_source'] or '-'} | "
                      f"{'' if r.degradation_ok is None else mark(r.degradation_ok)} {', '.join(g['gaps']) or '-'} | "
                      f"{r.summary_status} | {r.cited}/{r.sentences} | {sum(r.entities_found)}/{len(r.entities_found)} | "
+                     f"{len(r.key_facts_cited)}/{len(r.key_facts)} | "
                      f"{'' if r.seconds is None else r.seconds} | {_tokens(r.usage)} |")
     (out_dir / "report.md").write_text("\n".join(lines) + "\n")
     return summary
