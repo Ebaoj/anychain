@@ -312,6 +312,7 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
                 "evidence": [e.model_dump() for e in session.bundle.items] if started_now else None,
                 "tool_calls": turn.tool_calls, "problems": turn.problems,
                 "error": no_urls(turn.error, node) if turn.error else None, "run_id": run_id,
+                "intent": turn.intent, "path": turn.path, "suggestions": turn.suggestions,
                 "questions_left": max(0, MAX_QUESTIONS - len([t for t in session.turns if t.outcome != "refused"]))}
 
     @app.post("/feedback")

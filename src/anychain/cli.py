@@ -360,9 +360,23 @@ def run_eval(
     case: str = typer.Option(None, "--case", help="Run only this case id"),
     no_llm: bool = typer.Option(False, "--no-llm", help="Measure the evidence only (no written answers, no cost)"),
     out: str = typer.Option("eval", "--out", help="Folder for report.md and report.json"),
+    intents: bool = typer.Option(False, "--intents", help="Measure the chat's classifier on eval/chat_intents.json "
+                                 "instead (with --no-llm: the rules only); writes intents.md"),
 ) -> None:
     """Run the evaluation set: real recorded transactions, offline, measured, saved as a report."""
     from pathlib import Path
+    if intents:
+        from anychain.evaluate import intent_eval
+        from anychain.intents import load_intent_set
+        from anychain.llm_settings import effective
+        from anychain.writer import backend_for
+        cfg = load_config("configs/ethereum-mainnet.yaml")
+        model = "none (rules only)" if no_llm else effective(cfg.llm).model
+        summary = intent_eval(load_intent_set(Path("eval") / "chat_intents.json"),
+                              None if no_llm else (lambda: backend_for(cfg.llm)), model, Path(out))
+        print(json.dumps(summary, indent=1))
+        print(f"Report: {Path(out) / 'intents.md'}")
+        return
 
     from anychain.evaluate import load_cases, report, run_case
     try:

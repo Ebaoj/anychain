@@ -29,12 +29,16 @@ def _session(fixture="celo_fail_balance_confirmed", config=CELO, others=()):
 
 
 class Scripted:
-    """A model that answers from a script; each step sees the prompt it was sent."""
+    """A model that answers from a script; each step sees the prompt it was sent. The classifier's call (D74) is
+    answered with `intent` ("open" unless a test says otherwise) and kept apart in `classified`."""
 
-    def __init__(self, *steps):
-        self.steps, self.prompts, self.last_usage = list(steps), [], None
+    def __init__(self, *steps, intent="open"):
+        self.steps, self.prompts, self.last_usage, self.intent, self.classified = list(steps), [], None, intent, []
 
     def complete(self, system, user):
+        if system.startswith("You classify"):
+            self.classified.append(user)
+            return json.dumps({"intent": self.intent})
         self.prompts.append((system, user))
         step = self.steps.pop(0)
         return step(user) if callable(step) else step
@@ -292,7 +296,7 @@ def test_a_file_from_a_configured_repo():
     assert fact.kind == "code" and "103 |" in fact.text and "setPauser" in fact.text
     assert fact.sources[0].url.startswith("https://github.com/cloudwallk/brlc-token/blob/74a5498")
     assert all(str(c["result"]).startswith("refused") for c in turn.tool_calls[1:])
-    turn = session.ask("y", Scripted(json.dumps({"tools": [bad[2]]}), "It failed [E1]."))
+    turn = session.ask("y", Scripted(json.dumps({"tools": [bad[2]]}), "That file is not one of the sources [E1]."))
     assert str(turn.tool_calls[0]["result"]).startswith("refused")
 
 
@@ -388,7 +392,7 @@ def test_a_conversation_resumed_after_a_restart_gets_the_pages_copy_as_context_o
     _c, tx = _case("celo_fail_balance_confirmed")
     model = Scripted("It failed [E1].")
     client = _app(event_log, tmp_path, model)
-    out = client.post("/chat", json={"hash": tx, "message": "and the fee?", "opening": "my payment failed",
+    out = client.post("/chat", json={"hash": tx, "message": "and which contract was it?", "opening": "my payment failed",
                                      "first_answer": "The transfer failed [E1].",
                                      "earlier": [{"question": "did the money come back?", "answer": "No [E1]."}]})
     assert out.status_code == 200

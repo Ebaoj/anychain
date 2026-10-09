@@ -29,7 +29,7 @@ Do not run it with `--network host`: inside the container the API listens on 0.0
 
 ## Usage metrics
 
-`anychain metrics` prints usage numbers from the local event log (`data/runs.db`, one row per answer given from the CLI or the API; it fills as the tool is used, so a fresh clone shows empty tables), each with the SQL that computes it (all five below; the same text is in `src/anychain/metrics.py`):
+`anychain metrics` prints usage numbers from the local event log (`data/runs.db`, one row per answer given from the CLI or the API; it fills as the tool is used, so a fresh clone shows empty tables), each with the SQL that computes it (all six below; the same text is in `src/anychain/metrics.py`):
 
 <details><summary>The five queries</summary>
 
@@ -69,6 +69,13 @@ SELECT mode, COALESCE(SUM(feedback = 'up'), 0) AS up, COALESCE(SUM(feedback = 'd
 FROM runs
 WHERE ts >= :since AND source IN ('cli', 'api') AND mode IS NOT NULL
 GROUP BY mode ORDER BY mode;
+
+-- Chat questions by intent and by what decided the answer (intent 'human': a hand-off request)
+SELECT COALESCE(intent, 'unknown') AS intent, COALESCE(path, 'unknown') AS path, COUNT(*) AS questions,
+       100.0 * COUNT(*) / SUM(COUNT(*)) OVER () AS share
+FROM runs
+WHERE ts >= :since AND source = 'chat'
+GROUP BY intent, path ORDER BY questions DESC;
 ```
 
 </details>

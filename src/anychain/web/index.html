@@ -359,6 +359,9 @@ const STRINGS = {
     netNodeOk: "nó respondeu, na chain certa", netSaved: "Rede salva e em uso.", netActive: "Em uso",
     networkSwitched: "Mudei para a rede", errorPrefix: "Não consegui:",
     sugSupport: ["Por que foi cobrada uma taxa?", "O dinheiro voltou para mim?", "O que eu faço agora?"],
+    maybe: "Você quis perguntar:", intentQ_status: "Deu certo?", intentQ_why_failed: "Por que falhou?",
+    intentQ_money_moved: "O dinheiro saiu ou voltou?", intentQ_fee: "Quanto paguei de taxa?",
+    intentQ_what_to_do: "O que eu faço agora?", intentQ_when: "Quando foi?",
     sugDeveloper: ["Mostre o código da função chamada", "Qual era o saldo do remetente antes?", "Quais eventos foram emitidos?"],
     sugAuditor: ["Quem pode chamar essa função?", "Quais modificadores protegem a função?", "Mostre o código da função chamada"],
   },
@@ -413,6 +416,9 @@ const STRINGS = {
     netNodeOk: "node answered, on the right chain", netSaved: "Network saved and in use.", netActive: "In use",
     networkSwitched: "Switched to the network", errorPrefix: "I could not do it:",
     sugSupport: ["Why was a fee charged?", "Did the money come back to me?", "What do I do now?"],
+    maybe: "Did you mean:", intentQ_status: "Did it go through?", intentQ_why_failed: "Why did it fail?",
+    intentQ_money_moved: "Did the money leave or come back?", intentQ_fee: "How much was the fee?",
+    intentQ_what_to_do: "What do I do now?", intentQ_when: "When was it?",
     sugDeveloper: ["Show the called function's code", "What was the sender's balance before?", "Which events were emitted?"],
     sugAuditor: ["Who may call this function?", "Which modifiers guard the function?", "Show the called function's code"],
   },
@@ -797,7 +803,14 @@ function showChat(r) {
   const tools = r.tool_calls.map((c) => `<div class="tool">🔎 ${esc(c.tool || "request")}: ${typeof c.result === "string" ? esc(c.result) : c.result.map((id) => `<a class="cite" href="#fact-${esc(id)}" data-fact="${esc(id)}">${esc(id)}</a>`).join(" ")}</div>`).join("");
   const text = r.answer ? markdown(r.answer) :
     `<p class="muted">${esc(r.outcome === "withheld" ? t("noSummary_withheld") : r.error || "—")}</p>`;
-  say("bot", `${tools}${text}<div class="answer-foot">${feedbackHtml(r.run_id)}</div>`);
+  const row = say("bot", `${tools}${text}<div class="answer-foot">${feedbackHtml(r.run_id)}</div>`);
+  if (r.suggestions && r.suggestions.length) {  // the code saw an ambiguity: the likely questions as buttons (D74)
+    const label = document.createElement("p");
+    label.className = "muted";
+    label.textContent = t("maybe");
+    row.querySelector(".bubble").appendChild(label);
+    chipsInto(row, r.suggestions.map((i) => ({label: t("intentQ_" + i), onClick: () => send(t("intentQ_" + i))})));
+  }
 }
 
 // ---- the conversation survives a reload (D72): kept in this browser as data (the messages and the API's answers),

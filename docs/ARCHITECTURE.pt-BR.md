@@ -171,9 +171,32 @@ sequenceDiagram
 
 ---
 
-## 4. O chat com ferramentas
+## 4. O chat: primeiro um harness, por último um chatbot (D73, D74)
 
-Depois da explicação, a pessoa pode perguntar mais. **O modelo não executa nada**: quando precisa de um dado, pede em JSON, e o nosso código confere o pedido, executa e devolve como fato novo, com fonte.
+Antes de qualquer modelo escrever, o código decide que tipo de pergunta é e, para as comuns, o que a resposta diz:
+
+```mermaid
+flowchart LR
+    Q["Pergunta da pessoa"] --> R{"Regras<br/>(sem modelo)"}
+    R -->|"taxa, fee, atendente,<br/>ignore suas instruções"| K
+    R -->|"o resto"| C["Classificador<br/>o modelo da pessoa,<br/>um rótulo de lista fechada"]
+    C --> K{"Intenção"}
+    K -->|"human, off_topic"| F["Resposta pronta<br/>(sem modelo)"]
+    K -->|"status, why_failed, money_moved,<br/>fee, when, what_to_do, purpose_claim"| B["Roteiro montado pelo código<br/>afirmações + seus fatos"]
+    B --> W["Modelo barato escreve<br/>só essas afirmações"]
+    K -->|"open"| O["Chat com ferramentas<br/>(abaixo)"]
+    W --> V["Checagens: valores + afirmações<br/>uma nova tentativa, depois as frases do código"]
+    O --> V
+    V --> A["Resposta"]
+    F --> A
+
+    classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
+    class Q,R,C,K,F,B,W,O,V,A done
+```
+
+A checagem de afirmações barra o que a de valores não vê: "deu certo" numa falha, "o dinheiro voltou" sem transferência de volta, "tente de novo" quando já deu certo depois, e o propósito dito pela pessoa (conta de luz, aluguel) tratado como sabido. A conversa é lembrada: a primeira mensagem, a explicação lida, as perguntas anteriores (D73).
+
+Numa pergunta `open`, a pessoa pode perguntar qualquer coisa sobre a transação. **O modelo não executa nada**: quando precisa de um dado, pede em JSON, e o nosso código confere o pedido, executa e devolve como fato novo, com fonte.
 
 ```mermaid
 sequenceDiagram
@@ -199,7 +222,7 @@ sequenceDiagram
     S-->>P: resposta + fato novo + 👍/👎
 ```
 
-Ferramentas: `read` (estado de um contrato), `code` (código de uma função), `file` (arquivo de um repositório configurado), `transaction` (outra transação). No máximo 3 por pergunta e 10 perguntas por conversa.
+Ferramentas: `read` (estado de um contrato), `code` (código de uma função), `file` (arquivo de um repositório configurado), `transaction` (outra transação). No máximo 3 por pergunta e 20 perguntas por conversa.
 
 ---
 
@@ -368,6 +391,7 @@ flowchart LR
 
 ## Histórico deste documento
 
+- **09/10/2026, D72 a D74:** a conversa sobrevive a recarregar a página e a reiniciar o serviço; o chat lembra a conversa; o chat como harness (regras, classificador, roteiros montados pelo código, checagem de afirmações), seção 4.
 - **09/10/2026, depois da Fase 4 (D59 a D67):** rede privada montada como a da CloudWalk (nó local, Blockscout próprio, BRLC atrás de um proxy), lida só com um arquivo de configuração; o modelo e a chave de API escolhidos pelo terminal ou pela página, com o modelo vindo da lista do próprio provedor; modelos menores confiáveis por código (roteiro da resposta montado a partir dos fatos, só os próximos passos do leitor, citações normalizadas, fatos-chave obrigatórios); rede trocada ou adicionada pela página sem reiniciar; a página virou uma conversa em três versões (lojista, desenvolvedor, auditor); linguagem simples para o lojista. Novos no mapa do código: `outline.py`, `networks.py`, `llm_settings.py`.
 - **08/10/2026, Fase 4 (D55 a D58):** triagem com uma pergunta escolhida pelo código; linha do tempo do remetente em volta de uma falha, com padrões ditos só sobre nonces contínuos; notas de gás (heurísticas); Dockerfile, testado num servidor; README final.
 - **08/10/2026, Fase 3 até a T5 (D44 a D51):** seção 0 em linguagem simples; cache por rede e hash e lote; métricas com SQL; API local e página; chat com ferramentas executadas pelo nosso código; valores na unidade do token, lidos do próprio token; avaliação com 10 casos reais; diagnóstico que parte da origem da falha e diz todo sinal que a conclusão não explica. Novas seções: como o diagnóstico decide, o chat com ferramentas, como a qualidade é medida.

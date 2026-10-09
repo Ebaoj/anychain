@@ -66,6 +66,8 @@ class RunEvent:
     cost_usd: float | None = None  # as Claude Code reports it: list price (costBasis "list"), not what a subscription
     #                                pays; the APIs report tokens only
     feedback: str | None = None  # up | down, from the page (set later with set_feedback)
+    intent: str | None = None  # chat only (D74): what the reader asked; "human" is a hand-off request
+    path: str | None = None  # chat only: fixed | frame | frame_plain | open
     gaps: tuple[GapEvent, ...] = ()
     checks: tuple[CheckEvent, ...] = ()
     ts: float = field(default_factory=time.time)
@@ -74,7 +76,7 @@ class RunEvent:
     def from_bundle(cls, bundle: EvidenceBundle, source: str, duration_ms: int,
                     checks: tuple[CheckEvent, ...] = (), ts: float | None = None,
                     writer: str | None = None, cache: str | None = None, mode: str | None = None,
-                    usage: dict | None = None) -> "RunEvent":
+                    usage: dict | None = None, intent: str | None = None, path: str | None = None) -> "RunEvent":
         gaps = tuple(GapEvent(g.what, g.cause, g.why, g.retryable) for g in bundle.gaps)
         problem = (any(g.cause in PROBLEM_CAUSES for g in gaps) or any(c.status == "fail" for c in checks)
                    or writer in WRITER_PROBLEMS)
@@ -86,7 +88,7 @@ class RunEvent:
                    output_tokens=(usage or {}).get("output_tokens"),
                    cache_read_tokens=(usage or {}).get("cache_read_tokens"),
                    cache_write_tokens=(usage or {}).get("cache_write_tokens"), cost_usd=(usage or {}).get("cost_usd"),
-                   **({"ts": ts} if ts else {}))
+                   intent=intent, path=path, **({"ts": ts} if ts else {}))
 
     @classmethod
     def crash(cls, network: str, tx_hash: str, source: str, duration_ms: int, error: str,
@@ -172,7 +174,7 @@ RUN_COLUMNS = ["ts", "network", "tx_hash", "source", "outcome", "duration_ms", "
 ADDED_COLUMNS = [("writer", "TEXT"), ("diagnosis", "TEXT"), ("cache", "TEXT"), ("mode", "TEXT"), ("rule", "TEXT"),
                  ("abi_source", "TEXT"), ("input_tokens", "INTEGER"), ("output_tokens", "INTEGER"),
                  ("cost_usd", "REAL"), ("feedback", "TEXT"), ("cache_read_tokens", "INTEGER"),
-                 ("cache_write_tokens", "INTEGER")]
+                 ("cache_write_tokens", "INTEGER"), ("intent", "TEXT"), ("path", "TEXT")]
 
 
 class SqliteEventLog:

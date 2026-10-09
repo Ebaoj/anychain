@@ -115,7 +115,7 @@ def test_metrics_count_users_answers_only(event_log):
                               duration_ms=1, status="failed", mode=None, rule="no_reason", diagnosis="UNKNOWN"))
     event_log.record(RunEvent(network="ethereum-mainnet", tx_hash="0x3", source="cli", outcome="ok",
                               duration_ms=1, status="failed", diagnosis="CONFIRMED"))  # before T1: no mode
-    causes, labels, abi, satisfaction, cache = run_queries(event_log, 0)
+    causes, labels, abi, satisfaction, cache, _chat = run_queries(event_log, 0)
     assert {r["cause"]: r["answers"] for r in causes} == {"insufficient_balance": 2, "no_reason": 1}
     assert {r["label"]: r["answers"] for r in labels} == {"CONFIRMED": 2, "UNKNOWN": 1}
     assert {r["mode"]: (r["up"], r["down"], r["satisfaction"]) for r in satisfaction} == {
@@ -131,7 +131,7 @@ def test_metrics_print_each_query_with_its_sql(monkeypatch, event_log):
     for title in ("Failure causes", "Diagnosis labels", "ABI source of the main call", "Satisfaction by mode",
                   "Cache"):
         assert title in out
-    assert out.count("SELECT") == 5  # every number comes with the query that made it
+    assert out.count("SELECT") == 6  # every number comes with the query that made it
     assert "insufficient_balance | 2 | 2 | 66.7%" in out and "support | 1 | 1 | 50.0%" in out
     assert "all networks in this log" in out
 
@@ -149,7 +149,7 @@ def test_metrics_on_a_log_from_before_these_columns(tmp_path, monkeypatch):
     old = SqliteEventLog(path, read_only=True)
     monkeypatch.setattr(cli, "SqliteEventLog", lambda _path, read_only=False: old)
     result = CliRunner().invoke(cli.app, ["metrics", "--config", str(ROOT / "configs" / "ethereum-mainnet.yaml")])
-    assert result.exit_code == 0 and result.output.count("column yet") == 5  # none of the five columns exists
+    assert result.exit_code == 0 and result.output.count("column yet") == 6  # none of the six queries' columns exists
     assert "(no answers in this period)" not in result.output
 
 

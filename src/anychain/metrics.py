@@ -51,6 +51,14 @@ WHERE ts >= :since AND source IN ('cli', 'api') AND mode IS NOT NULL
 GROUP BY 1
 ORDER BY answers DESC
 """),
+    ("Chat questions by intent and by what decided the answer (intent 'human': a hand-off request; D74)", """
+SELECT COALESCE(intent, 'unknown') AS intent, COALESCE(path, 'unknown') AS path, COUNT(*) AS questions,
+       100.0 * COUNT(*) / SUM(COUNT(*)) OVER () AS share
+FROM runs
+WHERE ts >= :since AND source = 'chat'
+GROUP BY intent, path
+ORDER BY questions DESC
+"""),
 ]
 
 
@@ -61,7 +69,8 @@ def run_queries(log, since: float) -> list[list[dict] | set[str]]:
         columns = {r[1] for r in db.execute("PRAGMA table_info(runs)")}
         out = []
         for _title, sql in QUERIES:
-            needed = {"rule", "diagnosis", "abi_source", "feedback", "mode", "cache", "source"} & set(re.findall(r"\w+", sql))
+            needed = ({"rule", "diagnosis", "abi_source", "feedback", "mode", "cache", "source", "intent", "path"}
+                      & set(re.findall(r"\w+", sql)))
             if needed - columns:
                 out.append(needed - columns)
                 continue

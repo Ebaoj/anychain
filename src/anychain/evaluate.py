@@ -251,3 +251,47 @@ def _commit() -> str:
         return f"{head} + uncommitted changes" if dirty else head
     except (OSError, subprocess.TimeoutExpired):
         return "unknown"
+
+
+# ---- D74: the classifier of the chat, measured on a labelled set of reader questions (eval/chat_intents.json) ----
+
+RISKY = ("what_to_do", "money_moved", "purpose_claim")  # a wrong fixed frame here would mislead the most
+
+
+def intent_eval(rows: list[tuple[str, str]], make_backend, model: str, out_dir: Path, workers: int = 6) -> dict:
+    """Routes every question (rules, then the classifier; `make_backend` None: rules only) and reports accuracy,
+    the share routed by rules, and wrong answers sent into a risky frame. `open` is the safe side."""
+    import concurrent.futures as cf
+
+    from anychain import intents
+    started = time.time()
+
+    def one(row):
+        question, expected = row
+        r = intents.route(question, make_backend() if make_backend else None)
+        return question, expected, "+".join(r.intents), r.how
+    with cf.ThreadPoolExecutor(workers) as pool:
+        got = list(pool.map(one, rows))
+    single = [g for g in got if "+" not in g[2]]
+    right = [g for g in single if g[2] == g[1]]
+    into_risky = [g for g in single if g[2] != g[1] and g[2] in RISKY]
+    summary = {"questions": len(rows), "accuracy": round(100 * len(right) / len(single), 1) if single else None,
+               "by_rules": sum(1 for g in got if g[3] == "rule"), "wrong_into_risky_frame": len(into_risky),
+               "split_into_two_questions": len(got) - len(single), "seconds": round(time.time() - started, 1)}
+    meta = {"date": time.strftime("%Y-%m-%d %H:%M"), "commit": _commit(), "model": model}
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "intents.json").write_text(json.dumps({**meta, "summary": summary, "rows": got}, indent=1,
+                                                     ensure_ascii=False))
+    lines = ["# Chat intents: rules, then the classifier\n",
+             f"Run {meta['date']}, commit {meta['commit']}, model {model}. {len(rows)} reader questions in pt-BR, en "
+             "and es (eval/chat_intents.json). A message with two questions is split and each part routed.\n",
+             "| Metric | Result |", "|---|---|",
+             f"| Accuracy (single questions) | {summary['accuracy']}% |",
+             f"| Routed by rules, no model | {summary['by_rules']} of {len(rows)} |",
+             f"| Wrong label into a risky frame (what to do, money moved, purpose) | {summary['wrong_into_risky_frame']} |",
+             f"| Messages split into two questions | {summary['split_into_two_questions']} |",
+             f"| Seconds, all questions ({workers} at a time) | {summary['seconds']} |", "",
+             "| Question | Expected | Got | How |", "|---|---|---|---|"]
+    lines += [f"| {q} | {e} | {'' if g == e else 'MISS '}{g} | {h} |" for q, e, g, h in got]
+    (out_dir / "intents.md").write_text("\n".join(lines) + "\n")
+    return summary

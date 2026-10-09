@@ -22,6 +22,8 @@ from eth_utils import is_address, to_checksum_address
 
 import threading
 
+from anychain import intents as intents_
+from anychain.claims import check_claims, purposes_in
 from anychain.collectors.http import CollectorError
 from anychain.models import EvidenceBundle, Source
 from anychain.reads import Read, StateReader, UnreadableState
@@ -56,6 +58,16 @@ class Turn:
     problems: list[str] = field(default_factory=list)
     usage: dict | None = None
     error: str | None = None
+    intent: str | None = None  # what the reader asked (D74): one label, or "a+b" for two questions in one message
+    path: str | None = None  # fixed | frame | frame_plain | open: who decided the answer
+    route: str | None = None  # rule | classifier | default: how the intent was found
+    suggestions: list[str] = field(default_factory=list)  # intents offered as buttons
+
+
+FRAME_SYSTEM = ("You write the answer to the reader's question from statements prepared for you: write only those "
+                "statements, in plain words for this reader and in the answer's language, each sentence followed by "
+                "its fact ids. Do not add facts, advice or anything the statements do not say. Speak to the reader as "
+                "\"you\" (\"você\", \"usted\"); never call them \"the reader\".")
 
 
 class Tools:
@@ -245,6 +257,24 @@ class ChatSession:
             return Turn(question, None, "refused", error=f"this conversation reached {MAX_QUESTIONS} questions: "
                                                           "start a new one")
         turn = Turn(question, None, "unavailable")
+        # D74: rules, then the classifier; a framed intent is answered from statements built by code, a fixed one by
+        # code alone; only the rest reaches the open chat below. Every written answer passes both checks.
+        routed = intents_.route(question, backend, self.bundle.status,
+                                usage_sink=lambda u: setattr(turn, "usage", add_usage(turn.usage, u)))
+        turn.intent, turn.route, turn.suggestions = "+".join(routed.intents), routed.how, routed.suggestions
+        if len(routed.intents) == 1 and routed.intents[0] in intents_.FIXED:
+            turn.answer, turn.outcome, turn.path = (intents_.fixed_reply(routed.intents[0], self.bundle,
+                                                                         self._language()), "ok", "fixed")
+            self.turns.append(turn)
+            return turn
+        if all(i in intents_.FRAMED for i in routed.intents):
+            frames = [intents_.build_frame(i, self.bundle, self.mode, self._language()) for i in routed.intents]
+            if all(frames):
+                self._answer_framed(question, frames, backend, turn)
+                self.turns.append(turn)
+                return turn
+        turn.path = "open"
+        purposes = self._purposes(question)
         tools_left, feedback, nagged = MAX_TOOLS, None, False
         try:
             for round_ in range(MAX_ROUNDS + 2):  # tool rounds, then the answer and one retry
@@ -264,7 +294,7 @@ class ChatSession:
                     continue
                 reply = normalize_citations(reply)  # "conforme E19" -> "[E19]" (D62)
                 problems = check_answer(reply, evidence_payload(self.bundle, self.cfg), allowed_urls(self.bundle),
-                                        evidence_ids(self.bundle))
+                                        evidence_ids(self.bundle)) + check_claims(reply, self.bundle, purposes)
                 if not problems:
                     turn.answer, turn.outcome = reply, "retried" if turn.problems else "ok"
                     break
@@ -280,6 +310,50 @@ class ChatSession:
             turn.usage = add_usage(turn.usage, exc.usage)
         self.turns.append(turn)
         return turn
+
+    def _language(self) -> str:
+        from anychain.llm_settings import language
+        return language(self.cfg.assistant.language)
+
+    def _purposes(self, question: str) -> list[str]:
+        """What the reader said the payment was for, in this conversation: never confirmed (claims.py)."""
+        said = [self.opening or "", question] + [t.question for t in self.turns] + [q for q, _a in self.carried]
+        return sorted({p for text in said for p in purposes_in(text)})
+
+    def _answer_framed(self, question: str, frames: list, backend, turn: Turn) -> None:
+        """The cheap model writes the statements; both checks, one retry, then the frame's own sentences."""
+        payload = evidence_payload(self.bundle, self.cfg)
+        system = load_prompt(self.mode, self._language()) + "\n\n" + FRAME_SYSTEM
+        user = payload + "\n\n" + intents_.frame_prompt(frames, question)
+        allowed = set().union(*(f.ids() for f in frames))
+        purposes, feedback = self._purposes(question), None
+        try:
+            for _attempt in range(2):
+                reply = backend.complete(system, user + (
+                    "\n\nYour previous answer was rejected:\n" + "\n".join(f"- {p[:200]}" for p in feedback[:10])
+                    + "\nWrite it again." if feedback else ""))
+                turn.usage = add_usage(turn.usage, getattr(backend, "last_usage", None))
+                reply = normalize_citations(reply)
+                outside = sorted({i for group in re.findall(r"\[(E\d+(?:\s*,\s*E\d+)*)\]", reply)
+                                  for i in re.split(r"\s*,\s*", group)} - allowed)
+                cited = set(re.findall(r"E\d+", " ".join(re.findall(r"\[(E\d+(?:\s*,\s*E\d+)*)\]", reply))))
+                uncited = [f.intent for f in frames if f.ids() and not f.ids() & cited]
+                not_facts = sorted(set(re.findall(r"\[((?!E\d)[^\]\[]{1,30})\]", reply)))
+                problems = (check_answer(reply, payload, allowed_urls(self.bundle), evidence_ids(self.bundle))
+                            + check_claims(reply, self.bundle, purposes)
+                            + ([f"it cites facts the answer was not built from: {', '.join(outside)}"] if outside else [])
+                            + ([f"it does not cite the facts of: {', '.join(uncited)}"] if uncited else [])
+                            + ([f"it cites something that is not a fact: {', '.join(not_facts)}"] if not_facts else []))
+                if not problems:
+                    turn.answer, turn.outcome, turn.path = reply, "retried" if turn.problems else "ok", "frame"
+                    return
+                turn.problems = feedback = problems
+        except WriterError as exc:  # no model: the code's own sentences still answer
+            turn.error = no_urls(str(exc), self._hidden)
+            turn.usage = add_usage(turn.usage, exc.usage)
+        turn.answer, turn.outcome, turn.path = intents_.plain_answer(frames), "fallback", "frame_plain"
+        asked = {f.intent for f in frames}
+        turn.suggestions = turn.suggestions or [i for i in intents_.suggestions_for(self.bundle.status) if i not in asked]
 
     def _run(self, request, turn: Turn) -> dict:
         shown = _shown_request(request)
@@ -499,7 +573,10 @@ class Sessions:
 def turn_event(session: ChatSession, turn: Turn, source: str, duration_ms: int):
     """The event-log row of one chat question (its writer outcome, check problems, usage)."""
     from anychain.events import CheckEvent, RunEvent
-    checks = (CheckEvent("answer_check", "fail" if turn.answer is None else "retried", "; ".join(turn.problems)),
+    # a frame's own sentences after two failed attempts is a failed check, though the reader got an answer
+    failed = turn.answer is None or turn.path == "frame_plain"
+    checks = (CheckEvent("answer_check", "fail" if failed else "retried", "; ".join(turn.problems)),
               ) if turn.problems else ()
     return RunEvent.from_bundle(session.bundle, source, duration_ms, checks=checks, mode=session.mode,
-                                writer={"refused": "skipped"}.get(turn.outcome, turn.outcome), usage=turn.usage)
+                                writer={"refused": "skipped"}.get(turn.outcome, turn.outcome), usage=turn.usage,
+                                intent=turn.intent, path=turn.path)
