@@ -41,6 +41,11 @@ def build(failed_hash: str, sender: str, rows: list[AddressTransaction]) -> Time
     return Timeline(window, failed, _patterns(failed, ordered[:at], ordered[at + 1:]))
 
 
+def _edge(run: list, before: list, after: list) -> bool:
+    """The run of failures reaches the first or last transaction read: more may lie beyond what was read."""
+    return (not before or before[0] in run) or (not after or after[-1] in run)
+
+
 def _same_call(a: AddressTransaction, b: AddressTransaction) -> bool:
     return bool(a.method) and a.method == b.method and (a.to or "").lower() == (b.to or "").lower()
 
@@ -72,7 +77,8 @@ def _patterns(failed, before, after) -> list[tuple[str, str]]:
     if len(run) >= 2:
         nonces = sorted(r.nonce for r in run)
         listed = (", ".join(str(n) for n in nonces) if len(nonces) <= 6 else f"nonces {nonces[0]} to {nonces[-1]}")
-        out.append(("repeated_failures", f"The same call ({failed.method}) failed {len(run)} times in a row, with "
+        times = f"at least {len(run)} times" if _edge(run, before, after) else f"{len(run)} times"
+        out.append(("repeated_failures", f"The same call ({failed.method}) failed {times} in a row, with "
                     f"no other transaction of the sender in between ({'nonces ' if len(nonces) <= 6 else ''}"
                     f"{listed})."))
     return out
@@ -82,6 +88,8 @@ def _later(seconds: int | None) -> str:
     """"N seconds later", with days or hours added for long gaps (the number of seconds stays: it is the fact)."""
     if seconds is None:
         return "later"
+    if seconds == 0:
+        return "0 seconds later (the same timestamp: the same block or second)"
     for unit, size in (("day", 86400), ("hour", 3600)):
         if seconds >= size:
             n = round(seconds / size)

@@ -66,7 +66,10 @@ def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool,
         result.run_id = record(log, event())
         return result
     if clarified:
-        apply_answer(bundle, str(clarified.get("kind") or ""), str(clarified.get("answer") or ""))
+        kind = str(clarified.get("kind") or "")
+        asked = for_bundle(bundle, question, cfg)  # only an answer to the question this evidence calls for counts
+        if asked is not None and asked.kind == kind:
+            apply_answer(bundle, kind, str(clarified.get("answer") or ""))
     elif write == WRITE and bundle.items:
         result.clarify = for_bundle(bundle, question, cfg)
         if result.clarify is not None:  # asked before anything is written; the reader's answer comes back

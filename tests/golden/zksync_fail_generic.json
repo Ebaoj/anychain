@@ -22,7 +22,7 @@
    "needed": "Open the sender's page on the explorer",
    "retryable": false,
    "what": "Timeline",
-   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+   "why": "the sender sent at least 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -649,7 +649,7 @@
      "url": "https://zksync.blockscout.com/api/v2/addresses/0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250/transactions?filter=from"
     }
    ],
-   "text": "The same call (0x8412a3b9) failed 22 times in a row, with no other transaction of the sender in between (nonces 73801 to 73822)."
+   "text": "The same call (0x8412a3b9) failed at least 22 times in a row, with no other transaction of the sender in between (nonces 73801 to 73822)."
   },
   {
    "confidence": "single_source",

@@ -86,7 +86,8 @@ def test_an_address_that_received_nothing_is_said_from_the_transfers():
     cfg, b = _bundle("eth_usdc_transfer")
     other = "0x000000000000000000000000000000000000dEaD"
     fact = apply_answer(b, "expected_receipt", other)
-    assert fact.kind == "triage" and "None of the 1 token transfer" in fact.text and other in fact.text
+    assert fact.kind == "triage" and "none of the movements of value the explorer lists" in fact.text
+    assert other in fact.text
     assert fact.sources  # the transfers' own sources
 
 
@@ -182,3 +183,37 @@ def test_the_command_line_shows_the_question_when_it_cannot_ask(monkeypatch):
     monkeypatch.setattr(cli, "ExplorerClient", lambda *a, **kw: _explorer(cfg))
     out = CliRunner().invoke(cli.app, ["explain", SENDER, "--config", ETH, "--json"])
     assert out.exit_code == 1 and '"which_transaction"' in out.stdout and USDC_TX in out.stdout
+
+
+# ---- review of Phase 4 ----
+
+def test_an_answer_to_a_question_never_asked_adds_nothing(event_log):
+    # the deadline cause on the verified Uniswap router is CONFIRMED: no intent question applies there
+    cfg, b = _bundle("eth_fail_expired_v2")
+    result = _answer(b, cfg, event_log, clarified={"kind": "intent", "answer": "other"})
+    assert not [e for e in result.bundle.items if e.kind == "triage"]
+    cfg, b = _bundle("eth_fail_expired_v2")  # a failure: no "did not receive it" question either
+    result = _answer(b, cfg, event_log, clarified={"kind": "expected_receipt", "answer": SENDER})
+    assert not [e for e in result.bundle.items if e.kind == "triage"]
+
+
+def test_native_value_sent_by_the_call_counts_as_a_payment():
+    # real: the Uniswap v2 swap sent 0.2 ETH with the call to the router
+    cfg, b = _bundle("eth_uniswap_v2_swap")
+    overview = next(e for e in b.items if e.kind == "overview")
+    fact = apply_answer(b, "expected_receipt", overview.data["to"])
+    assert "went to that address" in fact.text and overview.id in fact.text
+
+
+def test_the_scope_of_none_is_said():
+    cfg, b = _bundle("eth_usdc_transfer")
+    fact = apply_answer(b, "expected_receipt", "0x000000000000000000000000000000000000dEaD")
+    assert "the explorer lists" in fact.text and "hides" in fact.text
+
+
+def test_an_incomplete_transfer_list_is_said():
+    cfg, b = _bundle("eth_usdc_transfer")
+    b.add_gap("Token transfers", "more than 5 pages of transfers", "Open the explorer page", False,
+              "not_interpretable")  # edit: the real gap the bundle declares past MAX_PAGES
+    fact = apply_answer(b, "expected_receipt", "0x000000000000000000000000000000000000dEaD")
+    assert "incomplete" in fact.text

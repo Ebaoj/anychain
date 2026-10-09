@@ -22,7 +22,7 @@ MAX_OPTIONS = 10
 # "did not receive", "never arrived", "não recebi", "não chegou", "ainda não caiu"...
 NOT_RECEIVED = re.compile(
     r"\b(n[ãa]o|nunca|ainda\s+n[ãa]o|didn'?t|did\s+not|never|haven'?t|have\s+not|hasn'?t|has\s+not|not)\b"
-    r"(\W+\w+){0,3}?\W+(receb\w*|cheg\w*|ca[íi]\w*|receiv\w*|arriv\w*|got|get|come|came)\b", re.IGNORECASE)
+    r"(\W+\w+){0,3}?\W+(receb\w*|cheg\w*|ca[íi]\w*|receiv\w*|arriv\w*|got)\b", re.IGNORECASE)
 # Rules whose LIKELY reading rests on words borrowed from a known contract, and what that contract's check is.
 BORROWED = {"slippage": "a swap's minimum-output (slippage) check",
             "deadline": "a swap's or trade's time limit (deadline) check"}
@@ -75,11 +75,11 @@ def for_bundle(bundle: EvidenceBundle, question: str | None, cfg) -> Clarify | N
     """The one question the evidence calls for, or None."""
     if cfg.assistant.max_clarifying_questions < 1:
         return None
-    transfers = [e for e in bundle.items if e.kind == "token_transfer"]
-    if bundle.status == "success" and question and NOT_RECEIVED.search(question) and transfers:
+    movements = _movements(bundle)
+    if bundle.status == "success" and question and NOT_RECEIVED.search(question) and movements:
         return Clarify("expected_receipt", "Which payment did you expect? Pick the one below, or type the address "
                        "that should have received it.",
-                       [Option(e.id, e.text) for e in transfers[:MAX_OPTIONS]], "The receiving address (0x…)")
+                       [Option(e.id, e.text) for e, _to in movements[:MAX_OPTIONS]], "The receiving address (0x…)")
     own = _own_diagnosis(bundle)
     if bundle.status == "failed" and own is not None and own.data.get("label") == "LIKELY" \
             and own.data.get("rule") in BORROWED:
@@ -100,27 +100,46 @@ def apply_answer(bundle: EvidenceBundle, kind: str, answer: str) -> Evidence | N
     return None  # which_transaction: the answer is the hash itself
 
 
+def _movements(bundle: EvidenceBundle) -> list[tuple[Evidence, str]]:
+    """Every movement of value the evidence lists, with its recipient: token transfers, native movements, and the
+    native value the call itself sent (Phase 4 review: native value counts as a payment too)."""
+    out = [(e, e.data.get("to")) for e in bundle.items if e.kind in ("token_transfer", "native_transfer")
+           and e.data.get("to")]
+    overview = next((e for e in bundle.items if e.kind == "overview"), None)
+    if overview is not None and overview.data.get("to") and str(overview.data.get("value")) not in ("0", "unknown", "None"):
+        out.append((overview, overview.data["to"]))
+    return out
+
+
 def _expected_receipt(bundle: EvidenceBundle, answer: str) -> Evidence | None:
-    transfers = [e for e in bundle.items if e.kind == "token_transfer"]
-    sources = _unique_sources(transfers)
-    picked = next((e for e in transfers if e.id == answer), None)
+    movements = _movements(bundle)
+    sources = _unique_sources([e for e, _to in movements])
+    picked = next((e for e, _to in movements if e.id == answer), None)
     if picked is not None:
+        to = next(to for e, to in movements if e is picked)
         return bundle.add("triage", f"The reader picked {picked.id} as the payment they expected: in this "
-                          f"transaction it went to {picked.data.get('to')} ({picked.id}).", [READER] + sources,
+                          f"transaction it went to {to} ({picked.id}).", [READER] + sources,
                           {"kind": "expected_receipt", "answer": answer, "matches": [picked.id]},
                           confidence="candidate")
     if not ADDRESS.match(answer):
         return None
-    to_it = [e for e in transfers if (e.data.get("to") or "").lower() == answer.lower()]
-    n = len(transfers)
-    noun = "token transfer" if n == 1 else "token transfers"
+    to_it = [e for e, to in movements if to.lower() == answer.lower()]
+    ids = ", ".join(e.id for e, _to in movements)
     if to_it:
-        text = (f"The reader expected a payment to {answer}: of the {n} {noun} in this transaction, "
-                f"{', '.join(e.id for e in to_it)} went to that address.")
+        text = (f"The reader expected a payment to {answer}: of the movements of value the explorer lists for this "
+                f"transaction ({ids}), {', '.join(e.id for e in to_it)} went to that address.")
     else:
-        others = sorted({e.data.get("to") for e in transfers if e.data.get("to")})
-        text = (f"The reader expected a payment to {answer}: None of the {n} {noun} in this transaction went to "
-                f"that address (they went to {', '.join(others)}; {', '.join(e.id for e in transfers)}).")
+        others = sorted({to for _e, to in movements})
+        text = (f"The reader expected a payment to {answer}: none of the movements of value the explorer lists for "
+                f"this transaction ({ids}) went to that address; they went to {', '.join(others)}.")
+        # what the comparison cannot see, said so it is never read as "nothing went there"
+        limits = ["tokens the explorer hides (for example those it marks as scam) are not listed"]
+        if any(g.what == "Token transfers" for g in bundle.gaps):
+            limits.insert(0, "the token-transfer list is incomplete (see its gap), so a transfer to it may be "
+                             "missing")
+        if any(e.kind == "internal_call" and e.data.get("moves_value") for e in bundle.items):
+            limits.append("native value moved inside internal calls is not compared")
+        text += " Limits of this comparison: " + "; ".join(limits) + "."
     return bundle.add("triage", text, [READER] + sources,
                       {"kind": "expected_receipt", "answer": answer, "matches": [e.id for e in to_it]},
                       confidence="candidate")

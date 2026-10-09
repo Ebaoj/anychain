@@ -15,7 +15,7 @@
    "needed": "Open the sender's page on the explorer",
    "retryable": false,
    "what": "Timeline",
-   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+   "why": "the sender sent at least 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -291,7 +291,7 @@
      "url": "https://explorer.optimism.io/api/v2/addresses/0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013/transactions?filter=from"
     }
    ],
-   "text": "The same call (0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993) succeeded 0 seconds later (nonce 951507): the first time it succeeded after this failure."
+   "text": "The same call (0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993) succeeded 0 seconds later (the same timestamp: the same block or second) (nonce 951507): the first time it succeeded after this failure."
   },
   {
    "confidence": "single_source",
@@ -315,7 +315,7 @@
      "url": "https://explorer.optimism.io/api/v2/addresses/0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013/transactions?filter=from"
     }
    ],
-   "text": "Gas notes (heuristic, not a finding): Gas used 26311 of the 2600000 limit (1.0%). The same call succeeded at nonce 951503 using 821467 gas, with a limit of 2600000 (E8); this transaction had a limit of 2600000."
+   "text": "Gas notes (heuristic, not a finding): Gas used 26311 of the 2600000 limit (1.0%). The same call succeeded at nonce 951507 using 828772 gas, with a limit of 2600000 (E8); this transaction had a limit of 2600000."
   }
  ],
  "network": "optimism-mainnet",

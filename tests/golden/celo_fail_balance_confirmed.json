@@ -8,7 +8,7 @@
    "needed": "Open the sender's page on the explorer",
    "retryable": false,
    "what": "Timeline",
-   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+   "why": "the sender sent at least 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -395,7 +395,7 @@
      "url": "https://celo.blockscout.com/api/v2/addresses/0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0/transactions?filter=from"
     }
    ],
-   "text": "The same call (transfer) failed 35 times in a row, with no other transaction of the sender in between (nonces 54482 to 54516)."
+   "text": "The same call (transfer) failed at least 35 times in a row, with no other transaction of the sender in between (nonces 54482 to 54516)."
   },
   {
    "confidence": "single_source",

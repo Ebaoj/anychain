@@ -567,7 +567,7 @@
      "url": "https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from"
     }
    ],
-   "text": "Gas notes (heuristic, not a finding): Gas used 133145 of the 600000 limit (22.2%). The same call succeeded at nonce 10343 using 151535 gas, with a limit of 600011 (E19); this transaction had a limit of 600000."
+   "text": "Gas notes (heuristic, not a finding): Gas used 133145 of the 600000 limit (22.2%). The same call succeeded at nonce 10346 using 129820 gas, with a limit of 600000 (E19); this transaction had a limit of 600000."
   }
  ],
  "network": "ethereum-mainnet",

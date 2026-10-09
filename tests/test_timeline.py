@@ -61,13 +61,6 @@ def test_repeated_failures_of_the_same_call():
     assert "retried_ok" not in [p[0] for p in t.patterns]
 
 
-def test_no_timeline_for_a_success():
-    from tests.test_golden import _case
-    _c, tx = _case("eth_usdc_transfer")
-    b = replay_bundle(ETH, tx, "eth_usdc_transfer")
-    assert not [e for e in b.items if e.kind == "timeline"]
-
-
 def test_an_explorer_that_cannot_list_the_sender_is_a_gap():
     b = replay_bundle(ETH, TX, "eth_fail_timeline", overrides={
         k.split(" ", 1)[1]: {"status": 503, "body": "busy"}

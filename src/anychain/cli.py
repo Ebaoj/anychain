@@ -115,9 +115,10 @@ def _ask(clarify, as_json: bool) -> str:
             for i, o in enumerate(clarify.options, 1):
                 print(f"  {i}. {o.label} ({o.id})")
         raise typer.Exit(1)
-    print(clarify.question, file=sys.stderr)
+    clean = lambda t: "".join(ch for ch in t if ch.isprintable())  # noqa: E731  explorer text: no terminal codes
+    print(clean(clarify.question), file=sys.stderr)
     for i, o in enumerate(clarify.options, 1):
-        print(f"  {i}. {o.label}", file=sys.stderr)
+        print(f"  {i}. {clean(o.label)}", file=sys.stderr)
     reply = typer.prompt("Your answer (a number" + (", or " + clarify.free_text if clarify.free_text else "") + ")",
                          err=True).strip()
     if reply.isdigit() and 1 <= int(reply) <= len(clarify.options):

@@ -455,7 +455,7 @@
      "url": "https://gnosisscan.io/api/v2/addresses/0xd14E38693f4a8B7cc71A3c0203e146Fd58A046d1/transactions?filter=from"
     }
    ],
-   "text": "Gas notes (heuristic, not a finding): Gas used 293252 of the 293668 limit (99.9%). The same call succeeded at nonce 14245 using 290377 gas, with a limit of 293830 (E15); this transaction had a limit of 293668."
+   "text": "Gas notes (heuristic, not a finding): Gas used 293252 of the 293668 limit (99.9%). The same call succeeded at nonce 14248 using 290217 gas, with a limit of 306052 (E15); this transaction had a limit of 293668."
   }
  ],
  "network": "gnosis-mainnet",

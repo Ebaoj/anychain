@@ -8,7 +8,7 @@
    "needed": "Open the sender's page on the explorer",
    "retryable": false,
    "what": "Timeline",
-   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+   "why": "the sender sent at least 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -273,7 +273,7 @@
      "url": "https://eth.blockscout.com/api/v2/addresses/0x7a703f3C2970B0bB4934a06A85bE4Fb3b03eAB02/transactions?filter=from"
     }
    ],
-   "text": "The same call (transfer) failed 4 times in a row, with no other transaction of the sender in between (nonces 9652, 9653, 9654, 9655)."
+   "text": "The same call (transfer) failed at least 4 times in a row, with no other transaction of the sender in between (nonces 9652, 9653, 9654, 9655)."
   },
   {
    "confidence": "single_source",

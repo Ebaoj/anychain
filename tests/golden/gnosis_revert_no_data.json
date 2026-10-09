@@ -284,7 +284,7 @@
      "url": "https://gnosisscan.io/api/v2/addresses/0x202600F312dC1dC44ca46d9eF7Fd134995038fd0/transactions?filter=from"
     }
    ],
-   "text": "The same call (keyGenAndCommit) failed 100 times in a row, with no other transaction of the sender in between (nonces 423312 to 423411)."
+   "text": "The same call (keyGenAndCommit) failed at least 100 times in a row, with no other transaction of the sender in between (nonces 423312 to 423411)."
   },
   {
    "confidence": "single_source",

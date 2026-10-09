@@ -29,7 +29,7 @@
    "needed": "Open the sender's page on the explorer",
    "retryable": false,
    "what": "Timeline",
-   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+   "why": "the sender sent at least 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [

@@ -15,7 +15,7 @@
    "needed": "Open the sender's page on the explorer",
    "retryable": false,
    "what": "Timeline",
-   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+   "why": "the sender sent at least 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -314,7 +314,7 @@
      "url": "https://celo.blockscout.com/api/v2/addresses/0x224cFC26c83Fccc3463c804e7F86b10651D5dF96/transactions?filter=from"
     }
    ],
-   "text": "The same call (0x61461954) failed 2 times in a row, with no other transaction of the sender in between (nonces 68277, 68278)."
+   "text": "The same call (0x61461954) failed at least 2 times in a row, with no other transaction of the sender in between (nonces 68277, 68278)."
   },
   {
    "confidence": "single_source",

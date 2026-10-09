@@ -31,10 +31,11 @@ def same_call_note(timeline_fact) -> str | None:
         return None
     ok = [r for r in rows if r is not failed and r.get("result") == "success" and r.get("method")
           and r.get("method") == failed.get("method") and (r.get("to") or "").lower() == (failed.get("to") or "").lower()
-          and r.get("gas_used")]
+          and r.get("gas_used") and r.get("gas_limit") and failed.get("gas_limit")]
     if not ok:
         return None
-    r = ok[0]
+    later = [r for r in ok if (r.get("nonce") or 0) > (failed.get("nonce") or 0)]
+    r = (later or ok)[0]  # the attempt after the failure first, as the timeline's pattern names it
     return (f"The same call succeeded at nonce {r['nonce']} using {r['gas_used']} gas, with a limit of "
             f"{r['gas_limit']} ({timeline_fact.id}); this transaction had a limit of {failed.get('gas_limit')}.")
 

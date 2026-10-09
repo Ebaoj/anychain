@@ -340,7 +340,7 @@
      "url": "https://rootstock.blockscout.com/api/v2/addresses/0x9E954ef6a88A85a8FC203148c360Af5a4EFA3640/transactions?filter=from"
     }
    ],
-   "text": "The same call (stake) failed 13 times in a row, with no other transaction of the sender in between (nonces 8 to 20)."
+   "text": "The same call (stake) failed at least 13 times in a row, with no other transaction of the sender in between (nonces 8 to 20)."
   },
   {
    "confidence": "single_source",

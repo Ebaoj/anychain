@@ -763,7 +763,7 @@ class BundleBuilder:
                       "Ask again in a minute", retryable=True, cause="source_behind")
             return
         if not reached:
-            self._gap("Timeline", f"the sender sent more than {len(rows) - len(before)} transactions after this one; "
+            self._gap("Timeline", f"the sender sent at least {len(rows) - len(before)} transactions after this one; "
                       "those right after it are not shown", "Open the sender's page on the explorer",
                       retryable=False, cause="not_interpretable")
 
