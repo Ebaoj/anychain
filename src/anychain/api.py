@@ -80,6 +80,18 @@ class NetworkRequest(BaseModel):
     name: str = Field(..., max_length=100)
 
 
+class NetworkDraft(BaseModel):
+    """A network typed on the page (D65)."""
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(..., max_length=41)
+    chain_id: int = Field(..., gt=0)
+    native_symbol: str = Field(..., min_length=1, max_length=12)
+    native_decimals: int = Field(18, ge=0, le=36)
+    chain_type: str = Field("default", max_length=30)
+    explorer_url: str = Field(..., max_length=300)
+    rpc_url: str = Field(..., max_length=500)
+
+
 class AnswersRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     language: str = Field(..., max_length=10)
@@ -332,6 +344,57 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
              "active": True}]
         return {"active": cfg.network.name, "networks": listed,
                 "examples": [e.model_dump() for e in cfg.examples]}
+
+    @app.post("/settings/network/check")
+    def check_network(body: NetworkDraft, request: Request) -> dict:
+        """Asks the explorer and the node of a network being added, before it is saved (D65)."""
+        same_page_only(request)
+        from anychain.networks import draft_config
+        try:
+            draft = draft_config(body.model_dump(), cfg)
+        except ConfigError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        budget = Budget(PROBE_BUDGET_S)
+        return {"explorer": probe_explorer(draft, client, budget), "node": probe_node(draft, client, budget)}
+
+    @app.post("/settings/network/save")
+    def save_network(body: NetworkDraft, request: Request) -> dict:
+        """Saves a network from the page as a config file outside the repository, and makes it the active one; refused
+        when its node answers for another chain (D65)."""
+        same_page_only(request)
+        from anychain.networks import draft_config, save_user_network
+        if networks is None:
+            raise HTTPException(422, "this server runs one network only")
+        try:
+            draft = draft_config(body.model_dump(), cfg)
+        except ConfigError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        from anychain.networks import user_dir
+        existing = networks.paths.get(draft.network.name)
+        if existing is not None and existing.parent.resolve() != user_dir().resolve():
+            raise HTTPException(422, f"{draft.network.name!r} is a network that ships with the project: pick another name")
+        node = probe_node(draft, client, Budget(PROBE_BUDGET_S))
+        if node["status"] == "wrong_chain":
+            raise HTTPException(422, node["detail"])
+        path = save_user_network(draft)
+        networks.add(draft.network.name, path)
+        networks.select(draft.network.name)
+        return {"active": draft.network.name, "node": node, "saved_in": str(path.parent)}
+
+    @app.get("/settings/network/draft")
+    def network_draft(name: str | None = None) -> dict:
+        """The form's fields, from a network (to edit it, or to start a new one from it)."""
+        base = cfg
+        if name and networks is not None:
+            try:
+                base = networks._config(name)
+            except Exception as exc:
+                raise HTTPException(404, f"no network called {name!r}") from exc
+        from anychain.chains import BLOCKSCOUT_CHAIN_TYPES
+        return {"name": base.network.name, "chain_id": base.network.chain_id, "native_symbol": base.network.native_symbol,
+                "native_decimals": base.network.native_decimals, "chain_type": base.network.chain_type,
+                "explorer_url": base.explorer.base_url, "rpc_url": "",  # a node's URL can carry a key: never sent back
+                "chain_types": sorted(BLOCKSCOUT_CHAIN_TYPES)}
 
     @app.post("/settings/network")
     def set_network(body: NetworkRequest, request: Request) -> dict:
