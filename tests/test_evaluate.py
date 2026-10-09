@@ -75,3 +75,17 @@ def test_the_command_writes_the_report(tmp_path):
     report = json.loads((tmp_path / "report.json").read_text())
     assert report["summary"]["degradation_declared"] == 100.0 and report["commit"]
     assert "| node_unavailable |" in (tmp_path / "report.md").read_text()
+
+
+def test_the_summary_counts_tokens_as_each_case_does(tmp_path):
+    """The summary's input tokens include the cache, like each case's row: a cached prompt is still sent."""
+    from anychain.evaluate import report
+    case = next(c for c in load_cases(CASES) if c["id"] == "out_of_gas")
+    backend = Scripted("It ran out of gas: 60000 of 60000 were used [E1] [E6]. The fee was charged anyway in this "
+                       "transaction [E2]. The same transfer failed several times in a row [E9].")
+    backend.last_usage = {"input_tokens": 3, "output_tokens": 50, "cache_read_tokens": 3000, "cache_write_tokens": 200}
+    r = run_case(case, write=True, backend=backend)
+    report([r], "test", tmp_path)
+    md = (tmp_path / "report.md").read_text()
+    assert "| 3203/50 |" in md
+    assert "| Tokens sent (cache included) / received | 3203 / 50 (3000 read from the cache) |" in md

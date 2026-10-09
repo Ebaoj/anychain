@@ -182,7 +182,8 @@ def report(results: list[CaseResult], model: str, out_dir: Path) -> dict:
               f"| Values the check caught on a first attempt | {summary['hallucinated_items']} |",
               f"| Answers withheld | {summary['withheld']} of {summary['written']} |",
               f"| Time per written answer | {summary['seconds_per_case']} s |",
-              f"| Tokens (input, output, cache read, cache write) | {', '.join(str(v) for v in summary['tokens'].values())} |",
+              f"| Tokens sent (cache included) / received | {_sent(summary['tokens'])} / "
+              f"{summary['tokens']['output_tokens']} ({summary['tokens']['cache_read_tokens']} read from the cache) |",
               f"| Cost reported by the backend | {summary['cost_usd']} USD |", "",
               "| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values | Key facts | Seconds | Tokens in/out |",
               "|---|---|---|---|---|---|---|---|---|---|---|---|"]
@@ -204,8 +205,12 @@ def _tokens(usage: dict | None) -> str:
     """Input tokens (cache reads and writes included) and output tokens, as the backend reported them."""
     if not usage:
         return ""
-    sent = sum(usage.get(k) or 0 for k in ("input_tokens", "cache_read_tokens", "cache_write_tokens"))
-    return f"{sent}/{usage.get('output_tokens') or 0}"
+    return f"{_sent(usage)}/{usage.get('output_tokens') or 0}"
+
+
+def _sent(usage: dict) -> int:
+    """Tokens sent to the model: a cached prompt is still sent, only billed differently."""
+    return sum(usage.get(k) or 0 for k in ("input_tokens", "cache_read_tokens", "cache_write_tokens"))
 
 
 def _recorded_hash(fixture: Path) -> str:
