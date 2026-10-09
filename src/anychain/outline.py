@@ -37,7 +37,13 @@ def build(bundle: EvidenceBundle, mode: str) -> list[tuple[str, str, list[str]]]
         if timeline:
             out.append(("What happened next", "what the sender's other transactions show; this is often what the "
                         "reader most needs to know", timeline))
-        if failed and diagnosis:
+        retried_ok = _ids(bundle, "timeline", where=lambda e: e.data.get("pattern") in ("retried_ok",
+                                                                                       "approved_then_ok"))
+        if failed and retried_ok:  # the steps of the failure's rule assume nothing happened since (D63)
+            out.append(("What to do", "the same operation already succeeded later: say there is nothing to redo, "
+                        "and that the reader can check that later transaction; do not repeat the conclusion's steps "
+                        "about trying again or contacting support", retried_ok))
+        elif failed and diagnosis:
             out.append(("What to do", "only the next steps for a non-technical reader in the conclusion; nothing "
                         "technical", diagnosis))
     else:

@@ -223,3 +223,19 @@ def test_an_answer_missing_a_key_fact_is_rewritten_once_and_then_given(eth_cfg):
     checked = write_checked(b, eth_cfg, "support", backend=backend)
     assert checked.outcome == "retried" and pattern in checked.text
     assert f"must say what {pattern} says" in backend.users[1]
+
+
+def test_when_the_same_operation_succeeded_later_the_support_steps_say_so():
+    # real: gpt-4.1-nano said the swap succeeded 48 s later [E10], then told the merchant to contact support before
+    # trying again (the deadline rule's own steps); the outline now gives one instruction, from the timeline (D63)
+    from anychain import outline
+    from anychain.config import load_config
+    from tests.conftest import ROOT
+    from tests.test_golden import _case
+    cfg = load_config(str(ROOT / "configs" / "ethereum-mainnet.yaml"))
+    _c, tx = _case("eth_fail_expired_v2")
+    items = {h: (w, ids) for h, w, ids in outline.build(replay_bundle(cfg, tx, "eth_fail_expired_v2"), "support")}
+    what, ids = items["What to do"]
+    pattern = next(e.id for e in replay_bundle(cfg, tx, "eth_fail_expired_v2").items
+                   if e.kind == "timeline" and e.data.get("pattern") == "retried_ok")
+    assert "already succeeded later" in what and ids == [pattern]
