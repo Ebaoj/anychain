@@ -22,7 +22,7 @@ Labels: **CONFIRMED** (proved), **LIKELY** (the best reading of the facts), **UN
 - **If the AI makes a mistake, the check catches it.** A number that is not in the facts never reaches the reader.
 - **If a rule makes a mistake, a test finds it.** The evaluation found a rule that ignored an inner call running out of gas; the rule was fixed and the real case became a test (D50, D51).
 - **When data is missing, the answer says what is missing** ("the explorer did not answer; try again") instead of guessing.
-- **Another network is another YAML file:** seven networks ship, among them a private one built like CloudWalk's.
+- **Another network is another YAML file:** configs for seven networks ship (plus a CloudWalk template), among them a private one built like CloudWalk's.
 
 | Who | What they get |
 |---|---|
@@ -49,7 +49,7 @@ Interfaces: a **web page** (a conversation), a **CLI** (`explain`, `chat`, `batc
 Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). The written answer needs a model: the local [Claude Code](https://claude.com/claude-code) CLI (the default, logged in, no key), or an Anthropic or OpenAI API key, saved once with `anychain llm set` (or the page's **Model** panel) and kept outside the repository, readable by your user only. Without a model, everything still runs and shows the facts only.
 
 ```bash
-cd anychain        # the repository's folder
+git clone https://github.com/Ebaoj/anychain.git && cd anychain
 uv sync
 
 # choose the model (skip if Claude Code is installed and logged in); the key is asked for, not shown
@@ -71,9 +71,14 @@ uv run anychain explain 0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2
 # API + web page on http://127.0.0.1:8000 (this machine only: the API has no authentication); see "The page" below
 uv run anychain serve --config configs/ethereum-mainnet.yaml
 
-# follow-up questions in the terminal, evaluation, usage metrics, tests (offline, real recordings)
+# follow-up questions in the terminal
 uv run anychain chat 0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a --config configs/ethereum-mainnet.yaml
-uv run anychain eval
+
+# evaluation: the facts-only run needs no model; the full run (drop --no-llm) has the model write every answer.
+# --out keeps the committed eval/report.md (the table in section 5) untouched
+uv run anychain eval --no-llm --out data/eval
+
+# usage metrics, and the tests (offline, on real recordings; about a minute, longer on a busy machine)
 uv run anychain metrics --config configs/ethereum-mainnet.yaml
 uv run pytest -q
 ```
@@ -90,8 +95,8 @@ Do not run it with `--network host`: inside the container the API listens on 0.0
 
 **The page** (`anychain serve`, then http://127.0.0.1:8000) is a conversation, in three versions chosen on its first screen:
 
-- **Merchant** (`#/lojista`): plain words, the answer at a glance (worked or not, value moved, the fee rounded, the date in the reader's time zone), what to do now; the proof slides in on demand.
-- **Developer** (`#/desenvolvedor`) and **Auditor** (`#/auditor`): the facts and their sources always beside the thread; the auditor sees the security notes first. A "facts only, no AI" switch.
+- **Merchant** (`#/lojista`, also `#/merchant`): plain words, the answer at a glance (worked or not, value moved, the fee rounded, the date in the reader's time zone), what to do now; the proof slides in on demand.
+- **Developer** (`#/desenvolvedor`, also `#/developer`) and **Auditor** (`#/auditor`): the facts and their sources always beside the thread; the auditor sees the security notes first. A "facts only, no AI" switch.
 
 The reader writes as they like ("meu pagamento 0x… não passou"): a transaction hash or an address anywhere in the message starts an explanation, the rest of the message is the question; an address lists its transactions as buttons; the clarifying question, when there is one, comes as a message with buttons. Any other message is a follow-up on the same transaction, answered by the chat with tools (a read on the node, a function's code, another transaction), each result a new sourced fact. Every citation `[E#]` opens its fact. Each network's config offers real example transactions.
 
@@ -103,7 +108,7 @@ The reader writes as they like ("meu pagamento 0x… não passou"): a transactio
 
 ## 2. Configuration, and retargeting to another network (e.g. CloudWalk)
 
-Everything network-specific is in one YAML file (`configs/*.yaml`); there is no network value in the code (a test enforces it: no explorer or node host, chain id, symbol or address; the only fixed URLs are links to the source of a rule's meaning, such as Uniswap's and OpenZeppelin's code, D31). Eight configs ship: Ethereum, Optimism, Gnosis, Rootstock, Celo, zkSync Era, the private demo network, and the CloudWalk template.
+Everything network-specific is in one YAML file (`configs/*.yaml`); there is no network value in the code (a test enforces it: no explorer or node host, chain id, symbol or address; the only fixed URLs are links to the source of a rule's meaning, such as Uniswap's and OpenZeppelin's code, D31). Eight configs ship (seven networks and a template): Ethereum, Optimism, Gnosis, Rootstock, Celo, zkSync Era, the private demo network, and the CloudWalk template.
 
 ```yaml
 network:    { name, chain_id, native_symbol, native_decimals, chain_type }   # chain_type = the explorer's Blockscout CHAIN_TYPE
@@ -614,4 +619,4 @@ GROUP BY mode ORDER BY mode;
 
 ## 8. How AI was used to build this
 
-The code, tests and documents were written with Claude Code, in phases (Phase 1 from the plan in the case itself; Phases 2, 2.5, 3 and 4 each from a written spec approved before any code, in `docs/specs/`). The human decisions, recorded in `docs/DECISIONS.md` with dates, were mine: the scope and the order of the phases; the acceptance criterion (zero false facts of level A or B on 300 sampled transactions per network, checked against the node); which imprecise wordings to fix now and which to keep for later; running the writer on Claude Code instead of an API key; the retargeting target (CloudWalk) and its sources; and, after the evaluation found a rule that ignored an inner out-of-gas, asking for the diagnosis to start from the failure's origin. The process the model followed: a failing test before each fix, written from a real recorded transaction (nothing in the tests is invented); a review by a separate agent with a clean context before commits; and an independent acceptance run against the network's own node at the end of each phase.
+The code, tests and documents were written with Claude Code, in phases (Phase 1 from the plan in the case itself; Phases 2, 2.5, 3 and 4 each from a written spec approved before any code, in `docs/specs/`). The human decisions, recorded in `docs/DECISIONS.md` with dates, were mine: the scope and the order of the phases; the acceptance criterion (zero false facts of level A or B on 300 sampled transactions per network, checked against the node); which imprecise wordings to fix now and which to keep for later; running the writer on Claude Code instead of an API key; the retargeting target (CloudWalk) and its sources; and, after the evaluation found a rule that ignored an inner out-of-gas, asking for the diagnosis to start from the failure's origin. The rules the model worked under are in [CLAUDE.md](CLAUDE.md) (in Portuguese, as written for it; they came from real mistakes during the project), enforced by two hooks in `.claude/settings.json`: the tests run after every edit, and a commit is refused unless the whole suite passes. The process the model followed: a failing test before each fix, written from a real recorded transaction (nothing in the tests is invented); a review by a separate agent with a clean context before commits; and an independent acceptance run against the network's own node at the end of each phase.

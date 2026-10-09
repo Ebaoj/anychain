@@ -163,6 +163,7 @@ def summarize(results: list[CaseResult]) -> dict:
 
 def report(results: list[CaseResult], model: str, out_dir: Path) -> dict:
     summary = summarize(results)
+    out_dir.mkdir(parents=True, exist_ok=True)
     meta = {"date": time.strftime("%Y-%m-%d %H:%M"), "commit": _commit(), "model": model}
     (out_dir / "report.json").write_text(json.dumps({**meta, "summary": summary,
                                                      "cases": [asdict(r) for r in results]}, indent=1,

@@ -89,3 +89,13 @@ def test_the_summary_counts_tokens_as_each_case_does(tmp_path):
     md = (tmp_path / "report.md").read_text()
     assert "| 3203/50 |" in md
     assert "| Tokens sent (cache included) / received | 3203 / 50 (3000 read from the cache) |" in md
+
+
+def test_the_command_creates_the_output_folder(tmp_path):
+    """The quickstart's `eval --out data/eval` runs on a fresh clone, where the folder does not exist yet."""
+    cases = tmp_path / "cases.yaml"
+    cases.write_text(yaml.safe_dump({"cases": [c for c in load_cases(CASES) if c["id"] == "node_unavailable"]}))
+    out = tmp_path / "new" / "eval"
+    result = CliRunner().invoke(cli.app, ["eval", "--cases", str(cases), "--no-llm", "--out", str(out)])
+    assert result.exit_code == 0, result.output
+    assert (out / "report.md").exists()
