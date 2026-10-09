@@ -106,16 +106,16 @@
   .steps-list li.done .mark { border-color: var(--ok); background: var(--ok); color: var(--on-accent); }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .steps-list li.now .mark { animation: none; } }
-  .glance { display: flex; gap: 14px; align-items: flex-start; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
-  .glance .big { font-size: 28px; line-height: 1; }
-  .glance .head { font-size: 17px; font-weight: 700; margin: 0 0 2px; }
+  .glance { border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
+  .glance .head { font-size: 15px; font-weight: 700; margin: 0 6px 0 0; display: inline; }
   .glance.success { background: var(--ok-bg); } .glance.success .head { color: var(--ok); }
   .glance.failed { background: var(--bad-bg); } .glance.failed .head { color: var(--bad); }
   .glance.pending, .glance.unknown, .glance.dropped { background: var(--unknown-bg); }
   .facts-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .kv { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 5px 9px; font-size: 13px; color: var(--ink); }
   .kv .k { display: block; font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
-  .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: 6px; overflow-wrap: anywhere; }
+  .meta a { white-space: nowrap; }
   .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
   .CONFIRMED { color: var(--ok); background: var(--ok-bg); } .LIKELY { color: var(--likely); background: var(--likely-bg); }
   .UNKNOWN { color: var(--unknown); background: var(--unknown-bg); } .heuristic { color: var(--likely); background: var(--likely-bg); }
@@ -446,7 +446,7 @@ function markdown(text) {  // the model's answer: paragraphs, bullet and numbere
       const kind = bullet ? "ul" : "ol";
       if (list !== kind) { close(); out.push(`<${kind}>`); list = kind; }
       out.push(`<li>${inline((bullet || numbered)[1])}</li>`);
-    } else if (!line.trim()) { close(); }
+    } else if (!line.trim()) { /* a blank line between items keeps the list going */ }
     else { close(); out.push(heading ? `<p><strong>${inline(heading[1])}</strong></p>` : `<p>${inline(line)}</p>`); }
   }
   close();
@@ -480,7 +480,6 @@ function feedbackHtml(runId) {
     <button type="button" data-value="down" aria-label="not useful" aria-pressed="false">👎</button></div>`;
 }
 function glanceHtml(a) {  // the answer at a glance: did it work, how much moved, the fee, when; all from the facts
-  const icon = {success: "✅", failed: "❌", pending: "⏳", dropped: "🗑️"}[a.status] || "❔";
   const head = {success: t("headSuccess"), failed: t("headFailed"), pending: t("headPending"),
                 dropped: t("headDropped")}[a.status] || t("headUnknown");
   const ev = a.evidence || [];
@@ -492,11 +491,11 @@ function glanceHtml(a) {  // the answer at a glance: did it work, how much moved
   const kv = (k, v) => `<span class="kv"><span class="k">${esc(k)}</span>${esc(v)}</span>`;
   const page = overview && (overview.sources || []).find((s) => s.kind === "explorer_ui");
   const url = page && safeUrl(page.url);
-  return `<div class="glance ${esc(a.status)}"><div class="big">${icon}</div><div>` +
+  return `<div class="glance ${esc(a.status)}"><div>` +
     `<p class="head">${esc(head)}</p>` + (a.diagnosis.length ? badge(a.diagnosis[0].label) : "") +
     `<div class="facts-row">${moved ? kv(t("kvMoved"), moved) : (a.status === "success" ? "" : kv(t("kvMoved"), t("kvNothing")))}` +
     `${feeText ? kv(t("kvFee"), feeText) : ""}${when ? kv(t("kvWhen"), `${when[1]} ${when[2]} UTC`) : ""}</div>` +
-    `<div class="meta wrap">${esc(a.tx_hash)}${a.confidence.status_basis ? " · " + esc(t("basis_" + a.confidence.status_basis)) : ""}` +
+    `<div class="meta">${esc(a.tx_hash)}${a.confidence.status_basis ? " · " + esc(t("basis_" + a.confidence.status_basis)) : ""}` +
     `${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t("openExplorer"))}</a>` : ""}</div>` +
     `</div></div>`;
 }
