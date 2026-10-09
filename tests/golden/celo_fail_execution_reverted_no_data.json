@@ -242,34 +242,46 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 290740,
+      "gas_used": 171034,
       "hash": "0xe0eadb51b1808ae42b989eef3d435da7c68bd9efcb348fbaac26feec330c8bf6",
       "method": "0x61461954",
       "nonce": 68275,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-01T13:40:34.000000Z",
       "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A"
      },
      {
+      "gas_limit": 373539,
+      "gas_used": 214129,
       "hash": "0xd69f29194677be5ab480cdb6f451d9d4d9d6dd7628db1a3a460fd5053e2e613f",
       "method": "0x22000000",
       "nonce": 68276,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-01T14:01:14.000000Z",
       "to": "0xae6D7D47b8505C4149c853d586D7f0cc4D34C01a"
      },
      {
+      "gas_limit": 403030,
+      "gas_used": 37799,
       "hash": "0xa345e106673a99e344ddf4366aa9893f634885d9c36dfa4f8ebcf44cc3620643",
       "method": "0x61461954",
       "nonce": 68277,
       "result": "execution reverted",
+      "this": false,
       "timestamp": "2026-10-01T14:03:01.000000Z",
       "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A"
      },
      {
+      "gas_limit": 402993,
+      "gas_used": 37799,
       "hash": "0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc",
       "method": "0x61461954",
       "nonce": 68278,
       "result": "execution reverted",
+      "this": true,
       "timestamp": "2026-10-01T14:06:39.000000Z",
       "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A"
      }
@@ -303,6 +315,30 @@
     }
    ],
    "text": "The same call (0x61461954) failed 2 times in a row, with no other transaction of the sender in between (nonces 68277, 68278)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 402993,
+    "used": 37799
+   },
+   "id": "E13",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://celo.blockscout.com/api/v2/addresses/0x224cFC26c83Fccc3463c804e7F86b10651D5dF96/transactions?filter=from"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 37799 of the 402993 limit (9.4%). The same call succeeded at nonce 68275 using 171034 gas, with a limit of 290740 (E11); this transaction had a limit of 402993."
   }
  ],
  "network": "celo-mainnet",

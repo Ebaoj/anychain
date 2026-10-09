@@ -524,6 +524,24 @@
     }
    ],
    "text": "Event LiFiTransferStarted((bytes32,string,string,address,address,address,uint256,uint256,bool,bool)) emitted by 0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE (LiFiDiamond): bridgeData=(0x42897b5f56b8a9c0ae6b7ac5c6baa2cbce07f14a4fcb88184f9983c8fd9d27d9, arbitrum, jumper.exchange, 0x0000000000000000000000000000000000000000, 0x0000000000000000000000000000000000000000, 0x70fb4195638281faa69472dbd7d8f9b65f535e7f, 73320386123128615, 42161, True, False)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 964900,
+    "used": 497248
+   },
+   "id": "E23",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xf5199e66f52f95ba3ed23340c81ef924296c684f9e0f8bb69975ab25ace3ff8c"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 497248 of the 964900 limit (51.5%)."
   }
  ],
  "network": "ethereum-mainnet",

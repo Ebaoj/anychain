@@ -508,6 +508,24 @@
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 291849,
+    "used": 169984
+   },
+   "id": "E24",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x4eb27f6b86c81685f8c23b2abcaf5cc9510ed1f2a737c42d5ff344914f890dd0"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 169984 of the 291849 limit (58.2%)."
   }
  ],
  "network": "ethereum-mainnet",

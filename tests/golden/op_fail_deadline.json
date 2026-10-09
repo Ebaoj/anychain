@@ -197,50 +197,68 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 3000000,
+      "gas_used": 631401,
       "hash": "0x44e85d7479d57fa9cf9ef3947bada215fc2624638432af47bcf1af9b7de80f10",
       "method": "0xc393d0e3",
       "nonce": 951502,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T02:59:33.000000Z",
       "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
      },
      {
+      "gas_limit": 2600000,
+      "gas_used": 821467,
       "hash": "0x139a641ff6c928c7aa269127f8fa3b6f6359932c7528d2cfe8bd0f46e3f68e1c",
       "method": "0x83730cc3",
       "nonce": 951503,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T02:59:33.000000Z",
       "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
      },
      {
+      "gas_limit": 3000000,
+      "gas_used": 619721,
       "hash": "0x9499d3f9f9ef392043f93f53cb9f7bfd2af05dd9c3079fcfeea52723d187fbe7",
       "method": "0xc393d0e3",
       "nonce": 951504,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T02:59:35.000000Z",
       "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
      },
      {
+      "gas_limit": 2600000,
+      "gas_used": 26311,
       "hash": "0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3",
       "method": "0x83730cc3",
       "nonce": 951505,
       "result": "execution reverted",
+      "this": true,
       "timestamp": "2026-10-05T02:59:37.000000Z",
       "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
      },
      {
+      "gas_limit": 3000000,
+      "gas_used": 37391,
       "hash": "0x6739291c433ff4f8f5dfe1052c144a99966bcbd11d032a12959e867fb82c8368",
       "method": "0xc393d0e3",
       "nonce": 951506,
       "result": "execution reverted",
+      "this": false,
       "timestamp": "2026-10-05T02:59:37.000000Z",
       "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
      },
      {
+      "gas_limit": 2600000,
+      "gas_used": 828772,
       "hash": "0xc909fdbb368be4ab70838d5f72edf510458755b977eaccdb6d974b5aea36e7ae",
       "method": "0x83730cc3",
       "nonce": 951507,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T02:59:37.000000Z",
       "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
      }
@@ -274,6 +292,30 @@
     }
    ],
    "text": "The same call (0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993) succeeded 0 seconds later (nonce 951507): the first time it succeeded after this failure."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 2600000,
+    "used": 26311
+   },
+   "id": "E10",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://explorer.optimism.io/api/v2/addresses/0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013/transactions?filter=from"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 26311 of the 2600000 limit (1.0%). The same call succeeded at nonce 951503 using 821467 gas, with a limit of 2600000 (E8); this transaction had a limit of 2600000."
   }
  ],
  "network": "optimism-mainnet",

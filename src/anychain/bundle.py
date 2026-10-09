@@ -29,7 +29,7 @@ from anychain.collectors.signatures import SignatureDb
 from anychain.decoder import AbiDecoder, decode_revert, fit_signature
 from anychain.collectors.repo import Repo, RepoCache
 from anychain.diagnosis import SUPPORT_STEPS, Context, diagnose, label_for, reason_text, steps_text
-from anychain import security, timeline
+from anychain import gas, security, timeline
 from anychain.solidity import SolidityIndex, filter_abi
 from anychain.reads import REPLAY_LIMITS, StateReader
 from anychain.models import EvidenceBundle, GapCause, Source
@@ -186,6 +186,7 @@ class BundleBuilder:
         self.rpc_verified = False  # True once the RPC's chain id matched the config
         self.rpc_missed = False  # the node answered null for the hash
         self.rpc_view: RpcView | None = None
+        self.called_code = None  # (verified index, found function, contract name, address) for the gas notes
         self.repos: list[Repo] | None = None  # configured repos from the local cache, loaded on first use
         self.source_repo: Repo | None = None  # the repo matched to the called contract, if any
         self.abi_origin: dict[str, tuple] = {}  # address -> (repo_pinned | repo_artifact | repo_match, repo, contract or
@@ -237,6 +238,8 @@ class BundleBuilder:
         if tx is not None and self.bundle.status == "failed" and not explorer_lagging:
             # last, so the facts before it keep their numbers (PHASE4 T2)
             self._safely("Timeline", lambda: self._add_timeline(tx_hash, tx))
+        if tx is not None and self.bundle.status in ("success", "failed"):
+            self._safely("Gas notes", lambda: self._add_gas_notes(tx))  # last too: earlier numbers stay
         return self.bundle
 
     def _declare_explorer_miss(self, has_receipt: bool) -> None:
@@ -615,6 +618,7 @@ class BundleBuilder:
             found = verified.find(name, selector) if verified else None
             if found:
                 notes = security.scan(verified, found, name)
+                self.called_code = (verified, found, name, address)  # for the gas notes (PHASE4 T3)
                 code = self._code_fact(verified, found, address, origin, show=tuple(n.line for n in notes))
                 self._add_security_notes(notes, found, address, code.id)
                 return
@@ -710,6 +714,30 @@ class BundleBuilder:
         if finding.rule in REPLAY_WHEN and ctx.reader is not None:
             self._add_replay(tx_hash, tx, ctx)
 
+    def _add_gas_notes(self, tx: Transaction) -> None:
+        """Gas notes (PHASE4 T3, R3, D57): the share of the limit used, the same call's gas when the sender's
+        timeline has a success of it, and storage used inside a loop of the called function's verified code."""
+        texts, sources = [], [self._tx_source(self.bundle.tx_hash)]
+        usage = gas.usage_note(tx.gas_used, tx.gas_limit, self.bundle.status)
+        if usage:
+            texts.append(usage)
+        timeline_fact = next((e for e in self.bundle.items if e.kind == "timeline" and e.data.get("rows")), None)
+        same = gas.same_call_note(timeline_fact) if timeline_fact else None
+        if same:
+            texts.append(same)
+            sources += timeline_fact.sources
+        code = next((e for e in self.bundle.items if e.kind == "code"), None)
+        if self.called_code and code is not None:
+            verified, found, name, address = self.called_code
+            loop = gas.storage_in_loop(verified, found, name)
+            if loop:
+                texts.append(f"In the called function's code ({code.id}), heuristic: "
+                             + "; ".join(t for _n, t in loop) + ".")
+                sources.append(self._api_source(f"/smart-contracts/{address}", "Explorer API: verified source"))
+        if texts:
+            self.bundle.add("gas_note", "Gas notes (heuristic, not a finding): " + " ".join(texts), sources,
+                            {"used": tx.gas_used, "limit": tx.gas_limit})
+
     def _add_timeline(self, tx_hash: str, tx: Transaction) -> None:
         """The sender's transactions around this failure and the patterns they show (PHASE4 T2, R2, D56). Bounded:
         the latest pages of the sender's sent transactions until this block is reached (TIMELINE_PAGES at most),
@@ -746,7 +774,8 @@ class BundleBuilder:
         self.bundle.add("timeline", "The sender's own transactions around this failure, by nonce: "
                         + "; ".join(line(r) for r in found.rows) + ".", [source],
                         {"rows": [{"hash": r.hash, "nonce": r.nonce, "method": r.method, "to": r.to,
-                                   "result": r.result, "timestamp": r.timestamp} for r in found.rows]})
+                                   "result": r.result, "timestamp": r.timestamp, "gas_used": r.gas_used,
+                                   "gas_limit": r.gas_limit, "this": r is found.failed} for r in found.rows]})
         for name, sentence in found.patterns:
             self.bundle.add("timeline", sentence, [source], {"pattern": name})
 

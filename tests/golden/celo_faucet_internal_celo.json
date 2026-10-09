@@ -390,6 +390,24 @@
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 130579,
+    "used": 126239
+   },
+   "id": "E19",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x6be4971d7a629bcbdcd14ed45426370359c4cf2a8205860ba371ea1f48b39429"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 126239 of the 130579 limit (96.7%). It succeeded close to its limit: the same call doing a little more work could run out of gas."
   }
  ],
  "network": "celo-mainnet",

@@ -978,6 +978,24 @@
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 1100000,
+    "used": 164844
+   },
+   "id": "E48",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x092a7ba32ffb022c9678385ee59d2de2d2192a4cceb2ca2618789874841603af"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 164844 of the 1100000 limit (15.0%). The limit was more than twice the gas used."
   }
  ],
  "network": "zksync-era",

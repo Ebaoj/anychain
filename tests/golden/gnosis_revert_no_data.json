@@ -179,58 +179,79 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 250000,
+      "gas_used": 42150,
       "hash": "0xab799f51f0fea32131e683a68a71686eba98caa6820daaf617d70346bbf88f26",
       "method": "keyGenAndCommit",
       "nonce": 423339,
       "result": "Reverted",
+      "this": false,
       "timestamp": "2026-10-07T17:28:30.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 42090,
       "hash": "0x9b519d949c449f01b394abf08b6fd2f90535e0c4a7d1f3eee40b4f02fb2f9d21",
       "method": "keyGenAndCommit",
       "nonce": 423340,
       "result": "Reverted",
+      "this": false,
       "timestamp": "2026-10-07T17:53:40.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 42150,
       "hash": "0x903419644b32b17249b19e08a431dad0e83318693a6d8c2dbff02eb435fa5c9b",
       "method": "keyGenAndCommit",
       "nonce": 423341,
       "result": "Reverted",
+      "this": false,
       "timestamp": "2026-10-07T18:18:55.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 42150,
       "hash": "0xf354bf88343e794ca6f4574416778ef41bd06a51f32fb5c1ddfc1e71404ab6d1",
       "method": "keyGenAndCommit",
       "nonce": 423342,
       "result": "Reverted",
+      "this": true,
       "timestamp": "2026-10-07T18:44:20.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 42210,
       "hash": "0x76979ad60052660dd4cb612d94d636763e991c4900375e08d7737c571f31e993",
       "method": "keyGenAndCommit",
       "nonce": 423343,
       "result": "Reverted",
+      "this": false,
       "timestamp": "2026-10-07T19:10:00.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 42180,
       "hash": "0xa26f4cd05ba68b837c907414d3deef9fc12934dd0e64b7c024dc42bd2c547c0e",
       "method": "keyGenAndCommit",
       "nonce": 423344,
       "result": "Reverted",
+      "this": false,
       "timestamp": "2026-10-07T19:35:30.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 42180,
       "hash": "0x833cbdde5b4b28fc0f46c5b220457f00c22a11d57182e3ebfadd0a5b7b9dd448",
       "method": "keyGenAndCommit",
       "nonce": 423345,
       "result": "Reverted",
+      "this": false,
       "timestamp": "2026-10-07T20:00:45.000000Z",
       "to": "0x2f88C123f34cB3c45482C5b04A0Faf00C6571F44"
      }
@@ -264,6 +285,24 @@
     }
    ],
    "text": "The same call (keyGenAndCommit) failed 100 times in a row, with no other transaction of the sender in between (nonces 423312 to 423411)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 250000,
+    "used": 42150
+   },
+   "id": "E10",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xf354bf88343e794ca6f4574416778ef41bd06a51f32fb5c1ddfc1e71404ab6d1"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 42150 of the 250000 limit (16.9%)."
   }
  ],
  "network": "gnosis-mainnet",

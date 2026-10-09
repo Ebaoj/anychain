@@ -169,6 +169,24 @@
     }
    ],
    "text": "Event PauserChanged(address) emitted by 0xAC176d9e75384F7d71275bb9D5265281CC0Dd284 (TransparentUpgradeableProxy): pauser=0xdeD9f2956d8B8E1190DB30343de7ca69f81ec520."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 82722,
+    "used": 54774
+   },
+   "id": "E7",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x610935d36b23bd879133c5344f805bc144b1c254ab78cefae8db79dcb24659ef"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 54774 of the 82722 limit (66.2%)."
   }
  ],
  "network": "ethereum-mainnet",

@@ -577,34 +577,46 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 3000000,
+      "gas_used": 87849,
       "hash": "0x7580a43a0caa96f5b50de3ae8e0b16d2f648e17ef326c5e14c537554b0986636",
       "method": "0x8412a3b9",
       "nonce": 73819,
       "result": "Bootloader-based tx failed",
+      "this": false,
       "timestamp": "2026-09-20T16:44:12.000000Z",
       "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
      },
      {
+      "gas_limit": 3000000,
+      "gas_used": 87849,
       "hash": "0x8936a1fb64a32c6ab99a4629e3a4c837dbe7b2214e12c88b451f680eae2aa6a8",
       "method": "0x8412a3b9",
       "nonce": 73820,
       "result": "Bootloader-based tx failed",
+      "this": false,
       "timestamp": "2026-09-20T16:44:14.000000Z",
       "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
      },
      {
+      "gas_limit": 3000000,
+      "gas_used": 89819,
       "hash": "0x3f353e7ca92e5d8a51b267142891581fe43de25014f211255f79de174ddeecf4",
       "method": "0x8412a3b9",
       "nonce": 73821,
       "result": "Bootloader-based tx failed",
+      "this": false,
       "timestamp": "2026-09-20T16:44:27.000000Z",
       "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
      },
      {
+      "gas_limit": 3000000,
+      "gas_used": 87849,
       "hash": "0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a",
       "method": "0x8412a3b9",
       "nonce": 73822,
       "result": "Bootloader-based tx failed",
+      "this": true,
       "timestamp": "2026-09-20T16:44:29.000000Z",
       "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
      }
@@ -638,6 +650,24 @@
     }
    ],
    "text": "The same call (0x8412a3b9) failed 22 times in a row, with no other transaction of the sender in between (nonces 73801 to 73822)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 3000000,
+    "used": 87849
+   },
+   "id": "E28",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 87849 of the 3000000 limit (2.9%)."
   }
  ],
  "network": "zksync-era",

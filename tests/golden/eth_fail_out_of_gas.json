@@ -201,34 +201,46 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 60000,
+      "gas_used": 60000,
       "hash": "0x019c217e8c4cdaa734aa49d26e3677c46f6e072e81145be4596bef698f262050",
       "method": "transfer",
       "nonce": 9652,
       "result": "out of gas",
+      "this": false,
       "timestamp": "2026-10-08T20:24:23.000000Z",
       "to": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
      },
      {
+      "gas_limit": 60000,
+      "gas_used": 60000,
       "hash": "0x7b8ff706fe15586d202d50f5dab7277766eeffc788047ca2ccb8f63972dbf532",
       "method": "transfer",
       "nonce": 9653,
       "result": "out of gas",
+      "this": false,
       "timestamp": "2026-10-08T20:25:35.000000Z",
       "to": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
      },
      {
+      "gas_limit": 60000,
+      "gas_used": 60000,
       "hash": "0xc0abc26edb791020f1cd271b980f285b96099ef221ad535f2f4d965c2dc2bdb7",
       "method": "transfer",
       "nonce": 9654,
       "result": "out of gas",
+      "this": false,
       "timestamp": "2026-10-08T20:29:47.000000Z",
       "to": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
      },
      {
+      "gas_limit": 60000,
+      "gas_used": 60000,
       "hash": "0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81",
       "method": "transfer",
       "nonce": 9655,
       "result": "out of gas",
+      "this": true,
       "timestamp": "2026-10-08T20:31:11.000000Z",
       "to": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
      }
@@ -262,6 +274,24 @@
     }
    ],
    "text": "The same call (transfer) failed 4 times in a row, with no other transaction of the sender in between (nonces 9652, 9653, 9654, 9655)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 60000,
+    "used": 60000
+   },
+   "id": "E10",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0660a8a28446773a8b76f41e9802995da09713db7ee557cc6c7f4a177fc8fd81"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 60000 of the 60000 limit (100.0%)."
   }
  ],
  "network": "ethereum-mainnet",

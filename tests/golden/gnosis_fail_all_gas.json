@@ -326,58 +326,79 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 510979,
+      "gas_used": 329110,
       "hash": "0xbb6616ddb23808083a8760075a1829c5ae611e796357a33918b2ee58723280cc",
       "method": "0x1cd821eb",
       "nonce": 14244,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T12:01:25.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      },
      {
+      "gas_limit": 293830,
+      "gas_used": 290377,
       "hash": "0xb3807de562ddb7ecd75a7fc0229ec27c0e230fcdf84506dab8c5cca0f44648a3",
       "method": "0xfc40415e",
       "nonce": 14245,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T12:01:30.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      },
      {
+      "gas_limit": 495100,
+      "gas_used": 316843,
       "hash": "0x6441c59156c362f68551cf3df1e528f5538a77632e550af58cfe6643112f605e",
       "method": "0x1cd821eb",
       "nonce": 14246,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T12:32:25.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      },
      {
+      "gas_limit": 293668,
+      "gas_used": 293252,
       "hash": "0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57",
       "method": "0xfc40415e",
       "nonce": 14247,
       "result": "Reverted",
+      "this": true,
       "timestamp": "2026-10-08T12:32:30.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      },
      {
+      "gas_limit": 306052,
+      "gas_used": 290217,
       "hash": "0x3ae03a23a871f686779cbe157a3c46bcafdc31db136dd4a595740519236ef534",
       "method": "0xfc40415e",
       "nonce": 14248,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T12:32:55.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      },
      {
+      "gas_limit": 499333,
+      "gas_used": 329110,
       "hash": "0x303bb07524f3b67da6d60629b3630c6b22465859ccc8b79b57f3c861a0034e9b",
       "method": "0x1cd821eb",
       "nonce": 14249,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T13:02:55.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      },
      {
+      "gas_limit": 700786,
+      "gas_used": 694110,
       "hash": "0x424e57e18f28d868caeb665db00b533d5ff09e189641e20aad1878071ea2e51f",
       "method": "0xfc40415e",
       "nonce": 14250,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T13:03:00.000000Z",
       "to": "0x8C9A555402A8F14c20810ea1b8C6B27479F96669"
      }
@@ -411,6 +432,30 @@
     }
    ],
    "text": "The same call (0xfc40415e to 0x8C9A555402A8F14c20810ea1b8C6B27479F96669) succeeded 25 seconds later (nonce 14248): the first time it succeeded after this failure."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 293668,
+    "used": 293252
+   },
+   "id": "E17",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0x74c84d98b23bc5d88024249b186eaa2af72b09b8c22d131382c1ba55add2ec57"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://gnosisscan.io/api/v2/addresses/0xd14E38693f4a8B7cc71A3c0203e146Fd58A046d1/transactions?filter=from"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 293252 of the 293668 limit (99.9%). The same call succeeded at nonce 14245 using 290377 gas, with a limit of 293830 (E15); this transaction had a limit of 293668."
   }
  ],
  "network": "gnosis-mainnet",

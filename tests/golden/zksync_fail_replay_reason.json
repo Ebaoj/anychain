@@ -986,34 +986,46 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 5000000,
+      "gas_used": 212507,
       "hash": "0x144825033fa05c2f90403664ec267e870e8a81074e7857c92160feccd8a9d890",
       "method": "0x24856bc3",
       "nonce": 240373,
       "result": "Bootloader-based tx failed",
+      "this": false,
       "timestamp": "2026-10-01T12:58:26.000000Z",
       "to": "0xA478bf3f621d47E6753F463711630C282D2803aB"
      },
      {
+      "gas_limit": 5000000,
+      "gas_used": 248627,
       "hash": "0x1646efef3c8efb0d6c86420b0da816144e3421976c3ff09da6b35563702c6005",
       "method": "0xc04b8d59",
       "nonce": 240374,
       "result": "Bootloader-based tx failed",
+      "this": false,
       "timestamp": "2026-10-01T12:58:33.000000Z",
       "to": "0xC8A3d1d834617796cdd8c68709e9719f41cb472E"
      },
      {
+      "gas_limit": 5000000,
+      "gas_used": 212507,
       "hash": "0x3d4928270c38891b91784fe118413a6f0d5ceb51b6b1925c9d4818dc9487d00a",
       "method": "0x24856bc3",
       "nonce": 240375,
       "result": "Bootloader-based tx failed",
+      "this": false,
       "timestamp": "2026-10-01T12:59:10.000000Z",
       "to": "0xA478bf3f621d47E6753F463711630C282D2803aB"
      },
      {
+      "gas_limit": 5000000,
+      "gas_used": 248627,
       "hash": "0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147",
       "method": "0xc04b8d59",
       "nonce": 240376,
       "result": "Bootloader-based tx failed",
+      "this": true,
       "timestamp": "2026-10-01T12:59:17.000000Z",
       "to": "0xC8A3d1d834617796cdd8c68709e9719f41cb472E"
      }
@@ -1030,6 +1042,24 @@
     }
    ],
    "text": "The sender's own transactions around this failure, by nonce: nonce 240373: 0x24856bc3 to 0xA478bf3f621d47E6753F463711630C282D2803aB, failed ('Bootloader-based tx failed'), at 2026-10-01T12:58:26.000000Z; nonce 240374: 0xc04b8d59 to 0xC8A3d1d834617796cdd8c68709e9719f41cb472E, failed ('Bootloader-based tx failed'), at 2026-10-01T12:58:33.000000Z; nonce 240375: 0x24856bc3 to 0xA478bf3f621d47E6753F463711630C282D2803aB, failed ('Bootloader-based tx failed'), at 2026-10-01T12:59:10.000000Z; nonce 240376: 0xc04b8d59 to 0xC8A3d1d834617796cdd8c68709e9719f41cb472E, failed ('Bootloader-based tx failed'), at 2026-10-01T12:59:17.000000Z (this transaction)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 5000000,
+    "used": 248627
+   },
+   "id": "E45",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://zksync.blockscout.com/api/v2/transactions/0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 248627 of the 5000000 limit (5.0%)."
   }
  ],
  "network": "zksync-era",

@@ -323,34 +323,46 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 100000,
+      "gas_used": 33827,
       "hash": "0xf3fe70f59eae6fb404b9448ec8afbd3102ff87f32e18ada2ea8c32008740cc91",
       "method": "transfer",
       "nonce": 54513,
       "result": "execution reverted",
+      "this": false,
       "timestamp": "2026-10-01T13:33:39.000000Z",
       "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
      },
      {
+      "gas_limit": 100000,
+      "gas_used": 33839,
       "hash": "0xd1da7101ba628107352d060b0119316fbeddc32f4a5d4c319e0a99c95e797c7f",
       "method": "transfer",
       "nonce": 54514,
       "result": "execution reverted",
+      "this": false,
       "timestamp": "2026-10-01T13:48:29.000000Z",
       "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
      },
      {
+      "gas_limit": 100000,
+      "gas_used": 33827,
       "hash": "0x33c0908317584100d4af76094e5914ebcd78186b284c7d7c359a19a701cdaf8a",
       "method": "transfer",
       "nonce": 54515,
       "result": "execution reverted",
+      "this": false,
       "timestamp": "2026-10-01T13:50:24.000000Z",
       "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
      },
      {
+      "gas_limit": 100000,
+      "gas_used": 33839,
       "hash": "0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817",
       "method": "transfer",
       "nonce": 54516,
       "result": "execution reverted",
+      "this": true,
       "timestamp": "2026-10-01T14:07:22.000000Z",
       "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
      }
@@ -384,6 +396,24 @@
     }
    ],
    "text": "The same call (transfer) failed 35 times in a row, with no other transaction of the sender in between (nonces 54482 to 54516)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 100000,
+    "used": 33839
+   },
+   "id": "E15",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 33839 of the 100000 limit (33.8%)."
   }
  ],
  "network": "celo-mainnet",

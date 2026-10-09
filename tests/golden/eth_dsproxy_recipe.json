@@ -1703,6 +1703,24 @@
     }
    ],
    "text": "Event RecipeEvent(address,string) emitted by 0xcE7a977Cac4a481bc84AC06b2Da0df614e621cf3 (DefisaverLogger): caller=0x2b1dE6F5Bb3F8ae0B19099DbbDe4398a0fdF6c8E, logName=0xdf9412d4e8bc9e9fe4e102b9272ac63f05251e55a7b1f3f296801533a02334e6 (hash of the string value)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 1989695,
+    "used": 1564422
+   },
+   "id": "E84",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x92f208d329d76c8e557a0f64c7527efca13ef7748f9cc56ebb498f90f25e172a"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 1564422 of the 1989695 limit (78.6%)."
   }
  ],
  "network": "ethereum-mainnet",

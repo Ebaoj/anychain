@@ -391,6 +391,24 @@
     }
    ],
    "text": "3 read-only staticcall(s) (no state change) not listed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 621384,
+    "used": 146207
+   },
+   "id": "E19",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xe40d5210e5186af42683ef029caa7e56f6f6527975ca64be268305171c9ac957"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 146207 of the 621384 limit (23.5%). The limit was more than twice the gas used."
   }
  ],
  "network": "ethereum-mainnet",

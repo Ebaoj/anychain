@@ -273,6 +273,24 @@
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 1326609,
+    "used": 96917
+   },
+   "id": "E13",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://explorer.optimism.io/api/v2/transactions/0xffd7237981c26cac7cee1b2cdaf0d16279a423080a1cd7b492c89a83f01649bb"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 96917 of the 1326609 limit (7.3%). The limit was more than twice the gas used."
   }
  ],
  "network": "optimism-mainnet",

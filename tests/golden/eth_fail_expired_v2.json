@@ -230,58 +230,79 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 100000,
+      "gas_used": 62260,
       "hash": "0x84ec3d967f45c9fd12ed45e59f52f22e2e84da5cb51b8f55c905003026a02571",
       "method": "transfer",
       "nonce": 49,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T23:45:35.000000Z",
       "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
      },
      {
+      "gas_limit": 60000,
+      "gas_used": 55570,
       "hash": "0x8edec7759e33e3c06b0f0842d6ab933b1f7e820b2328c093afc781a7058302d4",
       "method": "approve",
       "nonce": 50,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T23:45:47.000000Z",
       "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
      },
      {
+      "gas_limit": 250000,
+      "gas_used": 113564,
       "hash": "0x14a2f95c7f487cc0c5161bf40321cabb386a221d3b6e9853222d988aaf3df7b3",
       "method": "swapExactTokensForETH",
       "nonce": 51,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-05T23:45:59.000000Z",
       "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
      },
      {
+      "gas_limit": 300000,
+      "gas_used": 25320,
       "hash": "0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a",
       "method": "swapExactETHForTokens",
       "nonce": 52,
       "result": "Reverted",
+      "this": true,
       "timestamp": "2026-10-08T17:11:47.000000Z",
       "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
      },
      {
+      "gas_limit": 300000,
+      "gas_used": 119837,
       "hash": "0x76fc70bb809fac950f3af4918578f0bcc3f63928d99a7fbf770e98d6a59c0a6f",
       "method": "swapExactETHForTokens",
       "nonce": 53,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T17:12:35.000000Z",
       "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
      },
      {
+      "gas_limit": 100000,
+      "gas_used": 62248,
       "hash": "0xc3b8dd5ee3896dd08710117893786835f713622791f5d2bacefea5bef514919f",
       "method": "transfer",
       "nonce": 54,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T17:12:59.000000Z",
       "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
      },
      {
+      "gas_limit": 100000,
+      "gas_used": 62248,
       "hash": "0xebab55854f9ae013512d455e8045fa6bfa0a87560ae2662b78d234851f88c578",
       "method": "transfer",
       "nonce": 55,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T17:13:11.000000Z",
       "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
      }
@@ -315,6 +336,30 @@
     }
    ],
    "text": "The same call (swapExactETHForTokens to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) succeeded 48 seconds later (nonce 53): the first time it succeeded after this failure."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 300000,
+    "used": 25320
+   },
+   "id": "E11",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0x79D6C25dE86bC4A858d7e383A474667aB109FeD0/transactions?filter=from"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 25320 of the 300000 limit (8.4%). The same call succeeded at nonce 53 using 119837 gas, with a limit of 300000 (E9); this transaction had a limit of 300000."
   }
  ],
  "network": "ethereum-mainnet",

@@ -164,6 +164,24 @@
     }
    ],
    "text": "Token transfer: 10 BRLC from 0x3b995d0B4247CF47058D54E8947038dc11f6Aac9 to 0x78DAd017134019d5e9d4aF3045180B898955934c."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 76702,
+    "used": 50829
+   },
+   "id": "E7",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x0e755eee36ca55ca55fc386f55bb942acc85daaac17f908fe4eaac3cf968ca39"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 50829 of the 76702 limit (66.3%)."
   }
  ],
  "network": "ethereum-mainnet",

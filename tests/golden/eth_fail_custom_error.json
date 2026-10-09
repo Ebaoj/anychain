@@ -826,58 +826,79 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 1167201,
+      "gas_used": 947604,
       "hash": "0x247e5011c768a31500819c9753fcc463184745aa93718696e6258875db115826",
       "method": "0x32bb9270",
       "nonce": 3152,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T17:28:47.000000Z",
       "to": "0xd32d5E6D43E0D9d50B8D6303D0F3a63455d5Be89"
      },
      {
+      "gas_limit": 353546,
+      "gas_used": 223432,
       "hash": "0xe54735ec84e3d98bfef57da29b473278e767c648c6e2814194743fac98578e5c",
       "method": "0x32bb9270",
       "nonce": 3153,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T17:36:47.000000Z",
       "to": "0x5185c805fF80af2ECB660f2c0965470801b95923"
      },
      {
+      "gas_limit": 442106,
+      "gas_used": 309402,
       "hash": "0xdbc15278a795ecf378a748945fdcb6cca23d94617ed129f1e292f7e7f30df5fa",
       "method": "0x32bb9270",
       "nonce": 3154,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T19:28:11.000000Z",
       "to": "0xD53e31924d0CFDa200769bA80ae6b383dFec92BB"
      },
      {
+      "gas_limit": 777776,
+      "gas_used": 628329,
       "hash": "0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8",
       "method": "0x32bb9270",
       "nonce": 3155,
       "result": "Reverted",
+      "this": true,
       "timestamp": "2026-10-08T20:31:11.000000Z",
       "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA"
      },
      {
+      "gas_limit": 845338,
+      "gas_used": 626697,
       "hash": "0xe23e02893a47cfca6d46f9970e7dadfb6a64fafc8e4994a2d17ee8de6a109519",
       "method": "0x32bb9270",
       "nonce": 3156,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T21:47:35.000000Z",
       "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA"
      },
      {
+      "gas_limit": 822807,
+      "gas_used": 566320,
       "hash": "0x0d189e1028f4834bf667afc79e79cdc95acef2c2dc9f00bdf20c9aa37f0b3102",
       "method": "0x32bb9270",
       "nonce": 3157,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T21:48:11.000000Z",
       "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA"
      },
      {
+      "gas_limit": 599029,
+      "gas_used": 409828,
       "hash": "0x40c420c12cf42de98a54d1c54bbe98a84cd909d2057f2529461b98523db722a6",
       "method": "0x4a190cac",
       "nonce": 3158,
       "result": "success",
+      "this": false,
       "timestamp": "2026-10-08T22:54:11.000000Z",
       "to": "0x7957E5A88f0389997B352315e70aB20d77Ec410a"
      }
@@ -911,6 +932,30 @@
     }
    ],
    "text": "The same call (0x32bb9270 to 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA) succeeded 4584 seconds later (about 1 hour) (nonce 3156): the first time it succeeded after this failure."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 777776,
+    "used": 628329
+   },
+   "id": "E40",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9/transactions?filter=from"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 628329 of the 777776 limit (80.8%). The same call succeeded at nonce 3156 using 626697 gas, with a limit of 845338 (E38); this transaction had a limit of 777776."
   }
  ],
  "network": "ethereum-mainnet",

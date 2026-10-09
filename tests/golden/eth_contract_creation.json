@@ -85,6 +85,24 @@
     }
    ],
    "text": "Contract creation: deployed 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f (UniswapV2Factory)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 3049335,
+    "used": 3049335
+   },
+   "id": "E4",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://eth.blockscout.com/api/v2/transactions/0xc31d7e7e85cab1d38ce1b8ac17e821ccd47dbde00f9d57f2bd8613bff9428396"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 3049335 of the 3049335 limit (100.0%). It succeeded close to its limit: the same call doing a little more work could run out of gas."
   }
  ],
  "network": "ethereum-mainnet",

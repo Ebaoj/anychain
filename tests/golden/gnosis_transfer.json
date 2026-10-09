@@ -177,6 +177,24 @@
     }
    ],
    "text": "RPC receipt independently reports status success, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 100000,
+    "used": 42119
+   },
+   "id": "E8",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://gnosisscan.io/api/v2/transactions/0xac36f2fa8f0fc93e51ee3bee4f40a96421de08aa5f515c4602cdeb4a1ec6303b"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 42119 of the 100000 limit (42.1%). The limit was more than twice the gas used."
   }
  ],
  "network": "gnosis-mainnet",

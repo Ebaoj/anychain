@@ -401,34 +401,46 @@
    "data": {
     "rows": [
      {
+      "gas_limit": 191701,
+      "gas_used": 135743,
       "hash": "0xcc99c28270fbc5cc7341e0075040255ee1208b52520a6146b617ccda6389c6a4",
       "method": "exactOutputSingle",
       "nonce": 16904,
       "result": "success",
+      "this": false,
       "timestamp": "2026-09-14T10:27:18.000000Z",
       "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
      },
      {
+      "gas_limit": 193138,
+      "gas_used": 135739,
       "hash": "0xadc4285a85973f3a39dcba05f94eba11d11224e7ec73f7735cce0702692ab708",
       "method": "exactOutputSingle",
       "nonce": 16905,
       "result": "success",
+      "this": false,
       "timestamp": "2026-09-14T10:28:28.000000Z",
       "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
      },
      {
+      "gas_limit": 193132,
+      "gas_used": 135769,
       "hash": "0x9f94eba1deef363c96267c2e3c6e7ddb2fc113b2cee8fce9e07c7bb2d31baa9e",
       "method": "exactOutputSingle",
       "nonce": 16906,
       "result": "success",
+      "this": false,
       "timestamp": "2026-09-14T10:29:15.000000Z",
       "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
      },
      {
+      "gas_limit": 191707,
+      "gas_used": 123734,
       "hash": "0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d",
       "method": "exactOutputSingle",
       "nonce": 16907,
       "result": "Reverted",
+      "this": true,
       "timestamp": "2026-09-14T12:43:44.000000Z",
       "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
      }
@@ -445,6 +457,30 @@
     }
    ],
    "text": "The sender's own transactions around this failure, by nonce: nonce 16904: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, succeeded, at 2026-09-14T10:27:18.000000Z; nonce 16905: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, succeeded, at 2026-09-14T10:28:28.000000Z; nonce 16906: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, succeeded, at 2026-09-14T10:29:15.000000Z; nonce 16907: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, failed ('Reverted'), at 2026-09-14T12:43:44.000000Z (this transaction)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 191707,
+    "used": 123734
+   },
+   "id": "E18",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "https://rootstock.blockscout.com/api/v2/transactions/0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/addresses/0x93BeAC98ABAC34cc174B5F772b16B388fC5b30e3/transactions?filter=from"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 123734 of the 191707 limit (64.5%). The same call succeeded at nonce 16904 using 135743 gas, with a limit of 191701 (E17); this transaction had a limit of 191707."
   }
  ],
  "network": "rootstock-mainnet",
