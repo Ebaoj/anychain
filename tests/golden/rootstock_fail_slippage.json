@@ -2,7 +2,15 @@
  "abi_sources": {
   "0x0B14ff67F0014046b4b99057Aec4509640b3947A": "explorer: verified contract SwapRouter02"
  },
- "gaps": [],
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+  }
+ ],
  "items": [
   {
    "confidence": "single_source",
@@ -387,6 +395,56 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0xcc99c28270fbc5cc7341e0075040255ee1208b52520a6146b617ccda6389c6a4",
+      "method": "exactOutputSingle",
+      "nonce": 16904,
+      "result": "success",
+      "timestamp": "2026-09-14T10:27:18.000000Z",
+      "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
+     },
+     {
+      "hash": "0xadc4285a85973f3a39dcba05f94eba11d11224e7ec73f7735cce0702692ab708",
+      "method": "exactOutputSingle",
+      "nonce": 16905,
+      "result": "success",
+      "timestamp": "2026-09-14T10:28:28.000000Z",
+      "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
+     },
+     {
+      "hash": "0x9f94eba1deef363c96267c2e3c6e7ddb2fc113b2cee8fce9e07c7bb2d31baa9e",
+      "method": "exactOutputSingle",
+      "nonce": 16906,
+      "result": "success",
+      "timestamp": "2026-09-14T10:29:15.000000Z",
+      "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
+     },
+     {
+      "hash": "0x59f5c356dc0bf35db06d89e5aaa98b850bd21809f29662fcab5f980001d0b20d",
+      "method": "exactOutputSingle",
+      "nonce": 16907,
+      "result": "Reverted",
+      "timestamp": "2026-09-14T12:43:44.000000Z",
+      "to": "0x0B14ff67F0014046b4b99057Aec4509640b3947A"
+     }
+    ]
+   },
+   "id": "E17",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/addresses/0x93BeAC98ABAC34cc174B5F772b16B388fC5b30e3/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 16904: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, succeeded, at 2026-09-14T10:27:18.000000Z; nonce 16905: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, succeeded, at 2026-09-14T10:28:28.000000Z; nonce 16906: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, succeeded, at 2026-09-14T10:29:15.000000Z; nonce 16907: exactOutputSingle to 0x0B14ff67F0014046b4b99057Aec4509640b3947A, failed ('Reverted'), at 2026-09-14T12:43:44.000000Z (this transaction)."
   }
  ],
  "network": "rootstock-mainnet",

@@ -9,6 +9,13 @@
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993 matches selector 0x83730cc3"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -184,6 +191,89 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x44e85d7479d57fa9cf9ef3947bada215fc2624638432af47bcf1af9b7de80f10",
+      "method": "0xc393d0e3",
+      "nonce": 951502,
+      "result": "success",
+      "timestamp": "2026-10-05T02:59:33.000000Z",
+      "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
+     },
+     {
+      "hash": "0x139a641ff6c928c7aa269127f8fa3b6f6359932c7528d2cfe8bd0f46e3f68e1c",
+      "method": "0x83730cc3",
+      "nonce": 951503,
+      "result": "success",
+      "timestamp": "2026-10-05T02:59:33.000000Z",
+      "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
+     },
+     {
+      "hash": "0x9499d3f9f9ef392043f93f53cb9f7bfd2af05dd9c3079fcfeea52723d187fbe7",
+      "method": "0xc393d0e3",
+      "nonce": 951504,
+      "result": "success",
+      "timestamp": "2026-10-05T02:59:35.000000Z",
+      "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
+     },
+     {
+      "hash": "0x277589b331e0a1f1f0c633267935f50c2915ab9aa7e6e8f3493eeff985f0c5d3",
+      "method": "0x83730cc3",
+      "nonce": 951505,
+      "result": "execution reverted",
+      "timestamp": "2026-10-05T02:59:37.000000Z",
+      "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
+     },
+     {
+      "hash": "0x6739291c433ff4f8f5dfe1052c144a99966bcbd11d032a12959e867fb82c8368",
+      "method": "0xc393d0e3",
+      "nonce": 951506,
+      "result": "execution reverted",
+      "timestamp": "2026-10-05T02:59:37.000000Z",
+      "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
+     },
+     {
+      "hash": "0xc909fdbb368be4ab70838d5f72edf510458755b977eaccdb6d974b5aea36e7ae",
+      "method": "0x83730cc3",
+      "nonce": 951507,
+      "result": "success",
+      "timestamp": "2026-10-05T02:59:37.000000Z",
+      "to": "0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993"
+     }
+    ]
+   },
+   "id": "E8",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://explorer.optimism.io/api/v2/addresses/0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 951502: 0xc393d0e3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993, succeeded, at 2026-10-05T02:59:33.000000Z; nonce 951503: 0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993, succeeded, at 2026-10-05T02:59:33.000000Z; nonce 951504: 0xc393d0e3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993, succeeded, at 2026-10-05T02:59:35.000000Z; nonce 951505: 0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993, failed ('execution reverted'), at 2026-10-05T02:59:37.000000Z (this transaction); nonce 951506: 0xc393d0e3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993, failed ('execution reverted'), at 2026-10-05T02:59:37.000000Z; nonce 951507: 0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993, succeeded, at 2026-10-05T02:59:37.000000Z."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "retried_ok"
+   },
+   "id": "E9",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://explorer.optimism.io/api/v2/addresses/0x1e070a020305Ad91c6f8bBA6a360Bf94a8F68013/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (0x83730cc3 to 0x91f17fc4d25f45Fabc185fbd09e1477Be2DC5993) succeeded 0 seconds later (nonce 951507): the first time it succeeded after this failure."
   }
  ],
  "network": "optimism-mainnet",

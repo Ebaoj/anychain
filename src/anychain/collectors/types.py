@@ -270,9 +270,12 @@ class AddressTransaction:
     result: str | None  # "success", or the failure text
     sender: str | None
     to: str | None
+    nonce: int | None = None
+    block: int | None = None
 
     @classmethod
     def from_api(cls, v: dict) -> "AddressTransaction":
         return cls(_str(v.get("hash")), _str(v.get("timestamp")), _str(v.get("method")), _str(v.get("result")),
                    _str((v.get("from") or {}).get("hash")) if isinstance(v.get("from"), dict) else None,
-                   _str((v.get("to") or {}).get("hash")) if isinstance(v.get("to"), dict) else None)
+                   _str((v.get("to") or {}).get("hash")) if isinstance(v.get("to"), dict) else None,
+                   to_int(v.get("nonce")), to_int(v.get("block_number")))

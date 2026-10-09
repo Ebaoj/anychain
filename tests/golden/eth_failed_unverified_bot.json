@@ -415,6 +415,114 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x348761cdab906d540192b6d520c9b0b588881666ca8a8049784a5890a96c9413",
+      "method": "0x70521ae9",
+      "nonce": 10342,
+      "result": "Reverted",
+      "timestamp": "2026-10-07T15:19:59.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     },
+     {
+      "hash": "0x8faa6b6e6489bd3d50de74a5e18ec42e0a6211677aba9ed5cf2959b28580817a",
+      "method": "0x70521ae9",
+      "nonce": 10343,
+      "result": "success",
+      "timestamp": "2026-10-07T15:37:23.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     },
+     {
+      "hash": "0xedcaa21a57a7315242bd1520e41c11c5d7c416ceb7bd01a538ece7b59cdff417",
+      "method": "0x70521ae9",
+      "nonce": 10344,
+      "result": "Reverted",
+      "timestamp": "2026-10-07T15:46:47.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     },
+     {
+      "hash": "0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9",
+      "method": "0x70521ae9",
+      "nonce": 10345,
+      "result": "Reverted",
+      "timestamp": "2026-10-07T15:51:11.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     },
+     {
+      "hash": "0x789f7d283800b27dec800b3601475dd2a68bf73d2d010da74515753d4313bdd3",
+      "method": "0x70521ae9",
+      "nonce": 10346,
+      "result": "success",
+      "timestamp": "2026-10-07T15:57:23.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     },
+     {
+      "hash": "0x12ff840f0a39754b42433d87dad0f9ccc997e501ea98675a391c4c5710c2991a",
+      "method": "0x70521ae9",
+      "nonce": 10347,
+      "result": "Reverted",
+      "timestamp": "2026-10-07T16:22:23.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     },
+     {
+      "hash": "0xe02e2fc9c7563ac25c26f3c1f67bae502f7c6237b33aeecdf8619170ebf5ffa5",
+      "method": "0x70521ae9",
+      "nonce": 10348,
+      "result": "success",
+      "timestamp": "2026-10-07T16:32:35.000000Z",
+      "to": "0x278d858f05b94576C1E6f73285886876ff6eF8D2"
+     }
+    ]
+   },
+   "id": "E19",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 10342: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, failed ('Reverted'), at 2026-10-07T15:19:59.000000Z; nonce 10343: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, succeeded, at 2026-10-07T15:37:23.000000Z; nonce 10344: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, failed ('Reverted'), at 2026-10-07T15:46:47.000000Z; nonce 10345: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, failed ('Reverted'), at 2026-10-07T15:51:11.000000Z (this transaction); nonce 10346: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, succeeded, at 2026-10-07T15:57:23.000000Z; nonce 10347: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, failed ('Reverted'), at 2026-10-07T16:22:23.000000Z; nonce 10348: 0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2, succeeded, at 2026-10-07T16:32:35.000000Z."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "retried_ok"
+   },
+   "id": "E20",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (0x70521ae9 to 0x278d858f05b94576C1E6f73285886876ff6eF8D2) succeeded 372 seconds later (nonce 10346): the first time it succeeded after this failure."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "repeated_failures"
+   },
+   "id": "E21",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (0x70521ae9) failed 2 times in a row, with no other transaction of the sender in between (nonces 10344, 10345)."
   }
  ],
  "network": "ethereum-mainnet",

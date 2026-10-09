@@ -338,6 +338,89 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x47409e49ded841bf7feb6c3e7540e5b82a10888b6673c897f98080b6e2b4d925",
+      "method": "swapExactETHForTokensSupportingFeeOnTransferTokens",
+      "nonce": 420,
+      "result": "success",
+      "timestamp": "2026-10-08T18:59:35.000000Z",
+      "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+     },
+     {
+      "hash": "0x6519ec77b07eeb0fe0241bfa3a9e8cb9fcda6cf1a9af52f4062ac0cb1e14cdf6",
+      "method": "swapExactETHForTokensSupportingFeeOnTransferTokens",
+      "nonce": 421,
+      "result": "success",
+      "timestamp": "2026-10-08T19:07:35.000000Z",
+      "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+     },
+     {
+      "hash": "0xecb3461bdc8fc630647fd17c21293961a7a9121b13e3b924eb84d794b3d74143",
+      "method": "approve",
+      "nonce": 422,
+      "result": "success",
+      "timestamp": "2026-10-08T20:11:35.000000Z",
+      "to": "0x4F827024D012d56733CE099F2f3dECCCe634C422"
+     },
+     {
+      "hash": "0x6fed13616ef76557c669fe7b8fb6737625dede4e41926651db5055746f72f832",
+      "method": "swapExactTokensForETHSupportingFeeOnTransferTokens",
+      "nonce": 423,
+      "result": "Reverted",
+      "timestamp": "2026-10-08T20:11:47.000000Z",
+      "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+     },
+     {
+      "hash": "0x924f7c7cb3d416e28f283f4a9242c8dd9bd6f4e90893957111e2c84c4147d006",
+      "method": "swapExactTokensForETHSupportingFeeOnTransferTokens",
+      "nonce": 424,
+      "result": "success",
+      "timestamp": "2026-10-08T20:12:11.000000Z",
+      "to": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+     },
+     {
+      "hash": "0x14b0b4bf13b189a03f9dc293294be0ac5a978523fa3eed1b527e4efdfce47126",
+      "method": null,
+      "nonce": 425,
+      "result": "success",
+      "timestamp": "2026-10-08T20:13:47.000000Z",
+      "to": "0x38ca5031cE5FD4921DDE3E21e07D4D90b546EeB0"
+     }
+    ]
+   },
+   "id": "E15",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0x449ed53a5600A0336069C9de52A8E322f977fDc4/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 420: swapExactETHForTokensSupportingFeeOnTransferTokens to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, succeeded, at 2026-10-08T18:59:35.000000Z; nonce 421: swapExactETHForTokensSupportingFeeOnTransferTokens to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, succeeded, at 2026-10-08T19:07:35.000000Z; nonce 422: approve to 0x4F827024D012d56733CE099F2f3dECCCe634C422, succeeded, at 2026-10-08T20:11:35.000000Z; nonce 423: swapExactTokensForETHSupportingFeeOnTransferTokens to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, failed ('Reverted'), at 2026-10-08T20:11:47.000000Z (this transaction); nonce 424: swapExactTokensForETHSupportingFeeOnTransferTokens to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, succeeded, at 2026-10-08T20:12:11.000000Z; nonce 425: a call to 0x38ca5031cE5FD4921DDE3E21e07D4D90b546EeB0, succeeded, at 2026-10-08T20:13:47.000000Z."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "retried_ok"
+   },
+   "id": "E16",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0x449ed53a5600A0336069C9de52A8E322f977fDc4/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (swapExactTokensForETHSupportingFeeOnTransferTokens to 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) succeeded 24 seconds later (nonce 424): the first time it succeeded after this failure."
   }
  ],
  "network": "ethereum-mainnet",

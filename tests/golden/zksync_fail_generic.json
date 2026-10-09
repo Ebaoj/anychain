@@ -16,6 +16,13 @@
    "retryable": false,
    "what": "Replay",
    "why": "the replay's revert 0x40206e43 is a custom error the called contract's ABI does not declare, or no ABI for it is available"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -564,6 +571,73 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x7580a43a0caa96f5b50de3ae8e0b16d2f648e17ef326c5e14c537554b0986636",
+      "method": "0x8412a3b9",
+      "nonce": 73819,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-09-20T16:44:12.000000Z",
+      "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
+     },
+     {
+      "hash": "0x8936a1fb64a32c6ab99a4629e3a4c837dbe7b2214e12c88b451f680eae2aa6a8",
+      "method": "0x8412a3b9",
+      "nonce": 73820,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-09-20T16:44:14.000000Z",
+      "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
+     },
+     {
+      "hash": "0x3f353e7ca92e5d8a51b267142891581fe43de25014f211255f79de174ddeecf4",
+      "method": "0x8412a3b9",
+      "nonce": 73821,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-09-20T16:44:27.000000Z",
+      "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
+     },
+     {
+      "hash": "0xb354e5046fb0357bc08eb06ec692a6cb9bc8d226f374a3e74ceedf03f68b6b9a",
+      "method": "0x8412a3b9",
+      "nonce": 73822,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-09-20T16:44:29.000000Z",
+      "to": "0x7c168119bf754269523AC9728aeEba8e4Eee6100"
+     }
+    ]
+   },
+   "id": "E26",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://zksync.blockscout.com/api/v2/addresses/0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 73819: 0x8412a3b9 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100, failed ('Bootloader-based tx failed'), at 2026-09-20T16:44:12.000000Z; nonce 73820: 0x8412a3b9 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100, failed ('Bootloader-based tx failed'), at 2026-09-20T16:44:14.000000Z; nonce 73821: 0x8412a3b9 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100, failed ('Bootloader-based tx failed'), at 2026-09-20T16:44:27.000000Z; nonce 73822: 0x8412a3b9 to 0x7c168119bf754269523AC9728aeEba8e4Eee6100, failed ('Bootloader-based tx failed'), at 2026-09-20T16:44:29.000000Z (this transaction)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "repeated_failures"
+   },
+   "id": "E27",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://zksync.blockscout.com/api/v2/addresses/0x9E2c68a2c6aC3F5f80d9a857A53a3154176Ce250/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (0x8412a3b9) failed 22 times in a row, with no other transaction of the sender in between (nonces 73801 to 73822)."
   }
  ],
  "network": "zksync-era",

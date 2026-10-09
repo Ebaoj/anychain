@@ -9,6 +9,13 @@
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0xa89eee597C69fFc0F83d7CF69793250f73d1D190 matches selector 0x457094cc"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -222,6 +229,80 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x939d89038ece34b69d717ae4b4825fbe510151e7da58b493f5c8c135deea8b3d",
+      "method": "0x457094cc",
+      "nonce": 22318,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:40.000000Z",
+      "to": "0x0c1cd88512D112d71B37Fe909737aC5F6149b177"
+     },
+     {
+      "hash": "0x9bef75df0e00661a626a6a683fa99264333455c8c4aa7b398c28efd3b43e2612",
+      "method": "0x457094cc",
+      "nonce": 22319,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:40.000000Z",
+      "to": "0x65d3F2475B40dF0F25CfdeA79C65a1a731508E60"
+     },
+     {
+      "hash": "0xee2b375153e61d00f4a1dd8d7c7c8064e1d05f8ffe067f8625ff603a4c413d55",
+      "method": "0x457094cc",
+      "nonce": 22320,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:50.000000Z",
+      "to": "0xf49B38ca2C9b147eE07C8481c112d1d037a0da3B"
+     },
+     {
+      "hash": "0xa5a5c155ea043d7c358744254b4974f6ccf0ec1ad0f841b04dcaf761debecc7a",
+      "method": "0x457094cc",
+      "nonce": 22321,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:50.000000Z",
+      "to": "0xa89eee597C69fFc0F83d7CF69793250f73d1D190"
+     },
+     {
+      "hash": "0x29665a8123bc64dc8b8fc26ce66e0f5d4384ff0dbc7b3b98422f05d0758e5afc",
+      "method": "0x457094cc",
+      "nonce": 22322,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:50.000000Z",
+      "to": "0x0c1cd88512D112d71B37Fe909737aC5F6149b177"
+     },
+     {
+      "hash": "0xb8c86c14d690848dcb6623131cb0e5f1564ad90e6db20c808fda6783aba78d4f",
+      "method": "0x457094cc",
+      "nonce": 22323,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:50.000000Z",
+      "to": "0x65d3F2475B40dF0F25CfdeA79C65a1a731508E60"
+     },
+     {
+      "hash": "0x9b02da21829064707267f5c66cb7ecd630d8ce08d518aad5e122e2503e8f8d3e",
+      "method": "0x457094cc",
+      "nonce": 22324,
+      "result": "Reverted",
+      "timestamp": "2026-09-13T00:43:50.000000Z",
+      "to": "0xf49B38ca2C9b147eE07C8481c112d1d037a0da3B"
+     }
+    ]
+   },
+   "id": "E10",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://gnosisscan.io/api/v2/addresses/0x68769FC9A71A10754b33C326fDF30914Aa8A3B10/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 22318: 0x457094cc to 0x0c1cd88512D112d71B37Fe909737aC5F6149b177, failed ('Reverted'), at 2026-09-13T00:43:40.000000Z; nonce 22319: 0x457094cc to 0x65d3F2475B40dF0F25CfdeA79C65a1a731508E60, failed ('Reverted'), at 2026-09-13T00:43:40.000000Z; nonce 22320: 0x457094cc to 0xf49B38ca2C9b147eE07C8481c112d1d037a0da3B, failed ('Reverted'), at 2026-09-13T00:43:50.000000Z; nonce 22321: 0x457094cc to 0xa89eee597C69fFc0F83d7CF69793250f73d1D190, failed ('Reverted'), at 2026-09-13T00:43:50.000000Z (this transaction); nonce 22322: 0x457094cc to 0x0c1cd88512D112d71B37Fe909737aC5F6149b177, failed ('Reverted'), at 2026-09-13T00:43:50.000000Z; nonce 22323: 0x457094cc to 0x65d3F2475B40dF0F25CfdeA79C65a1a731508E60, failed ('Reverted'), at 2026-09-13T00:43:50.000000Z; nonce 22324: 0x457094cc to 0xf49B38ca2C9b147eE07C8481c112d1d037a0da3B, failed ('Reverted'), at 2026-09-13T00:43:50.000000Z."
   }
  ],
  "network": "gnosis-mainnet",

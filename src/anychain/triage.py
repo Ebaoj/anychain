@@ -53,7 +53,7 @@ def for_input(text: str, explorer) -> Clarify | None:
         return None
     paste = "Transaction hash (0x followed by 64 hexadecimal characters)"
     if not ADDRESS.match(value):
-        return Clarify("which_transaction", "That is not a transaction hash. Which transaction should I explain? "
+        return Clarify("which_transaction", "That is not a valid transaction hash. Which transaction should I explain? "
                        "Paste its hash (0x followed by 64 hexadecimal characters).", [], paste)
     try:
         rows = explorer.address_transactions(value)

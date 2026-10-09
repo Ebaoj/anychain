@@ -2,7 +2,15 @@
  "abi_sources": {
   "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e": "explorer: verified contract TransparentUpgradeableProxy proxy -> TetherTokenCeloExtension"
  },
- "gaps": [],
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
+  }
+ ],
  "items": [
   {
    "confidence": "single_source",
@@ -309,6 +317,73 @@
     }
    ],
    "text": "The reason 'ERC20: transfer amount exceeds balance' is written in the verified source @openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol, line 236."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0xf3fe70f59eae6fb404b9448ec8afbd3102ff87f32e18ada2ea8c32008740cc91",
+      "method": "transfer",
+      "nonce": 54513,
+      "result": "execution reverted",
+      "timestamp": "2026-10-01T13:33:39.000000Z",
+      "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+     },
+     {
+      "hash": "0xd1da7101ba628107352d060b0119316fbeddc32f4a5d4c319e0a99c95e797c7f",
+      "method": "transfer",
+      "nonce": 54514,
+      "result": "execution reverted",
+      "timestamp": "2026-10-01T13:48:29.000000Z",
+      "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+     },
+     {
+      "hash": "0x33c0908317584100d4af76094e5914ebcd78186b284c7d7c359a19a701cdaf8a",
+      "method": "transfer",
+      "nonce": 54515,
+      "result": "execution reverted",
+      "timestamp": "2026-10-01T13:50:24.000000Z",
+      "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+     },
+     {
+      "hash": "0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817",
+      "method": "transfer",
+      "nonce": 54516,
+      "result": "execution reverted",
+      "timestamp": "2026-10-01T14:07:22.000000Z",
+      "to": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e"
+     }
+    ]
+   },
+   "id": "E13",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://celo.blockscout.com/api/v2/addresses/0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 54513: transfer to 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e, failed ('execution reverted'), at 2026-10-01T13:33:39.000000Z; nonce 54514: transfer to 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e, failed ('execution reverted'), at 2026-10-01T13:48:29.000000Z; nonce 54515: transfer to 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e, failed ('execution reverted'), at 2026-10-01T13:50:24.000000Z; nonce 54516: transfer to 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e, failed ('execution reverted'), at 2026-10-01T14:07:22.000000Z (this transaction)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "repeated_failures"
+   },
+   "id": "E14",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://celo.blockscout.com/api/v2/addresses/0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (transfer) failed 35 times in a row, with no other transaction of the sender in between (nonces 54482 to 54516)."
   }
  ],
  "network": "celo-mainnet",

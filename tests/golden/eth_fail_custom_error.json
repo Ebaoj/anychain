@@ -820,6 +820,97 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x247e5011c768a31500819c9753fcc463184745aa93718696e6258875db115826",
+      "method": "0x32bb9270",
+      "nonce": 3152,
+      "result": "success",
+      "timestamp": "2026-10-08T17:28:47.000000Z",
+      "to": "0xd32d5E6D43E0D9d50B8D6303D0F3a63455d5Be89"
+     },
+     {
+      "hash": "0xe54735ec84e3d98bfef57da29b473278e767c648c6e2814194743fac98578e5c",
+      "method": "0x32bb9270",
+      "nonce": 3153,
+      "result": "success",
+      "timestamp": "2026-10-08T17:36:47.000000Z",
+      "to": "0x5185c805fF80af2ECB660f2c0965470801b95923"
+     },
+     {
+      "hash": "0xdbc15278a795ecf378a748945fdcb6cca23d94617ed129f1e292f7e7f30df5fa",
+      "method": "0x32bb9270",
+      "nonce": 3154,
+      "result": "success",
+      "timestamp": "2026-10-08T19:28:11.000000Z",
+      "to": "0xD53e31924d0CFDa200769bA80ae6b383dFec92BB"
+     },
+     {
+      "hash": "0x11b115d74febcb54cd47c33a7b731cc044fea39aeea5c875628b9291d2a4b5c8",
+      "method": "0x32bb9270",
+      "nonce": 3155,
+      "result": "Reverted",
+      "timestamp": "2026-10-08T20:31:11.000000Z",
+      "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA"
+     },
+     {
+      "hash": "0xe23e02893a47cfca6d46f9970e7dadfb6a64fafc8e4994a2d17ee8de6a109519",
+      "method": "0x32bb9270",
+      "nonce": 3156,
+      "result": "success",
+      "timestamp": "2026-10-08T21:47:35.000000Z",
+      "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA"
+     },
+     {
+      "hash": "0x0d189e1028f4834bf667afc79e79cdc95acef2c2dc9f00bdf20c9aa37f0b3102",
+      "method": "0x32bb9270",
+      "nonce": 3157,
+      "result": "success",
+      "timestamp": "2026-10-08T21:48:11.000000Z",
+      "to": "0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA"
+     },
+     {
+      "hash": "0x40c420c12cf42de98a54d1c54bbe98a84cd909d2057f2529461b98523db722a6",
+      "method": "0x4a190cac",
+      "nonce": 3158,
+      "result": "success",
+      "timestamp": "2026-10-08T22:54:11.000000Z",
+      "to": "0x7957E5A88f0389997B352315e70aB20d77Ec410a"
+     }
+    ]
+   },
+   "id": "E38",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 3152: 0x32bb9270 to 0xd32d5E6D43E0D9d50B8D6303D0F3a63455d5Be89, succeeded, at 2026-10-08T17:28:47.000000Z; nonce 3153: 0x32bb9270 to 0x5185c805fF80af2ECB660f2c0965470801b95923, succeeded, at 2026-10-08T17:36:47.000000Z; nonce 3154: 0x32bb9270 to 0xD53e31924d0CFDa200769bA80ae6b383dFec92BB, succeeded, at 2026-10-08T19:28:11.000000Z; nonce 3155: 0x32bb9270 to 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA, failed ('Reverted'), at 2026-10-08T20:31:11.000000Z (this transaction); nonce 3156: 0x32bb9270 to 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA, succeeded, at 2026-10-08T21:47:35.000000Z; nonce 3157: 0x32bb9270 to 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA, succeeded, at 2026-10-08T21:48:11.000000Z; nonce 3158: 0x4a190cac to 0x7957E5A88f0389997B352315e70aB20d77Ec410a, succeeded, at 2026-10-08T22:54:11.000000Z."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "retried_ok"
+   },
+   "id": "E39",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://eth.blockscout.com/api/v2/addresses/0xf5B77b30eF47F56e4Ab7d6d28fbE3E91f894b9a9/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (0x32bb9270 to 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA) succeeded 4584 seconds later (about 1 hour) (nonce 3156): the first time it succeeded after this failure."
   }
  ],
  "network": "ethereum-mainnet",

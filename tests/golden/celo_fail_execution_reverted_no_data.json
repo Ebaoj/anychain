@@ -9,6 +9,13 @@
    "retryable": false,
    "what": "Call decoding",
    "why": "no ABI for 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A matches selector 0x61461954"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -229,6 +236,73 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0xe0eadb51b1808ae42b989eef3d435da7c68bd9efcb348fbaac26feec330c8bf6",
+      "method": "0x61461954",
+      "nonce": 68275,
+      "result": "success",
+      "timestamp": "2026-10-01T13:40:34.000000Z",
+      "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A"
+     },
+     {
+      "hash": "0xd69f29194677be5ab480cdb6f451d9d4d9d6dd7628db1a3a460fd5053e2e613f",
+      "method": "0x22000000",
+      "nonce": 68276,
+      "result": "success",
+      "timestamp": "2026-10-01T14:01:14.000000Z",
+      "to": "0xae6D7D47b8505C4149c853d586D7f0cc4D34C01a"
+     },
+     {
+      "hash": "0xa345e106673a99e344ddf4366aa9893f634885d9c36dfa4f8ebcf44cc3620643",
+      "method": "0x61461954",
+      "nonce": 68277,
+      "result": "execution reverted",
+      "timestamp": "2026-10-01T14:03:01.000000Z",
+      "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A"
+     },
+     {
+      "hash": "0xe807e84f99994e00c86a22950083eb2dafccd897c8edd171fc5b1b5b23a00ddc",
+      "method": "0x61461954",
+      "nonce": 68278,
+      "result": "execution reverted",
+      "timestamp": "2026-10-01T14:06:39.000000Z",
+      "to": "0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A"
+     }
+    ]
+   },
+   "id": "E11",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://celo.blockscout.com/api/v2/addresses/0x224cFC26c83Fccc3463c804e7F86b10651D5dF96/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 68275: 0x61461954 to 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A, succeeded, at 2026-10-01T13:40:34.000000Z; nonce 68276: 0x22000000 to 0xae6D7D47b8505C4149c853d586D7f0cc4D34C01a, succeeded, at 2026-10-01T14:01:14.000000Z; nonce 68277: 0x61461954 to 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A, failed ('execution reverted'), at 2026-10-01T14:03:01.000000Z; nonce 68278: 0x61461954 to 0x7ba67C6DB6889C2cb1406057d67cb8D9fAB0759A, failed ('execution reverted'), at 2026-10-01T14:06:39.000000Z (this transaction)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "repeated_failures"
+   },
+   "id": "E12",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://celo.blockscout.com/api/v2/addresses/0x224cFC26c83Fccc3463c804e7F86b10651D5dF96/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (0x61461954) failed 2 times in a row, with no other transaction of the sender in between (nonces 68277, 68278)."
   }
  ],
  "network": "celo-mainnet",

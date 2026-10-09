@@ -181,4 +181,4 @@ def test_the_command_line_shows_the_question_when_it_cannot_ask(monkeypatch):
     cfg = load_config(ETH)
     monkeypatch.setattr(cli, "ExplorerClient", lambda *a, **kw: _explorer(cfg))
     out = CliRunner().invoke(cli.app, ["explain", SENDER, "--config", ETH, "--json"])
-    assert out.exit_code == 0 and '"which_transaction"' in out.stdout and USDC_TX in out.stdout
+    assert out.exit_code == 1 and '"which_transaction"' in out.stdout and USDC_TX in out.stdout

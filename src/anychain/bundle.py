@@ -29,7 +29,7 @@ from anychain.collectors.signatures import SignatureDb
 from anychain.decoder import AbiDecoder, decode_revert, fit_signature
 from anychain.collectors.repo import Repo, RepoCache
 from anychain.diagnosis import SUPPORT_STEPS, Context, diagnose, label_for, reason_text, steps_text
-from anychain import security
+from anychain import security, timeline
 from anychain.solidity import SolidityIndex, filter_abi
 from anychain.reads import REPLAY_LIMITS, StateReader
 from anychain.models import EvidenceBundle, GapCause, Source
@@ -110,6 +110,7 @@ REPLAY_MEANING = {
 }
 PREFETCH_WORKERS = 6  # parallel explorer requests while prefetching (D26)
 MAX_INTERNAL = 30
+TIMELINE_PAGES = 3  # pages of the sender's latest transactions read to reach a failure (PHASE4 R2)
 ZERO_ADDRESS = "0x" + "0" * 40
 
 # Internal call types whose `value` is only the caller's context, never a payment:
@@ -233,6 +234,9 @@ class BundleBuilder:
 
         if tx is not None and rpc_view is not None and not explorer_lagging:
             self._safely("RPC cross-check", lambda: self._add_cross_check(rpc_view))
+        if tx is not None and self.bundle.status == "failed" and not explorer_lagging:
+            # last, so the facts before it keep their numbers (PHASE4 T2)
+            self._safely("Timeline", lambda: self._add_timeline(tx_hash, tx))
         return self.bundle
 
     def _declare_explorer_miss(self, has_receipt: bool) -> None:
@@ -705,6 +709,46 @@ class BundleBuilder:
             self._gap("Diagnosis", missing.why, missing.needed, retryable=missing.retryable, cause=missing.cause)
         if finding.rule in REPLAY_WHEN and ctx.reader is not None:
             self._add_replay(tx_hash, tx, ctx)
+
+    def _add_timeline(self, tx_hash: str, tx: Transaction) -> None:
+        """The sender's transactions around this failure and the patterns they show (PHASE4 T2, R2, D56). Bounded:
+        the latest pages of the sender's sent transactions until this block is reached (TIMELINE_PAGES at most),
+        plus one page from this block back."""
+        sender, block = address_of(tx.sender), tx.block_number
+        if not sender or block is None:
+            return
+        rows, nxt = self.explorer.sent_page(sender)
+        for _ in range(TIMELINE_PAGES - 1):
+            if not nxt or any(r.block is not None and r.block <= block for r in rows):
+                break
+            more, nxt = self.explorer.sent_page(sender, after=nxt)
+            rows += more
+        reached = any(r.block is not None and r.block <= block for r in rows)
+        before, _ = self.explorer.sent_page(sender, before_block=block + 1)
+        seen = {r.hash for r in rows}
+        rows += [r for r in before if r.hash not in seen]
+        source = self._api_source(f"/addresses/{sender}/transactions?filter=from", "Explorer API: the sender's "
+                                  "transactions")
+        found = timeline.build(tx_hash, sender, rows)
+        if found is None:
+            self._gap("Timeline", "this transaction is not in the explorer's list of the sender's transactions",
+                      "Ask again in a minute", retryable=True, cause="source_behind")
+            return
+        if not reached:
+            self._gap("Timeline", f"the sender sent more than {len(rows) - len(before)} transactions after this one; "
+                      "those right after it are not shown", "Open the sender's page on the explorer",
+                      retryable=False, cause="not_interpretable")
+
+        def line(r) -> str:
+            outcome = "succeeded" if r.result == "success" else f"failed ({r.result!r})"
+            mark = " (this transaction)" if r is found.failed else ""
+            return f"nonce {r.nonce}: {r.method or 'a call'} to {r.to or '(contract creation)'}, {outcome}, at {r.timestamp}{mark}"
+        self.bundle.add("timeline", "The sender's own transactions around this failure, by nonce: "
+                        + "; ".join(line(r) for r in found.rows) + ".", [source],
+                        {"rows": [{"hash": r.hash, "nonce": r.nonce, "method": r.method, "to": r.to,
+                                   "result": r.result, "timestamp": r.timestamp} for r in found.rows]})
+        for name, sentence in found.patterns:
+            self.bundle.add("timeline", sentence, [source], {"pattern": name})
 
     def _node_gas(self) -> tuple[int, int] | None:
         """(gas used, gas limit) as the node reports them (receipt, transaction), when both are known."""

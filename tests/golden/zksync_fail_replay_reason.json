@@ -23,6 +23,13 @@
    "retryable": false,
    "what": "Internal calls",
    "why": "the explorer's list was cut after 5 pages, so later internal calls (and any value they carried) are not known"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "Open the sender's page on the explorer",
+   "retryable": false,
+   "what": "Timeline",
+   "why": "the sender sent more than 150 transactions after this one; those right after it are not shown"
   }
  ],
  "items": [
@@ -973,6 +980,56 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x144825033fa05c2f90403664ec267e870e8a81074e7857c92160feccd8a9d890",
+      "method": "0x24856bc3",
+      "nonce": 240373,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-10-01T12:58:26.000000Z",
+      "to": "0xA478bf3f621d47E6753F463711630C282D2803aB"
+     },
+     {
+      "hash": "0x1646efef3c8efb0d6c86420b0da816144e3421976c3ff09da6b35563702c6005",
+      "method": "0xc04b8d59",
+      "nonce": 240374,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-10-01T12:58:33.000000Z",
+      "to": "0xC8A3d1d834617796cdd8c68709e9719f41cb472E"
+     },
+     {
+      "hash": "0x3d4928270c38891b91784fe118413a6f0d5ceb51b6b1925c9d4818dc9487d00a",
+      "method": "0x24856bc3",
+      "nonce": 240375,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-10-01T12:59:10.000000Z",
+      "to": "0xA478bf3f621d47E6753F463711630C282D2803aB"
+     },
+     {
+      "hash": "0x9b99887c56ec938d1adf2b06cf3901c5835fb53aedfb14fdd794ea79181d5147",
+      "method": "0xc04b8d59",
+      "nonce": 240376,
+      "result": "Bootloader-based tx failed",
+      "timestamp": "2026-10-01T12:59:17.000000Z",
+      "to": "0xC8A3d1d834617796cdd8c68709e9719f41cb472E"
+     }
+    ]
+   },
+   "id": "E44",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://zksync.blockscout.com/api/v2/addresses/0x464fC339aDD314932920d3e060745bd7Ea3e92AD/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 240373: 0x24856bc3 to 0xA478bf3f621d47E6753F463711630C282D2803aB, failed ('Bootloader-based tx failed'), at 2026-10-01T12:58:26.000000Z; nonce 240374: 0xc04b8d59 to 0xC8A3d1d834617796cdd8c68709e9719f41cb472E, failed ('Bootloader-based tx failed'), at 2026-10-01T12:58:33.000000Z; nonce 240375: 0x24856bc3 to 0xA478bf3f621d47E6753F463711630C282D2803aB, failed ('Bootloader-based tx failed'), at 2026-10-01T12:59:10.000000Z; nonce 240376: 0xc04b8d59 to 0xC8A3d1d834617796cdd8c68709e9719f41cb472E, failed ('Bootloader-based tx failed'), at 2026-10-01T12:59:17.000000Z (this transaction)."
   }
  ],
  "network": "zksync-era",

@@ -105,7 +105,8 @@ def explain(
 
 def _ask(clarify, as_json: bool) -> str:
     """Asks the clarifying question in the terminal and returns the answer (an option's id or typed text). Without a
-    terminal to answer in, it prints the question (as JSON with --json) and stops."""
+    terminal to answer in, it prints the question (as JSON with --json) and stops with exit code 1: nothing was
+    explained yet."""
     if not sys.stdin.isatty():
         if as_json:
             print(json.dumps({"clarify": clarify.to_dict()}, indent=2, ensure_ascii=False))
@@ -113,7 +114,7 @@ def _ask(clarify, as_json: bool) -> str:
             print(clarify.question)
             for i, o in enumerate(clarify.options, 1):
                 print(f"  {i}. {o.label} ({o.id})")
-        raise typer.Exit(0)
+        raise typer.Exit(1)
     print(clarify.question, file=sys.stderr)
     for i, o in enumerate(clarify.options, 1):
         print(f"  {i}. {o.label}", file=sys.stderr)

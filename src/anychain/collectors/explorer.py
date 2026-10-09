@@ -73,8 +73,22 @@ class ExplorerClient:
 
     def address_transactions(self, address: str) -> list[AddressTransaction]:
         """The address's latest transactions, newest first (the first page only: triage lists a few, PHASE4 R1)."""
-        page = self._get(f"/addresses/{address}/transactions")
-        return [AddressTransaction.from_api(i) for i in page.get("items") or [] if isinstance(i, dict)]
+        return self.sent_page(address, sent_only=False)[0]
+
+    def sent_page(self, address: str, before_block: int | None = None, after: dict | None = None,
+                  sent_only: bool = True) -> tuple[list[AddressTransaction], dict | None]:
+        """One page of the address's transactions, newest first, and the next page's parameters. `before_block`:
+        only those in earlier blocks (Blockscout's keyset: `block_number=X&index=0` gives blocks below X, checked
+        live on 2026-10-08); `sent_only`: `filter=from`. PHASE4 R2."""
+        params = dict(after or {})
+        if before_block is not None:
+            params |= {"block_number": before_block, "index": 0}
+        if sent_only:
+            params["filter"] = "from"
+        page = self._get(f"/addresses/{address}/transactions", params or None)
+        rows = [AddressTransaction.from_api(i) for i in page.get("items") or [] if isinstance(i, dict)]
+        nxt = page.get("next_page_params")
+        return rows, nxt if isinstance(nxt, dict) else None
 
     def logs(self, tx_hash: str) -> tuple[list[Log], bool]:
         def fetch():

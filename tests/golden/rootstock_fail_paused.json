@@ -229,6 +229,97 @@
     }
    ],
    "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "hash": "0x373b3427cee203c59c1091bc68c22c98a55e35656eae8526d74e09948de0c56f",
+      "method": "stake",
+      "nonce": 13,
+      "result": "Reverted",
+      "timestamp": "2026-09-22T10:32:11.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     },
+     {
+      "hash": "0x6bf898cd2b6dda309d988ce1a6977336fbeef937b3953b6785e440d1600dc54c",
+      "method": "stake",
+      "nonce": 14,
+      "result": "Reverted",
+      "timestamp": "2026-09-22T10:32:43.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     },
+     {
+      "hash": "0xf4e75badb18e82f5ef5f1798d2c44668d2dcd8b14835d7f0260f1e65262a60b1",
+      "method": "stake",
+      "nonce": 15,
+      "result": "Reverted",
+      "timestamp": "2026-09-22T10:35:43.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     },
+     {
+      "hash": "0x9ca321afd6c436a285e4d26ebd7c3fe7b2474b878d8ee2b3efd005520b9906dd",
+      "method": "stake",
+      "nonce": 16,
+      "result": "Reverted",
+      "timestamp": "2026-09-22T10:37:48.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     },
+     {
+      "hash": "0x7bd0afe29592b3bcbc4dbf211de3a69b3ac5dafbc7077ac96a4f82e31477a83e",
+      "method": "stake",
+      "nonce": 17,
+      "result": "Reverted",
+      "timestamp": "2026-09-22T10:39:29.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     },
+     {
+      "hash": "0x552340d5e27f2075a9a7c6dc7c9518a0dd0d4797295b32474208d9e4a1e2470b",
+      "method": "stake",
+      "nonce": 18,
+      "result": "Reverted",
+      "timestamp": "2026-09-22T10:41:48.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     },
+     {
+      "hash": "0x3d48b5d9b92c1374aa8500fc68bd358a0cb9f9d2d630a02b052f978bf675294b",
+      "method": "stake",
+      "nonce": 19,
+      "result": "Reverted",
+      "timestamp": "2026-09-23T06:07:05.000000Z",
+      "to": "0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e"
+     }
+    ]
+   },
+   "id": "E10",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/addresses/0x9E954ef6a88A85a8FC203148c360Af5a4EFA3640/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 13: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-22T10:32:11.000000Z; nonce 14: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-22T10:32:43.000000Z; nonce 15: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-22T10:35:43.000000Z; nonce 16: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-22T10:37:48.000000Z (this transaction); nonce 17: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-22T10:39:29.000000Z; nonce 18: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-22T10:41:48.000000Z; nonce 19: stake to 0x5684A06CaB22Db16D901FEe2a5c081b4C91eA40e, failed ('Reverted'), at 2026-09-23T06:07:05.000000Z."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "pattern": "repeated_failures"
+   },
+   "id": "E11",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "https://rootstock.blockscout.com/api/v2/addresses/0x9E954ef6a88A85a8FC203148c360Af5a4EFA3640/transactions?filter=from"
+    }
+   ],
+   "text": "The same call (stake) failed 13 times in a row, with no other transaction of the sender in between (nonces 8 to 20)."
   }
  ],
  "network": "rootstock-mainnet",
