@@ -26,7 +26,8 @@ def build(bundle: EvidenceBundle, mode: str) -> list[tuple[str, str, list[str]]]
     if mode == "support":
         out.append(("What happened", "did it work or fail, and why, in plain words; for a failure, each conclusion with "
                     "its label in the answer's language; then, in parentheses, its specifics for support: the "
-                    "reason's original words, a figure or a name the conclusion gives", overview + diagnosis))
+                    "reason's original words, the error of the inner call that failed when the conclusion gives one (such as "
+                    "'out of gas'), the figures, and the names of the contracts where it failed", overview + diagnosis))
         if triage:
             out.append(("What you told us", "what the reader said and what the facts show about it", triage))
         out.append(("Did the money move?", "yes or no, how much and from whom to whom" if moves else

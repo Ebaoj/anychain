@@ -78,7 +78,7 @@ flowchart TD
     API --> PAGE["Página web<br/>com chat e 👍/👎"]
     OUT --> LOG["Log de eventos<br/>uma linha por resposta"]
     LOG --> MET["anychain log e anychain metrics<br/>(cada número com o seu SQL)"]
-    EVAL["anychain eval<br/>10 casos reais, medidos"] -.usa.-> BUN
+    EVAL["anychain eval<br/>11 casos reais, medidos"] -.usa.-> BUN
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
     class IN,TRI,TL,CACHE,CFG,EXP,RPC,REPO,DEC,PRO,CODE,DIAG,BUN,WRI,VAL,OUT,CLI,API,PAGE,LOG,MET,EVAL done
@@ -207,19 +207,18 @@ Ferramentas: `read` (estado de um contrato), `code` (código de uma função), `
 
 ```mermaid
 flowchart LR
-    T["Testes automáticos<br/>~950, offline,<br/>com respostas reais gravadas"] --> Q["Qualidade"]
-    E["anychain eval<br/>10 transações reais,<br/>o modelo escreve de verdade"] --> Q
+    T["Testes automáticos<br/>~1.050, offline,<br/>com respostas reais gravadas"] --> Q["Qualidade"]
+    E["anychain eval<br/>11 transações reais,<br/>o modelo escreve de verdade"] --> Q
     A["Aceitação<br/>1.800 transações sorteadas,<br/>conferidas contra o nó"] --> Q
     V["Revisão de contexto limpo<br/>a cada etapa, procura erros"] --> Q
     Q --> M["Números que o eval mede:<br/>acerto de status e diagnóstico,<br/>cobertura de citações,<br/>alucinação, degradação,<br/>tempo e custo"]
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
     classDef next fill:#fff3cd,stroke:#b8860b,color:#5d4037
-    class T,E,V,Q,M done
-    class A next
+    class T,E,A,V,Q,M done
 ```
 
-A aceitação de 1.800 transações já rodou nas Fases 1 e 2; a da Fase 3 roda no fim dela. Os resultados do eval ficam em `eval/report.md`.
+Os resultados do eval ficam em `eval/report.md`; os da aceitação, em `docs/acceptance-report.md`.
 
 ---
 
@@ -230,8 +229,10 @@ Qual arquivo faz o quê, e quem chama quem. Ordem sugerida de leitura: `service.
 ```mermaid
 flowchart LR
     subgraph entry["Entradas"]
-        cli["cli.py<br/>explain, chat, batch, serve,<br/>log, metrics, eval, repos sync"]
-        api["api.py + web/index.html<br/>API local e página"]
+        cli["cli.py<br/>explain, chat, batch, serve,<br/>log, metrics, eval, repos sync, llm"]
+        api["api.py + web/index.html<br/>API local e a página de conversa"]
+        networks["networks.py<br/>troca ou adiciona rede<br/>sem reiniciar"]
+        settings["llm_settings.py<br/>o modelo, a chave, o idioma<br/>(salvos fora do repo, 0600)"]
     end
 
     subgraph service_g["Uma resposta"]
@@ -263,6 +264,7 @@ flowchart LR
 
     subgraph output["Saída"]
         answer["answer.py<br/>resposta estruturada"]
+        outline["outline.py<br/>as seções da resposta,<br/>montadas a partir dos fatos"]
         writer["writer.py<br/>motores de IA"]
         validator["validator.py<br/>checagem"]
         render["render.py<br/>markdown sem IA"]
@@ -271,6 +273,11 @@ flowchart LR
 
     cli --> service
     api --> service
+    api --> networks
+    api --> settings
+    cli --> settings
+    writer --> outline
+    writer --> settings
     cli --> chat
     api --> chat
     cli --> evaluate
@@ -361,6 +368,7 @@ flowchart LR
 
 ## Histórico deste documento
 
+- **09/10/2026, depois da Fase 4 (D59 a D67):** rede privada montada como a da CloudWalk (nó local, Blockscout próprio, BRLC atrás de um proxy), lida só com um arquivo de configuração; o modelo e a chave de API escolhidos pelo terminal ou pela página, com o modelo vindo da lista do próprio provedor; modelos menores confiáveis por código (roteiro da resposta montado a partir dos fatos, só os próximos passos do leitor, citações normalizadas, fatos-chave obrigatórios); rede trocada ou adicionada pela página sem reiniciar; a página virou uma conversa em três versões (lojista, desenvolvedor, auditor); linguagem simples para o lojista. Novos no mapa do código: `outline.py`, `networks.py`, `llm_settings.py`.
 - **08/10/2026, Fase 4 (D55 a D58):** triagem com uma pergunta escolhida pelo código; linha do tempo do remetente em volta de uma falha, com padrões ditos só sobre nonces contínuos; notas de gás (heurísticas); Dockerfile, testado num servidor; README final.
 - **08/10/2026, Fase 3 até a T5 (D44 a D51):** seção 0 em linguagem simples; cache por rede e hash e lote; métricas com SQL; API local e página; chat com ferramentas executadas pelo nosso código; valores na unidade do token, lidos do próprio token; avaliação com 10 casos reais; diagnóstico que parte da origem da falha e diz todo sinal que a conclusão não explica. Novas seções: como o diagnóstico decide, o chat com ferramentas, como a qualidade é medida.
 - **08/10/2026, fim da Fase 2.5 (D38 a D43):** código da função como fato, notas de segurança, ABI de artefatos, controle de acesso, prazo pelo parâmetro, rótulos, passos por leitor, resposta estruturada.

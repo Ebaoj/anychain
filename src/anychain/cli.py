@@ -400,8 +400,8 @@ def serve(
     host: str = typer.Option("127.0.0.1", help="Address to listen on: this machine only"),
     port: int = typer.Option(8000, min=1, max=65535),
 ) -> None:
-    """Run the local API and its page: /explain, /chat, /health, /feedback, /settings/llm. It has no authentication, so it only listens on
-    this machine."""
+    """Run the local API and its page: /explain, /chat, /health, /feedback, and the page's settings (/settings/llm,
+    /settings/network, /settings/answers). It has no authentication, so it only listens on this machine."""
     import uvicorn
 
     from anychain.api import create_app

@@ -76,7 +76,7 @@ flowchart TD
     API --> PAGE["Web page<br/>with chat and 👍/👎"]
     OUT --> LOG["Event log<br/>one row per answer"]
     LOG --> MET["anychain log and anychain metrics<br/>(each number with its SQL)"]
-    EVAL["anychain eval<br/>10 real cases, measured"] -.uses.-> BUN
+    EVAL["anychain eval<br/>11 real cases, measured"] -.uses.-> BUN
 
     classDef done fill:#d4edda,stroke:#2e7d32,color:#1b5e20
     class IN,TRI,TL,CACHE,CFG,EXP,RPC,REPO,DEC,PRO,CODE,DIAG,BUN,WRI,VAL,OUT,CLI,API,PAGE,LOG,MET,EVAL done
@@ -205,8 +205,8 @@ Tools: `read` (a contract's state), `code` (a function's code), `file` (a file o
 
 ```mermaid
 flowchart LR
-    T["Automated tests<br/>~960, offline,<br/>with real recorded answers"] --> Q["Quality"]
-    E["anychain eval<br/>10 real transactions,<br/>the model really writes"] --> Q
+    T["Automated tests<br/>~1,050, offline,<br/>with real recorded answers"] --> Q["Quality"]
+    E["anychain eval<br/>11 real transactions,<br/>the model really writes"] --> Q
     A["Acceptance<br/>1,800 sampled transactions,<br/>checked against the node"] --> Q
     V["Clean-context reviews<br/>look for errors"] --> Q
     Q --> M["What the eval measures:<br/>status and diagnosis accuracy,<br/>citation coverage,<br/>hallucination, degradation,<br/>time and cost"]
@@ -226,8 +226,10 @@ Which file does what, and who calls whom. Suggested reading order: `service.py`,
 ```mermaid
 flowchart LR
     subgraph entry["Entry points"]
-        cli["cli.py<br/>explain, chat, batch, serve,<br/>log, metrics, eval, repos sync"]
-        api["api.py + web/index.html<br/>local API and page"]
+        cli["cli.py<br/>explain, chat, batch, serve,<br/>log, metrics, eval, repos sync, llm"]
+        api["api.py + web/index.html<br/>local API and the conversation page"]
+        networks["networks.py<br/>switch or add a network<br/>without restarting"]
+        settings["llm_settings.py<br/>the model, its key, the language<br/>(saved outside the repo, 0600)"]
     end
 
     subgraph service_g["One answer"]
@@ -259,6 +261,7 @@ flowchart LR
 
     subgraph output["Output"]
         answer["answer.py<br/>structured answer"]
+        outline["outline.py<br/>the answer's sections,<br/>built from the facts"]
         writer["writer.py<br/>AI backends"]
         validator["validator.py<br/>the check"]
         render["render.py<br/>markdown without AI"]
@@ -267,6 +270,11 @@ flowchart LR
 
     cli --> service
     api --> service
+    api --> networks
+    api --> settings
+    cli --> settings
+    writer --> outline
+    writer --> settings
     cli --> chat
     api --> chat
     cli --> evaluate
@@ -357,6 +365,7 @@ flowchart LR
 
 ## Changelog of this document
 
+- **2026-10-09, after phase 4 (D59 to D67):** a private network built like CloudWalk's (a local node, a self-hosted Blockscout, BRLC behind a proxy) read with a config only; the model and its API key chosen from the CLI or the page, the model picked from the provider's own list; smaller models made reliable by code (an outline of the answer built from the facts, only the reader's own next steps, citations normalized, key facts enforced); the network switched or added from the page without restarting; the page as a conversation in three versions (merchant, developer, auditor); plain language for a merchant. New in the code map: `outline.py`, `networks.py`, `llm_settings.py`.
 - **2026-10-08, phase 4 (D55 to D58):** triage with one question chosen by code; the sender's timeline around a failure, with patterns said only over unbroken nonces; heuristic gas notes; Dockerfile, run on a server; final README.
 - **2026-10-08, end of phase 3 (D44 to D53):** a one-minute overview; cache by network and hash and batch; metrics with SQL; local API and page; chat with tools run by our code; amounts in the token's units, read from the token itself; evaluation with 10 real cases; diagnosis that starts from the failure's origin and says every signal its conclusion leaves unexplained; the reader's question; a mined transaction without a receipt is "unknown", never "pending". New sections: how the diagnosis decides, the chat with tools, how quality is measured.
 - **2026-10-08, end of phase 2.5 (D38 to D43):** the model gets the called function's code (and the reason's line when the code pins it down); heuristic security notes; ABIs from repo artifacts, the address checked against the file's own list; access-control and deadline-parameter rules; CONFIRMED / LIKELY / UNKNOWN labels on each conclusion and in the log; steps for a merchant and for a developer; structured answer (`--json`). Header and code map brought up to date (phase 2 modules were missing).
