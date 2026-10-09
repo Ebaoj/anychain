@@ -1,6 +1,6 @@
 # PHASE2: failures and degradation (diagnosis, eth_call, repo grounding, ABI cascade, validator)
 
-- **Status:** DONE 2026-10-08 (approved by Joabe on 2026-10-08 with the proposed defaults: spec in the repo, order T1 to T9, signature database on as candidates only). Closing acceptance: D37.
+- **Status:** DONE 2026-10-08 (approved by the author on 2026-10-08 with the proposed defaults: spec in the repo, order T1 to T9, signature database on as candidates only). Closing acceptance: D37.
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)
@@ -12,7 +12,7 @@
 - **What changes for the user:** a failed transaction gets a diagnosis (likely causes, each tied to a fact, and next steps). Calls are explained from the contract's source in the configured repo, with a permalink. Contracts the explorer cannot decode are decoded from the repo, or named as a candidate from a signature database, clearly marked as a guess. The written answer is checked against the facts before it is shown.
 - **What does not change:** facts stay sourced; nothing is asserted without proof (a guess is labelled as one); config-only network changes; the tool stays read-only.
 - **Risk:** a diagnosis is the place where a false fact is most tempting. Every cause must be stated as "likely" with the fact that supports it, and confirmed by a state read when one exists.
-- **Decisions for Joabe:** section 12.
+- **Decisions for the author:** section 12.
 
 ## 2. Context
 
@@ -91,7 +91,7 @@ No `git push`, no deploy. No tracing node (`debug_traceTransaction`) as a requir
 
 Local tool, no deploy. Each source can be turned off by config (`abi_strategy.order`, `signature_db.enabled`, `repos: []`), which returns to Phase 1 behaviour.
 
-## 12. Decisions (Joabe, decided 2026-10-08: the proposed defaults)
+## 12. Decisions (the author, decided 2026-10-08: the proposed defaults)
 
 - **D1. Where this spec lives.** The global rule sends tickets to Jira (KAN), and asks before creating one for a project without a Jira space. Proposed default: keep it in the repo (`docs/specs/`), as the rest of this project's decisions.
 - **D2. Order.** Proposed default: T1 to T9 as listed (validator first).
@@ -118,5 +118,5 @@ Local tool, no deploy. Each source can be turned off by config (`abi_strategy.or
 
 - [x] D1 to D3 decided (2026-10-08).
 - [x] T1 to T9 committed, each with its tests and a clean-context review.
-- [x] Architecture docs (en and pt-BR) updated; Phase 2 explained to Joabe in plain Portuguese.
+- [x] Architecture docs (en and pt-BR) updated; Phase 2 explained to the author in plain Portuguese.
 - [x] Acceptance on the final code: 1,800 transactions, 0 tool errors, no level A or B false fact (D37).

@@ -26,6 +26,6 @@ Run on the Phase 3 code (sample in `docs/acceptance-samples/phase3/`): 1,800 tra
 |---|---|---|---|
 | ethereum `0xe40d5210…` status, celo `0xfb973b70…` status | A | the node returned the transaction with its block but a null receipt, the explorer did not answer within the budget, and the RPC-only path called it "pending" | fixed (D53): a mined transaction without a receipt is "unknown" with a gap; test on the recorded answers |
 | gnosis `0xda8a55bc…` fee | A | a blob transaction; the Gnosis config said `chain_type: default`, so the explorer's blob fee was left out of the stated fee | fixed (D54): Gnosis is `chain_type: ethereum`; a profile that does not add a reported blob fee says the fee may not be whole. Re-run live: 0.001123277000198441 XDAI, the node's total |
-| optimism `0xfb6616f8…` token transfers | C | the explorer marks the ERC-1155 as `reputation: scam` and hides its transfers; the tool lists what the explorer lists | backlog C1 (decided by Joabe on 2026-10-08) |
+| optimism `0xfb6616f8…` token transfers | C | the explorer marks the ERC-1155 as `reputation: scam` and hides its transfers; the tool lists what the explorer lists | backlog C1 (decided by the author on 2026-10-08) |
 
 With the two fixes, no level A or B false fact remains open from this run.

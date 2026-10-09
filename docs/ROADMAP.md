@@ -9,22 +9,22 @@ Agreed items for later phases, so they are not lost between sessions. Each item 
 - **What:** on a Linux server (Docker), run a local EVM node (Anvil) plus a self-hosted Blockscout. Deploy the BRLC contracts from the configured repo, generate real transactions (transfers, approvals, a paused-token revert, an access-control revert, an out-of-gas), then point AnyChain at it with a new YAML only.
 - **Done when:** `anychain explain` and `anychain eval` run against the devnet with a `configs/devnet.yaml`, no code changes, and the README shows one sample conversation from it.
 - **Risk:** Blockscout needs Postgres; the server has 4 GB RAM. Check memory before starting; fall back to the backend without the frontend.
-- **Decided:** 2026-10-07, by Joabe.
+- **Decided:** 2026-10-07, by the author.
 
 ### Dockerfile
 - **Why:** the original plan (section 11) welcomes a simple Dockerfile "if it costs little", and the case asks for "lightweight and deployable, runs locally".
 - **What:** one image that runs `anychain` and the API with a config mounted from outside; no secrets inside. Built and run on a server, never on the mac (CLAUDE.md).
 - **Done when:** the README quickstart, tested from a clean clone, also works with `docker run`.
-- **Decided:** 2026-10-08, by Joabe (moved here from Phase 3's gaps).
+- **Decided:** 2026-10-08, by the author (moved here from Phase 3's gaps).
 
 ## Open questions
 - ~~Anthropic API key for the LLM writer~~ Resolved 2026-10-08: the writer runs on Claude Code (D27); a key is needed only for a deployed service.
-- ~~Using the unofficial mirror `cloudwallk/brlc-token` in the demo~~ Approved by Joabe on 2026-10-08, with a README note that it is an unofficial mirror (pinned commit 74a5498).
+- ~~Using the unofficial mirror `cloudwallk/brlc-token` in the demo~~ Approved by the author on 2026-10-08, with a README note that it is an unofficial mirror (pinned commit 74a5498).
 - ~~Re-run of the 1,800-transaction acceptance after D26~~ Done at the end of Phase 2 (D37). Until it runs, the measured rates in docs/acceptance-report.md describe the code before D26 (C11 and C12 changed internal-call facts on every network; D26 re-checked them on the 40 recordings and by review, not on the sample).
 
-## Backlog: level C findings (decided by Joabe on 2026-10-08)
+## Backlog: level C findings (decided by the author on 2026-10-08)
 
-True but imprecise answers, found by the reviews and the acceptance run (docs/ACCEPTANCE.md). Joabe chose to fix C3, C11 and C12 now (D26) and keep these for later. Each item names the real transaction or file it came from.
+True but imprecise answers, found by the reviews and the acceptance run (docs/ACCEPTANCE.md). The author chose to fix C3, C11 and C12 now (D26) and keep these for later. Each item names the real transaction or file it came from.
 
 | # | Finding | Where it was seen |
 |---|---|---|
@@ -42,7 +42,7 @@ True but imprecise answers, found by the reviews and the acceptance run (docs/AC
 | C15 | Rootstock native contracts: the published ABIs (`@rsksmart/rsk-precompiled-abis`) as a configured repo source | Rootstock tx 0xf6009eb2… |
 | C16 | zkSync node status "failed" is quoted as is; a reader may take it for an L1 failure (unconfirmed what it means; check the zkSync source first) | review of D25 |
 
-Added at the close of Phase 2 (2026-10-08), sent to the backlog by Joabe:
+Added at the close of Phase 2 (2026-10-08), sent to the backlog by the author:
 
 | # | Finding | Where it was seen |
 |---|---|---|
@@ -53,7 +53,7 @@ Added at the close of Phase 2 (2026-10-08), sent to the backlog by Joabe:
 | C21 | Claude Code adds the logged-in user's email to the model's context whatever the flags | D27 review |
 | C22 | A base function overridden by a public state variable (`uint public override v`) is still named as the function writing a reason: the index does not read state variables | review of D38 |
 | C23 | Shown code line numbers count as known numbers for the answer check, so a 4-digit amount equal to one passes | review of D38 |
-| C25 | A sensitive-name note on a function that does nothing (Compound `mintVerify`: the `mint` prefix of the name rule) | review of D39, sent to the backlog by Joabe 2026-10-08 |
-| C26 | A function authorized by a signature (`ecrecover(...) == owner`) gets "no check of the caller": literally true, may mislead | review of D39, sent to the backlog by Joabe 2026-10-08 |
-| C27 | A selfdestruct anywhere in the contract's chain repeats the same note on every function (1inch router: 45 functions) | review of D39, sent to the backlog by Joabe 2026-10-08 |
+| C25 | A sensitive-name note on a function that does nothing (Compound `mintVerify`: the `mint` prefix of the name rule) | review of D39, sent to the backlog by the author 2026-10-08 |
+| C26 | A function authorized by a signature (`ecrecover(...) == owner`) gets "no check of the caller": literally true, may mislead | review of D39, sent to the backlog by the author 2026-10-08 |
+| C27 | A selfdestruct anywhere in the contract's chain repeats the same note on every function (1inch router: 45 functions) | review of D39, sent to the backlog by the author 2026-10-08 |
 | C24 | Uniswap V3 SwapRouter (0xE592…1564) gets no code fact: its verified source holds `Multicall.sol` and `PeripheryPayments.sol` twice under different paths, and the index gives up on duplicate names (no false fact, a missing one) | review of D39 |

@@ -1,6 +1,6 @@
 # PHASE3: interface and evaluation (API, web UI, chat with tools, metrics, eval suite)
 
-- **Status:** IN PROGRESS (approved by Joabe on 2026-10-08 with the proposed defaults D1 to D5)
+- **Status:** IN PROGRESS (approved by the author on 2026-10-08 with the proposed defaults D1 to D5)
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)
@@ -12,7 +12,7 @@
 - **What changes for the user:** a local web page and API. The user pastes a hash, picks a mode, gets the explanation with clickable sources, a confidence badge per conclusion and a "missing data" panel, then asks follow-up questions in a chat. In the chat the model can ask for more data (read contract state, open a repo file, look at another transaction), and every answer it gets becomes a new citable fact. `anychain eval` runs a fixed set of real cases and reports accuracy, citation coverage and hallucination rate; `anychain metrics` prints usage numbers from SQL. Asking again about the same transaction answers from a local cache (no new explorer or node calls), and a list of hashes can be explained in one batch command that resumes where it stopped.
 - **What does not change:** facts stay sourced, the answer check (validator) runs on every chat answer, nothing is asserted without a source, the tool stays read-only, network changes stay config-only.
 - **Risk:** a chat where the model chooses what to look up is where it can drift from the evidence; every tool result is a fact with a source, and every chat answer goes through the validator.
-- **Decisions for Joabe:** section 12.
+- **Decisions for the author:** section 12.
 
 ## 2. Context
 
@@ -90,20 +90,20 @@ No `git push`, no deploy, no auth, no cloud. The production queue and worker sta
 6. T6 (R8): `docs/IMPACT.md`.
 7. T7 (R12): the user's question in `explain`, the API and the structured answer.
 8. T8: the 1,800-transaction acceptance run (300 per network, seven checks against the node; docs/ACCEPTANCE.md) on the final code, as PHASE2_5 D3 decided; any level A or B false fact is fixed with a test before the phase closes.
-9. T9 (R9): the browser demo, recorded; architecture docs; Phase 3 report to Joabe.
+9. T9 (R9): the browser demo, recorded; architecture docs; Phase 3 report to the author.
 
 ## 11. Rollout and reversal
 
 Local tool: new commands and a server; nothing changes for `explain`. The chat can be left unused.
 
-## 12. Decisions for Joabe (each with a proposed default)
+## 12. Decisions for the author (each with a proposed default)
 
 - **D1. How the model asks for tools.** The original plan said "Anthropic SDK tool use"; the writer now runs on Claude Code (D27), which has no plain tool-calling API (only its own tools or MCP servers). Proposed: a small JSON protocol in the model's answer ("to answer I need: read balanceOf of X at block N"), run by our code, the same on every backend, and the model itself keeps no tools at all. Alternative: expose the tools to Claude Code as an MCP server (more moving parts, different per backend).
 - **D2. Missing eval categories.** Find real Ethereum transactions for an allowance revert, an out-of-gas failure and a custom error through the explorer. Proposed: search the explorer's recent failures by reason; if a category has no real case on Ethereum after a bounded search, take it from another network and say so in the report, never a made-up one.
 - **D3. The page.** Proposed: one plain HTML page with vanilla JavaScript served by the API (the original plan), no framework.
 - **D4. Where this spec lives.** Proposed: in the repo (`docs/specs/`), as Phase 2.
-- **Decided on 2026-10-08 (Joabe):** starting a conversation from the reader's problem instead of a hash (find the transaction by the account and its recent transactions) stays in Phase 4, with the original plan's triage (4.5); the page of T4 starts from a hash.
-- **D5. When a transaction is final enough to cache** (requested by Joabe on 2026-10-08). Proposed: the node's `finalized` block where the node supports it (Ethereum and most L2s); otherwise `cache.min_confirmations` in the network config (proposed 64); networks with extra steps (zkSync L1 status) are kept only once those steps are done.
+- **Decided on 2026-10-08 (the author):** starting a conversation from the reader's problem instead of a hash (find the transaction by the account and its recent transactions) stays in Phase 4, with the original plan's triage (4.5); the page of T4 starts from a hash.
+- **D5. When a transaction is final enough to cache** (requested by the author on 2026-10-08). Proposed: the node's `finalized` block where the node supports it (Ethereum and most L2s); otherwise `cache.min_confirmations` in the network config (proposed 64); networks with extra steps (zkSync L1 status) are kept only once those steps are done.
 
 ## 13. Tests and tracing
 
@@ -133,4 +133,4 @@ Local tool: new commands and a server; nothing changes for `explain`. The chat c
 - [ ] T0 to T9 committed, each with tests and a clean-context review.
 - [ ] The acceptance run (T8) has no level A or B false fact.
 - [ ] `anychain eval` runs and the UI does the full demo (the original plan's criterion).
-- [ ] Architecture docs updated; Phase 3 explained to Joabe in plain Portuguese.
+- [ ] Architecture docs updated; Phase 3 explained to the author in plain Portuguese.

@@ -1,6 +1,6 @@
 # Acceptance criteria
 
-Agreed with Joabe on 2026-10-07. A phase closes by this criterion, not by "no reviewer found anything".
+Agreed with the author on 2026-10-07. A phase closes by this criterion, not by "no reviewer found anything".
 
 ## Fact levels
 
@@ -8,7 +8,7 @@ Agreed with Joabe on 2026-10-07. A phase closes by this criterion, not by "no re
 |---|---|---|
 | **A: core** | status, sender and recipient, value moved (native and tokens), total fee, decoded call when an ABI exists, failure reason | **zero false facts** |
 | **B: network details** | L1 status, paymaster, fee flow, EIP-7702 delegations, explorer classifications, chain-type facts | **zero false facts**; may be declared "not interpreted" |
-| **C: precision and context** | labels, wording, grouping, a detail that could be said better | not a defect; **each one goes to Joabe**, who decides: fix now or backlog |
+| **C: precision and context** | labels, wording, grouping, a detail that could be said better | not a defect; **each one goes to the author**, who decides: fix now or backlog |
 
 ## Sample
 
@@ -33,5 +33,5 @@ What the automatic checks flag is reviewed by hand (or by a clean-context review
 ## Review findings
 
 - Level A or B: fixed, with a test that fails on the old code.
-- Level C: listed for Joabe to decide.
+- Level C: listed for the author to decide.
 - One review round per change.

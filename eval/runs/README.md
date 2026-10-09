@@ -1,8 +1,3 @@
-# Earlier evaluation runs
+# An earlier evaluation run
 
-Each folder is one `anychain eval` run kept as evidence for a decision; the official run is `eval/report.md`.
-
-- `nano-baseline`, `nano-prompt`, `nano-outline`, `nano-final`, `nano-final2` to `nano-final4`: gpt-4.1-nano, step by step, while making the answers reliable on a small model (D62): the prompt alone made it worse; the outline built from the facts made it work.
-- `claude-final`, `claude-final2`: Claude after the D62 changes, to check that the larger model did not lose quality.
-- `nano-plain`, `nano-plain2`: the merchant's plain-language prompt (D67), before and after removing a wording that misled the model.
-- `nano-final-d67`: gpt-4.1-nano with the final prompts (D68), the number quoted in the README.
+`nano-final-d67`: the same evaluation as `eval/report.md`, written by gpt-4.1-nano (OpenAI's smallest model) instead of Claude, the run quoted in the README's section on smaller models. The intermediate runs that measured each step of making small models reliable are in the git history.

@@ -1,6 +1,6 @@
 # PHASE2_5: the gaps between Phase 2 and the case (before the interface of Phase 3)
 
-- **Status:** DONE, approved by Joabe on 2026-10-08 (the three security-note wordings to the backlog as C25 to C27; the bare v4 Ownable text stays CONFIRMED and a no-reason failure with a passed deadline stays UNKNOWN, as D42 says)
+- **Status:** DONE, approved by the author on 2026-10-08 (the three security-note wordings to the backlog as C25 to C27; the bare v4 Ownable text stays CONFIRMED and a no-reason failure with a passed deadline stays UNKNOWN, as D42 says)
 - **Level:** full
 - **Opened:** 2026-10-08
 - **Project:** anychain (case 1.4, CloudWalk)
@@ -12,7 +12,7 @@
 - **What changes for the user:** the answer can say what the called function does and where it failed, quoting its code; it adds heuristic security notes (clearly not an audit); access-control and expired-deadline failures are diagnosed and confirmed when a read can; next steps fit the reader (a merchant or a developer); every conclusion carries CONFIRMED, LIKELY or UNKNOWN; `explain --json` gives the structured answer the plan describes.
 - **What does not change:** sourced facts only, the answer check, config-only networks, read-only.
 - **Risk:** code given to the model is long and third-party text: it goes in as data inside the evidence, cut to the relevant function, and the validator still checks values. Security notes can sound like findings: they are labelled as pattern matches, never as vulnerabilities.
-- **Decisions for Joabe:** section 12.
+- **Decisions for the author:** section 12.
 
 ## 2. Context
 
@@ -78,13 +78,13 @@ No push, no deploy. Triage, multi-transaction analysis, gas suggestions and `deb
 4. T4 (R5, R6): access control rule and deadline from the decoded parameter, each with a real case.
 5. T5 (R7, R8): next steps per audience and the CONFIRMED / LIKELY / UNKNOWN labels.
 6. T6 (R4): structured JSON answer.
-7. T7: architecture docs, decisions, report to Joabe; Phase 3 spec updated to build on this.
+7. T7: architecture docs, decisions, report to the author; Phase 3 spec updated to build on this.
 
 ## 11. Rollout and reversal
 
 Each addition is a new fact kind or rule; the answer check and the degradation rules are unchanged. Turning repos off (`repos: []`) removes code facts and notes.
 
-## 12. Decisions for Joabe (each with a proposed default)
+## 12. Decisions for the author (each with a proposed default)
 
 - **D1. Security notes now.** The original plan put them in Phase 4 as the second thing to cut; the case asks for them inside repo grounding. Proposed: build them here, and remove them from the cut list.
 - **D2. Real cases to find.** Access control and deadline-from-parameter failures, and a public repo that commits compiled ABIs for a contract with real transactions. Proposed: search the explorers and GitHub; if a category has no real case after a bounded search, say so and test it on the closest real data, never on made-up data. Candidate for artifacts: Safe's published deployment ABIs (`safe-global/safe-deployments`), for the real Safe transaction already recorded.
@@ -113,6 +113,6 @@ Each addition is a new fact kind or rule; the answer check and the degradation r
 - [x] D1 to D4 decided (2026-10-08, the proposed defaults).
 - [x] T1 to T7 committed, each with tests and a clean-context review (T1 D38, T2 D39, T3 D40, T4 D41, T5 D42, T6 D43); every review found real errors, all fixed before the commit.
 - [x] Phase 3 spec updated to build on this.
-- [x] Phase 2.5 explained to Joabe in plain Portuguese and approved (2026-10-08).
+- [x] Phase 2.5 explained to the author in plain Portuguese and approved (2026-10-08).
 
 Results: suite 792 tests; no real access-control failure found in 1,600 recent failures on five networks (D41), so that rule is tested on OpenZeppelin's exact texts only.

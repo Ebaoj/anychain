@@ -1,6 +1,6 @@
 # Evaluation report
 
-Run 2026-10-09 10:03, commit 965a152 + uncommitted changes, model gpt-4.1-nano. Every case is a real transaction replayed from its recording (eval/cases.yaml).
+Run 2026-10-09 10:03, commit 28d4c33 + uncommitted changes, model gpt-4.1-nano. Every case is a real transaction replayed from its recording (eval/cases.yaml).
 
 | Metric | Result |
 |---|---|

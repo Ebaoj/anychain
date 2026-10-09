@@ -1,10 +1,10 @@
 # PHASE 4: bonus features and finish
 
-Status: **APPROVED** by Joabe on 2026-10-08 (D1 and D2 as proposed). Delivery: 2026-10-09. Process (Joabe, 2026-10-08): one clean-context review for the whole phase, level C findings go to the backlog, level A and B stop the work.
+Status: **APPROVED** by the author on 2026-10-08 (D1 and D2 as proposed). Delivery: 2026-10-09. Process (the author, 2026-10-08): one clean-context review for the whole phase, level C findings go to the backlog, level A and B stop the work.
 
 ## 1. Summary for the decision
 
-The original plan's Phase 4 is "triage, multi-transaction, security notes, gas; final README, DECISIONS.md, diagram", with the cut order **gas, then security, then multi-transaction**, and **never cut: degradation, citations, eval, README**. Security notes are done (D39). Added later by Joabe: a private devnet on a server (ROADMAP, 2026-10-07) and a Dockerfile (ROADMAP, 2026-10-08).
+The original plan's Phase 4 is "triage, multi-transaction, security notes, gas; final README, DECISIONS.md, diagram", with the cut order **gas, then security, then multi-transaction**, and **never cut: degradation, citations, eval, README**. Security notes are done (D39). Added later by the author: a private devnet on a server (ROADMAP, 2026-10-07) and a Dockerfile (ROADMAP, 2026-10-08).
 
 ## 2. Requirements
 
@@ -18,11 +18,11 @@ The original plan's Phase 4 is "triage, multi-transaction, security notes, gas; 
 - **R4. Final README (plan section 10)**, every part: what it is with the demo GIF; quickstart tested from a clean clone; configuration and "Retargeting to another network (e.g. CloudWalk)"; architecture diagram and the ABI cascade; **at least 3 real sample conversations** (success in support mode, diagnosed failure in developer mode with an `eth_call` read and a repo citation, unverified contract with degradation, and triage with a clarifying question); the eval table copied from `eval/report.md`; metrics and impact (docs/IMPACT.md); known limits and next steps; a transparent note on how AI (Claude Code) was used and which decisions were human.
 - **R5. Dockerfile**: one image running the CLI and the API with a config mounted from outside, no secrets inside; built and run on a server. **Accept:** `docker run` serves `/health` on that server.
 - **R6. Private devnet on a server (ROADMAP)**: Anvil plus a self-hosted Blockscout, the BRLC contracts deployed, real transactions (transfer, approve, paused revert, access-control revert, out of gas), then `configs/devnet.yaml` only. **Risk:** Blockscout needs Postgres and the server has 4 GB of RAM. **Proposed:** attempt it last, time-boxed to 2 hours; if it does not fit, the README says so and the design stays in ROADMAP.
-- **R7. Architecture docs** (both languages) and DECISIONS.md updated; the Phase 4 report to Joabe in plain Portuguese.
+- **R7. Architecture docs** (both languages) and DECISIONS.md updated; the Phase 4 report to the author in plain Portuguese.
 
 ## 3. Out of scope
 
-No push, no deploy (the delivery itself is Joabe's call). `debug_traceTransaction` stays optional (`rpc.supports_debug_trace`): no public node used here offers it, and the devnet's Anvil would (only if R6 runs).
+No push, no deploy (the delivery itself is the author's call). `debug_traceTransaction` stays optional (`rpc.supports_debug_trace`): no public node used here offers it, and the devnet's Anvil would (only if R6 runs).
 
 ## 4. Tasks, in the order they are done
 
@@ -36,7 +36,7 @@ No push, no deploy (the delivery itself is Joabe's call). `debug_traceTransactio
 
 If time runs short, the plan's cut order applies: gas first, then multi-transaction; R1, R4 and the review are never cut.
 
-## 5. Decisions for Joabe
+## 5. Decisions for the author
 
 - **D1.** The devnet (R6) last and time-boxed to 2 hours, or cut now? Proposed: last and time-boxed.
 - **D2.** `max_clarifying_questions` default 1 (one question, then answer)? Proposed: 1.

@@ -13,8 +13,10 @@ def _source_text(source: Source) -> str:
     return text
 
 
-CONFIDENCE_TEXT = {"confirmed": "confirmed by the node", "single_source": "not cross-checked with the node",
+# The common case (from the explorer only) is said once, as a legend; each fact marks only what differs from it.
+CONFIDENCE_TEXT = {"confirmed": "confirmed by the node", "single_source": None,
                    "candidate": "candidate: inferred, not confirmed"}
+LEGEND = "_Facts come from the explorer and are not cross-checked with the node unless marked otherwise._"
 
 
 def render_markdown(bundle: EvidenceBundle) -> str:
@@ -23,10 +25,13 @@ def render_markdown(bundle: EvidenceBundle) -> str:
         f"Network: **{bundle.network}** | Status: **{bundle.status}**",
         "",
         "## Evidence",
+        LEGEND,
+        "",
     ]
     for ev in bundle.items:
         links = " ".join(_source_text(s) for s in ev.sources)
-        lines.append(f"- **[{ev.id}]** {ev.text} _({CONFIDENCE_TEXT[ev.confidence]})_  \n  _Sources:_ {links}")
+        mark = CONFIDENCE_TEXT[ev.confidence]
+        lines.append(f"- **[{ev.id}]** {ev.text}{f' _({mark})_' if mark else ''}  \n  _Sources:_ {links}")
     if bundle.abi_sources:
         lines += ["", "## ABI sources"] + [f"- `{a}`: {s}" for a, s in bundle.abi_sources.items()]
     if bundle.gaps:
