@@ -7,6 +7,7 @@ The documents (eval reports, decisions) quote commit ids of the development hist
 | 0b434ed | 40519c4 | Eval: key facts cited (conclusions and the timeline's patterns) |
 | 10ea453 | 6fb4be7 | Pick the model from the provider's own list; D61 written |
 | 7b2b3db | dab1df4 | Explorer and node asked in parallel, so a slow explorer cannot use up the node's time; oracle skips declared unknown status |
+| 7f39aba | af9391b | Delivery checked from a fresh clone: the eval reads only recordings, the quickstart syncs repositories, two samples in English, unit economics (D70) |
 | 88155eb | 4829a7e | Uniswap's V2 router as a configured repository on Ethereum (permalinks to the function and the reason's line); an auditor sample in English (D69) |
 | 965a152 | 28d4c33 | Eval report: the summary counts tokens as each case does (cache included), with the cached part shown |
 | c86c6af | 2cc5047 | PHASE2 T8: the degradation matrix; a failure with the explorer down now says its reason is missing and replays (D36) |

@@ -530,7 +530,7 @@ For a developer: review by hand whether each item reachable through this loop ac
 
 `anychain eval` replays 11 real transactions from their recordings (8 on Ethereum, 2 on Optimism, 1 on the private demo network; `eval/cases.yaml`) through the whole pipeline, the model included, and measures the answer. Latest run ([eval/report.md](eval/report.md), per-case details in `eval/report.json`):
 
-Run 2026-10-09 11:37, commit 7f39aba, model claude-sonnet-5-5. Every case is a real transaction replayed from its recording (eval/cases.yaml).
+Run 2026-10-09 11:37, commit 7f39aba (public id af9391b), model claude-sonnet-5-5. Every case is a real transaction replayed from its recording (eval/cases.yaml).
 
 | Metric | Result |
 |---|---|
