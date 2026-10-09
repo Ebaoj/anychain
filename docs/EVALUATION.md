@@ -47,3 +47,20 @@ The allowance category had no real case on a public network (the candidate found
 
 `anychain eval --intents` routes 60 reader questions written in pt-BR, en and es, with slang (`eval/chat_intents.json`), through the rules and then the classifier, and compares each with its label. With gpt-4.1-nano ([eval/intents.md](../eval/intents.md)): 96.6% of single questions right, 13 of 60 routed by rules with no model, 1 wrong label into a framed answer ("it was the supplier's payment, did he receive it?" read as "did the money move": the frame says only what moved, and the statement check rejects calling the recipient "the supplier"). With Claude: 100% ([eval/runs/intents-claude/intents.md](../eval/runs/intents-claude/intents.md)). `--no-llm` measures the rules alone, offline. Before the code, a prototype measured the alternatives, including the model's own doubt as a signal to ask (it flagged 0 and 1 of its 6 errors): [docs/specs/CHAT_HARNESS.md](specs/CHAT_HARNESS.md) section 10.
 
+## Choosing the model (gpt-4.1-nano against gpt-4.1-mini, 2026-10-09)
+
+The same eval on the same commit (`eval/runs/nano-d75`, `eval/runs/mini-d75`), and the same chat scenario (the expired swap; "it was my electricity bill"; six questions):
+
+| | gpt-4.1-nano | gpt-4.1-mini |
+|---|---|---|
+| Status, diagnosis, ABI source, degradation | 100% | 100% |
+| Key values / key facts | 93.8% / 100% | 100% / 100% |
+| Citation coverage | 77.0% | 70.0% |
+| First drafts rejected by the check | 0% | 9.1% |
+| Chat, open question "what is this deadline of 2400?" | wrong, twice: "2400 seconds, that is 40 minutes" | right: "a time long past, 1970-01-01 00:40 UTC" |
+| Chat, Portuguese | stiff ("o valor restante" for "the value left", "nonce 53" to a merchant) | natural |
+| Time per written answer | 3.6 s | 5.9 s |
+| Cost per written answer (measured tokens, OpenAI list prices on 2026-10-09: nano US$ 0.10 / 0.025 cached / 0.40 per 1M tokens in / out; mini 0.40 / 0.10 / 1.60) | US$ 0.0004 | US$ 0.0019 |
+
+On the explanations the two are close, and their numbers move between runs: the frame built by code (D62) carries both. The difference is in the chat, on open questions, where the model interprets: nano misreads a value the value check accepts because the number is right. **Recommended: gpt-4.1-mini**, about US$ 2 per thousand answers. For reference, gpt-5.4-mini's list price (US$ 0.75 / 0.075 / 4.50) on the same tokens would be about US$ 0.004 per answer, a floor since that family may spend reasoning tokens; the official eval's Claude Sonnet cost US$ 0.027 per answer. The classifier is fine on nano (96.6%).
+

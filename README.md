@@ -38,6 +38,8 @@ Interfaces: a **web page** (a conversation), a **CLI** (`explain`, `chat`, `batc
 
 Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). The written answer needs a model: the local [Claude Code](https://claude.com/claude-code) CLI (the default, logged in, no key), or an Anthropic or OpenAI API key saved once with `anychain llm set` (kept outside the repository). Without a model everything still runs and shows the facts only (`--no-llm`).
 
+**Which model:** with an OpenAI key, use **gpt-4.1-mini** (or larger), not gpt-4.1-nano. The code keeps the facts right with both, but on open chat questions nano misread a fact it cited correctly twice in a row (a deadline of 2400, which is a date in 1970, read as "2400 seconds, 40 minutes") and its Portuguese is stiff; mini got it right. Measured cost per written answer: about US$ 0.0004 (nano), US$ 0.002 (mini), US$ 0.027 (Claude Sonnet). Details: [docs/EVALUATION.md](docs/EVALUATION.md).
+
 ```bash
 git clone https://github.com/Ebaoj/anychain.git && cd anychain
 uv sync
@@ -310,7 +312,7 @@ For a developer: review by hand whether each item reachable through this loop ac
 | Tokens sent (cache included) / received | 59248 / 10964 (12981 read from the cache) |
 | Cost reported by the backend | 0.2973 USD |
 
-Per case, the smaller model (gpt-4.1-nano: same accuracy, 100% of key values and facts, 80.3% citation coverage) and an acceptance run of 1,800 random transactions checked against the networks' own nodes: [docs/EVALUATION.md](docs/EVALUATION.md). A fresh clone reproduces the accuracy columns without a model: `uv run anychain eval --no-llm --out data/eval`.
+Per case, the OpenAI models compared (gpt-4.1-mini is the one recommended) and an acceptance run of 1,800 random transactions checked against the networks' own nodes: [docs/EVALUATION.md](docs/EVALUATION.md). A fresh clone reproduces the accuracy columns without a model: `uv run anychain eval --no-llm --out data/eval`.
 
 ---
 
