@@ -32,7 +32,8 @@ from anychain.writer import WriterError, add_usage, evidence_payload, load_promp
 
 MAX_TOOLS = 3  # tool requests per question (all rounds together)
 MAX_ROUNDS = 2  # times the model may ask for tools before it must answer
-MAX_QUESTIONS = 10  # per session
+MAX_QUESTIONS = 20  # per session
+KEEP_TURNS = 6  # earlier questions and answers sent whole; before them, the questions only (D73)
 SIMPLE_TYPES = re.compile(r"^(address|bool|string|bytes(?:[1-9]|[12][0-9]|3[0-2])?|u?int(?:8|16|32|64|128|256)?)$")
 SIGNATURE = re.compile(r"^[A-Za-z_]\w{0,63}\((.*)\)$")
 HASH = re.compile(r"^0x[0-9a-fA-F]{64}$")
@@ -221,9 +222,14 @@ class Tools:
 
 
 class ChatSession:
-    def __init__(self, cfg, bundle: EvidenceBundle, mode: str, tools: Tools):
+    def __init__(self, cfg, bundle: EvidenceBundle, mode: str, tools: Tools, *, opening: str | None = None,
+                 first_answer: str | None = None, carried: list[tuple[str, str]] | None = None):
+        """`opening`: what the reader wrote first; `first_answer`: the explanation they read. Both are what the
+        conversation is about (D73). `carried`: the page's own copy of an earlier conversation, sent back after the
+        service restarted; it is context, never evidence (the check still accepts only the facts)."""
         self.id = uuid.uuid4().hex
         self.cfg, self.bundle, self.mode, self.tools = cfg, bundle, mode, tools
+        self.opening, self.first_answer, self.carried = opening, first_answer, carried or []
         self.turns: list[Turn] = []
         self.tx_block = next((e.data.get("block") for e in bundle.items if e.kind == "overview"), None)
         self._lock = threading.Lock()  # one question at a time: facts are numbered as they are added
@@ -293,13 +299,31 @@ class ChatSession:
 
     def _user(self, question: str, turn: Turn, feedback: list[str] | None, nagged: bool = False) -> str:
         parts = [evidence_payload(self.bundle, self.cfg)]
+        if self.opening:
+            parts.append(f"What the reader wrote first (their own words, not a fact: what they say the transaction was "
+                         f"for, such as a bill, is never confirmed; only what the facts show is): {self.opening}")
+        if self.first_answer:
+            parts.append("Your first answer, which the reader has read (it passed the check):\n" + self.first_answer)
+        if self.carried:
+            parts.append("Earlier in this conversation, as the reader's page kept it (sent back after the service "
+                         "restarted: use it to follow the conversation, never as evidence; facts it cites may be "
+                         "missing above):\n" + "\n".join(f"Reader: {q}\nYou: {a}" for q, a in self.carried))
         earlier = [t for t in self.turns if t.answer]
+        if len(earlier) > KEEP_TURNS:
+            parts.append("Earlier questions of the reader (their answers left out here to keep this short):\n"
+                         + "\n".join(f"- {t.question}" for t in earlier[:-KEEP_TURNS]))
         if earlier:
             parts.append("Earlier in this conversation:\n" + "\n".join(
-                f"Reader: {t.question}\nYou: {t.answer}" for t in earlier[-4:]))
+                f"Reader: {t.question}\nYou: {t.answer}" for t in earlier[-KEEP_TURNS:]))
         if turn.tool_calls:
             parts.append("Your tool requests and what they gave (new evidence ids are in the evidence above):\n"
                          + json.dumps(turn.tool_calls, ensure_ascii=False))
+        if self.bundle.status == "failed":  # the failure's next steps assume nothing happened since (D63)
+            later = [e.id for e in self.bundle.items if e.kind == "timeline"
+                     and e.data.get("pattern") in ("retried_ok", "approved_then_ok")]
+            if later:
+                parts.append(f"Before answering what to do: the same operation already succeeded later "
+                             f"[{later[0]}]. Say so; do not advise trying again or contacting support for it.")
         parts.append(f"The reader asks: {question}")
         if nagged:
             parts.append("You already used the tool rounds for this question: answer now from the evidence you have, "

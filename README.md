@@ -325,6 +325,7 @@ How it would reach a support team (shadow mode, then 10%, 25%, 50%, 100% of tran
 - **No trace yet:** `debug_traceTransaction` is not called; failures are explained from the explorer, reads on the node and a replay. The config's `rpc.supports_debug_trace` records which nodes serve it.
 - **Public nodes** keep about the last 128 blocks of state, so reads for older failures are refused and said as a gap; an archive node removes that.
 - **Heuristics stay heuristics:** security and gas notes are pattern matches on the shown code, never an audit.
+- **The chat remembers the conversation** (the reader's first message, the explanation they read, the questions since; kept in the browser across a reload or a restart of the service), but there is no hand-off to a person yet, and nothing is kept per customer on a server ([docs/ROADMAP.md](docs/ROADMAP.md)).
 - **The private network** runs on a private server and was rebuilt by hand; everything it produced is recorded in the repository and replayed by the tests.
 
 ---

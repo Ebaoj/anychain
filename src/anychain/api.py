@@ -111,6 +111,12 @@ class LlmSettingsRequest(BaseModel):
     api_key: str | None = Field(None, max_length=400)
 
 
+class EarlierTurn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    question: str = Field(..., max_length=2000)
+    answer: str = Field(..., max_length=6000)
+
+
 class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     message: str = Field(..., min_length=1, max_length=2000, description="The reader's question")
@@ -118,6 +124,10 @@ class ChatRequest(BaseModel):
     run_id: int | None = Field(None, description="Start from the facts of this /explain answer (what the page shows)")
     hash: str | None = Field(None, description="The transaction to talk about (starts a conversation)")
     mode: Literal["support", "developer", "auditor"] | None = None
+    # To resume after the service restarted (D73): the page's own copy of what was said, context for the model only
+    opening: str | None = Field(None, max_length=2000, description="What the reader wrote first")
+    first_answer: str | None = Field(None, max_length=12000, description="The explanation the reader read")
+    earlier: list[EarlierTurn] | None = Field(None, max_length=10, description="Earlier questions and answers")
 
 
 class FeedbackRequest(BaseModel):
@@ -249,7 +259,7 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
         if result.writer_error:  # the command line prints it on stderr; here it travels with the answer
             out["writer_error"] = no_urls(result.writer_error, node)
         if result.run_id is not None:
-            explained.put(result.run_id, (result.bundle, mode))
+            explained.put(result.run_id, (result.bundle, mode, request.question, out.get("summary")))
         return out
 
     @app.post("/chat")
@@ -268,12 +278,15 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
             if kept is None:
                 raise HTTPException(404, f"no recent explain with run_id {request.run_id}: explain the transaction again, "
                                          "or start with its hash")
-            bundle, explain_mode = kept
-            session = ChatSession(cfg, bundle.model_copy(deep=True), request.mode or explain_mode, tools)
+            bundle, explain_mode, opening, first_answer = kept
+            session = ChatSession(cfg, bundle.model_copy(deep=True), request.mode or explain_mode, tools,
+                                  opening=opening, first_answer=first_answer)
             sessions.add(session)
         elif request.hash:
             try:
-                session = ChatSession(cfg, bundle_for(request.hash), request.mode or cfg.assistant.default_mode, tools)
+                session = ChatSession(cfg, bundle_for(request.hash), request.mode or cfg.assistant.default_mode, tools,
+                                      opening=request.opening, first_answer=request.first_answer,
+                                      carried=[(t.question, t.answer) for t in request.earlier or []])
             except InvalidHashError as exc:
                 raise HTTPException(400, str(exc)) from exc
             except Exception as exc:

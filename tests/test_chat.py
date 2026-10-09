@@ -352,3 +352,61 @@ def test_a_chat_from_an_unknown_explain_says_so(event_log, tmp_path):
     client = _app(event_log, tmp_path, Scripted())
     response = client.post("/chat", json={"run_id": 999999, "message": "x"})
     assert response.status_code == 404 and "explain" in response.json()["detail"]
+
+
+# ---- D73: the chat as the layer that talks to the reader: it knows what was said before ----
+
+def test_a_chat_from_an_explain_knows_the_readers_first_message_and_the_first_answer(event_log, tmp_path):
+    from anychain.writer import CheckedAnswer
+    _c, tx = _case("celo_fail_balance_confirmed")
+    model = Scripted("It failed [E1].")
+    session = _session()
+    client = TestClient(create_app(session.cfg, log=event_log, store=BundleCache(tmp_path / "c.db"),
+                                   build=lambda h, c: replay_bundle(c, h, "celo_fail_balance_confirmed"),
+                                   write_fn=lambda b, c, m, question=None: CheckedAnswer("The transfer failed [E1].", "ok", []),
+                                   finality=lambda: None, backend_factory=lambda: model, tools=session.tools),
+                        base_url="http://127.0.0.1:8000")
+    explained = client.post("/explain", json={"hash": tx, "question": "it was the electricity bill"}).json()
+    client.post("/chat", json={"run_id": explained["run_id"], "message": "what did you mean?"})
+    prompt = model.prompts[0][1]
+    assert "it was the electricity bill" in prompt  # what the reader said first
+    assert "is never confirmed" in prompt.split("it was the electricity bill")[0][-300:]  # their words, not a fact
+    assert "The transfer failed [E1]." in prompt  # what the reader read
+
+
+def test_a_long_conversation_keeps_its_earlier_questions():
+    session = _session()
+    for n in range(8):
+        session.ask(f"question number {n}?", Scripted("It failed [E1]."))
+    model = Scripted("It failed [E1].")
+    session.ask("and now?", model)
+    prompt = model.prompts[0][1]
+    assert "question number 0?" in prompt and "question number 7?" in prompt
+
+
+def test_a_conversation_resumed_after_a_restart_gets_the_pages_copy_as_context_only(event_log, tmp_path):
+    _c, tx = _case("celo_fail_balance_confirmed")
+    model = Scripted("It failed [E1].")
+    client = _app(event_log, tmp_path, model)
+    out = client.post("/chat", json={"hash": tx, "message": "and the fee?", "opening": "my payment failed",
+                                     "first_answer": "The transfer failed [E1].",
+                                     "earlier": [{"question": "did the money come back?", "answer": "No [E1]."}]})
+    assert out.status_code == 200
+    prompt = model.prompts[0][1]
+    for said in ("my payment failed", "The transfer failed [E1].", "did the money come back?"):
+        assert said in prompt
+    assert "never as evidence" in prompt  # the page's copy is context, not facts
+    too_many = [{"question": "q", "answer": "a"}] * 30
+    assert client.post("/chat", json={"hash": tx, "message": "x", "earlier": too_many}).status_code == 422
+
+
+def test_the_chat_is_reminded_when_the_same_operation_succeeded_later():
+    """D73: a follow-up on a failure the sender already redid with success used to advise trying again (the chat
+    did not have the outline's rule, D63); each question now carries that fact first."""
+    session = _session("eth_fail_expired_v2", "ethereum-mainnet")
+    model = Scripted("It failed [E1].")
+    session.ask("what do I do now?", model)
+    prompt = model.prompts[0][1]
+    assert "the same operation already succeeded later" in prompt
+    later = next(e.id for e in session.bundle.items if e.kind == "timeline" and e.data.get("pattern") == "retried_ok")
+    assert f"[{later}]" in prompt.split("the same operation already succeeded later")[1][:200]

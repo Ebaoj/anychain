@@ -105,3 +105,22 @@ def test_the_conversation_is_kept_as_data_and_shown_again_escaped():
         assert shown in restore, shown
     assert "innerHTML" not in restore  # nothing saved goes into the page as markup
     assert "saved.network !== state.network" in restore  # another network's conversation is not shown
+
+
+def test_a_conversation_the_service_lost_is_resumed_once_with_the_pages_copy():
+    """D73: after the service restarted (404 on the session), the page asks again once, sending what the reader
+    wrote first, the explanation they read and the questions and answers since, which the API takes as context."""
+    page = PAGE.read_text()
+    follow = page[page.index("async function followUp("):page.index("$(\"chatForm\").addEventListener")]
+    assert 'err.status !== 404' in follow and 'api("/chat", resumeBody(message))' in follow
+    resume = page[page.index("function resumeBody("):page.index("// What each kind of message shows")]
+    for field in ("opening:", "first_answer:", "earlier:"):
+        assert field in resume, field
+
+
+def test_a_message_sent_while_an_answer_is_on_its_way_waits():
+    """D73: Enter while the explanation is still being collected used to send the question with no transaction yet
+    ("send me the transaction's code") and lose it; now nothing is sent until the answer arrives."""
+    page = PAGE.read_text()
+    send = page[page.index("async function send("):page.index("async function explain(")]
+    assert '$("chatButton").disabled) return' in send

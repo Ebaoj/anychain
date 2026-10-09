@@ -57,3 +57,9 @@ Added at the close of Phase 2 (2026-10-08), sent to the backlog by the author:
 | C26 | A function authorized by a signature (`ecrecover(...) == owner`) gets "no check of the caller": literally true, may mislead | review of D39, sent to the backlog by the author 2026-10-08 |
 | C27 | A selfdestruct anywhere in the contract's chain repeats the same note on every function (1inch router: 45 functions) | review of D39, sent to the backlog by the author 2026-10-08 |
 | C24 | Uniswap V3 SwapRouter (0xE592…1564) gets no code fact: its verified source holds `Multicall.sol` and `PeripheryPayments.sol` twice under different paths, and the index gives up on duplicate names (no false fact, a missing one) | review of D39 |
+
+## Next: the chat as the support layer (D73)
+
+- **Hand-off to a person:** a "talk to a person" step that opens a ticket with the conversation, the facts it cited and their sources, so the agent starts from the evidence; the escalation rate it produces is the primary metric in docs/IMPACT.md.
+- **The conversation kept per customer, on the server:** today it lives in the reader's browser. Keeping it across devices and visits needs an identity (the merchant's account) and a store with a retention rule.
+

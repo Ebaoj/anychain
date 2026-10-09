@@ -654,7 +654,7 @@ function showSuggestions(on) {
 
 async function send(text) {
   text = String(text || "").trim();
-  if (!text) return;
+  if (!text || $("chatButton").disabled) return;  // an answer is on its way: the text waits in the box (Enter too)
   showMine(text);
   remember({k: "me", text});
   $("question").value = "";
@@ -721,7 +721,13 @@ async function followUp(message) {
     const body = state.sessionId ? {session_id: state.sessionId, message}
       : state.runId !== null && state.runId !== undefined ? {run_id: state.runId, message}
       : {hash: state.hash, mode: state.mode, message};
-    const r = await api("/chat", body);
+    let r;
+    try { r = await api("/chat", body); }
+    catch (err) {  // the service restarted or the conversation expired: resume it once with the page's copy (D73)
+      if (err.status !== 404 || !state.hash) throw err;
+      state.sessionId = null; state.runId = null;
+      r = await api("/chat", resumeBody(message));
+    }
     wait.done();
     if (generation !== state.generation) return;  // another transaction was explained meanwhile
     showChat(r);
@@ -754,12 +760,29 @@ function checkHash() {
 }
 $("question").addEventListener("input", checkHash);
 
+// The page's copy of the conversation about the current transaction: the reader's questions and the chat's answers
+// after the last explanation. Sent only to resume a conversation the service no longer has; context, never evidence.
+function resumeBody(message) {
+  const last = kept.map((e) => e.k).lastIndexOf("answer");
+  const earlier = [];
+  let question = null;
+  for (const e of kept.slice(last + 1)) {
+    if (e.k === "me") question = e.text;
+    else if (e.k === "chat" && question && e.r.answer) { earlier.push({question: question.slice(0, 2000), answer: e.r.answer.slice(0, 6000)}); question = null; }
+  }
+  return {hash: state.hash, mode: state.mode, message,
+          ...(state.opening ? {opening: state.opening.slice(0, 2000)} : {}),
+          ...(state.firstAnswer ? {first_answer: state.firstAnswer.slice(0, 12000)} : {}),
+          ...(earlier.length ? {earlier: earlier.slice(-10)} : {})};
+}
+
 // What each kind of message shows; used live and when a saved conversation is shown again after a reload.
 function showMine(text) { say("me", esc(text).replace(/\n/g, "<br>")); }
 function showError(text) { say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(text)}</div>`); }
 function showAnswer(a, request) {
   state.hash = request.hash; state.mode = request.mode; state.runId = a.run_id; state.sessionId = null;
   state.pendingClarify = null;  // the clarifying question, if any, was answered by this explanation
+  state.opening = request.question || null; state.firstAnswer = a.summary || null;  // to resume the chat (D73)
   $("hash").value = request.hash;
   renderAnswer(a);
   say("bot", $("answer").innerHTML);
@@ -821,7 +844,7 @@ function resetView() {
   kept = [];
   state.hash = null; state.runId = null; state.sessionId = null; state.pendingClarify = null;
   state.evidence = new Map();
-  ["statusLine", "steps", "diagnosis", "security", "gaps", "movements", "sources"].forEach((id) => { $(id).innerHTML = ""; });
+  ["statusLine", "steps", "diagnosis", "security", "gaps", "movements", "sources", "answer"].forEach((id) => { $(id).innerHTML = ""; });
   $("facts").innerHTML = `<p class="muted">${esc(t("noFactsYet"))}</p>`;
   $("newChat").classList.add("hidden");
   welcome();
