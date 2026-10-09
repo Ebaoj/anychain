@@ -1,0 +1,500 @@
+{
+ "date": "2026-10-09 08:36",
+ "commit": "0b434ed + uncommitted changes",
+ "model": "gpt-4.1-nano",
+ "summary": {
+  "cases": 11,
+  "status_accuracy": 100.0,
+  "diagnosis_accuracy": 100.0,
+  "abi_source_accuracy": 100.0,
+  "degradation_declared": 100.0,
+  "written": 11,
+  "citation_coverage": 85.9,
+  "hallucination_rate": 0.0,
+  "delivered_with_unsupported_values": 0,
+  "hallucinated_items": 0,
+  "withheld": 0,
+  "entities_found": 100.0,
+  "key_facts_cited": 100.0,
+  "seconds_per_case": 3.2,
+  "tokens": {
+   "input_tokens": 1793,
+   "output_tokens": 5399,
+   "cache_read_tokens": 33280,
+   "cache_write_tokens": 0
+  },
+  "cost_usd": 0
+ },
+ "cases": [
+  {
+   "id": "erc20_transfer",
+   "category": "ERC-20 transfer",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "success",
+    "rule": null,
+    "label": null,
+    "abi_source": "explorer",
+    "gaps": [],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 3,
+   "cited": 3,
+   "entities_found": [
+    true,
+    true
+   ],
+   "key_facts": [],
+   "key_facts_cited": [],
+   "seconds": 1.8,
+   "usage": {
+    "input_tokens": 189,
+    "output_tokens": 189,
+    "cache_read_tokens": 1792,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "O que aconteceu: a transação foi bem-sucedida, transferindo 69.3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828, sem enviar ETH nativo, usando 40360 de gás de um limite de 45758 [E1].\n\nO dinheiro se moveu: sim, 69.3484 USDC foram transferidos do endereço 0xCA62C34d54b445283121905F19193416212117c4 para o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].\n\nTaxa: o valor pago de gás foi 0.00008537619972948 ETH [E2].",
+   "error": null
+  },
+  {
+   "id": "dex_swap",
+   "category": "DEX swap (events and internal transfers)",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "success",
+    "rule": null,
+    "label": null,
+    "abi_source": "explorer",
+    "gaps": [],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 6,
+   "cited": 6,
+   "entities_found": [
+    true,
+    true
+   ],
+   "key_facts": [],
+   "key_facts_cited": [],
+   "seconds": 5.9,
+   "usage": {
+    "input_tokens": 175,
+    "output_tokens": 1121,
+    "cache_read_tokens": 3200,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. Resumo: a transação foi bem-sucedida no bloco 26141518, com o status confirmado pelo RPC, e o remetente foi 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b, que chamou o contrato UniswapV2Router02 [E1, E15].\n\n2. Taxa: a taxa paga foi 0.000294808567110131 ETH [E2].\n\n3. Chamada decodificada: a função chamada foi swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256), com os argumentos amountOutMin=0, path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa], to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b, deadline=1791388271, vindo do ABI listado na fonte verificada do contrato [E3].\n\n4. Movimentos: houve transferência de token: 0.2 WETH de 0x0000000000000000000000000000000000000000 para 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D [E5]; transferência de 0.2 WETH de 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D para 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 [E6]; transferência de 12118418.517751063 BUNKER de 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 para 0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b [E7]; transferência interna de 0.2 ETH de 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D para 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 [E8]; chamada interna de 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D para 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 [E9]; chamada interna de 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D para 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 [E10]; chamada interna de 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 para 0xdcfFD3ad3Dfea0C611ca46F028489ccb432c3ABa [E11]; não há chamadas de leitura listadas [E12]; evento de sincronização de reservas emitido por 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 com reservas: reserve0=8492451845051793135, reserve1=503968916733373231 [E13]; evento de troca emitido por 0x8df7C13961a8E5d5f3ee17b942efc09b8CFd19c3 indicando troca de tokens, com sender=0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, amount0In=200000000000000000, amount1In=0, amount0Out=0, amount1Out=12118418517751063, to=0x46c8AC35FdfA77fCfE09C3b92C58761E49543e1b [E14].\n\n5. Código: a função swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256) na UniswapV2Router02 realiza a troca de ETH por tokens, depositando ETH na WETH, transferindo para o contrato de pares, realizando a troca apoiando taxas de transferência, e verificando se a quantidade de tokens recebida é maior ou igual ao mínimo esperado, conforme as linhas 356-378 do arquivo contracts/UniswapV2Router02.sol [E4].\n\n6. Gas: notas heurísticas indicam que o gás utilizado foi 131767 de um limite de 300000, ou seja, 43.9% do limite, que era mais do que o dobro do gás usado [E16].",
+   "error": null
+  },
+  {
+   "id": "explicit_reason",
+   "category": "revert with an explicit message (Uniswap EXPIRED, deadline parameter 2400)",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "failed",
+    "rule": "deadline",
+    "label": "CONFIRMED",
+    "abi_source": "explorer",
+    "gaps": [],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 8,
+   "cited": 8,
+   "entities_found": [
+    true,
+    true
+   ],
+   "key_facts": [
+    "E6",
+    "E10"
+   ],
+   "key_facts_cited": [
+    "E6",
+    "E10"
+   ],
+   "seconds": 3.7,
+   "usage": {
+    "input_tokens": 139,
+    "output_tokens": 647,
+    "cache_read_tokens": 2944,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. Resumo: a transação falhou, no bloco 26149091, o remetente foi 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0, e a função chamada foi swapExactETHForTokens no contrato UniswapV2Router02 [E1, E8].\n\n2. Taxa: a taxa paga foi 0.00011683874115936 ETH, mesmo com a falha na transação [E2].\n\n3. Call decodificada: a função chamada foi swapExactETHForTokens(uint256,address[],address,uint256), com os argumentos amountOutMin=0, path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48], to=0x79D6C25dE86bC4A858d7e383A474667aB109FeD0, e deadline=2400, conforme a ABI do contrato [E4].\n\n4. Causa: o prazo da chamada era 2400 (1970-01-01T00:40:00Z) e o tempo do bloco era 1791479507 (2026-10-08T17:11:47Z), portanto o prazo tinha passado na inclusão da transação, e a razão 'UniswapV2Router: EXPIRED' é a verificação de prazo do Uniswap [E6]; a razão 'UniswapV2Router: EXPIRED' está no contrato verificado em lines 252-266 de UniswapV2Router02 [E7].\n\n5. Código: a função swapExactETHForTokens realiza a verificação de que o primeiro elemento do caminho é WETH, calcula os valores de troca, deposita ETH em WETH, transfere WETH para o par, e realiza a troca, tudo conforme as linhas 252-266 do contrato verificado [E5].\n\n6. Linha do tempo: o remetente realizou outras transações, incluindo transferências e aprovações, antes da falha, e a troca para 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D na nonce 52 falhou, sendo que na nonce 53 a mesma troca foi bem-sucedida 48 segundos depois [E9, E10].\n\n7. Gas: o uso de gás nesta transação foi 25320 de um limite de 300000, o que representa 8.4%, e a troca bem-sucedida na nonce 53 usou 119837 de gás, também com limite de 300000 [E11].\n\n8. Próximos passos: verificar o preço atual, enviar novamente com um novo prazo e uma taxa de gás suficiente para ser incluída a tempo, conforme a recomendação de verificar o prazo na fonte do contrato [E6].",
+   "error": null
+  },
+  {
+   "id": "inner_out_of_gas",
+   "category": "an inner call ran out of gas (a tax token's transferFrom, behind the router's TRANSFER_FROM_FAILED); found while looking for an allowance case, which it is not",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "failed",
+    "rule": "out_of_gas",
+    "label": "LIKELY",
+    "abi_source": "explorer",
+    "gaps": [],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 12,
+   "cited": 8,
+   "entities_found": [
+    true,
+    true
+   ],
+   "key_facts": [
+    "E12",
+    "E16"
+   ],
+   "key_facts_cited": [
+    "E12",
+    "E16"
+   ],
+   "seconds": 2.6,
+   "usage": {
+    "input_tokens": 128,
+    "output_tokens": 338,
+    "cache_read_tokens": 3712,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "O que aconteceu: a transação falhou. A operação tentou trocar tokens por ETH usando o contrato UniswapV2Router02, mas foi revertida devido a um erro de transferência. O motivo do revert foi 'TransferHelper: TRANSFER_FROM_FAILED' [E3]. A transação tentou usar a função swapExactTokensForETHSupportingFeeOnTransferTokens com um valor de entrada de 4749297923366582, mas não conseguiu completar a troca [E4]. A causa provável é que uma chamada interna ao contrato de WETH ficou sem gás, o que fez a operação parar [E12]. A transação foi revertida, confirmando que ela não foi bem-sucedida [E1].\n\nDid the money move?: não, o dinheiro não foi transferido porque a transação falhou [E1].\n\nFee: o valor pago de taxa foi 0.000256612236995224 ETH, mesmo com a falha da transação [E2].\n\nO que aconteceu depois: o remetente fez outras transações próximas no tempo, incluindo trocas de ETH por tokens e uma aprovação, que foram bem-sucedidas. A troca que falhou foi a de nonce 423, ocorrida às 20:11:47, e a mesma troca foi bem-sucedida 24 segundos depois, na nonce 424, às 20:12:11 [E16].\n\nO que fazer: tente novamente, ajustando o limite de gás na sua carteira ou aplicativo, pois a causa provável foi o esgotamento de gás na operação. Se precisar, peça ajuda ao suporte do aplicativo, usando o link da transação [E12].",
+   "error": null
+  },
+  {
+   "id": "out_of_gas",
+   "category": "out of gas (60000 of 60000)",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "failed",
+    "rule": "out_of_gas",
+    "label": "CONFIRMED",
+    "abi_source": "explorer",
+    "gaps": [
+     "not_interpretable"
+    ],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 6,
+   "cited": 6,
+   "entities_found": [
+    true
+   ],
+   "key_facts": [
+    "E6",
+    "E9"
+   ],
+   "key_facts_cited": [
+    "E6",
+    "E9"
+   ],
+   "seconds": 3.1,
+   "usage": {
+    "input_tokens": 146,
+    "output_tokens": 305,
+    "cache_read_tokens": 2432,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. O pagamento não foi realizado, pois a transação falhou por falta de gás (out of gas) ao tentar transferir 10.000 unidades do token USDT (TetherToken) para o endereço 0xd47a298C3A5d2F6d7B6EdB93c924eB979408E624, usando toda a quantidade de gás de 60000 unidades disponível [E1, E6].  \n2. Não, o dinheiro não foi transferido, pois a transação não foi concluída com sucesso [E1].  \n3. A taxa paga foi de 0.00002899040274 ETH, mesmo assim a transação falhou [E2].  \n4. Os outros envios feitos pelo mesmo remetente também falharam por falta de gás, com nonce 9652, 9653, 9654 e 9655, todos na mesma data e hora, sem transações intermediárias [E8, E9].  \n5. Para um leitor não técnico, a próxima etapa é tentar novamente a operação, permitindo que o aplicativo ajuste o limite de gás ou entrando em contato com o suporte, usando o link da transação para obter mais informações [E6].  \n6. O que falta: não se sabe o motivo exato de o gás não ter sido suficiente, e é necessário abrir a página do remetente no explorador para verificar o histórico completo de transações após essa falha [E6].",
+   "error": null
+  },
+  {
+   "id": "unverified_contract",
+   "category": "a contract the explorer has not verified (no ABI)",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "failed",
+    "rule": "slippage",
+    "label": "LIKELY",
+    "abi_source": "raw",
+    "gaps": [
+     "not_interpretable",
+     "source_unavailable"
+    ],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 9,
+   "cited": 8,
+   "entities_found": [
+    true
+   ],
+   "key_facts": [
+    "E17",
+    "E20",
+    "E21"
+   ],
+   "key_facts_cited": [
+    "E17",
+    "E20",
+    "E21"
+   ],
+   "seconds": 5.3,
+   "usage": {
+    "input_tokens": 226,
+    "output_tokens": 950,
+    "cache_read_tokens": 4096,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. Resumo: a transação falhou, no bloco 26141518, o remetente foi 0x70521ae9, e o contrato chamado foi 0x278d858f05b94576C1E6f73285886876ff6eF8D2 [E1]; [E18].\n\n2. Taxa: a taxa paga foi 0.000294067451118215 ETH, mesmo com a falha na transação [E2].\n\n3. Chamada decodificada: a função chamada tem o seletor 0x70521ae9 no contrato 0x278d858f05b94576C1E6f73285886876ff6eF8D2; não foi decodificada, e a origem da ABI não é conhecida [E4].\n\n4. Movimentos: houve uma chamada interna delegatecall de 0x278d858f05b94576C1E6f73285886876ff6eF8D2 para 0x617E169f98F966D520946282De52340b94b59A7c, que revertou; uma chamada interna de 0x278d858f05b94576C1E6f73285886876ff6eF8D2 para 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager) também revertou; uma chamada interna de 0x000000000004444c5dc75cB358380D2e3dE08A90 para 0x278d858f05b94576C1E6f73285886876ff6eF8D2 tentou enviar 0.091541598301954665 ETH, mas revertou; uma chamada interna para 0x62D0A8458eD7719FDAF978fe5929C6D342B0bFcE (BeamToken) também revertou; além disso, houve chamadas de 0x278d858f05b94576C1E6f73285886876ff6eF8D2 para 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 (WETH9) e para 0x000000000004444c5dc75cB358380D2e3dE08A90 (PoolManager), todas revertendo; também houve 4 chamadas de leitura (no estado) não listadas [E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14, E15, E16].\n\n5. Causa: a causa provável é a mensagem de revert 'INSUFFICIENT_OUTPUT_AMOUNT', que pode estar relacionada à verificação de slippage do contrato, ou a uma condição de preço insuficiente, como indicado na hipótese de causa 'INSUFFICIENT_OUTPUT_AMOUNT' [E17]; a transação realmente revertou, confirmando o status falhado [E3].\n\n6. Linha do tempo: as tentativas do remetente ao redor da falha mostram nonce 10342 falhou, nonce 10343 teve sucesso, nonce 10344 falhou, nonce 10345 falhou, nonce 10346 teve sucesso, nonce 10347 falhou, e nonce 10348 teve sucesso novamente [E19]; a chamada de nonce 10346 foi a primeira a ter sucesso após a falha [E20]; a mesma chamada falhou duas vezes consecutivas, sem outras transações do remetente entre elas [E21].\n\n7. Gás: o uso de gás foi 133145 de um limite de 600000, o que representa 22.2%; a mesma chamada, na nonce 10346, usou 129820 de gás, também com limite de 600000 [E22].\n\n8. Próximos passos: para um desenvolvedor, verificar o preço atual antes de tentar novamente, ajustar a tolerância de slippage, dividir swaps grandes ou usar pools mais profundas, conforme indicado na hipótese de causa 'INSUFFICIENT_OUTPUT_AMOUNT' [E17].\n\n9. O que falta: a decodificação da chamada, pois não há ABI correspondente ao seletor 0x70521ae9, e a busca pela assinatura falhou, pois o endpoint não respondeu; uma ABI verificada ou o contrato na explorer são necessários para decodificar a chamada [Gaps].",
+   "error": null
+  },
+  {
+   "id": "custom_error",
+   "category": "a Solidity custom error (SlippageExceeded)",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "failed",
+    "rule": "contract_reason",
+    "label": "CONFIRMED",
+    "abi_source": "raw",
+    "gaps": [
+     "not_interpretable"
+    ],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 9,
+   "cited": 8,
+   "entities_found": [
+    true
+   ],
+   "key_facts": [
+    "E36",
+    "E39"
+   ],
+   "key_facts_cited": [
+    "E36",
+    "E39"
+   ],
+   "seconds": 4.8,
+   "usage": {
+    "input_tokens": 129,
+    "output_tokens": 687,
+    "cache_read_tokens": 6656,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. Resumo: a transação falhou, ocorreu no bloco 26150083, o remetente foi 0x32bb9270, e o contrato chamado foi 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA [E1]; [E37].\n\n2. Taxa: a taxa paga foi 0.000245878271661087 ETH, mesmo com a falha na transação [E2].\n\n3. Chamada decodificada: a função chamada foi com o seletor 0x32bb9270 no endereço 0x20E67DC1eb86F630A6C1e2F01492D5472A407cfA; não foi decodificada, e a ABI não está disponível [E4].\n\n4. Movimentos: a transação não transferiu valor nativo (0 ETH) devido à reversão [E1]; o reverter foi por causa de SlippageExceeded, com _outputAmount='14328709197402396616239' e _outputAmountMin='14563846497565974891109' [E3]; o remetente 0x32bb9270 realizou outras transações bem-sucedidas antes e depois, incluindo uma que sucedeu aproximadamente uma hora após a falha, com nonce 3156, usando 626697 gas em uma transação com limite de 845338, e uma anterior com nonce 3155, usando 628329 gas com limite de 777776 [E38, E39, E40].\n\n5. Causa: a transação revertida devido a SlippageExceeded, o que indica que a condição de slippage foi excedida, e o contrato reverteu com essa razão [E36]; a causa do revert é definida no código do contrato, e o próximo passo para um desenvolvedor é ler a fonte do contrato ou consultar seus desenvolvedores; não enviar a mesma transação até que a condição seja alterada [E36].\n\n6. Linha do tempo: o remetente realizou outras transações antes e depois, com nonce 3152 a 3158, sendo que a transação com nonce 3155 falhou às 20:31:11, e a com nonce 3156 foi bem-sucedida aproximadamente uma hora depois, às 21:47:35 [E38, E39].\n\n7. Gas: o uso de gas foi de 628329 de um limite de 777776, aproximadamente 80.8%; uma transação posterior com nonce 3156 usou 626697 gas com limite de 845338, indicando uso eficiente de gas [E40].\n\n8. Próximos passos: o desenvolvedor deve ler a fonte do contrato onde a razão 'SlippageExceeded' é levantada, ou consultar seus desenvolvedores, e não reenviar a mesma transação até que a condição de slippage seja ajustada [E36].\n\n9. O que falta: não há decodificação da chamada, pois não há ABI correspondente ao seletor 0x32bb9270; também, não há detalhes completos das chamadas internas, pois há 30 de 63 chamadas internas listadas, e a lista completa requer abrir a página do explorer; esses dados são necessários para uma análise completa.",
+   "error": null
+  },
+  {
+   "id": "node_unavailable",
+   "category": "the node is down (degradation)",
+   "network": "ethereum-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": true,
+   "got": {
+    "status": "success",
+    "rule": null,
+    "label": null,
+    "abi_source": "explorer",
+    "gaps": [
+     "source_unavailable"
+    ],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 7,
+   "cited": 3,
+   "entities_found": [
+    true
+   ],
+   "key_facts": [],
+   "key_facts_cited": [],
+   "seconds": 2.2,
+   "usage": {
+    "input_tokens": 148,
+    "output_tokens": 274,
+    "cache_read_tokens": 1792,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. O que aconteceu: a transação foi bem-sucedida na blockchain, enviando USDC de 0xCA62C34d54b445283121905F19193416212117c4 para 0x74AA5387681505c806FF1E972B12cdfd01406828, sem valor nativo enviado (ETH). O gás utilizado foi 40360 de um limite de 45758. A transferência foi feita chamando a função transfer(address,uint256) no contrato USDC, com o valor de 69.3484 USDC. A transação foi confirmada como bem-sucedida [E1].\n\n2. O dinheiro se moveu: sim, foram transferidos 69.3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].\n\n3. Taxa: a taxa paga foi 0.00008537619972948 ETH [E2].\n\n4. O que falta: não se sabe detalhes do dado RPC da transação, pois o endpoint falhou após 3 tentativas devido a uma falha de conexão, e o endpoint RPC precisa estar acessível.",
+   "error": null
+  },
+  {
+   "id": "second_network_transfer",
+   "category": "ERC-20 transfer on the second network (Optimism)",
+   "network": "optimism-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "success",
+    "rule": null,
+    "label": null,
+    "abi_source": "explorer",
+    "gaps": [],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 3,
+   "cited": 3,
+   "entities_found": [
+    true,
+    true
+   ],
+   "key_facts": [],
+   "key_facts_cited": [],
+   "seconds": 1.8,
+   "usage": {
+    "input_tokens": 230,
+    "output_tokens": 237,
+    "cache_read_tokens": 1792,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "O que aconteceu: a transação foi bem-sucedida, enviando 199.820981 USDC do endereço 0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a para o endereço 0xe0F95c9180a137C826478cD4827CC53bAB8a6C89, sem enviar ETH nativo, usando 57371 de 94433 de gás disponível [E1].\n\nO dinheiro foi transferido?: sim, 199.820981 USDC de 0x1aa4a66Ef0cfA99cA9D39FdAD2B05489744C972a para 0xe0F95c9180a137C826478cD4827CC53bAB8a6C89 [E5].\n\nTaxa: o valor total pago foi 0.000000026584116078 ETH, sendo 0.000000000204699728 ETH para execução na Layer 2 e 0.00000002637941635 ETH para dados na Layer 1 [E2].",
+   "error": null
+  },
+  {
+   "id": "second_network_failure",
+   "category": "a failure on the second network (a time limit by block number)",
+   "network": "optimism-mainnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": null,
+   "got": {
+    "status": "failed",
+    "rule": "deadline",
+    "label": "LIKELY",
+    "abi_source": "signature_db",
+    "gaps": [
+     "not_interpretable"
+    ],
+    "replay": null
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 8,
+   "cited": 7,
+   "entities_found": [
+    true
+   ],
+   "key_facts": [
+    "E6",
+    "E9"
+   ],
+   "key_facts_cited": [
+    "E6",
+    "E9"
+   ],
+   "seconds": 1.8,
+   "usage": {
+    "input_tokens": 133,
+    "output_tokens": 278,
+    "cache_read_tokens": 2560,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. O que aconteceu: a transação falhou; a operação foi recusada por uma verificação de limite de tempo, possivelmente relacionada a um \"block number deadline\" [E6]. A causa provável é que o limite de tempo definido no contrato impediu a operação de ser concluída [E6]. A transação foi revertida por esse motivo [E1].\n\n2. O dinheiro foi transferido?: não; o valor não foi transferido porque a transação falhou [E1].\n\n3. Taxa: a taxa paga foi de 0.000000001092458893 ETH, mesmo com a falha [E2].\n\n4. O que aconteceu depois: o remetente enviou outras transações próximas a esse momento; uma delas, com o mesmo tipo de chamada, foi bem-sucedida logo após a falha, usando menos gás [E9].\n\n5. O que fazer: entre em contato com o suporte do aplicativo, fornecendo o link desta transação, antes de tentar novamente, pois a operação foi recusada por uma verificação de limite de tempo [E6].\n\n6. O que falta: não há decodificação da chamada, pois não há uma ABI do contrato ou uma entrada verificada na explorer; também não se sabe o que exatamente causou o limite de tempo, pois essa informação não está disponível.",
+   "error": null
+  },
+  {
+   "id": "allowance_devnet",
+   "category": "allowance revert (ERC20 insufficient allowance), on the private demo network, where the explorer runs without internal transactions and gives no reason; the replay on the node finds it",
+   "network": "anychain-devnet",
+   "status_ok": true,
+   "rule_ok": true,
+   "label_ok": true,
+   "abi_ok": true,
+   "degradation_ok": true,
+   "got": {
+    "status": "failed",
+    "rule": "no_reason",
+    "label": "UNKNOWN",
+    "abi_source": "raw",
+    "gaps": [
+     "not_interpretable",
+     "source_behind"
+    ],
+    "replay": "insufficient_allowance"
+   },
+   "summary_status": "ok",
+   "first_attempt_problems": [],
+   "sentences": 7,
+   "cited": 7,
+   "entities_found": [
+    true
+   ],
+   "key_facts": [
+    "E4",
+    "E6"
+   ],
+   "key_facts_cited": [
+    "E4",
+    "E6"
+   ],
+   "seconds": 2.5,
+   "usage": {
+    "input_tokens": 150,
+    "output_tokens": 373,
+    "cache_read_tokens": 2304,
+    "cache_write_tokens": null,
+    "cost_usd": null
+   },
+   "answer": "1. O que aconteceu: a transação falhou (revertida) no bloco 58 às 01:40:52 em 09-10-2026, do endereço 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC para o contrato BRL Coin, com valor nativo de 0 ETH, que não foi transferido porque a transação revertida [E1]. A causa do erro é desconhecida, pois o explorador não reportou o motivo da falha, e não há uma explicação clara do motivo do revertimento, sendo assim, essa causa é desconhecida [E4]. A reexecução na transação anterior indica que o erro provável foi \"ERC20: insuficiente allowance\", ou seja, a autorização para mover os tokens não foi suficiente, o que é uma causa possível, mas não confirmada, do erro [E6].\n2. O dinheiro não foi transferido: ele não foi transferido porque a transação falhou [E1].\n3. Taxa: a taxa paga foi de 0.000000020219154228 ETH, mesmo com a falha na transação [E2].\n4. O que fazer: entre em contato com o suporte do aplicativo com o link desta transação antes de tentar novamente, para que a taxa não seja cobrada novamente pelo mesmo erro [E4, E6].\n5. O que falta: não se sabe o motivo exato da falha, pois o explorador não reportou a razão do revertimento, e também não há decodificação da chamada, pois não há uma ABI verificada para o contrato, além de que as chamadas internas ainda estão sendo indexadas pelo explorador [E4, E5, E7, E8].",
+   "error": null
+  }
+ ]
+}

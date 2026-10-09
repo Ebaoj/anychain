@@ -31,8 +31,9 @@ from anychain.models import EvidenceBundle
 
 SPACES = "   "  # space, no-break space, narrow no-break space: thousands separators
 BRACKETS = re.compile(r"\[([^\[\]]{1,80})\]")
-CITATION_ID = re.compile(r"(?i)\bE\s?(\d+)\b")
-BARE_CITATION = re.compile(r"\bE(\d+)\b")
+# "E" after an ellipsis or a dot is the end of a shortened address ("0x52b2…E624"), not a citation (eval, 2026-10-09)
+CITATION_ID = re.compile(r"(?i)(?<![….])\bE\s?(\d+)\b")
+BARE_CITATION = re.compile(r"(?<![….])\bE(\d+)\b")
 URL = re.compile(r"(?:https?://|www\.)[^\s)\]>`'\"<]+", re.IGNORECASE)
 URL_TRAILING = ".,;:!?*_)>'\"/"
 HEX = re.compile(r"0x([0-9a-fA-F]+)(?:(?:…|\.\.\.)(?:([0-9a-fA-F]{4,})(?![0-9a-zA-Z]))?)?")

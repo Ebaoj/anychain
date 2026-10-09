@@ -36,7 +36,8 @@ def test_writer_sends_only_evidence_and_uses_config_model(eth_cfg):
     client = FakeClient()
     assert write_explanation(bundle, eth_cfg, "support", AnthropicBackend(eth_cfg.llm, client)) == "ok [E1]"
     assert client.sent["model"] == eth_cfg.llm.model
-    assert client.sent["messages"][0]["content"] == evidence_payload(bundle, eth_cfg)
+    assert client.sent["messages"][0]["content"].startswith(evidence_payload(bundle, eth_cfg, "support"))
+    assert "Outline for this answer" in client.sent["messages"][0]["content"]  # the facts, then their outline (D62)
     payload = json.loads(evidence_payload(bundle))
     assert payload["evidence"][0]["sources"][0]["url"].startswith("https://eth.blockscout.com/tx/")
     every_url = [src.get("url") for ev in payload["evidence"] for src in ev["sources"] if src.get("url")]
@@ -87,7 +88,8 @@ def test_claude_code_is_isolated_and_gets_the_evidence_on_stdin(eth_cfg, monkeyp
     assert argv[argv.index("--tools") + 1] == "" and argv[argv.index("--setting-sources") + 1] == ""
     assert argv[argv.index("--model") + 1] == eth_cfg.llm.model
     assert "Mode: support" in argv[argv.index("--system-prompt") + 1]
-    assert seen["input"] == evidence_payload(bundle, eth_cfg)  # the facts, and nothing else
+    assert seen["input"].startswith(evidence_payload(bundle, eth_cfg, "support"))  # the facts, then the outline
+    assert "Outline for this answer" in seen["input"]
     assert seen["cwd_files"] == [] and seen["cwd"] != str(Path.cwd())  # an empty directory, not the project
     assert "ANTHROPIC_API_KEY" not in seen["env"] and "PATH" in seen["env"]  # the login is used, not a stray key
 
@@ -127,7 +129,7 @@ def test_openai_backend_request_and_reply(eth_cfg, monkeypatch):
     assert seen["auth"] == "Bearer test-key-not-real" and body["model"] == "some-openai-model"
     assert body["max_completion_tokens"] == llm.max_tokens and "max_tokens" not in body
     assert [m["role"] for m in body["messages"]] == ["system", "user"]
-    assert body["messages"][1]["content"] == evidence_payload(bundle, eth_cfg)
+    assert body["messages"][1]["content"].startswith(evidence_payload(bundle, eth_cfg, "support"))
 
 
 def test_api_backends_need_their_key(eth_cfg, monkeypatch):
@@ -167,3 +169,57 @@ def test_openai_temperature_can_be_left_to_the_model(eth_cfg, monkeypatch):
     write_explanation(replay_bundle(eth_cfg, USDC_TX, "eth_usdc_transfer"), eth_cfg, "support",
                       OpenAIBackend(llm, httpx.Client(transport=httpx.MockTransport(handler))))
     assert "temperature" not in seen
+
+
+def test_a_support_answer_gets_only_the_readers_steps_and_an_outline_of_its_facts():
+    # D62: a small model given both lists of steps mixed them (gpt-4.1-nano, support mode, 2026-10-09)
+    from anychain import outline
+    from anychain.config import load_config
+    from tests.conftest import ROOT
+    from tests.test_golden import _case
+    cfg = load_config(str(ROOT / "configs" / "ethereum-mainnet.yaml"))
+    _c, tx = _case("eth_fail_expired_v2")
+    b = replay_bundle(cfg, tx, "eth_fail_expired_v2")
+    support = evidence_payload(b, cfg, "support")
+    assert "Next step for a non-technical reader:" in support and "Next step for a developer:" not in support
+    developer = evidence_payload(b, cfg, "developer")
+    assert "Next step for a developer:" in developer and "Next step for a non-technical reader:" not in developer
+    items = outline.build(b, "support")
+    headings = [h for h, _w, _ids in items]
+    timeline = [e.id for e in b.items if e.kind == "timeline" and e.data.get("pattern")]
+    assert "What happened next" in headings and timeline[0] in dict((h, ids) for h, _w, ids in items)["What happened next"]
+    _c, tx = _case("eth_usdc_transfer")
+    ok = replay_bundle(cfg, tx, "eth_usdc_transfer")
+    assert "What happened next" not in [h for h, _w, _ids in outline.build(ok, "support")]  # no fact, no section
+    assert "What to do" not in [h for h, _w, _ids in outline.build(ok, "support")]
+
+
+def test_citations_written_in_prose_are_normalized():
+    from anychain.writer import normalize_citations
+    # real shapes from gpt-4.1-nano answers (eval, 2026-10-09)
+    assert normalize_citations("conforme E19.") == "conforme [E19]."
+    assert normalize_citations("Os fatos E5 a E7 indicam") == "Os fatos [E5, E6, E7] indicam"
+    assert normalize_citations("já citado [E1, E7] e (E4)") == "já citado [E1, E7] e [E4]"
+    assert normalize_citations("ERC20 e E2E") == "ERC20 e E2E"  # not ids
+
+
+def test_an_answer_missing_a_key_fact_is_rewritten_once_and_then_given(eth_cfg):
+    from anychain.writer import write_checked
+    from tests.test_golden import _case
+    _c, tx = _case("eth_fail_expired_v2")
+    b = replay_bundle(eth_cfg, tx, "eth_fail_expired_v2")
+    pattern = next(e.id for e in b.items if e.kind == "timeline" and e.data.get("pattern"))
+    diagnosis = next(e.id for e in b.items if e.kind == "diagnosis")
+
+    class Backend:
+        last_usage = None
+        users = []
+        answers = iter([f"It failed [E1] [{diagnosis}].", f"It failed [E1] [{diagnosis}]. It worked later [{pattern}]."])
+
+        def complete(self, system, user):
+            self.users.append(user)
+            return next(self.answers)
+    backend = Backend()
+    checked = write_checked(b, eth_cfg, "support", backend=backend)
+    assert checked.outcome == "retried" and pattern in checked.text
+    assert f"must say what {pattern} says" in backend.users[1]

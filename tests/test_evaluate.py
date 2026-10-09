@@ -50,9 +50,12 @@ class Scripted:
 
 def test_a_written_case_is_measured():
     case = next(c for c in load_cases(CASES) if c["id"] == "out_of_gas")
-    r = run_case(case, write=True, backend=Scripted("It ran out of gas: 60000 of 60000 were used [E1]. The fee was "
-                                                    "charged anyway in this transaction [E2]."))
-    assert r.summary_status == "ok" and (r.cited, r.sentences) == (2, 2) and r.entities_found == [True]
+    # it cites the conclusion (E6) and the timeline's pattern (E9): an answer without them is rewritten (D62)
+    r = run_case(case, write=True, backend=Scripted("It ran out of gas: 60000 of 60000 were used [E1] [E6]. The fee "
+                                                    "was charged anyway in this transaction [E2]. The same transfer "
+                                                    "failed several times in a row [E9]."))
+    assert r.summary_status == "ok" and (r.cited, r.sentences) == (3, 3) and r.entities_found == [True]
+    assert r.key_facts == ["E6", "E9"] and r.key_facts_cited == ["E6", "E9"]
     s = summarize([r])
     assert s["citation_coverage"] == 100.0 and s["hallucination_rate"] == 0.0 and s["cost_usd"] == 0.01
 

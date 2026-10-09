@@ -28,7 +28,7 @@ from anychain.reads import Read, StateReader, UnreadableState
 from anychain.redact import no_urls
 from anychain.units import is_amount
 from anychain.validator import allowed_urls, check_answer, evidence_ids
-from anychain.writer import WriterError, add_usage, evidence_payload, load_prompt
+from anychain.writer import WriterError, add_usage, evidence_payload, load_prompt, normalize_citations
 
 MAX_TOOLS = 3  # tool requests per question (all rounds together)
 MAX_ROUNDS = 2  # times the model may ask for tools before it must answer
@@ -256,6 +256,7 @@ class ChatSession:
                 if requests is not None:  # out of tool rounds: it must answer from what it has (not a failed check)
                     nagged = True
                     continue
+                reply = normalize_citations(reply)  # "conforme E19" -> "[E19]" (D62)
                 problems = check_answer(reply, evidence_payload(self.bundle, self.cfg), allowed_urls(self.bundle),
                                         evidence_ids(self.bundle))
                 if not problems:

@@ -192,3 +192,13 @@ def test_digits_inside_a_name_are_not_a_number():
     evidence = json.dumps({"evidence": [{"id": "E1", "kind": "call", "fact": "Called upgradeTo on 0x1 (ERC1967Proxy)."}]})
     assert check_answer("The proxy ERC1967Proxy forwarded the call [E1].", evidence, set(), {"E1"}) == []
     assert check_answer("It moved 1967 tokens [E1].", evidence, set(), {"E1"})  # a real number still checked
+
+
+def test_a_shortened_address_is_not_a_citation():
+    # real: eval of 2026-10-09, case out_of_gas: Claude shortened 0x…408E624 as "0x52b2…E624" (the support prompt
+    # allows it) and the check read "E624" as a citation of a fact that does not exist, withholding a correct answer
+    from anychain.validator import _citations
+    from anychain.writer import normalize_citations
+    cited, _rest = _citations("Foi para 0x52b2…E624 e 0xdAC1...E624 [E5].")
+    assert cited == {5}
+    assert normalize_citations("para 0x52b2…E624 [E5]") == "para 0x52b2…E624 [E5]"

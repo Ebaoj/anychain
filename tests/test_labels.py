@@ -148,8 +148,11 @@ def test_each_mode_is_told_which_steps_to_give():
     for mode in ("support", "developer", "auditor"):
         prompt = load_prompt(mode, "en")
         assert f"Mode: {mode}." in prompt
-        assert 'In support mode give only the steps "for a non-technical reader"' in prompt
-        assert 'in developer and auditor modes give the steps "for a developer"' in prompt
+        if mode == "support":  # the outline names the reader's steps, and forbids the other ones
+            assert 'only the next steps written "for a non-technical reader"' in prompt
+            assert 'never the steps "for a developer"' in prompt
+        else:
+            assert 'steps written "for a developer"' in prompt
 
 
 def test_the_log_command_prints_the_label_counts(event_log, monkeypatch):

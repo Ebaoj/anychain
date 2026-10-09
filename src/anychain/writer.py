@@ -39,8 +39,28 @@ def load_prompt(mode: str, language: str) -> str:
     return f"{base}\n\n{mode_text}\n\nWrite the answer in this language: {language}."
 
 
-def evidence_payload(bundle: EvidenceBundle, cfg: AppConfig | None = None) -> str:
-    """The only information the model is allowed to use. The RPC node's address never goes in."""
+STEPS_FOR = {"support": "Next step for a non-technical reader:", "developer": "Next step for a developer:",
+             "auditor": "Next step for a developer:"}
+
+
+def _for_reader(text: str, mode: str | None) -> str:
+    """A conclusion's next steps for this reader only (D62): a small model given both lists mixes them."""
+    keep = STEPS_FOR.get(mode or "")
+    if not keep:
+        return text
+    drop = [m for m in set(STEPS_FOR.values()) if m != keep]
+    for marker in drop:
+        while marker in text:
+            start = text.index(marker)
+            ends = [text.find(m, start + len(marker)) for m in STEPS_FOR.values()]
+            end = min([e for e in ends if e != -1] or [len(text)])
+            text = (text[:start] + text[end:]).rstrip() if end == len(text) else text[:start] + text[end:]
+    return text
+
+
+def evidence_payload(bundle: EvidenceBundle, cfg: AppConfig | None = None, mode: str | None = None) -> str:
+    """The only information the model is allowed to use. The RPC node's address never goes in. With a mode, a
+    conclusion carries only that reader's next steps (D62)."""
     hidden = (httpx.URL(cfg.rpc.url).host,) if cfg else ()
     return json.dumps(
         {
@@ -48,7 +68,8 @@ def evidence_payload(bundle: EvidenceBundle, cfg: AppConfig | None = None) -> st
             "tx_hash": bundle.tx_hash,
             "status": bundle.status,
             "evidence": [
-                {"id": e.id, "kind": e.kind, "fact": e.text, "confidence": e.confidence,
+                {"id": e.id, "kind": e.kind, "fact": _for_reader(e.text, mode) if e.kind == "diagnosis" else e.text,
+                 "confidence": e.confidence,
                  "sources": _sources_for_llm(e.sources)}
                 for e in bundle.items
             ],
@@ -259,7 +280,8 @@ def write_explanation(bundle: EvidenceBundle, cfg: AppConfig, mode: str, backend
     """One answer. `feedback`: problems the validator found in a previous attempt, sent back once.
     `question`: the reader's question given with the hash (R12), answered first from the same evidence."""
     backend = backend or backend_for(cfg.llm)
-    user = evidence_payload(bundle, cfg)
+    from anychain import outline
+    user = evidence_payload(bundle, cfg, mode) + "\n\n" + outline.render(outline.build(bundle, mode))
     if feedback:
         user += ("\n\nYour previous answer was rejected because it contained things that are not in the "
                  "evidence above:\n" + "\n".join(f"- {p[:160]}" for p in feedback[:20]) +
@@ -289,19 +311,61 @@ def write_checked(bundle: EvidenceBundle, cfg: AppConfig, mode: str,
     WriterError (no model available) propagates: the caller shows the evidence only.
     """
     backend = backend or backend_for(cfg.llm)
-    evidence, urls, ids = evidence_payload(bundle, cfg), allowed_urls(bundle), evidence_ids(bundle)
-    answer = write_explanation(bundle, cfg, mode, backend, question=question)
+    evidence, urls, ids = evidence_payload(bundle, cfg, mode), allowed_urls(bundle), evidence_ids(bundle)
+    required = required_citations(bundle, mode)
+    answer = normalize_citations(write_explanation(bundle, cfg, mode, backend, question=question))
     usage = getattr(backend, "last_usage", None)
     first = check_answer(answer, evidence, urls, ids)
-    if not first:
+    missing = missing_citations(answer, required)
+    if not first and not missing:
         return CheckedAnswer(answer, "ok", [], usage)
     try:
-        answer = write_explanation(bundle, cfg, mode, backend, feedback=first, question=question)
+        answer = normalize_citations(write_explanation(bundle, cfg, mode, backend, feedback=first + missing,
+                                                       question=question))
     except WriterError as exc:  # the first attempt's tokens were spent: they go with the error
         exc.usage = usage
         raise
     usage = add_usage(usage, getattr(backend, "last_usage", None))
     problems = check_answer(answer, evidence, urls, ids)
-    if not problems:
-        return CheckedAnswer(answer, "retried", first, usage)
+    if not problems:  # a key fact still uncited is incomplete, not false: the answer is given (D62)
+        return CheckedAnswer(answer, "retried", first + missing, usage)
     return CheckedAnswer(None, "withheld", problems, usage)
+
+
+# A small model often cites in prose ("conforme E19", "os fatos E5 a E16", "(E4)"): rewritten as [E19], so the page
+# links it and the check reads it (D62). An id that does not exist is still caught by the check.
+_CITE_RANGE = re.compile(r"(?<![\[\w])E(\d+)\s*(?:a|to|até|-)\s*E(\d+)\b")
+_CITE_BARE = re.compile(r"(?<![\[\w,….])(?:\(\s*)?\bE(\d+)\b(?:\s*\))?(?![^\[]*\])")
+MAX_RANGE = 30
+
+
+def normalize_citations(text: str | None) -> str | None:
+    if not text:
+        return text
+
+    def expand(m: re.Match) -> str:
+        lo, hi = int(m.group(1)), int(m.group(2))
+        if not 0 < hi - lo < MAX_RANGE:
+            return m.group(0)
+        return "[" + ", ".join(f"E{n}" for n in range(lo, hi + 1)) + "]"
+    text = _CITE_RANGE.sub(expand, text)
+    return _CITE_BARE.sub(lambda m: f"[E{m.group(1)}]", text)
+
+
+def required_citations(bundle: EvidenceBundle, mode: str) -> dict[str, str]:
+    """{fact id: the outline section that must cite it}: each conclusion and each pattern of the sender's
+    timeline, the facts an answer is not complete without (D62)."""
+    from anychain import outline
+    wanted = {e.id for e in bundle.items if e.kind == "diagnosis" or (e.kind == "timeline" and e.data.get("pattern"))}
+    out = {}
+    for heading, _what, ids in outline.build(bundle, mode):
+        for fid in ids:
+            if fid in wanted and fid not in out:
+                out[fid] = heading
+    return out
+
+
+def missing_citations(answer: str | None, required: dict[str, str]) -> list[str]:
+    cited = set(re.findall(r"E\d+", answer or ""))
+    return [f"the section '{heading}' must say what {fid} says and cite [{fid}]"
+            for fid, heading in required.items() if fid not in cited]
