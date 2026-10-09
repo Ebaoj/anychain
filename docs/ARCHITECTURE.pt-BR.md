@@ -9,7 +9,7 @@ As cores mostram o que já existe:
 - **Cinza**: fases seguintes
 - Caixas brancas são só agrupamentos.
 
-Estado atual: **fim da Fase 4** (08/10/2026): triagem (uma pergunta antes de responder, escolhida pelo código), linha do tempo do remetente em volta de uma falha, notas de gás, Dockerfile, README final e a rede privada de demonstração (Anvil + Blockscout próprio + BRLC atrás de um proxy, lida só com `configs/devnet.yaml`).
+Estado atual: **depois da Fase 4** (09/10/2026): tudo da Fase 4, mais a página como conversa em três versões (lojista, desenvolvedor, auditor), a rede trocada ou adicionada pela página, o modelo e a chave escolhidos pelo terminal ou pela página, modelos menores confiáveis por código e linguagem simples para o lojista (D59 a D68).
 
 ---
 

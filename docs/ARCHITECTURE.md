@@ -9,7 +9,7 @@ Living document: updated at the end of every phase. Colors show what exists. A P
 
 View the diagrams in VS Code (extension "Markdown Preview Mermaid Support") or on GitHub, which renders them natively.
 
-Current state: **end of phase 4** (2026-10-08): triage (one question before answering, chosen by code), the sender's timeline around a failure, gas notes, the Dockerfile, the final README and the private demo network (Anvil + a self-hosted Blockscout + BRLC behind a proxy, read with `configs/devnet.yaml` only).
+Current state: **after phase 4** (2026-10-09): everything in phase 4 plus the page as a conversation in three versions (merchant, developer, auditor), the network switched or added from the page, the model and its key chosen from the CLI or the page, smaller models made reliable by code, and plain language for a merchant (D59 to D68).
 
 ---
 

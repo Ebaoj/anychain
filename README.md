@@ -1,14 +1,42 @@
 # AnyChain Transaction Assistant
 
-Explains and troubleshoots a transaction on **any EVM network**, for a merchant ("why didn't my payment go through?"), a developer or an auditor. Every statement cites a numbered fact with its source (explorer, node, verified code, repository); the AI only writes from those facts, and a check rejects anything it adds. Switching networks means switching a YAML file.
+An assistant that **explains a blockchain transaction** to someone non-technical (a merchant: "why didn't my payment go through?") and to someone technical (a developer, an auditor), on **any EVM network**, by changing only a configuration file.
 
-![The page as a conversation: a merchant pastes a failed payment with a question, gets the answer with its proof and asks a follow-up; then the developer view with the facts beside the thread](docs/demo/anychain_demo_chat.gif)
+![The page as a conversation: a merchant pastes a failed payment with a question, gets the answer with its proof and asks a follow-up; then the developer view with the facts beside the thread, and the settings](docs/demo/anychain_demo_chat.gif)
+
+## In one minute
+
+The idea behind everything: **the AI finds nothing out; it only writes.** The code finds things out, and code can be tested.
+
+```mermaid
+flowchart LR
+    Q["1. Question<br/>hash or address"] --> F["2. Facts<br/>no AI, numbered,<br/>with sources"]
+    F --> D["3. Conclusion<br/>no AI, rules +<br/>reads on the node"]
+    D --> W["4. Prose<br/>AI, cites<br/>every fact"]
+    W --> C["5. Check<br/>no AI: every number<br/>must be in the facts"]
+    C --> R["6. Answer<br/>page, CLI, API,<br/>chat"]
+```
+
+Labels: **CONFIRMED** (proved), **LIKELY** (the best reading of the facts), **UNKNOWN** (not enough data, said why). A check failure means one retry, then the answer is withheld and the facts are shown.
+
+- **If the AI makes a mistake, the check catches it.** A number that is not in the facts never reaches the reader.
+- **If a rule makes a mistake, a test finds it.** The evaluation found a rule that ignored an inner call running out of gas; the rule was fixed and the real case became a test (D50, D51).
+- **When data is missing, the answer says what is missing** ("the explorer did not answer; try again") instead of guessing.
+- **Another network is another YAML file:** seven networks ship, among them a private one built like CloudWalk's.
+
+| Who | What they get |
+|---|---|
+| Merchant | plain words: did it work, did the money move, the fee, what to do now; the proof on demand |
+| Developer | the decoded call, the function's code, reads on the node, the sender's timeline, gas notes; every fact with its source |
+| Auditor | security notes first (heuristics, never an audit), who may call the function, what could not be checked |
+
+Interfaces: a **web page** (a conversation), a **CLI** (`explain`, `chat`, `batch`, `eval`, `metrics`) and a **local API** (`/explain`, `/chat`).
 
 ---
 
 ## Start here (for a reviewer with an hour)
 
-1. Watch the GIF above, then run the quickstart below (a few minutes).
+1. Watch the GIF above, then run the quickstart below (a few minutes) and open the page.
 2. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) section 0 ("What this is, in one minute") and section 2 ("How the diagnosis decides").
 3. Read the code in this order, each a few hundred lines at its core: `src/anychain/service.py` (one answer, end to end), `bundle.py` (`BundleBuilder.build`: how facts are collected), `diagnosis.py` (`diagnose` and the rules list), `validator.py` (the check on the AI's answer), `writer.py` (the prompts and the three model backends).
 4. Skim the sample conversations (section 4) and the evaluation table (section 5).
@@ -103,15 +131,7 @@ No code change is needed: the same steps took the tool from Ethereum to five oth
 
 ## 3. Architecture
 
-```mermaid
-flowchart LR
-    Q["hash + mode<br/>+ question"] --> T{"triage<br/>(one question,<br/>chosen by code)"}
-    T --> F["facts, no AI<br/>explorer + node + repos<br/>numbered, sourced"]
-    F --> D["diagnosis, no AI<br/>rules + reads on the node<br/>CONFIRMED / LIKELY / UNKNOWN"]
-    D --> W["writer (AI)<br/>cites [E#]"]
-    W --> C["check, no AI<br/>numbers, addresses, links,<br/>citations"]
-    C --> O["answer<br/>CLI, API, page, chat"]
-```
+The six steps of "In one minute", in more detail:
 
 - **Collectors:** the explorer (Blockscout API v2) and the network's node (JSON-RPC) are read in parallel, each request bounded by a time budget; every failure becomes a **gap** with a cause and a "worth retrying" flag, never an error on screen. The node checks the explorer (status, receipt, gas); a network-type profile handles fees, L1 status and deposits per chain type.
 - **Decoder and ABI cascade:** explorer ABI (proxies and EIP-7702 delegates followed) → repo artifacts (the address checked against the artifact's own list) → signatures from repo sources → a public signature database (candidates only, never facts) → raw data, declared.
@@ -129,7 +149,18 @@ The full diagrams (pipeline, diagnosis, one `explain`, the chat, quality, code m
 
 Real transactions replayed from their recordings and answered by the model through the same path as `explain` and the API; generated by `scripts/sample_conversations.py`, not edited by hand (also in [docs/SAMPLES.md](docs/SAMPLES.md); here the answers' own headings are shown as bold lines). The answers are in Portuguese, the configs' `assistant.language` (the page can switch it). Under each answer, the sources of every fact it cites. No single recorded failure has both an `eth_call` read and a repository citation: the second sample shows the reads, the third and the last show repository sources (the last one a configured repository's permalink, on the private demo network).
 
-### A successful ERC-20 transfer, support mode
+| Sample | What it shows |
+|---|---|
+| 1. A successful ERC-20 transfer, support mode | the merchant's plain answer to a USDC transfer that worked |
+| 2. A failure diagnosed with reads on the node (eth_call), developer mode | a failure proved with reads on the node: the sender's balance at the block before |
+| 3. A failure diagnosed from the contract's verified code and the rule's repository source, with the sender's timeline, developer mode | a failure explained from the contract's verified code, with what the sender did next |
+| 4. A contract the explorer has not verified (degradation), with a clarifying question (triage) | an unverified contract: what is missing is said, and one question is asked first |
+| 5. Triage: it succeeded, but the reader says the payment did not arrive | the reader says "I did not receive it": their words checked against the facts |
+| 6. The private demo network: a BRLC call decoded from the configured repository, and the cause the explorer did not give recovered by replaying the call on the node, developer mode | the private network: CloudWalk's BRLC decoded from its repository, the hidden cause recovered by replay |
+
+Click a sample to open it.
+
+<details><summary><strong>1. A successful ERC-20 transfer, support mode</strong></summary>
 
 Network `ethereum-mainnet`, transaction `0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952`, mode `support`.
 
@@ -155,7 +186,9 @@ A taxa de rede paga foi de cerca de 0,000085 ETH (valor exato: 0.000085376199729
 
 </details>
 
-### A failure diagnosed with reads on the node (eth_call), developer mode
+</details>
+
+<details><summary><strong>2. A failure diagnosed with reads on the node (eth_call), developer mode</strong></summary>
 
 Network `celo-mainnet`, transaction `0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817`, mode `developer`.
 
@@ -232,7 +265,9 @@ A linha do tempo está incompleta: o remetente enviou pelo menos 150 transaçõe
 
 - Timeline: the sender sent at least 150 transactions after this one; those right after it are not shown
 
-### A failure diagnosed from the contract's verified code and the rule's repository source, with the sender's timeline, developer mode
+</details>
+
+<details><summary><strong>3. A failure diagnosed from the contract's verified code and the rule's repository source, with the sender's timeline, developer mode</strong></summary>
 
 Network `ethereum-mainnet`, transaction `0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a`, mode `developer`.
 
@@ -292,7 +327,9 @@ Para um desenvolvedor: verificar o preço atual e reenviar com um novo `deadline
 
 </details>
 
-### A contract the explorer has not verified (degradation), with a clarifying question (triage)
+</details>
+
+<details><summary><strong>4. A contract the explorer has not verified (degradation), with a clarifying question (triage)</strong></summary>
 
 Network `ethereum-mainnet`, transaction `0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9`, mode `support`.
 
@@ -352,7 +389,9 @@ Não dá para saber o que a operação pedia exatamente, porque não há informa
 - Call decoding: no ABI for 0x278d858f05b94576C1E6f73285886876ff6eF8D2 matches selector 0x70521ae9
 - Signature database: the recording has no answer from this source, so the replay treats it as unavailable
 
-### Triage: it succeeded, but the reader says the payment did not arrive
+</details>
+
+<details><summary><strong>5. Triage: it succeeded, but the reader says the payment did not arrive</strong></summary>
 
 Network `ethereum-mainnet`, transaction `0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952`, mode `support`.
 
@@ -391,7 +430,9 @@ A taxa de rede paga foi de cerca de 0,000085 ETH (0.00008537619972948 ETH) [E2].
 
 </details>
 
-### The private demo network: a BRLC call decoded from the configured repository, and the cause the explorer did not give recovered by replaying the call on the node, developer mode
+</details>
+
+<details><summary><strong>6. The private demo network: a BRLC call decoded from the configured repository, and the cause the explorer did not give recovered by replaying the call on the node, developer mode</strong></summary>
 
 Network `anychain-devnet`, transaction `0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f`, mode `developer`.
 
@@ -449,6 +490,8 @@ Network `anychain-devnet`, transaction `0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21
 - Revert reason: the explorer did not report why the transaction failed
 - Internal calls: the explorer is still indexing this transaction's internal calls
 
+</details>
+
 ---
 
 ## 5. Evaluation results
@@ -474,6 +517,8 @@ Run 2026-10-09 10:10, commit 9a151ac, model claude-sonnet-5-5. Every case is a r
 | Tokens sent (cache included) / received | 58239 / 10632 (12981 read from the cache) |
 | Cost reported by the backend | 0.2899 USD |
 
+<details><summary>Per case (11 real transactions)</summary>
+
 | Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values | Key facts | Seconds | Tokens in/out |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | erc20_transfer | ethereum-mainnet | ok success | ok -  | ok explorer |  - | ok | 4/4 | 2/2 | 0/0 | 4.4 | 3875/251 |
@@ -488,6 +533,8 @@ Run 2026-10-09 10:10, commit 9a151ac, model claude-sonnet-5-5. Every case is a r
 | second_network_failure | optimism-mainnet | ok failed | ok deadline LIKELY | ok signature_db |  not_interpretable | ok | 9/13 | 1/1 | 2/2 | 11.9 | 4839/658 |
 | allowance_devnet | anychain-devnet | ok failed | ok no_reason UNKNOWN (replay: insufficient_allowance) | ok raw | ok not_interpretable, source_behind | ok | 16/24 | 1/1 | 2/2 | 8.4 | 4512/779 |
 
+</details>
+
 Citation coverage varies between runs of the same commit and prompts: 78.1% and 84.0% in the two runs of 2026-10-09 with the final prompts (the model writes differently each time); the other metrics did not move.
 
 The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network, where the explorer gives no reason and the replay on the node finds "insufficient allowance" (D60). "First drafts the check caught" counts answers the model had to rewrite because they stated a value or cited a fact not in the evidence: none in this run. Earlier runs showed one ("E624"), which turned out to be the check's mistake, not the model's: a shortened address ("0x52b2…E624") read as a citation; fixed (D62).
@@ -501,6 +548,8 @@ The allowance category had no real case on a public network (the candidate found
 ## 6. Metrics and measuring impact in production
 
 `anychain metrics` prints usage numbers from the local event log (`data/runs.db`, one row per answer given from the CLI or the API; it fills as the tool is used, so a fresh clone shows empty tables), each with the SQL that computes it (all five below; the same text is in `src/anychain/metrics.py`):
+
+<details><summary>The five queries</summary>
 
 ```sql
 -- Failure causes (the diagnosis rule of each failed transaction)
@@ -539,6 +588,8 @@ FROM runs
 WHERE ts >= :since AND source IN ('cli', 'api') AND mode IS NOT NULL
 GROUP BY mode ORDER BY mode;
 ```
+
+</details>
 
 ### Measuring impact in production (summary of [docs/IMPACT.md](docs/IMPACT.md))
 
