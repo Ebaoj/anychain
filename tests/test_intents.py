@@ -122,7 +122,8 @@ def test_a_purpose_is_never_confirmed():
     session.opening = "era a conta de luz, não passou"
     writer = Scripted("A conta de luz foi paga [E3].", "Sua conta de luz está quitada [E3].", intent="purpose_claim")
     turn = session.ask("então foi paga?", writer)
-    assert turn.path == "frame_plain" and "não dá para saber" in turn.answer and "quitad" not in turn.answer
+    assert turn.path == "frame_plain" and "quitad" not in turn.answer
+    assert turn.answer.startswith("Se a conta de luz se referia a esta transação, não")
 
 
 def test_a_framed_answer_is_written_by_the_model_when_it_passes():
@@ -245,8 +246,8 @@ def test_the_fallback_speaks_the_readers_language():
     b = _bundle("eth_fail_expired_v2")
     plain = intents.plain_answer([intents.build_frame("why_failed", b, "support", "pt-BR")])
     assert "CONFIRMED" not in plain and "UniswapV2Router: EXPIRED" in plain and "motivo" in plain.lower()
-    purpose = intents.plain_answer([intents.build_frame("purpose_claim", b, "support", "pt-BR")])
-    assert "não deu certo" in purpose and "não dá para saber" in purpose
+    purpose = intents.plain_answer([intents.build_frame("purpose_claim", b, "support", "pt-BR", ["conta de luz"])])
+    assert purpose.startswith("Se a conta de luz se referia a esta transação, não: esta transação não foi realizada")
 
 
 def test_a_bracket_that_is_not_a_fact_is_not_a_citation():
@@ -254,3 +255,35 @@ def test_a_bracket_that_is_not_a_fact_is_not_a_citation():
     writer = Scripted(*["Não dá para saber para que era o pagamento [Gaps]."] * 2, intent="purpose_claim")
     turn = session.ask("era a conta de luz, foi paga?", writer)
     assert turn.path == "frame_plain" and any("not a fact" in p for p in turn.problems)
+
+
+
+@pytest.mark.parametrize("answer,ok", [
+    ("Se a conta de luz se referia a essa transação, não. Essa transação não foi realizada [E1].", True),
+    ("If the electricity bill was this transaction, no: it did not go through [E1].", True),
+    ("A conta de luz não foi paga, porque a transação falhou [E1].", False),  # unconditional: unknowable
+    ("Sua conta de luz foi paga [E1].", False),
+])
+def test_a_purpose_is_answered_only_as_a_condition(answer, ok):
+    purposes = ["conta de luz"] if "conta" in answer else ["bill"]
+    assert (check_claims(answer, _bundle("eth_fail_expired_v2"), purposes) == []) is ok, answer
+
+
+def test_a_successful_payment_is_answered_with_what_moved_and_who_can_confirm():
+    b = _bundle("eth_usdc_transfer")
+    plain = intents.plain_answer([intents.build_frame("purpose_claim", b, "support", "pt-BR", ["aluguel"])])
+    assert plain.startswith("Se o aluguel se referia a esta transação, o valor saiu:") and "69.3484 USDC" in plain
+    assert "só quem recebeu pode confirmar" in plain and check_claims(plain, b, ["aluguel"]) == []
+
+
+def test_a_purpose_on_a_failure_redone_with_success_says_both():
+    """The author, 2026-10-09: this transaction did not pay it, but the same operation succeeded 48 seconds later,
+    so the bill may have been paid by that one: the answer must say both (never "not paid" alone)."""
+    b = _bundle("eth_fail_expired_v2")
+    later = next(e.id for e in b.items if e.data.get("pattern") == "retried_ok")
+    frame = intents.build_frame("purpose_claim", b, "support", "pt-BR", ["conta de luz"])
+    plain = intents.plain_answer([frame])
+    assert plain.startswith("Se a conta de luz se referia a esta transação, não")
+    assert "a mesma operação foi feita de novo depois e deu certo" in plain and f"[{later}]" in plain
+    assert any(later in ids for _s, ids in frame.statements)
+    assert check_claims(plain, b, ["conta de luz"]) == []

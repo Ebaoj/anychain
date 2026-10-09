@@ -268,7 +268,8 @@ class ChatSession:
             self.turns.append(turn)
             return turn
         if all(i in intents_.FRAMED for i in routed.intents):
-            frames = [intents_.build_frame(i, self.bundle, self.mode, self._language()) for i in routed.intents]
+            said = self._purposes(question)
+            frames = [intents_.build_frame(i, self.bundle, self.mode, self._language(), said) for i in routed.intents]
             if all(frames):
                 self._answer_framed(question, frames, backend, turn)
                 self.turns.append(turn)

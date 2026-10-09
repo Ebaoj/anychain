@@ -112,7 +112,9 @@ def check_claims(answer: str, bundle: EvidenceBundle, purposes: list[str] | None
                 problems.append(f"it advises trying again, but the same operation already succeeded later "
                                 f"[{facts['succeeded_later'][0]}]: '{sentence[:120]}'")
             for purpose in purposes or []:
-                if re.search(rf"\b{re.escape(purpose)}\b", clause) and not re.search(UNKNOWABLE, clause):
+                named = rf"\b{re.escape(purpose)}\b"
+                conditional = re.search(rf"\b(?:se|if|si|caso|in case)\b.*{named}", clause)  # "if the bill was this"
+                if re.search(named, clause) and not conditional and not re.search(UNKNOWABLE, clause):
                     problems.append(f"it speaks of what the reader said the payment was for ('{purpose}') as known; "
                                     f"the facts cannot show it, so say only that: '{sentence[:120]}'")
     return list(dict.fromkeys(problems))

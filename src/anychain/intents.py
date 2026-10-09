@@ -157,6 +157,13 @@ TEXT = {
               "when": "Foi em {date} (UTC).",
               "later": "A mesma operação deu certo depois: não há nada para refazer.",
               "purpose": "Pela blockchain não dá para saber para que era o pagamento; ela mostra só o que a transação fez.",
+              "purpose_no": "Se {said} se referia a esta transação, não: esta transação não foi realizada.",
+              "purpose_no_generic": "Se o pagamento que você mencionou era esta transação, não: esta transação não foi "
+                                    "realizada.",
+              "purpose_later": "Mas a mesma operação foi feita de novo depois e deu certo: se o pagamento foi por ela, o "
+                               "valor saiu nessa outra transação.",
+              "purpose_yes": "Se {said} se referia a esta transação, o valor saiu: {moved} Se isso quitou {said}, só "
+                             "quem recebeu pode confirmar.", "the_payment": "o pagamento que você mencionou",
               "human": "Para falar com uma pessoa, procure o suporte do aplicativo que você usa e envie o link desta "
                        "transação{link}. Eu continuo aqui para explicar o que aconteceu.",
               "off_topic": "Eu só respondo sobre esta transação: se deu certo, o que se moveu, a taxa, o motivo de uma "
@@ -169,6 +176,13 @@ TEXT = {
            "when": "It was on {date} (UTC).",
            "later": "The same operation succeeded later: there is nothing to redo.",
            "purpose": "The blockchain cannot show what the payment was for; it shows only what the transaction did.",
+           "purpose_no": "If {said} was this transaction: no, this transaction did not go through.",
+           "purpose_no_generic": "If the payment you mentioned was this transaction: no, this transaction did not go "
+                                 "through.",
+           "purpose_later": "But the same operation was done again later and succeeded: if the payment was made by that "
+                            "one, the value left in that other transaction.",
+           "purpose_yes": "If {said} was this transaction, the value left: {moved} Whether that settled {said} only the "
+                          "receiver can confirm.", "the_payment": "the payment you mentioned",
            "human": "To talk to a person, contact the support of the app you use and send them the link to this "
                     "transaction{link}. I am still here to explain what happened.",
            "off_topic": "I only answer about this transaction: whether it worked, what moved, the fee, why it failed "
@@ -182,6 +196,12 @@ TEXT = {
            "when": "Fue el {date} (UTC).",
            "later": "La misma operación se completó después: no hay nada que rehacer.",
            "purpose": "La blockchain no puede mostrar para qué era el pago; solo muestra lo que hizo la transacción.",
+           "purpose_no": "Si {said} correspondía a esta transacción, no: esta transacción no se realizó.",
+           "purpose_no_generic": "Si el pago que mencionaste era esta transacción, no: esta transacción no se realizó.",
+           "purpose_later": "Pero la misma operación se hizo de nuevo después y se completó: si el pago se hizo con esa, "
+                            "el valor salió en esa otra transacción.",
+           "purpose_yes": "Si {said} correspondía a esta transacción, el valor salió: {moved} Si eso pagó {said}, solo "
+                          "quien recibió puede confirmarlo.", "the_payment": "el pago que mencionaste",
            "human": "Para hablar con una persona, contacta al soporte de la aplicación que usas y envíales el enlace de "
                     "esta transacción{link}. Sigo aquí para explicar lo que pasó.",
            "off_topic": "Solo respondo sobre esta transacción: si funcionó, qué se movió, la comisión, por qué falló y "
@@ -221,7 +241,25 @@ def fixed_reply(intent: str, bundle: EvidenceBundle, language: str) -> str:
     return t["off_topic"]
 
 
-def build_frame(intent: str, bundle: EvidenceBundle, mode: str, language: str) -> Frame | None:
+# The reader's own word for the purpose, with its article, as the answer says it back ("Se a conta de luz…").
+ARTICLE = {"pt-BR": {"conta": "a", "fatura": "a", "mensalidade": "a", "boleto": "o", "aluguel": "o", "salário": "o",
+                     "salario": "o", "imposto": "o", "fornecedor": "o pagamento ao"},
+           "es": {"factura": "la", "cuota": "la", "alquiler": "el", "proveedor": "el pago al"}}
+
+
+def _said(purposes: list[str] | None, language: str) -> str | None:
+    if not purposes:
+        return None
+    word = purposes[0]
+    if language == "en":
+        return f"the {word}"
+    articles = ARTICLE.get(language, {})
+    art = next((a for k, a in articles.items() if word.startswith(k)), "o" if language == "pt-BR" else "el")
+    return f"{art} {word}"
+
+
+def build_frame(intent: str, bundle: EvidenceBundle, mode: str, language: str,
+                purposes: list[str] | None = None) -> Frame | None:
     """The statements for a framed intent, from the facts only (None: the facts cannot answer it: open path)."""
     t = _text(language)
     overview, fee, diag = _first(bundle, "overview"), _first(bundle, "fee"), _diagnosis(bundle)
@@ -294,15 +332,30 @@ def build_frame(intent: str, bundle: EvidenceBundle, mode: str, language: str) -
         return Frame(intent, [(s, [diag.id]) for s in steps], ["Do not add steps of your own."],
                      [(s, [diag.id]) for s in steps])
     if intent == "purpose_claim":
+        # Answered as a condition (the author's wording, 2026-10-09): "If the electricity bill was this transaction,
+        # no: this transaction did not go through." It answers the question and states only what the chain shows.
         ids = [overview.id] + ([diag.id] if diag else [])
-        what = [(f"The transaction {'failed' if failed else 'succeeded'}.", ids)]
-        what += ([(m.text, [m.id]) for m in moves] if moves else
-                 [("Nothing was transferred.", [overview.id])] if failed else [])
-        return Frame(intent, what + [("Whether it paid what you said it was for cannot be known from the blockchain: it "
-                                      "shows only what the transaction did.", [])],
-                     ["Never say the bill, rent, invoice or supplier is paid or not paid: say it cannot be known.",
-                      "Do not repeat what the reader said the payment was for as a fact."],
-                     [(t["failed" if failed else "success"] + ".", [overview.id]), (t["purpose"], [])])
+        said = _said(purposes, language)
+        if failed:
+            statements = [(f"If {said or 'the payment you mentioned'} was this transaction: no, because this "
+                           "transaction did not go through.", ids)]
+            plain = [(t["purpose_no"].format(said=said) if said else t["purpose_no_generic"], ids)]
+            if later:  # the same operation succeeded later: it may have paid it (the author, 2026-10-09)
+                statements.append(("But the same operation was done again later and succeeded: if the payment was made "
+                                   "by that one, the value left in that other transaction.", later[:1]))
+                plain.append((t["purpose_later"], later[:1]))
+        else:
+            if not moves:
+                return None
+            statements = [(f"If {said or 'the payment you mentioned'} was this transaction, the value left: "
+                           + "; ".join(m.text for m in moves), [m.id for m in moves]),
+                          ("Whether that settled it only the receiver can confirm.", [])]
+            plain = [(t["purpose_yes"].format(said=said or t["the_payment"],
+                                              moved=" ".join(_moved(m, t) for m in moves)), [m.id for m in moves])]
+        return Frame(intent, statements,
+                     ["Answer as a condition, starting with 'If' in the answer's language, using the reader's own "
+                      "words for what the payment was for.",
+                      "Never say it is paid or not paid without that condition."], plain)
     return None
 
 
