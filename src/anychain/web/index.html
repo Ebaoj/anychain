@@ -351,7 +351,7 @@ const STRINGS = {
     healthOk: "Tudo funcionando", healthDegraded: "Funcionando em parte", healthDown: "Fontes fora do ar", healthModelMissing: "sem modelo",
     language: "Idioma", model: "Modelo que escreve as respostas", loadModels: "Carregar modelos", save: "Salvar", test: "Testar",
     keyPh: "Chave da API (vazio mantém a salva)",
-    modelHelp: "A chave fica salva só neste computador e nunca é mostrada de novo. Toda resposta é conferida contra os fatos, qualquer que seja o modelo.",
+    modelHelp: "A chave fica salva só neste computador e nunca é mostrada de novo. Toda resposta é conferida contra os fatos, qualquer que seja o modelo. Mínimo recomendado: gpt-4.1-mini (OpenAI) ou Claude Sonnet (Anthropic); o gpt-4.1-nano funciona, mas interpreta mal perguntas abertas.",
     addNetwork: "+ Adicionar rede", netHelp: "Qualquer rede EVM com um explorador Blockscout. A rede fica salva só neste computador (o endereço do nó pode ter uma chave).",
     netFrom: "Começar a partir de", netName: "Nome (letras minúsculas, números e hífens)", netSymbol: "Moeda", netDecimals: "Casas",
     netType: "Tipo de rede (CHAIN_TYPE do Blockscout)", netExplorer: "Explorador Blockscout", netRpc: "Nó da rede (JSON-RPC)",
@@ -408,7 +408,7 @@ const STRINGS = {
     healthOk: "All working", healthDegraded: "Partly working", healthDown: "Sources down", healthModelMissing: "no model",
     language: "Language", model: "The model that writes the answers", loadModels: "Load models", save: "Save", test: "Test",
     keyPh: "API key (empty keeps the saved one)",
-    modelHelp: "The key is saved on this computer only and never shown again. Every answer is checked against the facts, whichever model writes it.",
+    modelHelp: "The key is saved on this computer only and never shown again. Every answer is checked against the facts, whichever model writes it. Recommended minimum: gpt-4.1-mini (OpenAI) or Claude Sonnet (Anthropic); gpt-4.1-nano works but misreads open questions.",
     addNetwork: "+ Add a network", netHelp: "Any EVM network with a Blockscout explorer. The network is saved on this computer only (a node's address can carry a key).",
     netFrom: "Start from", netName: "Name (lowercase letters, digits and dashes)", netSymbol: "Coin", netDecimals: "Decimals",
     netType: "Network type (Blockscout CHAIN_TYPE)", netExplorer: "Blockscout explorer", netRpc: "Network node (JSON-RPC)",
@@ -1052,7 +1052,7 @@ async function loadModels() {
     select.appendChild(pick);
     for (const m of r.models) {
       const o = document.createElement("option");
-      o.value = m.id; o.textContent = m.label === m.id ? m.id : `${m.label} (${m.id})`;
+      o.value = m.id; o.textContent = m.label.startsWith(m.id) ? m.label : `${m.label} (${m.id})`;
       select.appendChild(o);
     }
     if (r.models.some((m) => m.id === state.savedModel)) select.value = state.savedModel;

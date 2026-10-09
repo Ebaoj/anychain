@@ -164,3 +164,13 @@ def test_an_openai_choice_needs_a_model(event_log):
     r = _client(event_log).post("/settings/llm", json={"provider": "openai", "api_key": KEY},
                                 headers={"X-AnyChain-Request": "1"})
     assert r.status_code == 422
+
+
+def test_the_list_marks_the_recommended_minimum_and_nano(monkeypatch):
+    """D77: the model list says which OpenAI model is the recommended minimum (gpt-4.1-mini) and that gpt-4.1-nano
+    is not recommended (it misread a fact on open questions, D76); the page and `llm set` show these labels."""
+    listed = {"data": [{"id": "gpt-4.1-nano", "created": 1}, {"id": "gpt-4.1-mini", "created": 2}]}
+    monkeypatch.setattr(llm_settings, "_client", lambda: httpx.Client(
+        transport=httpx.MockTransport(lambda r: httpx.Response(200, json=listed))))
+    labels = {m["id"]: m["label"] for m in llm_settings.list_models("openai", KEY)}
+    assert "recommended minimum" in labels["gpt-4.1-mini"] and "not recommended" in labels["gpt-4.1-nano"]

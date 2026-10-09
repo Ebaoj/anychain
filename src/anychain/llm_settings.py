@@ -21,6 +21,9 @@ ENV_KEYS = {"anthropic": "ANTHROPIC_API_KEY", "openai": "OPENAI_API_KEY"}
 #   checked in its API reference on 2026-10-09; OpenAI GET /v1/models (Bearer; data[].id, created), as the
 #   official openai-python SDK reads it (resources/models.py, types/model.py), checked the same day.
 MODELS_URL = {"anthropic": "https://api.anthropic.com/v1/models", "openai": "https://api.openai.com/v1/models"}
+# What the evaluation found (D76): gpt-4.1-mini is the smallest OpenAI model that answered the chat's open questions
+# right; gpt-4.1-nano misread a fact it cited correctly, twice. Shown next to the model in the page and `llm set`.
+ADVICE = {"gpt-4.1-mini": "recommended minimum", "gpt-4.1-nano": "not recommended: misreads facts on open questions"}
 # OpenAI lists every model of the account; these families do not write chat answers.
 NOT_CHAT = re.compile(r"embedding|whisper|tts|dall-e|moderation|davinci|babbage|transcribe|image|audio|realtime|"
                       r"search|sora", re.IGNORECASE)
@@ -63,7 +66,7 @@ def list_models(provider: str, api_key: str | None = None) -> list[dict]:
                 for m in data if isinstance(m, dict) and m.get("id") and m.get("lifecycle") != "retired"]
     chat = [m for m in data if isinstance(m, dict) and m.get("id") and not NOT_CHAT.search(m["id"])]
     chat.sort(key=lambda m: m.get("created") or 0, reverse=True)
-    return [{"id": m["id"], "label": m["id"]} for m in chat]
+    return [{"id": m["id"], "label": m["id"] + (f" ({ADVICE[m['id']]})" if m["id"] in ADVICE else "")} for m in chat]
 
 
 def path() -> Path:
