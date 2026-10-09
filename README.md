@@ -74,7 +74,7 @@ storage:    { sqlite_path, cache_dir }
 5. `signature_db.enabled: false` if policy forbids sending selectors to a public service.
 6. `uv run anychain repos sync --config configs/cloudwalk.yaml`, then `uv run anychain serve --config configs/cloudwalk.yaml`. `GET /health` confirms the explorer, the node (and that its chain id matches) and the model.
 
-No code change is needed: the same steps took the tool from Ethereum to five other networks of five different types.
+No code change is needed: the same steps took the tool from Ethereum to five other networks of five different types, and to a **private network built like CloudWalk's**: a local node and a self-hosted Blockscout with the BRLC token from the repository deployed behind a proxy, read with `configs/devnet.yaml` only ([devnet/README.md](devnet/README.md)). There the BRLC call was decoded from the repository's source, and the revert reasons the explorer did not give were recovered by replaying the call on the node.
 
 ---
 
@@ -319,7 +319,7 @@ Run 2026-10-08 21:23, commit 3827d6c, model claude-sonnet-5-5. Every case is a r
 | second_network_transfer | optimism-mainnet | ok success | ok -  | ok explorer |  - | ok | 10/15 | 2/2 |
 | second_network_failure | optimism-mainnet | ok failed | ok deadline LIKELY | ok signature_db |  not_interpretable | ok | 12/16 | 1/1 |
 
-The allowance category has no real case and is reported as missing, not filled: the candidate found turned out to be an inner out-of-gas (D50, D51). "Hallucination" counts first attempts the check caught; the one caught here cited a fact id that does not exist ("E624"), and the retry was clean: no answer reached a reader with it.
+The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network (D60). "Hallucination" counts first attempts the check caught; the one caught here cited a fact id that does not exist ("E624"), and the retry was clean: no answer reached a reader with it.
 
 **Acceptance against an independent source:** 1,800 randomly sampled transactions (300 on each of six networks), checked against the network's node: six checks each (status, value, fee, token transfers, no double-counted native value, addresses exist) plus the L1 status on zkSync, 11,100 checks in all: 11,008 passed, 88 had no node data to compare, 4 flagged. The 3 false facts found (a missing receipt called "pending", a blob fee left out on Gnosis) were fixed with tests on the recorded cases; the fourth is a token the explorer hides as scam ([docs/acceptance-report.md](docs/acceptance-report.md)). The run used the Phase 3 code: the Phase 4 facts (timeline, gas notes, triage) come from the same explorer lists and are covered by tests on recordings, not by this run.
 
@@ -337,7 +337,7 @@ The allowance category has no real case and is reported as missing, not filled: 
 - **No trace yet:** where the explorer's internal calls do not show the failing frame, `debug_traceTransaction` would (`rpc.supports_debug_trace`; Stratus serves it). Not used with the public nodes here.
 - **Explorer-hidden tokens:** a token the explorer marks as scam has its transfers hidden; the tool does not say so yet (backlog C1).
 - **Heuristics stay heuristics:** security and gas notes are pattern matches on the shown code, never an audit.
-- **Private demo network:** the planned Anvil + self-hosted Blockscout + BRLC deployment (docs/ROADMAP.md) proves the CloudWalk retargeting end to end; see its status in the roadmap.
+- **Private demo network:** built and recorded (devnet/), but on a home server and rebuilt by hand; a CI job that brings it up, sends the transactions and runs `anychain eval` against it would keep the retargeting proof current. Calls inherited from OpenZeppelin are not decoded there, because the library is not in the configured repository: adding its source as a second repository would decode them.
 - **Backlog:** imprecise wordings found by reviews and acceptance runs (level C), each with the real transaction it came from, in docs/ROADMAP.md.
 
 ---

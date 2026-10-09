@@ -9,12 +9,9 @@
 #   gaps         gap causes the answer must declare (degradation)
 #   entities     each entry is a list of accepted spellings; one of them must appear in the written answer
 
-# Categories of the original plan with no real case yet, reported as missing (never filled with another one):
-missing:
-  - category: allowance revert
-    why: no real failure with a confirmed missing approval was found in a bounded search (2026-10-08); the router's
-      TRANSFER_FROM_FAILED case found turned out to be an inner out of gas, and the public node keeps the parent
-      block's state for about 128 blocks only, too short to read the allowance of most failures found later
+# Categories of the original plan with no real case on a public network: allowance revert. The bounded search of
+# 2026-10-08 found none (the router's TRANSFER_FROM_FAILED case was an inner out of gas, and public nodes keep the
+# parent block's state for about 128 blocks); the real case below comes from the private demo network (D60).
 
 cases:
   - id: erc20_transfer
@@ -98,3 +95,12 @@ cases:
     mode: support
     expect: {status: failed, rule: deadline, label: LIKELY, abi_source: signature_db, gaps: [],
              entities: [["block number deadline"]]}
+
+  - id: allowance_devnet
+    category: allowance revert (ERC20 insufficient allowance), on the private demo network, where the explorer runs
+      without internal transactions and gives no reason; the replay on the node finds it
+    config: devnet
+    fixture: devnet_fail_allowance
+    mode: support
+    expect: {status: failed, rule: no_reason, label: UNKNOWN, abi_source: raw, gaps: [not_interpretable],
+             entities: [["insufficient allowance", "allowance", "aprovação", "autoriza"]]}

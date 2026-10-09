@@ -14,7 +14,8 @@ from tests.conftest import FIXTURES, ROOT, replay_bundle
 
 GOLDEN = ROOT / "tests" / "golden"
 CONFIG_BY_PREFIX = {"eth_": "ethereum-mainnet", "op_": "optimism-mainnet", "celo_": "celo-mainnet",
-                    "gnosis_": "gnosis-mainnet", "rootstock_": "rootstock-mainnet", "zksync_": "zksync-era"}
+                    "gnosis_": "gnosis-mainnet", "rootstock_": "rootstock-mainnet", "zksync_": "zksync-era",
+                    "devnet_": "devnet"}
 TX_KEY = re.compile(r"/transactions/(0x[0-9a-fA-F]{64})$|eth_getTransactionByHash \[\"(0x[0-9a-fA-F]{64})\"\]")
 
 

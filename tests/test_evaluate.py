@@ -15,8 +15,8 @@ def test_the_set_covers_the_plans_categories_with_real_recordings():
     ids = {c["id"] for c in cases}
     assert {"erc20_transfer", "dex_swap", "explicit_reason", "out_of_gas", "unverified_contract",
             "custom_error", "node_unavailable"} <= ids
-    missing = yaml.safe_load(CASES.read_text()).get("missing") or []
-    assert [m["category"] for m in missing] == ["allowance revert"]  # said, never filled with another case
+    # the allowance category has a real case only on the private demo network (D60), never filled with another one
+    assert "allowance_devnet" in ids and not (yaml.safe_load(CASES.read_text()).get("missing") or [])
     assert sum(c["config"] == "ethereum-mainnet" for c in cases) >= 8
     assert sum(c["config"] != "ethereum-mainnet" for c in cases) >= 2
     for c in cases:

@@ -100,6 +100,7 @@ REPLAY_MEANING = {
     "insufficient_balance": "the standard ERC-20 message for a transfer larger than the balance it moves from",
     "insufficient_allowance": "the standard ERC-20 message for moving tokens beyond an approval",
     "paused": "the reason a paused contract gives",
+    "access_control": "an access check (an owner or a role) refusing the caller",  # devnet, 2026-10-08 (D60)
     ("slippage", "single_source"): "the slippage check of Uniswap's routers (the swap would not meet the "
                                     "sender's limit)",
     ("slippage", "candidate"): "the words of the slippage check of Uniswap's routers; this contract's code decides "

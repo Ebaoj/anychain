@@ -1,0 +1,58 @@
+# The private demo network (PHASE4 T6, D60): a local Anvil node and a self-hosted Blockscout, with the BRLC token
+# from the configured repo deployed behind a proxy, as CloudWalk runs it. Retargeting needed this file only.
+# The services run on the home server server on 127.0.0.1; reach them with an SSH tunnel:
+#   ssh -N -L 14000:127.0.0.1:4000 -L 18545:127.0.0.1:8545 home server
+network:
+  name: anychain-devnet
+  chain_id: 31337               # Anvil's chain id (eth_chainId 0x7a69, checked 2026-10-08)
+  native_symbol: ETH
+  native_decimals: 18
+  chain_type: default           # Blockscout with ETHEREUM_JSONRPC_VARIANT=anvil, no CHAIN_TYPE set
+
+explorer:
+  type: blockscout
+  base_url: http://127.0.0.1:14000
+  api_path: /api/v2
+  tx_url_template: "{base_url}/tx/{hash}"
+  address_url_template: "{base_url}/address/{address}"
+  timeout_s: 15
+
+rpc:
+  url: http://127.0.0.1:18545
+  timeout_s: 10
+  supports_debug_trace: false   # Anvil has debug_traceTransaction, but the tool does not use traces yet
+
+repos:
+  - url: https://github.com/cloudwallk/brlc-token
+    ref: 74a5498d04b10dc882e48273a38b98b4275463bd
+    source_globs: ["contracts/**/*.sol"]
+
+address_map:   # deployed by the devnet's run.sh on 2026-10-08 (Anvil's first two contract addresses)
+  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512": { repo: https://github.com/cloudwallk/brlc-token, contract: BRLCToken }
+  "0x5FbDB2315678afecb367f032d93F642f64180aa3": { repo: https://github.com/cloudwallk/brlc-token, contract: BRLCToken }
+address_labels:
+  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512": "BRLC token (proxy)"
+
+abi_strategy:
+  order: [explorer, repo_artifacts, repo_source_signatures, signature_db]
+  signature_db:
+    enabled: false              # a private network: no selectors sent to a public service
+
+llm:
+  provider: claude_code
+  model: claude-sonnet-5-5
+  max_tokens: 2000
+  temperature: 0
+
+assistant:
+  default_mode: support
+  language: pt-BR
+  max_clarifying_questions: 1
+  time_budget_s: 30
+
+storage:
+  sqlite_path: data/runs-devnet.db
+  cache_dir: data/cache
+
+cache:
+  enabled: false                # the devnet is reset at will: nothing is kept

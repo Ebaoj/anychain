@@ -1,0 +1,151 @@
+{
+ "abi_sources": {
+  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 matches selector 0xa9059cbb"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 56,
+    "from": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "gas_limit": "75031",
+    "gas_used": "74311",
+    "status": "success",
+    "timestamp": "2026-10-09T01:40:48.000000Z",
+    "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "http://127.0.0.1:14000/tx/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+    }
+   ],
+   "text": "Transaction succeeded in block 56 at 2026-10-09T01:40:48.000000Z. From 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin). Native value sent: 0 ETH. Gas used 74311 of limit 75031."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000000050492912591",
+    "parts": {
+     "fee": "0.000000050492912591"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+    }
+   ],
+   "text": "Fee paid: 0.000000050492912591 ETH."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0xa9059cbb"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+    }
+   ],
+   "text": "Called function with selector 0xa9059cbb on 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin); not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "from": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "to": "0x3C44CDDdb6A900fA2b585D8C4E1a7C9ee5f0f9C3",
+    "token": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "token_id": null,
+    "value": 100000000
+   },
+   "id": "E4",
+   "kind": "token_transfer",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: token transfers",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1/token-transfers"
+    }
+   ],
+   "text": "Token transfer: 100 BRLC from 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 to 0x3C44CDDdb6A900fA2b585D8C4E1a7C9ee5f0f9C3."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "success"
+   },
+   "id": "E5",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+    }
+   ],
+   "text": "RPC receipt independently reports status success, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 75031,
+    "used": 74311
+   },
+   "id": "E6",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 74311 of the 75031 limit (99.0%). It succeeded close to its limit: the same call doing a little more work could run out of gas."
+  }
+ ],
+ "network": "anychain-devnet",
+ "status": "success",
+ "tx_hash": "0xb1511bd4cf18e3be8f567088537eeeec2e8894283169430d4f5cf8aa86c494c1"
+}

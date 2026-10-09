@@ -1,3 +1,4 @@
 Real files from github.com/cloudwallk/brlc-token at commit 74a5498d04b10dc882e48273a38b98b4275463bd
 (an unofficial mirror of CloudWalk's BRLC contracts, approved for the demo on 2026-10-08).
-Only the files of BRLCTokenBridgeable's inheritance chain are kept, unchanged.
+All 34 .sol files under contracts/ at that commit, unchanged (until 2026-10-08 only BRLCTokenBridgeable's
+inheritance chain was kept; the private demo network deploys BRLCToken, so the rest was added).

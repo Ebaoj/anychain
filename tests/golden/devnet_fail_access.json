@@ -1,0 +1,274 @@
+{
+ "abi_sources": {
+  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512": "repository cloudwallk/brlc-token@74a5498: BRLCToken (pinned to this address in the config)"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A node that can re-execute or trace the call (debug/trace RPC)",
+   "retryable": false,
+   "what": "Revert reason",
+   "why": "the explorer did not report why the transaction failed"
+  },
+  {
+   "cause": "source_behind",
+   "needed": "Ask again in a few minutes",
+   "retryable": true,
+   "what": "Internal calls",
+   "why": "the explorer is still indexing this transaction's internal calls"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 63,
+    "from": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+    "gas_limit": "200000",
+    "gas_used": "28963",
+    "status": "failed",
+    "timestamp": "2026-10-09T01:41:02.000000Z",
+    "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "http://127.0.0.1:14000/tx/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 63 at 2026-10-09T01:41:02.000000Z. From 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin). Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 28963 of limit 200000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000000007752902729",
+    "parts": {
+     "fee": "0.000000007752902729"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    }
+   ],
+   "text": "Fee paid: 0.000000007752902729 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "abi_origin": "repo_pinned",
+    "args": {
+     "newPauser": "0x3C44CDDdb6A900fA2b585D8C4E1a7C9ee5f0f9C3"
+    },
+    "function": "setPauser"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Repository cloudwallk/brlc-token@74a5498",
+     "url": "https://github.com/cloudwallk/brlc-token/blob/74a5498d04b10dc882e48273a38b98b4275463bd/contracts/BRLCToken.sol#L12-L60"
+    }
+   ],
+   "text": "Called setPauser(address) on 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin) with newPauser=0x3C44CDDdb6A900fA2b585D8C4E1a7C9ee5f0f9C3. ABI source: repository cloudwallk/brlc-token@74a5498: BRLCToken (pinned to this address in the config)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "computed": {},
+    "label": "UNKNOWN",
+    "level": "single_source",
+    "next_steps": {
+     "developer": [
+      "Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again, so the fee is not charged again for the same failure."
+     ]
+    },
+    "reads": [],
+    "rule": "no_reason"
+   },
+   "id": "E4",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    }
+   ],
+   "text": "UNKNOWN: No reason is available for this failure. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again, so the fee is not charged again for the same failure. Next step for a developer: Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "block": 62,
+    "reason": "Ownable: caller is not the owner",
+    "revert_data": "0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000204f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572",
+    "revert_kind": "error_string",
+    "reverted": true
+   },
+   "id": "E5",
+   "kind": "replay",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f from 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    }
+   ],
+   "text": "Re-run on the node at block 62, the block before, with the transaction's own call, it reverted with the reason 'Ownable: caller is not the owner'. The replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends), so this may differ from what happened in the original transaction."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "from_replay": true,
+    "label": "LIKELY",
+    "level": "candidate",
+    "next_steps": {
+     "developer": [
+      "The refusal comes from a permission check: sending the same call again unchanged fails the same way and costs the fee again.",
+      "Find which account the check refused (OpenZeppelin v5 errors name it) and whether it should hold the permission; if it should, ask the contract's operators to grant it."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again."
+     ]
+    },
+    "reads": [],
+    "replay": "E5",
+    "rule": "replay"
+   },
+   "id": "E6",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f from 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    },
+    {
+     "detail": null,
+     "kind": "repo",
+     "label": "Source of the rule's meaning",
+     "url": "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/dc44c9f1a4c3b10af99492eed84f83ed244203f6/contracts/access/Ownable.sol#L51"
+    }
+   ],
+   "text": "LIKELY: Possible cause, from the replay (E5): the replay reverted with the reason 'Ownable: caller is not the owner', an access check (an owner or a role) refusing the caller. If the original transaction failed the same way, that is its cause. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again. Next step for a developer: The refusal comes from a permission check: sending the same call again unchanged fails the same way and costs the fee again. Next step for a developer: Find which account the check refused (OpenZeppelin v5 errors name it) and whether it should hold the permission; if it should, ask the contract's operators to grant it."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E7",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "gas_limit": 200000,
+      "gas_used": 38817,
+      "hash": "0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd",
+      "method": "0x23b872dd",
+      "nonce": 0,
+      "result": "awaiting_internal_transactions",
+      "this": false,
+      "timestamp": "2026-10-09T01:40:52.000000Z",
+      "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+     },
+     {
+      "gas_limit": 200000,
+      "gas_used": 28963,
+      "hash": "0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f",
+      "method": "0x2d88af4a",
+      "nonce": 1,
+      "result": "awaiting_internal_transactions",
+      "this": true,
+      "timestamp": "2026-10-09T01:41:02.000000Z",
+      "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+     }
+    ]
+   },
+   "id": "E8",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "http://127.0.0.1:14000/api/v2/addresses/0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 0: 0x23b872dd to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, failed ('awaiting_internal_transactions'), at 2026-10-09T01:40:52.000000Z; nonce 1: 0x2d88af4a to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, failed ('awaiting_internal_transactions'), at 2026-10-09T01:41:02.000000Z (this transaction)."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 200000,
+    "used": 28963
+   },
+   "id": "E9",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 28963 of the 200000 limit (14.5%)."
+  }
+ ],
+ "network": "anychain-devnet",
+ "status": "failed",
+ "tx_hash": "0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f"
+}

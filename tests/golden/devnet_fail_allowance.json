@@ -1,0 +1,264 @@
+{
+ "abi_sources": {
+  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512": "none"
+ },
+ "gaps": [
+  {
+   "cause": "not_interpretable",
+   "needed": "A node that can re-execute or trace the call (debug/trace RPC)",
+   "retryable": false,
+   "what": "Revert reason",
+   "why": "the explorer did not report why the transaction failed"
+  },
+  {
+   "cause": "not_interpretable",
+   "needed": "A verified contract on the explorer, or the contract ABI in a configured repo",
+   "retryable": false,
+   "what": "Call decoding",
+   "why": "no ABI for 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 matches selector 0x23b872dd"
+  },
+  {
+   "cause": "source_behind",
+   "needed": "Ask again in a few minutes",
+   "retryable": true,
+   "what": "Internal calls",
+   "why": "the explorer is still indexing this transaction's internal calls"
+  }
+ ],
+ "items": [
+  {
+   "confidence": "single_source",
+   "data": {
+    "block": 58,
+    "from": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+    "gas_limit": "200000",
+    "gas_used": "38817",
+    "status": "failed",
+    "timestamp": "2026-10-09T01:40:52.000000Z",
+    "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "tx_type": 2,
+    "value": "0"
+   },
+   "id": "E1",
+   "kind": "overview",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_ui",
+     "label": "Explorer page",
+     "url": "http://127.0.0.1:14000/tx/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    }
+   ],
+   "text": "Transaction failed (reverted) in block 58 at 2026-10-09T01:40:52.000000Z. From 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin). Native value attached: 0 ETH, not transferred because the transaction reverted. Gas used 38817 of limit 200000."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "fee": "0.000000020219154228",
+    "parts": {
+     "fee": "0.000000020219154228"
+    },
+    "token": "ETH"
+   },
+   "id": "E2",
+   "kind": "fee",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    }
+   ],
+   "text": "Fee paid: 0.000000020219154228 ETH. The fee is charged even though the transaction failed."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "selector": "0x23b872dd"
+   },
+   "id": "E3",
+   "kind": "call",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    }
+   ],
+   "text": "Called function with selector 0x23b872dd on 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin); not decoded."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "computed": {},
+    "label": "UNKNOWN",
+    "level": "single_source",
+    "next_steps": {
+     "developer": [
+      "Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again, so the fee is not charged again for the same failure."
+     ]
+    },
+    "reads": [],
+    "rule": "no_reason"
+   },
+   "id": "E4",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    }
+   ],
+   "text": "UNKNOWN: No reason is available for this failure. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again, so the fee is not charged again for the same failure. Next step for a developer: Find where it reverted with a node that can trace the transaction, or ask the contract's developers."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "block": 57,
+    "reason": "ERC20: insufficient allowance",
+    "revert_data": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001d45524332303a20696e73756666696369656e7420616c6c6f77616e6365000000",
+    "revert_kind": "error_string",
+    "reverted": true
+   },
+   "id": "E5",
+   "kind": "replay",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd from 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    }
+   ],
+   "text": "Re-run on the node at block 57, the block before, with the transaction's own call, it reverted with the reason 'ERC20: insufficient allowance'. The replay is run on the parent block's state and context (its block number and time), without the transactions that came before it in its own block, and without charging the gas cost (nodes still check that the sender holds the value it sends), so this may differ from what happened in the original transaction."
+  },
+  {
+   "confidence": "candidate",
+   "data": {
+    "from_replay": true,
+    "label": "LIKELY",
+    "level": "candidate",
+    "next_steps": {
+     "developer": [
+      "Approve the spender for at least the amount (an approve transaction from the token holder), then send again."
+     ],
+     "support": [
+      "Contact the app's support with the link to this transaction before trying again."
+     ]
+    },
+    "reads": [],
+    "replay": "E5",
+    "rule": "replay"
+   },
+   "id": "E6",
+   "kind": "diagnosis",
+   "sources": [
+    {
+     "detail": "eth_call replay of 0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd from 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc with its gas limit",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    }
+   ],
+   "text": "LIKELY: Possible cause, from the replay (E5): the replay reverted with the reason 'ERC20: insufficient allowance', the standard ERC-20 message for moving tokens beyond an approval. If the original transaction failed the same way, that is its cause. Next step for a non-technical reader: Contact the app's support with the link to this transaction before trying again. Next step for a developer: Approve the spender for at least the amount (an approve transaction from the token holder), then send again."
+  },
+  {
+   "confidence": "confirmed",
+   "data": {
+    "agrees": true,
+    "rpc_status": "failed"
+   },
+   "id": "E7",
+   "kind": "cross_check",
+   "sources": [
+    {
+     "detail": "eth_getTransactionReceipt [0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd]",
+     "kind": "rpc",
+     "label": "JSON-RPC",
+     "url": "http://127.0.0.1:18545"
+    },
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    }
+   ],
+   "text": "RPC receipt independently reports status failed, matching the explorer."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "rows": [
+     {
+      "gas_limit": 200000,
+      "gas_used": 38817,
+      "hash": "0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd",
+      "method": "0x23b872dd",
+      "nonce": 0,
+      "result": "awaiting_internal_transactions",
+      "this": true,
+      "timestamp": "2026-10-09T01:40:52.000000Z",
+      "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+     },
+     {
+      "gas_limit": 200000,
+      "gas_used": 28963,
+      "hash": "0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f",
+      "method": "0x2d88af4a",
+      "nonce": 1,
+      "result": "awaiting_internal_transactions",
+      "this": false,
+      "timestamp": "2026-10-09T01:41:02.000000Z",
+      "to": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+     }
+    ]
+   },
+   "id": "E8",
+   "kind": "timeline",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: the sender's transactions",
+     "url": "http://127.0.0.1:14000/api/v2/addresses/0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC/transactions?filter=from"
+    }
+   ],
+   "text": "The sender's own transactions around this failure, by nonce: nonce 0: 0x23b872dd to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, failed ('awaiting_internal_transactions'), at 2026-10-09T01:40:52.000000Z (this transaction); nonce 1: 0x2d88af4a to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, failed ('awaiting_internal_transactions'), at 2026-10-09T01:41:02.000000Z."
+  },
+  {
+   "confidence": "single_source",
+   "data": {
+    "limit": 200000,
+    "used": 38817
+   },
+   "id": "E9",
+   "kind": "gas_note",
+   "sources": [
+    {
+     "detail": null,
+     "kind": "explorer_api",
+     "label": "Explorer API: transaction",
+     "url": "http://127.0.0.1:14000/api/v2/transactions/0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+    }
+   ],
+   "text": "Gas notes (heuristic, not a finding): Gas used 38817 of the 200000 limit (19.4%)."
+  }
+ ],
+ "network": "anychain-devnet",
+ "status": "failed",
+ "tx_hash": "0x330ac67b87203587e4de33001e7fa2b80467570235dcfd135ec66f0f45b629fd"
+}
