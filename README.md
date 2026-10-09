@@ -488,7 +488,7 @@ Run 2026-10-09 10:10, commit 9a151ac, model claude-sonnet-5-5. Every case is a r
 | second_network_failure | optimism-mainnet | ok failed | ok deadline LIKELY | ok signature_db |  not_interpretable | ok | 9/13 | 1/1 | 2/2 | 11.9 | 4839/658 |
 | allowance_devnet | anychain-devnet | ok failed | ok no_reason UNKNOWN (replay: insufficient_allowance) | ok raw | ok not_interpretable, source_behind | ok | 16/24 | 1/1 | 2/2 | 8.4 | 4512/779 |
 
-Citation coverage varies between runs of the same commit and prompts: 78.1% to 84.0% in the three runs of 2026-10-09 (the model writes differently each time); the other metrics did not move.
+Citation coverage varies between runs of the same commit and prompts: 78.1% and 84.0% in the two runs of 2026-10-09 with the final prompts (the model writes differently each time); the other metrics did not move.
 
 The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network, where the explorer gives no reason and the replay on the node finds "insufficient allowance" (D60). "First drafts the check caught" counts answers the model had to rewrite because they stated a value or cited a fact not in the evidence: none in this run. Earlier runs showed one ("E624"), which turned out to be the check's mistake, not the model's: a shortened address ("0x52b2…E624") read as a citation; fixed (D62).
 
