@@ -38,7 +38,7 @@ Interfaces: a **web page** (a conversation), a **CLI** (`explain`, `chat`, `batc
 
 Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). The written answer needs a model: the local [Claude Code](https://claude.com/claude-code) CLI (the default, logged in, no key), or an Anthropic or OpenAI API key saved once with `anychain llm set` (kept outside the repository). Without a model everything still runs and shows the facts only (`--no-llm`).
 
-**Which model:** with an OpenAI key, use **gpt-4.1-mini** (or larger), not gpt-4.1-nano. The code keeps the facts right with both, but on open chat questions nano misread a fact it cited correctly twice in a row (a deadline of 2400, which is a date in 1970, read as "2400 seconds, 40 minutes") and its Portuguese is stiff; mini got it right. Measured cost per written answer: about US$ 0.0004 (nano), US$ 0.002 (mini), US$ 0.027 (Claude Sonnet). Details: [docs/EVALUATION.md](docs/EVALUATION.md).
+**Which model:** with an OpenAI key, use **gpt-4.1-mini** or larger (about US$ 0.002 per answer); gpt-4.1-nano misreads facts on open questions. Comparison: [docs/EVALUATION.md](docs/EVALUATION.md).
 
 ```bash
 git clone https://github.com/Ebaoj/anychain.git && cd anychain
@@ -111,13 +111,13 @@ No code change is needed: the same steps took the tool from Ethereum to five oth
 
 ## How it works
 
-- **Collectors:** the explorer (Blockscout API v2) and the network's node (JSON-RPC) are read in parallel, each request bounded by a time budget; every failure becomes a **gap** with a cause and a "worth retrying" flag, never an error on screen. The node checks the explorer (status, receipt, gas); a network-type profile handles fees, L1 status and deposits per chain type.
-- **Decoder and ABI cascade:** explorer ABI (proxies and EIP-7702 delegates followed) → repo artifacts (the address checked against the artifact's own list) → signatures from repo sources → a public signature database (candidates only, never facts) → raw data, declared.
-- **Diagnosis:** finds where a failure began (an inner call's execution error first), reads the reason at the top, proves it with reads on the node at the parent block (balance, allowance, owner, roles, paused, decimals), and checks that the conclusion explains every failure signal; a signal left over lowers CONFIRMED to LIKELY. Next steps for a non-technical reader and for a developer.
-- **Context facts:** the called function's verified code (numbered lines, the reason's line), heuristic security notes, the sender's timeline around a failure (retries, approvals, repeated failures), gas notes.
-- **Writer and check:** one prompt per mode; the model receives only the facts and the gaps (no API or node addresses); every number, address, hash, link and citation in its answer must be in the evidence (a number may be rounded or cut to the precision written, "cerca de 0,00012 ETH" for a fee of 0.00011683874115936 ETH, but never changed), else it retries once, else the answer is withheld and the facts are shown.
-- **The chat, a harness more than a chatbot:** rules route clear questions ("taxa", "fee", "atendente") with no model; a classifier (the reader's chosen model, one label from a closed list) routes the rest. For the common questions (did it work, why it failed, did the money move or come back, the fee, when, what to do, "it was my electricity bill: is it paid?") the code builds the answer's statements from the facts and the cheap model only writes them; a person or an off-topic request gets a fixed reply with no model. Everything else goes to the chat with tools: the model asks for data in JSON (a read on the node, a function's code, a repo file, another transaction), our code runs it and adds a sourced fact. Every chat answer passes the value check and a **statement check** that rejects wrong claims without numbers: "it worked" for a failure, "the money came back" with no transfer back, "try again" after a later success, or a bill "paid" when the chain cannot know. Two failures: the code's own sentences. Measured on 60 labelled questions in three languages: 96.6% with gpt-4.1-nano, 100% with Claude ([eval/intents.md](eval/intents.md); design and prototype in [docs/specs/CHAT_HARNESS.md](docs/specs/CHAT_HARNESS.md)).
-- **Storage:** SQLite event log (one row per answer: gaps by cause, label, ABI source, cache, mode, tokens, cost, feedback) and a cache by network and hash for final, complete transactions.
+- **Collectors:** the explorer (Blockscout API v2) and the node (JSON-RPC), read in parallel under a time budget. The node cross-checks the explorer; any failure becomes a declared gap, never an error.
+- **Decoding:** explorer ABI (proxies followed) → repository artifacts → repository source signatures → public signature database (candidates only) → raw data.
+- **Diagnosis:** rules start from where the failure began, prove it with reads on the node at the parent block (balance, allowance, owner, roles), and label it CONFIRMED, LIKELY or UNKNOWN, with next steps per reader.
+- **Context:** the called function's verified code, the sender's timeline around a failure, heuristic gas and security notes.
+- **Writing and checking:** the model sees only the facts; every number, address, link and citation it writes must be in them (one retry, then the facts are shown instead).
+- **Chat:** rules and a classifier pick the question type; for common questions the code builds the answer and the model only writes it; a statement check rejects wrong claims such as "try again" after a later success. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) section 4.
+- **Storage:** an SQLite event log (one row per answer) and a cache of final transactions.
 
 To follow one transaction through the code in two minutes: [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). Diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -318,7 +318,7 @@ Per case, the OpenAI models compared (gpt-4.1-mini is the one recommended) and a
 
 ## Measuring impact
 
-How it would reach a support team (shadow mode, then 10%, 25%, 50%, 100% of transaction tickets), the hypothesis (fewer escalations to engineering, faster diagnosis, no more wrong answers sent), primary and guard metrics, when to scale or roll back, and the unit economics (about US$ 0.027 per written answer, measured): [docs/IMPACT.md](docs/IMPACT.md). Every answer is logged to SQLite; `anychain metrics` prints usage numbers with the SQL behind each.
+[docs/IMPACT.md](docs/IMPACT.md): a rollout to support (shadow mode, then 10% to 100% of transaction tickets), the hypothesis (fewer escalations, faster diagnosis), primary and guard metrics, when to scale or roll back, and the cost per answer. `anychain metrics` prints usage numbers with the SQL behind each.
 
 ---
 
@@ -327,7 +327,7 @@ How it would reach a support team (shadow mode, then 10%, 25%, 50%, 100% of tran
 - **No trace yet:** `debug_traceTransaction` is not called; failures are explained from the explorer, reads on the node and a replay. The config's `rpc.supports_debug_trace` records which nodes serve it.
 - **Public nodes** keep about the last 128 blocks of state, so reads for older failures are refused and said as a gap; an archive node removes that.
 - **Heuristics stay heuristics:** security and gas notes are pattern matches on the shown code, never an audit.
-- **The chat remembers the conversation** (the reader's first message, the explanation they read, the questions since; kept in the browser across a reload or a restart of the service). A request for a person is answered and logged, but nothing opens a ticket yet, and nothing is kept per customer on a server ([docs/ROADMAP.md](docs/ROADMAP.md)). The statement check covers the claims found wrong in practice, not every interpretation: an open question can still get a misreading of a fact it cites correctly (seen live: a deadline of 2400 read as "00:40 the next day"; it is 1970-01-01 00:40). Common questions go through answers built by code for that reason.
+- **Chat:** a request for a person is answered and logged, but no ticket is opened yet; the conversation lives in the browser, not per customer on a server. The statement check covers the wrong claims seen in practice, not every misreading of a fact on an open question.
 - **The private network** runs on a private server and was rebuilt by hand; everything it produced is recorded in the repository and replayed by the tests.
 
 ---

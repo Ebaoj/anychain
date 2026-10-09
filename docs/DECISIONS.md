@@ -593,3 +593,7 @@ A bug hunt with varied real transactions found facts that were well formatted, s
 
 ## D77. The recommended minimum shown where the model is chosen (the author, 2026-10-09)
 - The model list (page and `anychain llm set`) marks gpt-4.1-mini "recommended minimum" and gpt-4.1-nano "not recommended: misreads facts on open questions" (D76); the settings panel says: recommended minimum gpt-4.1-mini (OpenAI) or Claude Sonnet (Anthropic). Test first.
+
+## D78. A shorter README after the second independent grade (2026-10-09)
+- A grader on Opus with only the case statement and the public repository gave 8.6 of 10 and would advance the candidate; README and communication scored 7.5 ("dense after the first minute, paragraph-length bullets, unusual prose"). The "How it works" items are now one or two lines each (the chat's detail is in docs/ARCHITECTURE.md section 4), the model recommendation and the chat's limit are one line each, and the impact summary points to docs/IMPACT.md, which now also gives the break-even with the recommended gpt-4.1-mini.
+- The other low score, code and architecture (7.0), is the 1,836-line `BundleBuilder`; its split is the next change.

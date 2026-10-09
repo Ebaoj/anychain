@@ -67,5 +67,7 @@ The numbers below are **assumptions to replace with CloudWalk's own**, written s
 | Escalation | an escalated ticket takes an engineer 30 minutes at US$ 60 per hour (US$ 30) | **one avoided escalation pays for about 1,100 answers** |
 | Volume | 10,000 transaction tickets a month, one answer each, plus two follow-up questions | about **US$ 800 a month** in model cost (30,000 answers × 0.027), before the cache, which serves a repeated final transaction without a new answer from the sources |
 
+With the recommended gpt-4.1-mini (about US$ 0.002 per answer, measured, D76) the same assumptions give about 0.5 seconds of an agent to break even, one avoided escalation for about 16,000 answers, and about US$ 60 a month for 30,000 answers.
+
 So the cost of the model is not what decides the rollout: the guard metrics are (section 5). A wrong answer sent to a merchant costs more than thousands of right ones, which is why the agent reads the answer first and why the experiment stops on any confirmed hallucination. A cheaper model (gpt-4.1-nano kept 100% of the key values and facts in the eval, D62 and D68) lowers the cost further, at some loss of citation coverage and plain wording.
 
