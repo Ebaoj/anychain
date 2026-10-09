@@ -655,7 +655,8 @@ function showSuggestions(on) {
 async function send(text) {
   text = String(text || "").trim();
   if (!text) return;
-  say("me", esc(text).replace(/\n/g, "<br>"));
+  showMine(text);
+  remember({k: "me", text});
   $("question").value = "";
   checkHash();
   const tx = text.match(HASH), address = tx ? null : text.match(ADDRESS);
@@ -665,7 +666,7 @@ async function send(text) {
     return explain({hash: code, mode: $("mode").value, write: !$("factsOnly").checked,
                     ...(question.length > 3 ? {question} : {})});
   }
-  if (!state.hash) { sayText(t("askForCode")); return; }
+  if (!state.hash) { sayText(t("askForCode")); remember({k: "text", text: t("askForCode")}); return; }
   return followUp(text);
 }
 
@@ -677,16 +678,13 @@ async function explain(request) {
     const a = await api("/explain", request);
     if (generation !== state.generation) return;
     wait.done();
-    if (a.clarify) { clarify(a.clarify, request); return; }
-    state.hash = request.hash; state.mode = request.mode; state.runId = a.run_id; state.sessionId = null;
-    $("hash").value = request.hash;
-    renderAnswer(a);
-    say("bot", $("answer").innerHTML);
-    showSuggestions(true);
-    $("newChat").classList.remove("hidden");
+    if (a.clarify) { clarify(a.clarify, request); remember({k: "clarify", c: a.clarify, request}); return; }
+    showAnswer(a, request);
+    remember({k: "answer", a, request});
   } catch (err) {
     wait.done();
-    say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(err.message)}</div>`);
+    showError(err.message);
+    remember({k: "error", text: err.message});
   } finally {
     $("chatButton").disabled = false;
     $("question").focus();
@@ -700,7 +698,8 @@ function clarify(c, request) {
   const row = sayText(text || c.question);
   const label = (o) => c.kind === "intent" ? ({swap: t("optSwap"), other: t("optOther")}[o.id] || o.label) : o.label;
   chipsInto(row, c.options.map((o) => ({label: label(o), title: o.id, onClick: () => {
-    say("me", esc(label(o)));
+    showMine(label(o));
+    remember({k: "me", text: label(o)});
     const next = {...request, clarified: {kind: c.kind, answer: o.id}};
     if (c.kind === "which_transaction") next.hash = o.id;
     explain(next);
@@ -725,18 +724,13 @@ async function followUp(message) {
     const r = await api("/chat", body);
     wait.done();
     if (generation !== state.generation) return;  // another transaction was explained meanwhile
-    state.sessionId = r.session_id;
-    if (r.evidence) state.evidence = new Map(r.evidence.map((e) => [e.id, e]));  // the conversation's own facts
-    for (const f of r.new_facts) state.evidence.set(f.id, f);
-    renderFacts();
-    const tools = r.tool_calls.map((c) => `<div class="tool">🔎 ${esc(c.tool || "request")}: ${typeof c.result === "string" ? esc(c.result) : c.result.map((id) => `<a class="cite" href="#fact-${esc(id)}" data-fact="${esc(id)}">${esc(id)}</a>`).join(" ")}</div>`).join("");
-    const text = r.answer ? markdown(r.answer) :
-      `<p class="muted">${esc(r.outcome === "withheld" ? t("noSummary_withheld") : r.error || "—")}</p>`;
-    say("bot", `${tools}${text}<div class="answer-foot">${feedbackHtml(r.run_id)}</div>`);
+    showChat(r);
+    remember({k: "chat", r});
   } catch (err) {
     wait.done();
     if (err.status === 404) { state.sessionId = null; state.runId = null; }  // expired: the next question starts anew
-    say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(err.message)}</div>`);
+    showError(err.message);
+    remember({k: "error", text: err.message});
   } finally {
     $("chatButton").disabled = false;
     $("question").focus();
@@ -760,8 +754,71 @@ function checkHash() {
 }
 $("question").addEventListener("input", checkHash);
 
+// What each kind of message shows; used live and when a saved conversation is shown again after a reload.
+function showMine(text) { say("me", esc(text).replace(/\n/g, "<br>")); }
+function showError(text) { say("bot", `<div class="error">${esc(t("errorPrefix"))} ${esc(text)}</div>`); }
+function showAnswer(a, request) {
+  state.hash = request.hash; state.mode = request.mode; state.runId = a.run_id; state.sessionId = null;
+  state.pendingClarify = null;  // the clarifying question, if any, was answered by this explanation
+  $("hash").value = request.hash;
+  renderAnswer(a);
+  say("bot", $("answer").innerHTML);
+  showSuggestions(true);
+  $("newChat").classList.remove("hidden");
+}
+function showChat(r) {
+  state.sessionId = r.session_id;
+  if (r.evidence) state.evidence = new Map(r.evidence.map((e) => [e.id, e]));  // the conversation's own facts
+  for (const f of r.new_facts) state.evidence.set(f.id, f);
+  renderFacts();
+  const tools = r.tool_calls.map((c) => `<div class="tool">🔎 ${esc(c.tool || "request")}: ${typeof c.result === "string" ? esc(c.result) : c.result.map((id) => `<a class="cite" href="#fact-${esc(id)}" data-fact="${esc(id)}">${esc(id)}</a>`).join(" ")}</div>`).join("");
+  const text = r.answer ? markdown(r.answer) :
+    `<p class="muted">${esc(r.outcome === "withheld" ? t("noSummary_withheld") : r.error || "—")}</p>`;
+  say("bot", `${tools}${text}<div class="answer-foot">${feedbackHtml(r.run_id)}</div>`);
+}
+
+// ---- the conversation survives a reload (D72): kept in this browser as data (the messages and the API's answers),
+// one per way of using it, and shown again through the same functions, so everything is escaped as when it came.
+// Never stored as markup. A conversation of another network is not shown. "New conversation" forgets it. ----
+const STORE = "anychain.conversation.";
+let kept = [];
+function storeKey() { return STORE + $("mode").value; }
+function remember(entry) {
+  kept.push(entry);
+  const save = (entries) => localStorage.setItem(storeKey(), JSON.stringify({network: state.network, entries}));
+  try { save(kept); }
+  catch {  // full or switched off: keep the latest messages, or nothing; the conversation itself still works
+    try { save(kept.slice(-6)); } catch { /* not kept */ }
+  }
+}
+function forget() {
+  kept = [];
+  try { localStorage.removeItem(storeKey()); } catch { /* storage may be off */ }
+}
+function restore() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(storeKey()) || "null"); } catch { saved = null; }
+  if (!saved || !Array.isArray(saved.entries) || !state.network || saved.network !== state.network) return;
+  for (const e of saved.entries) {
+    try {
+      if (e.k === "me") showMine(e.text);
+      else if (e.k === "text") sayText(e.text);
+      else if (e.k === "error") showError(e.text);
+      else if (e.k === "answer") showAnswer(e.a, e.request);
+      else if (e.k === "clarify") clarify(e.c, e.request);
+      else if (e.k === "chat") showChat(e.r);
+    } catch { /* a saved message this page version cannot show is skipped */ }
+  }
+  kept = saved.entries;
+}
+
 function newConversation() {
+  forget();
+  resetView();
+}
+function resetView() {
   ++state.generation;
+  kept = [];
   state.hash = null; state.runId = null; state.sessionId = null; state.pendingClarify = null;
   state.evidence = new Map();
   ["statusLine", "steps", "diagnosis", "security", "gaps", "movements", "sources"].forEach((id) => { $(id).innerHTML = ""; });
@@ -787,7 +844,7 @@ function route() {
   $("personaSelect").value = persona;
   if (persona === "support") $("factsOnly").checked = false;
   $("proof").classList.toggle("closed", persona === "support" || window.innerWidth <= 920);
-  if (changed) newConversation();
+  if (changed) { resetView(); restore(); }
   try { localStorage.setItem("anychain.persona", persona); } catch { /* storage may be off */ }
 }
 window.addEventListener("hashchange", route);
@@ -819,10 +876,11 @@ async function loadNetworks() {
       }
     }
     const active = n.networks.find((x) => x.active);
+    state.network = active ? active.name : null;
     $("networkInfo").textContent = active ? `${t("netActive")}: ${active.name} · chain ${active.chain_id} · ${active.explorer}` : "";
     const first = !state.examples;
     state.examples = n.examples || [];
-    if (first && document.body.dataset.persona && !state.hash) welcome();
+    if (first && document.body.dataset.persona && !state.hash) { welcome(); restore(); }
     return active;
   } catch (err) { $("networkInfo").textContent = err.message; return null; }
 }

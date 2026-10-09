@@ -92,3 +92,16 @@ def test_the_page_escapes_every_text_it_shows(tmp_path):
     for raw in ("<img", "<svg", "<b>", "<i>", 'onclick="alert', "onerror=alert(1)>"):
         assert raw not in html, raw
     assert len(re.findall(r"&lt;img src=x onerror=alert\(1\)&gt;", html)) > 10  # the texts are there, escaped
+
+
+def test_the_conversation_is_kept_as_data_and_shown_again_escaped():
+    """D72: a reload shows the conversation again. It is kept in the browser as data (the messages and the API's
+    answers) and shown through the same functions as when it came, which escape it; it is never stored as markup."""
+    page = PAGE.read_text()
+    assert "localStorage.setItem(storeKey(), JSON.stringify({network: state.network, entries}))" in page
+    restore = page[page.index("function restore()"):page.index("function newConversation()")]
+    for shown in ("showMine(e.text)", "sayText(e.text)", "showError(e.text)", "showAnswer(e.a, e.request)",
+                  "clarify(e.c, e.request)", "showChat(e.r)"):
+        assert shown in restore, shown
+    assert "innerHTML" not in restore  # nothing saved goes into the page as markup
+    assert "saved.network !== state.network" in restore  # another network's conversation is not shown
