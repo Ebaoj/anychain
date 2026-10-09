@@ -14,9 +14,12 @@ recording (no network), the configured model writes the answer through the same 
 
 The report goes to eval/report.md and eval/report.json, with the date, the commit and the model.
 """
+import functools
 import json
 import re
+import shutil
 import subprocess
+import tempfile
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -65,8 +68,20 @@ def load_cases(path: Path) -> list[dict]:
     return yaml.safe_load(path.read_text())["cases"]
 
 
+@functools.cache
+def _recorded_storage() -> str:
+    """A cache folder holding only what the repository records (the configured repositories' snapshots and the
+    signature database's recorded answers), so the eval gives the same result on a fresh clone as here: it never
+    reads the local cache in data/, which a clone does not have."""
+    folder = Path(tempfile.mkdtemp(prefix="anychain-eval-"))
+    shutil.copytree(ROOT / "tests" / "fixtures_repos" / "repos", folder / "repos")
+    shutil.copy(ROOT / "tests" / "fixtures_signatures" / "signatures.json", folder / "signatures.json")
+    return str(folder)
+
+
 def run_case(case: dict, write: bool, backend=None) -> CaseResult:
     cfg = load_config(str(ROOT / "configs" / f"{case['config']}.yaml"))
+    cfg = cfg.model_copy(update={"storage": cfg.storage.model_copy(update={"cache_dir": _recorded_storage()})})
     fixture = ROOT / "tests" / "fixtures" / f"{case['fixture']}.json"
     transport = ReplayTransport(fixture, set(case.get("offline_hosts") or []))
     client = httpx.Client(transport=transport)

@@ -1,6 +1,6 @@
 # Commit ids quoted in the documents
 
-The documents (eval reports, decisions) quote commit ids of the development history. Before publishing, that history was rewritten once to replace personal details (the author's e-mail address and the names of home machines); nothing else in any commit changed, but each commit got a new id. This table gives the public id of every commit a document quotes.
+The documents (eval reports, decisions) quote commit ids of the development history. Before publishing, that history was rewritten once to replace personal details (the author's e-mail address and private host names); nothing else in any commit changed, but each commit got a new id. This table gives the public id of every commit a document quotes.
 
 | Quoted id | Public id | Commit |
 |---|---|---|

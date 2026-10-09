@@ -52,5 +52,20 @@ A rollback is a flag in the support tool: the answer stops being shown, recordin
 ## 6. What it does not measure yet
 
 - Answers to customers directly (only after the agent-facing stages).
-- Phase 4's triage (finding the transaction from a description); until then only tickets with a hash are in the experiment.
+- Tickets without a hash: the triage (D55) finds the transaction from an address and asks one question, but how often it finds the right one on real tickets is measured only once tickets carry its outcome.
 - Long-term effects: fewer repeated tickets for the same cause, product fixes found from the failure causes the log counts (`anychain metrics` "failure causes" per network).
+
+## 7. Unit economics: when does it pay for itself
+
+Measured here: a written answer costs about **US$ 0.027** with Claude Sonnet (US$ 0.2954 for the 11 answers of the official eval, as the backend reports it) and takes about 10 seconds; the facts alone (no model) cost nothing but the explorer's and the node's requests. The OpenAI backend reports tokens, not cost.
+
+The numbers below are **assumptions to replace with CloudWalk's own**, written so the reasoning can be checked:
+
+| | Assumption | What it gives |
+|---|---|---|
+| Support time | an agent costs US$ 15 per hour, loaded | one answer pays for itself if it saves **about 6.5 seconds** of the agent's time (0.027 / 15 × 3600) |
+| Escalation | an escalated ticket takes an engineer 30 minutes at US$ 60 per hour (US$ 30) | **one avoided escalation pays for about 1,100 answers** |
+| Volume | 10,000 transaction tickets a month, one answer each, plus two follow-up questions | about **US$ 800 a month** in model cost (30,000 answers × 0.027), before the cache, which serves a repeated final transaction without a new answer from the sources |
+
+So the cost of the model is not what decides the rollout: the guard metrics are (section 5). A wrong answer sent to a merchant costs more than thousands of right ones, which is why the agent reads the answer first and why the experiment stops on any confirmed hallucination. A cheaper model (gpt-4.1-nano kept 100% of the key values and facts in the eval, D62 and D68) lowers the cost further, at some loss of citation coverage and plain wording.
+

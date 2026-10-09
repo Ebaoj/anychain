@@ -99,3 +99,21 @@ def test_the_command_creates_the_output_folder(tmp_path):
     result = CliRunner().invoke(cli.app, ["eval", "--cases", str(cases), "--no-llm", "--out", str(out)])
     assert result.exit_code == 0, result.output
     assert (out / "report.md").exists()
+
+
+def test_the_eval_gives_the_same_result_on_a_fresh_clone(tmp_path):
+    """The eval reads only what the repository records: run where no local cache exists (data/cache is relative to
+    the working folder), the cases that need the signature database or a configured repository still pass."""
+    import subprocess
+    import sys
+    cases = tmp_path / "cases.yaml"
+    picked = [c for c in load_cases(CASES) if c["id"] in ("second_network_failure", "unverified_contract")]
+    cases.write_text(yaml.safe_dump({"cases": picked}))
+    out = tmp_path / "out"
+    run = subprocess.run([sys.executable, "-c", "from anychain.cli import app; app()", "eval", "--cases", str(cases),
+                          "--no-llm", "--out", str(out)], cwd=tmp_path, capture_output=True, text=True, timeout=300)
+    assert run.returncode == 0, run.stderr[-2000:]
+    report = json.loads((out / "report.json").read_text())
+    assert report["summary"]["abi_source_accuracy"] == 100.0
+    for case in report["cases"]:
+        assert "config_error" not in case["got"]["gaps"], case["id"]

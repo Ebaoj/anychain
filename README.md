@@ -52,6 +52,9 @@ Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). The written answer n
 git clone https://github.com/Ebaoj/anychain.git && cd anychain
 uv sync
 
+# download the configured contract repositories, pinned to their commits (once; `explain` only reads this local copy)
+uv run anychain repos sync --config configs/ethereum-mainnet.yaml
+
 # choose the model (skip if Claude Code is installed and logged in); the key is asked for, not shown
 uv run anychain llm set --provider anthropic            # or openai; then pick the model from the provider's list
 uv run anychain llm test --config configs/ethereum-mainnet.yaml
@@ -569,7 +572,7 @@ Run 2026-10-09 11:14, commit 88155eb, model claude-sonnet-5-5. Every case is a r
 
 </details>
 
-The commit ids quoted in reports and decisions are those of the development history; their public ids are in [docs/COMMIT_MAP.md](docs/COMMIT_MAP.md) (the history was rewritten once to remove personal details). Citation coverage varies between runs while the other metrics hold: 84.0% and 78.1% in two runs of the same prompts and evidence, 81.1% in this run after the repository fact was added (D69); the model writes differently each time.
+The commit ids quoted in reports and decisions are those of the development history; their public ids are in [docs/COMMIT_MAP.md](docs/COMMIT_MAP.md) (the history was rewritten once to remove personal data). Citation coverage varies between runs while the other metrics hold: 84.0% and 78.1% in two runs of the same prompts and evidence, 81.1% in this run after the repository fact was added (D69); the model writes differently each time.
 
 The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network, where the explorer gives no reason and the replay on the node finds "insufficient allowance" (D60). "First drafts the check caught" counts answers the model had to rewrite because they stated a value or cited a fact not in the evidence: none in this run. Earlier runs showed one ("E624"), which turned out to be the check's mistake, not the model's: a shortened address ("0x52b2…E624") read as a citation; fixed (D62).
 
@@ -631,6 +634,7 @@ GROUP BY mode ORDER BY mode;
 - **Hypothesis:** for transaction tickets, support resolves more without escalating to engineering, faster, without more wrong answers sent. Target to test: a 30% relative drop in escalations (an assumption, measured against a baseline).
 - **Primary metrics:** resolution without escalation; time from ticket open to the first message stating the cause. **Guard metrics:** answers corrected by humans (edited cause, 👎, ticket reopened), reported hallucinations (target zero, each one becomes a test), answers withheld or without a model. **Health:** gaps by cause per network, cost, latency and cache per answer.
 - **Experiment:** two weeks in shadow (answers recorded, never shown) for the baseline and the guards, then randomized by ticket at 10%, 25%, 50%, 100%, each stage until the primary metric's interval is clear.
+- **Unit economics:** a written answer costs about US$ 0.027 (measured, Claude Sonnet). With assumed costs to replace with real ones (support at US$ 15 per hour, an escalation at US$ 30 of engineering time), an answer pays for itself if it saves about 6.5 seconds of an agent, and one avoided escalation pays for about 1,100 answers; the decision rests on the guard metrics, not on the model's cost.
 - **Scale or roll back:** next stage when escalations drop and every guard holds; roll back on any confirmed hallucination sent to a customer, corrections above the control's rate, or more than 10% withheld or unavailable answers in a day. A rollback is a flag: recording continues.
 
 ---
@@ -641,7 +645,7 @@ GROUP BY mode ORDER BY mode;
 - **No trace yet:** where the explorer's internal calls do not show the failing frame, `debug_traceTransaction` would. The config records whether a node serves it (`rpc.supports_debug_trace`; Stratus does), but the tool does not call it yet: failures are explained from the explorer, reads on the node and a replay.
 - **Explorer-hidden tokens:** a token the explorer marks as scam has its transfers hidden; the tool does not say so yet (backlog C1).
 - **Heuristics stay heuristics:** security and gas notes are pattern matches on the shown code, never an audit.
-- **Private demo network:** built and recorded (devnet/), but on a home server and rebuilt by hand; a CI job that brings it up, sends the transactions and runs `anychain eval` against it would keep the retargeting proof current. Calls inherited from OpenZeppelin are not decoded there, because the library is not in the configured repository: adding its source as a second repository would decode them.
+- **Private demo network:** built and recorded (devnet/), but on a private server and rebuilt by hand; a CI job that brings it up, sends the transactions and runs `anychain eval` against it would keep the retargeting proof current. Calls inherited from OpenZeppelin are not decoded there, because the library is not in the configured repository: adding its source as a second repository would decode them.
 - **Backlog:** imprecise wordings found by reviews and acceptance runs (level C), each with the real transaction it came from, in docs/ROADMAP.md.
 
 ---

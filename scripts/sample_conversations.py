@@ -22,9 +22,9 @@ from tests.test_golden import _case  # noqa: E402
 SAMPLES = [
     ("A successful ERC-20 transfer, support mode", "eth_usdc_transfer", "support", None, None),
     ("A failure diagnosed with reads on the node (eth_call), developer mode", "celo_fail_balance_confirmed",
-     "developer", None, None),
+     "developer", None, None, "en"),
     ("A failure diagnosed from the contract's verified code and the rule's repository source, with the sender's "
-     "timeline, developer mode", "eth_fail_expired_v2", "developer", None, None),
+     "timeline, developer mode", "eth_fail_expired_v2", "developer", None, None, "en"),
     ("A contract the explorer has not verified (degradation), with a clarifying question (triage)",
      "eth_failed_unverified_bot", "support", None, ("intent", "other")),
     ("Triage: it succeeded, but the reader says the payment did not arrive", "eth_usdc_transfer", "support",
