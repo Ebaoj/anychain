@@ -36,6 +36,8 @@
   .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: start; }
   @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
   .fact, .answer, .card, .gaps, .chat-log, .error, #statusLine, #movements { overflow-wrap: anywhere; }
+  .clarify-options { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+  .clarify-options button { text-align: left; overflow-wrap: anywhere; }
   .spaced { margin-top: 16px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   h2 { font-size: 15px; margin: 0 0 10px; }
@@ -87,8 +89,20 @@
       </select>
       <label class="check"><input type="checkbox" id="write" checked> written answer</label>
       <button type="submit" id="askButton">Explain</button>
+      <label class="sr" for="readerQuestion">Your question (optional)</label>
+      <input type="text" id="readerQuestion" maxlength="500" placeholder="Your question, optional (e.g. why didn't my payment go through?)" autocomplete="off">
     </form>
     <p class="muted">Every statement cites a numbered fact with its source. Facts come from the explorer and the node, never from the model.</p>
+  </section>
+
+  <section id="clarify" class="panel hidden" aria-live="polite">
+    <h2>One question first</h2>
+    <p id="clarifyQuestion"></p>
+    <div id="clarifyOptions" class="clarify-options"></div>
+    <form id="clarifyForm" class="ask hidden">
+      <input type="text" id="clarifyText" maxlength="200" autocomplete="off" spellcheck="false">
+      <button type="submit">Answer</button>
+    </form>
   </section>
 
   <section id="result" class="hidden layout" aria-live="polite">
@@ -261,17 +275,25 @@ function renderAnswer(a) {
   renderFacts();
 }
 
-$("askForm").addEventListener("submit", async (event) => {
+$("askForm").addEventListener("submit", (event) => {
   event.preventDefault();
-  const hash = $("hash").value.trim(), mode = $("mode").value;
+  const question = $("readerQuestion").value.trim();
+  explain({hash: $("hash").value.trim(), mode: $("mode").value, write: $("write").checked,
+           ...(question ? {question} : {})});
+});
+
+async function explain(request) {
+  const hash = request.hash, mode = request.mode;
   const generation = ++state.generation;  // a reply to an older request is dropped
   $("askButton").disabled = true;
   $("chatButton").disabled = true;
   $("askButton").textContent = "Collecting…";
   $("failure").classList.add("hidden");
+  $("clarify").classList.add("hidden");
   try {
-    const a = await api("/explain", {hash, mode, write: $("write").checked});
+    const a = await api("/explain", request);
     if (generation !== state.generation) return;
+    if (a.clarify) { showClarify(a.clarify, request); return; }
     state.hash = hash; state.mode = mode; state.runId = a.run_id; state.sessionId = null;
     $("chatLog").innerHTML = "";
     renderAnswer(a);
@@ -285,6 +307,40 @@ $("askForm").addEventListener("submit", async (event) => {
     $("askButton").disabled = false;
     $("askButton").textContent = "Explain";
   }
+}
+
+// Triage (PHASE4 R1): the API may answer with one clarifying question; the reader's answer goes back with the
+// same request, and no second question is asked.
+function showClarify(c, request) {
+  $("clarifyQuestion").textContent = c.question;
+  const box = $("clarifyOptions");
+  box.replaceChildren();
+  for (const option of c.options) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = option.label;
+    button.addEventListener("click", () => answerClarify(c, request, option.id));
+    box.appendChild(button);
+  }
+  $("clarifyForm").classList.toggle("hidden", !c.free_text);
+  $("clarifyText").value = "";
+  $("clarifyText").placeholder = c.free_text || "";
+  state.pendingClarify = {c, request};
+  $("result").classList.add("hidden");
+  $("clarify").classList.remove("hidden");
+}
+
+function answerClarify(c, request, answer) {
+  $("clarify").classList.add("hidden");
+  const next = {...request, clarified: {kind: c.kind, answer}};
+  if (c.kind === "which_transaction") { next.hash = answer; $("hash").value = answer; }
+  explain(next);
+}
+
+$("clarifyForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const typed = $("clarifyText").value.trim();
+  if (typed && state.pendingClarify) answerClarify(state.pendingClarify.c, state.pendingClarify.request, typed);
 });
 
 $("chatForm").addEventListener("submit", async (event) => {

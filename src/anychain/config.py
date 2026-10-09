@@ -164,7 +164,7 @@ class LlmConfig(BaseModel):
 class AssistantConfig(BaseModel):
     default_mode: str = "support"
     language: str = "en"
-    max_clarifying_questions: int = 2
+    max_clarifying_questions: int = 1  # triage asks one question at most (PHASE4 D2); 0 turns it off
     time_budget_s: float = Field(default=30, gt=0)  # max total wait for one explanation
 
     @field_validator("default_mode")

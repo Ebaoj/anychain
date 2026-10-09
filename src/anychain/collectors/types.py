@@ -257,3 +257,22 @@ class RpcReceipt:
     def from_rpc(cls, v: dict) -> "RpcReceipt":
         status = {"0x1": "success", "0x0": "failed"}.get(v.get("status"), "unknown")
         return cls(status, to_int(v.get("gasUsed")), len(_list(v.get("logs"))), _str(v.get("contractAddress")))
+
+
+@dataclass(frozen=True)
+class AddressTransaction:
+    """One row of the explorer's list of an address's transactions (GET /addresses/{a}/transactions), the fields
+    seen live on eth.blockscout.com on 2026-10-08: hash, timestamp, method, result, to, from."""
+
+    hash: str | None
+    timestamp: str | None
+    method: str | None
+    result: str | None  # "success", or the failure text
+    sender: str | None
+    to: str | None
+
+    @classmethod
+    def from_api(cls, v: dict) -> "AddressTransaction":
+        return cls(_str(v.get("hash")), _str(v.get("timestamp")), _str(v.get("method")), _str(v.get("result")),
+                   _str((v.get("from") or {}).get("hash")) if isinstance(v.get("from"), dict) else None,
+                   _str((v.get("to") or {}).get("hash")) if isinstance(v.get("to"), dict) else None)

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 import httpx
 
 from anychain.collectors.http import Budget, CollectorError, NotFoundError, make_client, request_json
-from anychain.collectors.types import InternalCall, Log, TokenTransfer, Transaction
+from anychain.collectors.types import AddressTransaction, InternalCall, Log, TokenTransfer, Transaction
 from anychain.config import ExplorerConfig
 
 MAX_PAGES = 5  # lists are paged; we stop here and declare the truncation
@@ -70,6 +70,11 @@ class ExplorerClient:
 
     def transaction(self, tx_hash: str) -> Transaction:
         return Transaction.from_api(self._get(f"/transactions/{tx_hash}"))
+
+    def address_transactions(self, address: str) -> list[AddressTransaction]:
+        """The address's latest transactions, newest first (the first page only: triage lists a few, PHASE4 R1)."""
+        page = self._get(f"/addresses/{address}/transactions")
+        return [AddressTransaction.from_api(i) for i in page.get("items") or [] if isinstance(i, dict)]
 
     def logs(self, tx_hash: str) -> tuple[list[Log], bool]:
         def fetch():

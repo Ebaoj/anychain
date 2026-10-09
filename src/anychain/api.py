@@ -24,10 +24,12 @@ from anychain.bundle import InvalidHashError, build_bundle
 from anychain.collectors.http import USER_AGENT, Budget, CollectorError, request_json
 from anychain.events import NullEventLog, RunEvent
 from anychain.redact import no_urls
+from anychain.collectors.explorer import ExplorerClient
 from anychain.collectors.rpc import RpcClient
 from anychain.config import AppConfig
 from anychain.chat import MAX_QUESTIONS
 from anychain.service import SKIP, WRITE, Crash, answer_transaction
+from anychain.triage import for_input
 from anychain.writer import write_checked
 
 LOCAL_NAMES = ["127.0.0.1", "localhost", "[::1]", "::1"]
@@ -60,6 +62,17 @@ class ExplainRequest(BaseModel):
     fresh: bool = Field(False, description="Fetch everything again, ignoring the cache")
     write: bool = Field(True, description="Write the summary with the model (false: evidence only)")
     question: str | None = Field(None, max_length=500, description="The reader's question, answered first (R12)")
+    clarified: "Clarified | None" = Field(None, description="The reader's answer to the clarifying question")
+
+
+class Clarified(BaseModel):
+    """The answer to the one clarifying question (PHASE4 R1); with it, no other question is asked."""
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["which_transaction", "expected_receipt", "intent"]
+    answer: str = Field(..., max_length=200)
+
+
+ExplainRequest.model_rebuild()  # resolves the forward reference to Clarified
 
 
 class ChatRequest(BaseModel):
@@ -129,7 +142,7 @@ def chat_tools(cfg: AppConfig, bundle_for):
 
 def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write_checked, finality=None,
                probe_client: httpx.Client | None = None, record=None, backend_factory=None, tools=None,
-               sessions=None) -> FastAPI:
+               sessions=None, explorer_for=None) -> FastAPI:
     """The app for one network's config. Collaborators are passed in, so tests replay recorded traffic."""
     from contextlib import asynccontextmanager
     client = probe_client or httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True)
@@ -149,6 +162,7 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
     sessions = sessions or Sessions()
     explained = Recent()  # each /explain's evidence for a while, so a chat starts from the facts the page shows
     backend_factory = backend_factory or (lambda: backend_for(cfg.llm))
+    explorer_for = explorer_for or (lambda: ExplorerClient(cfg.explorer, budget=Budget(cfg.assistant.time_budget_s)))
 
     def bundle_for(tx_hash: str):
         return cached_bundle(tx_hash.strip(), cfg, store or NoCache(), build, finality)[0]
@@ -175,11 +189,16 @@ def create_app(cfg: AppConfig, *, log, store, build=build_bundle, write_fn=write
     def explain(request: ExplainRequest) -> dict:
         mode = request.mode or cfg.assistant.default_mode
         started = time.monotonic()
+        if request.clarified is None and cfg.assistant.max_clarifying_questions > 0:
+            asked = for_input(request.hash, explorer_for())  # not a hash: which transaction (PHASE4 R1)
+            if asked is not None:
+                return {"clarify": asked.to_dict(), "network": cfg.network.name}
         try:
             result = answer_transaction(request.hash, cfg, mode, write=WRITE if request.write else SKIP,
                                         fresh=request.fresh, source="api", log=log, store=store, build=build,
                                         write_fn=write_fn, finality=finality, record=record,
-                                        question=request.question)
+                                        question=request.question,
+                                        clarified=request.clarified.model_dump() if request.clarified else None)
             out = result.structured()
         except InvalidHashError as exc:
             raise HTTPException(400, str(exc)) from exc

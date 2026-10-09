@@ -1,6 +1,6 @@
 # PHASE 4: bonus features and finish
 
-Status: **DRAFT** (2026-10-08). Delivery: 2026-10-09. Process (Joabe, 2026-10-08): one clean-context review for the whole phase, level C findings go to the backlog, level A and B stop the work.
+Status: **APPROVED** by Joabe on 2026-10-08 (D1 and D2 as proposed). Delivery: 2026-10-09. Process (Joabe, 2026-10-08): one clean-context review for the whole phase, level C findings go to the backlog, level A and B stop the work.
 
 ## 1. Summary for the decision
 

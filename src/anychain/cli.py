@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from anychain.answer import structured_answer
 from anychain.bundle import InvalidHashError, build_bundle
 from anychain.cache import BundleCache, NoCache, cached_bundle
+from anychain.collectors.explorer import ExplorerClient
 from anychain.collectors.rpc import RpcClient
 from anychain.config import ConfigError, load_config
 from anychain.events import PROBLEM_CAUSES, NullEventLog, RunEvent, SqliteEventLog, event_log_for
@@ -55,15 +56,29 @@ def explain(
     except ConfigError as exc:
         _fail(str(exc))
     mode_name = (mode or Mode(cfg.assistant.default_mode)).value
-    try:
-        result = answer_transaction(
-            tx_hash, cfg, mode_name, write=NONE if as_evidence else SKIP if no_llm else WRITE, fresh=fresh,
-            source="cli", log=_open_log(cfg), store=cache_for(cfg), build=build_bundle, write_fn=write_checked,
-            finality=lambda: finality_rpc_for(cfg), record=_record, question=question)
-    except InvalidHashError as exc:
-        _fail(str(exc))
-    except Crash as exc:
-        _fail(f"Unexpected error while collecting data ({exc}). Please report it.")
+    write = NONE if as_evidence else SKIP if no_llm else WRITE
+    clarified = None
+    if write == WRITE and cfg.assistant.max_clarifying_questions > 0:  # not a hash: which transaction (PHASE4 R1)
+        from anychain.collectors.http import Budget
+        from anychain.triage import for_input
+        asked = for_input(tx_hash, ExplorerClient(cfg.explorer, budget=Budget(cfg.assistant.time_budget_s)))
+        if asked is not None:
+            tx_hash = _ask(asked, as_json)
+            clarified = {"kind": "which_transaction", "answer": tx_hash}
+
+    def run(clarified):
+        try:
+            return answer_transaction(
+                tx_hash, cfg, mode_name, write=write, fresh=fresh, source="cli", log=_open_log(cfg),
+                store=cache_for(cfg), build=build_bundle, write_fn=write_checked,
+                finality=lambda: finality_rpc_for(cfg), record=_record, question=question, clarified=clarified)
+        except InvalidHashError as exc:
+            _fail(str(exc))
+        except Crash as exc:
+            _fail(f"Unexpected error while collecting data ({exc}). Please report it.")
+    result = run(clarified)
+    if result.clarify is not None:  # one question, then the answer (PHASE4 D2)
+        result = run({"kind": result.clarify.kind, "answer": _ask(result.clarify, as_json)})
     for note in result.notes:
         print(note, file=sys.stderr)
     if as_evidence:
@@ -74,7 +89,7 @@ def explain(
                                                                "Showing the evidence only.)_\n"), file=sys.stderr)
     if as_json:
         print(json.dumps({**structured_answer(result.bundle, result.text, result.summary_status, mode_name),
-                          "question": result.question}, indent=2,
+                          "question": result.question, "clarify": None}, indent=2,
                          ensure_ascii=False))
         return
     evidence_md = render_markdown(result.bundle)
@@ -86,6 +101,27 @@ def explain(
         print(evidence_md)
         return
     print(result.text + "\n\n---\n" + evidence_md)
+
+
+def _ask(clarify, as_json: bool) -> str:
+    """Asks the clarifying question in the terminal and returns the answer (an option's id or typed text). Without a
+    terminal to answer in, it prints the question (as JSON with --json) and stops."""
+    if not sys.stdin.isatty():
+        if as_json:
+            print(json.dumps({"clarify": clarify.to_dict()}, indent=2, ensure_ascii=False))
+        else:
+            print(clarify.question)
+            for i, o in enumerate(clarify.options, 1):
+                print(f"  {i}. {o.label} ({o.id})")
+        raise typer.Exit(0)
+    print(clarify.question, file=sys.stderr)
+    for i, o in enumerate(clarify.options, 1):
+        print(f"  {i}. {o.label}", file=sys.stderr)
+    reply = typer.prompt("Your answer (a number" + (", or " + clarify.free_text if clarify.free_text else "") + ")",
+                         err=True).strip()
+    if reply.isdigit() and 1 <= int(reply) <= len(clarify.options):
+        return clarify.options[int(reply) - 1].id
+    return reply
 
 
 def cache_for(cfg):

@@ -79,7 +79,8 @@ def test_explain_with_the_model(event_log, tmp_path, mode):
 
 
 @pytest.mark.parametrize("payload, status", [
-    ({"hash": "0x123"}, 400),  # not a hash
+    ({"hash": "0x123", "clarified": {"kind": "which_transaction", "answer": "0x123"}}, 400),  # not a hash, after
+    # the one clarifying question (before it, "0x123" gets the question: tests/test_triage.py)
     ({"hash": "0x" + "ab" * 32, "mode": "boss"}, 422),  # not a mode
     ({"mode": "support"}, 422),  # no hash
     ({"hash": "0x" + "ab" * 32, "Mode": "auditor"}, 422),  # a misspelled field is refused, not dropped

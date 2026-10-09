@@ -46,7 +46,7 @@ llm:
 assistant:
   default_mode: support
   language: pt-BR
-  max_clarifying_questions: 2
+  max_clarifying_questions: 1
   time_budget_s: 30             # total wait for one explanation; then answer with what we have
 
 storage:

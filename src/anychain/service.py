@@ -11,6 +11,7 @@ from anychain.answer import structured_answer
 from anychain.cache import answer_key, cached_bundle
 from anychain.events import CheckEvent, RunEvent
 from anychain.models import EvidenceBundle
+from anychain.triage import Clarify, apply_answer, for_bundle
 from anychain.writer import CheckedAnswer, WriterError, clean_question
 
 WRITE, SKIP, NONE = "write", "skip", "none"  # write the answer; skip it (asked not to); not asked (evidence only)
@@ -32,14 +33,19 @@ class Answered:
     run_id: int | None = None  # the event log row, for feedback
     notes: list[str] = field(default_factory=list)  # side problems to tell the user (the answer is still given)
     question: str | None = None  # the reader's question given with the hash (R12)
+    clarify: Clarify | None = None  # the one clarifying question to ask before answering (PHASE4 R1)
 
     def structured(self) -> dict:
         return {**structured_answer(self.bundle, self.text, self.summary_status, self.mode),
-                "question": self.question, "run_id": self.run_id}
+                "question": self.question, "clarify": self.clarify.to_dict() if self.clarify else None,
+                "run_id": self.run_id}
 
 
 def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool, source: str, log, store,
-                       build, write_fn, finality, record, question: str | None = None) -> Answered:
+                       build, write_fn, finality, record, question: str | None = None,
+                       clarified: dict | None = None) -> Answered:
+    """`clarified`: the reader's answer to the clarifying question ({"kind", "answer"}); with it, no other question
+    is asked (at most one, PHASE4 D2)."""
     """Raises InvalidHashError for a malformed hash, Crash for anything unexpected (already logged)."""
     from anychain.bundle import InvalidHashError
     started = time.monotonic()
@@ -59,6 +65,14 @@ def answer_transaction(tx_hash: str, cfg, mode: str, *, write: str, fresh: bool,
     if write == NONE:
         result.run_id = record(log, event())
         return result
+    if clarified:
+        apply_answer(bundle, str(clarified.get("kind") or ""), str(clarified.get("answer") or ""))
+    elif write == WRITE and bundle.items:
+        result.clarify = for_bundle(bundle, question, cfg)
+        if result.clarify is not None:  # asked before anything is written; the reader's answer comes back
+            result.summary_status = "clarify"
+            result.run_id = record(log, event(writer="clarify"))
+            return result
     if write == SKIP or not bundle.items:
         result.summary_status = "skipped" if write == SKIP else "no_evidence"
         result.run_id = record(log, event(writer="skipped"))
