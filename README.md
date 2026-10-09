@@ -112,13 +112,15 @@ Network `ethereum-mainnet`, transaction `0x7909bd56b9a3a0e932fa20ccd7093fcafcad1
 
 **Assistant:**
 
-**O que aconteceu:** a transação deu certo e o dinheiro foi movimentado. Foram enviados 69,3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5]. A transação foi incluída no bloco 26141501 [E1], e a rede (nó) confirmou, de forma independente, que ela teve sucesso [E7].
+**O que aconteceu:** A transação foi concluída com sucesso no bloco 26141501 [E1]. A rede Ethereum confirmou esse resultado de forma independente [E7].
 
-**Como foi feito:** a chamada foi feita ao contrato do USDC, usando a função de transferência (transfer) [E3]. Segundo o código mostrado, essa função só executa a transferência se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver em lista de bloqueio. Depois disso, ela move o valor e devolve "verdadeiro" [E4]. O código exibido é o da versão que o explorador lista hoje, e ele pode ter sido atualizado desde essa transação [E4].
+**O dinheiro foi movido?** Sim. Foram transferidos 69,3484 USDC da carteira 0xCA62C34d54b445283121905F19193416212117c4 para a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5]. Nenhum ETH foi enviado nessa operação [E1]. A transferência foi feita chamando a função "transfer" do contrato do USDC [E3].
 
-**Taxa cobrada:** 0,00008537619972948 ETH, paga em taxa de rede [E2]. Nenhum ETH foi enviado como valor da transação (0 ETH) [E1]. A transação usou 40360 de um limite de 45758 de gás [E1].
+**O que a função faz:** Segundo o código mostrado, a função só roda se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver numa lista de bloqueio. Depois disso, ela move o valor do remetente para o destinatário [E4]. O código exibido é o da versão atual listada no explorador, que pode ter sido atualizada depois desta transação [E4].
 
-**O que fazer:** nada é necessário se esse pagamento era o esperado. Se você esperava receber esse valor, confira se o endereço de destino (0x74AA…6828) é o da sua carteira [E5]. Os dados disponíveis não apresentam lacunas [E1].
+**Taxa cobrada:** A taxa de rede foi de 0,00008537619972948 ETH [E2]. Foram usadas 40360 unidades de gás, de um limite de 45758 [E1].
+
+**O que fazer:** Não há nenhum problema a corrigir. Se você esperava receber esse pagamento, confira se a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 é a sua e se o valor de 69,3484 USDC é o combinado [E5]. Se algo não bater, entre em contato com quem enviou o pagamento e mostre a página da transação: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 [E1].
 
 ### A failure diagnosed with reads on the node (eth_call), developer mode
 
@@ -128,52 +130,55 @@ Network `celo-mainnet`, transaction `0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872
 
 **Resumo**
 
-A transação falhou (revert) no bloco 78962884 na rede celo-mainnet. Ela foi enviada de 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 para o contrato 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD) [E1]. Usou 33839 de gas, de um limite de 100000 [E1]. A taxa paga foi 0.008222877 CELO, cobrada mesmo com a falha [E2].
+A transação falhou (revert) no bloco 78962884 [E1]. O motivo reportado é `ERC20: transfer amount exceeds balance` [E3]. O saldo do remetente era menor que o valor pedido [E10].
 
 **Chamada decodificada**
 
-- Função: `transfer(address,uint256)` em 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e, com `recipient=0x14634De7D71618013Dc48F2e85E80A28023f4367` e `amount=106500` [E4].
-- Fonte da ABI: explorer, contrato verificado TransparentUpgradeableProxy (proxy) -> TetherTokenCeloExtension [E4].
-- Em unidades do token, 106500 equivale a 0.1065 USD₮ (decimals() = 6, symbol() = USD₮) [E10].
+- Chamada: `transfer(address,uint256)` em 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD), com `recipient=0x14634De7D71618013Dc48F2e85E80A28023f4367` e `amount=106500` [E4].
+- Origem: 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0, valor nativo 0 CELO [E1].
+- Fonte do ABI: explorer, contrato verificado TransparentUpgradeableProxy (proxy) -> TetherTokenCeloExtension [E4].
+- Gas usado: 33839 de um limite de 100000 [E1].
+- Taxa paga: 0,008222877 CELO, cobrada mesmo com a falha [E2].
 
-**Chamadas internas, transferências e eventos**
+**Transferências de tokens e eventos**
 
-- Houve um delegatecall interno do proxy 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e para 0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98 (TetherTokenCeloExtension). Ele falhou com "execution reverted" [E6].
-- Nenhuma transferência de token foi concluída e nenhum evento aparece nas evidências, pois a transação reverteu [E1].
+Nenhuma transferência ocorreu, pois a transação reverteu. Não há eventos nas evidências [E1].
 
-**Causa**
+**Chamadas internas**
 
-- CONFIRMED: o explorer reporta o motivo `Error(string reason)` com `reason='ERC20: transfer amount exceeds balance'` [E3].
-- CONFIRMED: no bloco 78962883, o saldo de 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 era 1445 unidades brutas (0.001445 USD₮) [E7][E10]. Isso é menor que as 106500 unidades (0.1065 USD₮) pedidas [E10].
+- Delegatecall de 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD) para 0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98 (TetherTokenCeloExtension). Essa chamada interna falhou com "execution reverted" [E6].
 
 **Código**
 
-- `transfer` em ERC20Upgradeable (linhas 117-120) chama `_transfer(_msgSender(), recipient, amount)` e retorna `true` [E5].
-- O código é da implementação que o explorer lista hoje, que pode ter sido atualizada desde esta transação [E5].
-- Em `_transfer`, a mensagem aparece somente em `ERC20Upgradeable.sol`, linha 236: `require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");`. A falha foi, mais provavelmente, gerada ali, a menos que tenha sido repassada de outra função ou contrato chamado [E11][E12].
+- `transfer` em ERC20Upgradeable (linhas 117-120) apenas chama `_transfer(_msgSender(), recipient, amount)` e retorna `true` [E5].
+- A fonte é da implementação listada hoje pelo explorer e pode ter sido atualizada desde esta transação [E5].
+- Em `_transfer`, a razão está escrita somente na linha 236 do arquivo `@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol`: `require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");`. O erro foi, mais provavelmente, gerado ali, a menos que tenha sido repassado de outra função ou contrato chamado [E11][E12].
 
-**Padrão de falhas repetidas**
+**Diagnóstico**
 
-- Esta é a transação de nonce 54516. Os nonces 54513, 54514 e 54515 também falharam com `transfer` para o mesmo contrato [E13].
-- A mesma chamada `transfer` falhou 35 vezes seguidas, dos nonces 54482 a 54516, sem outra transação do remetente no meio [E14].
-- Lacuna: o remetente enviou mais de 150 transações depois desta, e as seguintes não são mostradas. Para vê-las, é preciso abrir a página do remetente no explorer [gaps].
+- CONFIRMED: no bloco 78962883, o saldo de 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 era 1445 unidades brutas (0,001445 USD₮), menor que as 106500 unidades (0,1065 USD₮) pedidas [E7][E10].
+- Os valores usam `decimals()` = 6 e `symbol()` = USD₮, lidos no bloco 78962883 [E8][E9].
+- Próximo passo (dev): verificar o saldo da conta de origem antes de enviar e transferir no máximo esse valor [E10].
+- Próximo passo (dev): se o saldo era esperado, procurar uma transação anterior que o tenha gasto [E10].
+
+**Padrão de repetição**
+
+- Esta é a transação de nonce 54516; os nonces 54513, 54514 e 54515 também falharam com `transfer` para o mesmo contrato [E13].
+- A mesma chamada `transfer` falhou ao menos 35 vezes seguidas, sem outra transação do remetente no meio (nonces 54482 a 54516) [E14].
+- Isso sugere um processo automatizado que reenvia sem verificar o saldo, mas as evidências não confirmam isso.
 
 **Notas**
 
-- Nota de gas (heurística): 33839 de 100000 usados (33.8%) [E15].
-- Nenhuma nota de segurança (security_note) foi fornecida nas evidências.
+- Nota de gas (heurística): 33839 de 100000 usados (33,8%) [E15].
+- Não há notas de segurança nas evidências.
 
-**Próximos passos (desenvolvedor)**
+**Lacunas**
 
-- Verifique o saldo da conta de origem antes de enviar e transfira no máximo esse valor [E10].
-- Se o saldo era esperado, procure uma transação anterior que o tenha gasto [E10].
-- Dado o padrão de 35 falhas seguidas, vale checar a lógica de reenvio do remetente [E14].
-
-Fonte: https://celo.blockscout.com/tx/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817
+- Linha do tempo: o remetente enviou ao menos 150 transações depois desta e as seguintes não são mostradas. Para vê-las, abra a página do remetente no explorer [E1].
 
 **Missing data the answer declares:**
 
-- Timeline: the sender sent more than 150 transactions after this one; those right after it are not shown
+- Timeline: the sender sent at least 150 transactions after this one; those right after it are not shown
 
 ### A failure diagnosed from the contract's verified code and the rule's repository source, with the sender's timeline, developer mode
 
@@ -181,49 +186,36 @@ Network `ethereum-mainnet`, transaction `0x73c4c0385483897a8c3cca6e4573c880dab32
 
 **Assistant:**
 
-**Resumo**
+# Transação revertida: `UniswapV2Router: EXPIRED`
 
-A transação falhou (revert) no bloco 26149091, em uma chamada de `0x79D6C25dE86bC4A858d7e383A474667aB109FeD0` para o UniswapV2Router02 (`0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D`) [E1]. O RPC confirma de forma independente o status "failed" [E8]. A causa é o prazo expirado: `UniswapV2Router: EXPIRED` [E3].
+**Status:** a transação falhou (reverted) no bloco 26149091, em 2026-10-08T17:11:47Z [E1]. O receipt via RPC confirma o status de falha [E8].
 
-**Chamada decodificada**
+**Causa (CONFIRMED):** o parâmetro `deadline` da chamada é 2400 (1970-01-01T00:40:00Z), e o timestamp do bloco é 1791479507 (2026-10-08T17:11:47Z). O prazo já tinha expirado quando a transação foi incluída, e `UniswapV2Router: EXPIRED` é a verificação de deadline da Uniswap [E6]. O explorer reporta o motivo `Error(string reason)` com `reason='UniswapV2Router: EXPIRED'` [E3].
 
-- Função: `swapExactETHForTokens(uint256,address[],address,uint256)` [E4].
-- `amountOutMin` = 0 [E4].
-- `path` = [0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48] [E4].
-- `to` = 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0 [E4].
-- `deadline` = 2400 [E4].
-- Fonte do ABI: contrato verificado UniswapV2Router02 no explorer [E4].
-- Valor nativo anexado: 0.045 ETH, não transferido porque a transação reverteu [E1].
+**Linha do motivo:** o texto `UniswapV2Router: EXPIRED` está escrito no código-fonte verificado `contracts/UniswapV2Router02.sol`, linha 19 [E7]. As linhas dessa região não foram incluídas na evidência, só a referência de linha.
 
-**Transferências, chamadas internas e eventos**
+**Chamada decodificada** (ABI: contrato verificado `UniswapV2Router02` no explorer) [E4]:
+- Função: `swapExactETHForTokens(uint256,address[],address,uint256)` em `0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D` [E4]
+- `amountOutMin=0` [E4]
+- `path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48]` [E4]
+- `to=0x79D6C25dE86bC4A858d7e383A474667aB109FeD0` [E4]
+- `deadline=2400` [E4]
+- Valor nativo anexado: 0.045 ETH, não transferido porque a transação reverteu [E1]
 
-A evidência não traz transferências de tokens, chamadas internas nem eventos para esta transação [E1].
+**O que a função faz** (linhas 252-266): ela é `payable` e usa o modificador `ensure(deadline)` (apenas citado pelo nome; seu código não foi fornecido) [E5]. Depois exige `path[0] == WETH`, calcula `amounts` com `UniswapV2Library.getAmountsOut` usando `msg.value`, e exige que a última quantidade seja `>= amountOutMin` [E5]. Em seguida chama `IWETH(WETH).deposit`, transfere o WETH ao par com `transfer` e executa `_swap(amounts, path, to)` [E5]. A reversão ocorreu antes desses passos, no check de deadline.
 
-**Causa**
+**Transferências de tokens, chamadas internas e eventos:** a evidência não lista nenhum. Isso é coerente com a reversão logo no início, mas a evidência não afirma isso explicitamente.
 
-- CONFIRMED: o `deadline` é 2400 (1970-01-01T00:40:00Z) e o horário do bloco é 1791479507 (2026-10-08T17:11:47Z). O prazo já havia passado na inclusão, e `UniswapV2Router: EXPIRED` é a verificação de prazo da Uniswap [E6].
-- A razão está escrita no código-fonte verificado, `contracts/UniswapV2Router02.sol`, linha 19 [E7]. O modificador `ensure(deadline)` aparece na declaração da função (linha 257), mas o código dele não foi fornecido, então não descrevo seu comportamento [E5].
-
-**O que a função faz (linhas 252-266)**
-
-- Exige `path[0] == WETH`, senão `'UniswapV2Router: INVALID_PATH'` [E5].
-- Calcula `amounts` com `UniswapV2Library.getAmountsOut(factory, msg.value, path)` [E5].
-- Exige que o último `amounts` seja `>= amountOutMin`, senão `'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'` [E5].
-- Chama `IWETH(WETH).deposit` com `amounts[0]`, transfere o WETH ao par e executa `_swap(amounts, path, to)` [E5].
-- A execução reverteu antes disso: foram usados apenas 25320 de gás, de um limite de 300000 [E1].
-
-**Taxa e contexto**
-
+**Gás e taxa:**
+- Gás usado: 25320 de um limite de 300000 [E1].
 - Taxa paga: 0.00011683874115936 ETH, cobrada mesmo com a falha [E2].
-- O mesmo tipo de chamada teve sucesso 48 segundos depois (nonce 53) [E10], usando 119837 de gás com limite de 300000 [E11]. Esta transação é o nonce 52 [E9].
+- Nota heurística: a mesma chamada teve sucesso no nonce 53 usando 119837 de gás, com limite de 300000 [E11].
 
-**Próximo passo (desenvolvedor)**
+**Contexto do remetente:** esta transação é o nonce 52 [E9]. A mesma chamada `swapExactETHForTokens` teve sucesso 48 segundos depois, no nonce 53 [E10].
 
-Verifique o preço atual e reenvie com um novo `deadline` e uma taxa alta o suficiente para ser incluída a tempo [E6].
+**Próximo passo (desenvolvedor):** verifique o preço atual e reenvie com um novo `deadline` (e uma taxa alta o suficiente para inclusão a tempo) [E6].
 
-**Notas de segurança**
-
-Não há evidência de notas de segurança (`security_note`) para este código, então nada a relatar. Isso não significa que o código seja seguro.
+**Notas de segurança:** não há evidência do tipo `security_note`, então nada é afirmado sobre segurança.
 
 ### A contract the explorer has not verified (degradation), with a clarifying question (triage)
 
@@ -238,22 +230,20 @@ Network `ethereum-mainnet`, transaction `0x68098e2a69deadd1f60396d667781517a5cfd
 
 **Assistant:**
 
-**O que aconteceu:** a transação falhou (foi revertida) no bloco 26141518 [E1]. A rede Ethereum confirmou, de forma independente, que o status é "falhou" [E18].
+**O que aconteceu:** a transação falhou (foi revertida) no bloco 26141518 [E1]. A rede (via RPC) confirma de forma independente que ela falhou [E18].
 
-**O dinheiro se moveu?** Não. O valor anexado era 0 ETH e, de qualquer forma, nada foi transferido porque a transação foi revertida [E1]. Houve tentativas internas de enviar cerca de 0,0915 ETH, mas todas foram desfeitas [E11][E12].
+**O dinheiro se moveu?** Não. A transação não carregava valor em ETH (0 ETH) [E1]. As tentativas internas de enviar cerca de 0,0915 ETH foram desfeitas, e nada foi transferido [E11][E12].
 
 **Quanto foi cobrado:** a taxa foi de 0,000294067451118215 ETH. Ela é cobrada mesmo com a falha [E2].
 
-**Motivo da falha:** o explorador informa a mensagem "INSUFFICIENT_OUTPUT_AMOUNT" [E3].
+**Causa:** UNKNOWN. O explorador informa o motivo "INSUFFICIENT_OUTPUT_AMOUNT" [E3]. Essas palavras costumam aparecer na verificação de preço mínimo de uma troca (swap) [E17]. Isso é apenas uma possibilidade. Você disse que não estava trocando tokens, o que não combina com essa leitura [E23]. O significado real depende do código do contrato, que não está disponível nas evidências [E23]. Não foi possível decodificar a chamada, porque não há ABI correspondente ao seletor 0x70521ae9 [E4]. A consulta ao banco de assinaturas também falhou, mas pode ser tentada de novo depois.
 
-- UNKNOWN: a causa não pode ser afirmada. Essa mensagem usa as palavras da checagem de limite de preço (slippage) dos roteadores da Uniswap, o que sugere possivelmente que o resultado ficaria abaixo do mínimo definido [E17]. Mas você disse que não estava fazendo troca de tokens, e isso não combina com essa leitura. O significado real depende do código do contrato, que não temos [E23].
-- Faltam o código ou a descrição (ABI) do contrato, necessários para decodificar a chamada [E4]. Também falhou a consulta ao banco de assinaturas, que pode ser tentada de novo em alguns minutos.
-
-**Contexto:** o mesmo tipo de chamada, do mesmo remetente para o mesmo contrato, alterna entre sucessos e falhas. Esta falhou junto com a anterior, e a seguinte funcionou 372 segundos depois [E19][E20][E21]. O limite de gás (600000) não parece ter sido o problema, pois só 133145 foram usados [E22].
+**Contexto:** a mesma chamada, feita pelo mesmo remetente, falhou algumas vezes e teve sucesso em outras nas horas ao redor [E19]. Ela funcionou 372 segundos depois desta falha [E20]. Isso sugere que o problema depende das condições do momento, mas as evidências não confirmam isso.
 
 **O que fazer:**
-- Confira o preço atual e tente de novo mais tarde, com um valor menor ou com um limite que se ajuste ao preço [E17].
-- Se não era para haver troca, entre em contato com o suporte do aplicativo ou do contrato que gerou essa operação, passando o código da transação [E23].
+- Confirme com o aplicativo ou serviço que enviou essa operação o que ela deveria fazer, pois não foi possível identificar isso pelos dados [E4].
+- Se ela mexe com preço ou troca, verifique o preço atual e tente de novo com um valor menor ou com um limite adequado. Se não resolver, procure o suporte do aplicativo [E17].
+- Para uma análise melhor, é preciso o contrato verificado no explorador ou o ABI dele [E4].
 
 **Missing data the answer declares:**
 
@@ -274,20 +264,24 @@ Network `ethereum-mainnet`, transaction `0x7909bd56b9a3a0e932fa20ccd7093fcafcad1
 
 **Assistant:**
 
-**Resposta à sua pergunta:** a transação deu certo, mas o pagamento não foi para o endereço que você esperava. Segundo o que você disse, o pagamento deveria ir para 0x000000000000000000000000000000000000dEaD [E9]. A única transferência de token da transação foi para 0x74AA5387681505c806FF1E972B12cdfd01406828 [E9][E5]. Por isso, se o seu endereço de recebimento é outro, o dinheiro não chegou até ele.
+**Resposta à sua pergunta:** a transação foi concluída com sucesso, mas o pagamento não foi para o endereço que você esperava.
 
-**O que aconteceu**
-- A transação foi concluída com sucesso no bloco 26141501 [E1]. A rede confirmou o mesmo resultado [E7].
-- Foram enviados 69,3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].
-- O dinheiro se moveu, mas para o endereço 0x74AA…6828, e não para o que você esperava [E5][E9].
-- O código mostrado da função de transferência apenas checa se o contrato não está pausado e se os endereços não estão bloqueados, e então move o valor [E4]. Esse código é da versão que o explorador lista hoje, que pode ter mudado desde a transação [E4].
+- A transação teve sucesso no bloco 26141501 [E1], e a rede confirmou isso de forma independente [E7].
+- Foram enviados 69,3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].
+- Você disse que esperava um pagamento para 0x000000000000000000000000000000000000dEaD. Nenhuma das movimentações listadas foi para esse endereço [E9]. A comparação tem um limite: tokens que o explorador esconde, como os marcados como golpe, não aparecem na lista [E9].
 
-**Taxa cobrada:** 0,00008537619972948 ETH [E2].
+**O dinheiro se moveu?** Sim. O valor saiu do remetente e foi para o endereço 0x74AA…6828 [E5]. O código mostrado da função de transferência apenas move o valor de quem envia para o destinatário informado [E4]. Esse código é da versão que o explorador lista hoje, e o contrato pode ter sido atualizado desde essa transação [E4].
 
-**O que fazer agora**
-- Confira se o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 é mesmo o seu endereço de recebimento. Se for, o pagamento chegou [E5].
-- Se não for, peça ao pagador que confirme para qual endereço enviou. A evidência não mostra por que esse endereço foi usado [E9].
-- Compartilhe o código da transação (0x7909bd56…7952) com o pagador ou com o suporte [E1].
+**Taxa cobrada:** 0,00008537619972948 ETH [E2]. Nenhum ETH foi enviado como pagamento [E1].
+
+**O que fazer:**
+1. Confira se o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 é o da sua carteira ou da sua loja [E5].
+2. Se não for, peça a quem pagou que confirme o endereço usado. Os dados mostram que o pagamento foi para esse endereço, e não para o que você esperava [E5][E9].
+3. Se for o seu endereço, verifique se a sua carteira exibe USDC. Pode ser necessário adicionar o token manualmente. Isso é uma sugestão geral, e não consta nas evidências.
+
+Posso ajudar a explicar mais algum detalhe se você me disser qual endereço é o da sua loja.
+
+Link da transação: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952
 
 ---
 
