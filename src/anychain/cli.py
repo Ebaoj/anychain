@@ -154,7 +154,7 @@ def batch(
     fresh: bool = typer.Option(False, "--fresh", help="Fetch everything again, ignoring the cache"),
 ) -> None:
     """Explain many transactions (evidence and structured answer, no written summary). Resumes where it stopped:
-    hashes already answered in --out are skipped (PHASE3 T0, R11)."""
+    hashes already answered in --out are skipped."""
     from concurrent.futures import ThreadPoolExecutor
     from pathlib import Path
     try:
@@ -301,7 +301,7 @@ def chat(
     mode: Mode = typer.Option(None, help="Who the answers are for (default: from config)"),
     config: str = typer.Option(None, "--config", help="Path to network YAML (or set ANYCHAIN_CONFIG)"),
 ) -> None:
-    """Ask follow-up questions about one transaction (PHASE3 T3). The model may ask for read-only data (a contract's
+    """Ask follow-up questions about one transaction. The model may ask for read-only data (a contract's
     state, a function's code, another transaction); every answer is checked against the evidence."""
     from anychain.api import chat_tools
     from anychain.chat import ChatSession, turn_event
@@ -361,7 +361,7 @@ def run_eval(
     no_llm: bool = typer.Option(False, "--no-llm", help="Measure the evidence only (no written answers, no cost)"),
     out: str = typer.Option("eval", "--out", help="Folder for report.md and report.json"),
 ) -> None:
-    """Run the evaluation set (PHASE3 T5): real recorded transactions, offline, measured, saved as a report."""
+    """Run the evaluation set: real recorded transactions, offline, measured, saved as a report."""
     from pathlib import Path
 
     from anychain.evaluate import load_cases, report, run_case
@@ -400,7 +400,7 @@ def serve(
     host: str = typer.Option("127.0.0.1", help="Address to listen on: this machine only"),
     port: int = typer.Option(8000, min=1, max=65535),
 ) -> None:
-    """Run the local API (PHASE3 T2): /health, /explain, /feedback. It has no authentication, so it only listens on
+    """Run the local API and its page: /explain, /chat, /health, /feedback, /settings/llm. It has no authentication, so it only listens on
     this machine."""
     import uvicorn
 
@@ -440,7 +440,7 @@ def show_metrics(
     config: str = typer.Option(None, "--config", help="Network YAML whose storage.sqlite_path holds the log"),
     hours: float = typer.Option(24 * 30, help="Look back this many hours"),
 ) -> None:
-    """Usage metrics from the event log, each printed with the SQL that computes it (PHASE3 T1, R6)."""
+    """Usage metrics from the event log, each printed with the SQL that computes it."""
     from anychain.metrics import QUERIES, run_queries
     try:
         cfg = load_config(config)
@@ -478,7 +478,7 @@ def _cell(name: str, value) -> str:
     return f"{value:.1f}%" if name in ("share", "satisfaction") else str(value)
 
 
-repos_app = typer.Typer(help="Contract repositories cited as source (PHASE2 T6).")
+repos_app = typer.Typer(help="Contract repositories cited as source.")
 app.add_typer(repos_app, name="repos")
 
 llm_app = typer.Typer(help="The model that writes the answers, and its API key (saved outside the repository).")

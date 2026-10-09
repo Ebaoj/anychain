@@ -6,14 +6,14 @@ Agreed items for later phases, so they are not lost between sessions. Each item 
 
 ### Private devnet that mirrors the CloudWalk setup
 - **Why:** no public network reproduces CloudWalk's situation: a private node, a private Blockscout and its own contracts. This is the strongest proof that retargeting needs config only.
-- **What:** on the `home server` server (Docker), run a local EVM node (Anvil) plus a self-hosted Blockscout. Deploy the BRLC contracts from the configured repo, generate real transactions (transfers, approvals, a paused-token revert, an access-control revert, an out-of-gas), then point AnyChain at it with a new YAML only.
+- **What:** on a Linux server (Docker), run a local EVM node (Anvil) plus a self-hosted Blockscout. Deploy the BRLC contracts from the configured repo, generate real transactions (transfers, approvals, a paused-token revert, an access-control revert, an out-of-gas), then point AnyChain at it with a new YAML only.
 - **Done when:** `anychain explain` and `anychain eval` run against the devnet with a `configs/devnet.yaml`, no code changes, and the README shows one sample conversation from it.
-- **Risk:** Blockscout needs Postgres; `home server` has 4 GB RAM. Check memory before starting; fall back to the backend without the frontend.
+- **Risk:** Blockscout needs Postgres; the server has 4 GB RAM. Check memory before starting; fall back to the backend without the frontend.
 - **Decided:** 2026-10-07, by Joabe.
 
 ### Dockerfile
 - **Why:** the original plan (section 11) welcomes a simple Dockerfile "if it costs little", and the case asks for "lightweight and deployable, runs locally".
-- **What:** one image that runs `anychain` and the API with a config mounted from outside; no secrets inside. Built and run on `home server`, never on the Mac (CLAUDE.md).
+- **What:** one image that runs `anychain` and the API with a config mounted from outside; no secrets inside. Built and run on a server, never on the mac (CLAUDE.md).
 - **Done when:** the README quickstart, tested from a clean clone, also works with `docker run`.
 - **Decided:** 2026-10-08, by Joabe (moved here from Phase 3's gaps).
 

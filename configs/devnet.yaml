@@ -1,7 +1,7 @@
 # The private demo network (PHASE4 T6, D60): a local Anvil node and a self-hosted Blockscout, with the BRLC token
 # from the configured repo deployed behind a proxy, as CloudWalk runs it. Retargeting needed this file only.
-# The services run on the home server server on 127.0.0.1; reach them with an SSH tunnel:
-#   ssh -N -L 14000:127.0.0.1:4000 -L 18545:127.0.0.1:8545 home server
+# The services run on a server on its 127.0.0.1 only; reach them with an SSH tunnel:
+#   ssh -N -L 14000:127.0.0.1:4000 -L 18545:127.0.0.1:8545 <server>
 network:
   name: anychain-devnet
   chain_id: 31337               # Anvil's chain id (eth_chainId 0x7a69, checked 2026-10-08)

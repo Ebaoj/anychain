@@ -4,7 +4,7 @@ Status: **APPROVED** by Joabe on 2026-10-08 (D1 and D2 as proposed). Delivery: 2
 
 ## 1. Summary for the decision
 
-The original plan's Phase 4 is "triage, multi-transaction, security notes, gas; final README, DECISIONS.md, diagram", with the cut order **gas, then security, then multi-transaction**, and **never cut: degradation, citations, eval, README**. Security notes are done (D39). Added later by Joabe: a private devnet on `home server` (ROADMAP, 2026-10-07) and a Dockerfile (ROADMAP, 2026-10-08).
+The original plan's Phase 4 is "triage, multi-transaction, security notes, gas; final README, DECISIONS.md, diagram", with the cut order **gas, then security, then multi-transaction**, and **never cut: degradation, citations, eval, README**. Security notes are done (D39). Added later by Joabe: a private devnet on a server (ROADMAP, 2026-10-07) and a Dockerfile (ROADMAP, 2026-10-08).
 
 ## 2. Requirements
 
@@ -16,8 +16,8 @@ The original plan's Phase 4 is "triage, multi-transaction, security notes, gas; 
 - **R2. Multi-transaction timeline (plan bonus 3).** For a failed transaction, fetch the sender's transactions around it (previous and next nonces, a bounded window) from the explorer, and add a `timeline` fact: each with its status, function and time, plus the patterns the plan names, said only when the data shows them: an `approve` after the failure followed by a success of the same call; several failures of the same call in a row. **Accept:** on a real sender with a failure then a success, the timeline and the pattern are facts with sources.
 - **R3. Gas notes (plan bonus 5, small scope).** `gas_used / gas_limit`, the fee in the native coin (already a fact), and, from the called function's code shown (D38), a heuristic note for storage reads repeated in a loop. Comparison with similar transactions only when the timeline has the same call. Always labelled as notes. **Accept:** on the out-of-gas and a success recording.
 - **R4. Final README (plan section 10)**, every part: what it is with the demo GIF; quickstart tested from a clean clone; configuration and "Retargeting to another network (e.g. CloudWalk)"; architecture diagram and the ABI cascade; **at least 3 real sample conversations** (success in support mode, diagnosed failure in developer mode with an `eth_call` read and a repo citation, unverified contract with degradation, and triage with a clarifying question); the eval table copied from `eval/report.md`; metrics and impact (docs/IMPACT.md); known limits and next steps; a transparent note on how AI (Claude Code) was used and which decisions were human.
-- **R5. Dockerfile**: one image running the CLI and the API with a config mounted from outside, no secrets inside; built and run on `home server`. **Accept:** `docker run` serves `/health` on `home server`.
-- **R6. Private devnet on `home server` (ROADMAP)**: Anvil plus a self-hosted Blockscout, the BRLC contracts deployed, real transactions (transfer, approve, paused revert, access-control revert, out of gas), then `configs/devnet.yaml` only. **Risk:** Blockscout needs Postgres and `home server` has 4 GB of RAM. **Proposed:** attempt it last, time-boxed to 2 hours; if it does not fit, the README says so and the design stays in ROADMAP.
+- **R5. Dockerfile**: one image running the CLI and the API with a config mounted from outside, no secrets inside; built and run on a server. **Accept:** `docker run` serves `/health` on that server.
+- **R6. Private devnet on a server (ROADMAP)**: Anvil plus a self-hosted Blockscout, the BRLC contracts deployed, real transactions (transfer, approve, paused revert, access-control revert, out of gas), then `configs/devnet.yaml` only. **Risk:** Blockscout needs Postgres and the server has 4 GB of RAM. **Proposed:** attempt it last, time-boxed to 2 hours; if it does not fit, the README says so and the design stays in ROADMAP.
 - **R7. Architecture docs** (both languages) and DECISIONS.md updated; the Phase 4 report to Joabe in plain Portuguese.
 
 ## 3. Out of scope
@@ -29,7 +29,7 @@ No push, no deploy (the delivery itself is Joabe's call). `debug_traceTransactio
 1. T1 (R1) triage, with tests on recordings.
 2. T2 (R2) timeline.
 3. T3 (R3) gas notes.
-4. T4 (R5) Dockerfile on `home server`.
+4. T4 (R5) Dockerfile on a server.
 5. T5 (R4, R7) README, sample conversations run for real, docs.
 6. T6 (R6) devnet, time-boxed.
 7. One clean-context review of the whole phase; fixes for level A and B; then stop and ask about delivery.

@@ -6,13 +6,27 @@ Explains and troubleshoots a transaction on **any EVM network**, for a merchant 
 
 ---
 
+## Start here (for a reviewer with an hour)
+
+1. Watch the GIF above, then run the quickstart below (a few minutes).
+2. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) section 0 ("What this is, in one minute") and section 2 ("How the diagnosis decides").
+3. Read the code in this order, each a few hundred lines at its core: `src/anychain/service.py` (one answer, end to end), `bundle.py` (`BundleBuilder.build`: how facts are collected), `diagnosis.py` (`diagnose` and the rules list), `validator.py` (the check on the AI's answer), `writer.py` (the prompts and the three model backends).
+4. Skim the sample conversations (section 4) and the evaluation table (section 5).
+5. For any choice that looks odd, search [docs/DECISIONS.md](docs/DECISIONS.md) for its number (D1 to D61): each says why, with the real transaction behind it.
+
+---
+
 ## 1. Quickstart
 
-Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). The written answer uses the local [Claude Code](https://claude.com/claude-code) CLI by default (logged in, no API key); without it, everything still runs and shows the facts only.
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). The written answer needs a model: the local [Claude Code](https://claude.com/claude-code) CLI (the default, logged in, no key), or an Anthropic or OpenAI API key, saved once with `anychain llm set` (or the page's **Model** panel) and kept outside the repository, readable by your user only. Without a model, everything still runs and shows the facts only.
 
 ```bash
 git clone <this repo> anychain && cd anychain
 uv sync
+
+# choose the model (skip if Claude Code is installed and logged in); the key is asked for, not shown
+uv run anychain llm set --provider anthropic            # or: --provider openai --model <model name>
+uv run anychain llm test --config configs/ethereum-mainnet.yaml
 
 # CLI: explain a transaction (a USDC transfer on Ethereum)
 uv run anychain explain 0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 \
@@ -46,13 +60,13 @@ docker run --rm anychain anychain explain 0x7909bd56b9a3a0e932fa20ccd7093fcafcad
 
 Do not run it with `--network host`: inside the container the API listens on 0.0.0.0, which with the host's network means every interface of the host. In a container the Claude Code CLI is not available: for a written answer set `llm.provider: anthropic` (or `openai`) in a mounted config and pass the key as an environment variable at run time.
 
-**Interfaces:** `anychain explain <hash> [--mode support|developer|auditor] [--config path] [--json] [--evidence] [--question "…"] [--no-llm] [--fresh]`, `anychain chat`, `anychain batch <file>`, `anychain serve`, `anychain eval`, `anychain metrics`, `anychain log`, `anychain repos sync`. API: `POST /explain` (hash, mode, question?, clarified?), `POST /chat` (session_id), `POST /feedback`, `GET /health` (active network; explorer, node and model status).
+**Interfaces:** `anychain explain <hash> [--mode support|developer|auditor] [--config path] [--json] [--evidence] [--question "…"] [--no-llm] [--fresh]`, `anychain chat`, `anychain batch <file>`, `anychain serve`, `anychain eval`, `anychain metrics`, `anychain log`, `anychain repos sync`, `anychain llm show|set|test|clear`. API: `POST /explain` (hash, mode, question?, clarified?), `POST /chat` (session_id), `POST /feedback`, `GET /health` (active network; explorer, node and model status), `GET/POST /settings/llm` and `POST /settings/llm/test` (the model and its key; the key is never returned).
 
 ---
 
 ## 2. Configuration, and retargeting to another network (e.g. CloudWalk)
 
-Everything network-specific is in one YAML file (`configs/*.yaml`); there is no network value in the code (a test enforces it). Seven configs ship: Ethereum, Optimism, Gnosis, Rootstock, Celo, zkSync Era, and the CloudWalk template.
+Everything network-specific is in one YAML file (`configs/*.yaml`); there is no network value in the code (a test enforces it: no explorer or node host, chain id, symbol or address; the only fixed URLs are links to the source of a rule's meaning, such as Uniswap's and OpenZeppelin's code, D31). Eight configs ship: Ethereum, Optimism, Gnosis, Rootstock, Celo, zkSync Era, the private demo network, and the CloudWalk template.
 
 ```yaml
 network:    { name, chain_id, native_symbol, native_decimals, chain_type }   # chain_type = the explorer's Blockscout CHAIN_TYPE
@@ -60,7 +74,7 @@ explorer:   { type: blockscout, base_url, api_path: /api/v2, tx_url_template, ad
 rpc:        { url, timeout_s, supports_debug_trace }                         # read-only JSON-RPC
 repos:      [ { url, ref, source_globs, artifact_globs } ]                    # contract sources and ABIs, pinned
 abi_strategy: { order: [explorer, repo_artifacts, repo_source_signatures, signature_db] }
-llm:        { provider: claude_code | anthropic | openai, model, max_tokens }
+llm:        { provider: claude_code | anthropic | openai, model, max_tokens }  # `anychain llm set` overrides it
 assistant:  { default_mode, language, max_clarifying_questions, time_budget_s }
 storage:    { sqlite_path, cache_dir }
 ```
@@ -98,13 +112,13 @@ flowchart LR
 - **Chat with tools:** the model asks for data in JSON (read a contract's state, show a function's code or a repo file, look at another transaction); our code checks and runs the request and adds the result as a new sourced fact.
 - **Storage:** SQLite event log (one row per answer: gaps by cause, label, ABI source, cache, mode, tokens, cost, feedback) and a cache by network and hash for final, complete transactions.
 
-The full diagrams (pipeline, diagnosis, one `explain`, the chat, quality, code map, gap classification, metrics) are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); every decision, with the real case behind it, is in [docs/DECISIONS.md](docs/DECISIONS.md) (D1 to D60).
+The full diagrams (pipeline, diagnosis, one `explain`, the chat, quality, code map, gap classification, metrics) are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); every decision, with the real case behind it, is in [docs/DECISIONS.md](docs/DECISIONS.md) (D1 to D61).
 
 ---
 
 ## 4. Sample conversations
 
-Real transactions replayed from their recordings and answered by the model through the same path as `explain` and the API; generated by `scripts/sample_conversations.py`, not edited by hand (also in [docs/SAMPLES.md](docs/SAMPLES.md)). The answers are in Portuguese, the configs' `assistant.language`. No recorded failure has both an `eth_call` read and a repository citation, so the second and third samples show one each.
+Real transactions replayed from their recordings and answered by the model through the same path as `explain` and the API; generated by `scripts/sample_conversations.py`, not edited by hand (also in [docs/SAMPLES.md](docs/SAMPLES.md)). The answers are in Portuguese, the configs' `assistant.language`. Under each answer, the sources of every fact it cites. No single recorded failure has both an `eth_call` read and a repository citation: the second sample shows the reads, the third and the last show repository sources (the last one a configured repository's permalink, on the private demo network).
 
 ### A successful ERC-20 transfer, support mode
 
@@ -112,15 +126,26 @@ Network `ethereum-mainnet`, transaction `0x7909bd56b9a3a0e932fa20ccd7093fcafcad1
 
 **Assistant:**
 
-**O que aconteceu:** A transação foi concluída com sucesso no bloco 26141501 [E1]. A rede Ethereum confirmou esse resultado de forma independente [E7].
+**O que aconteceu:** a transação foi concluída com sucesso no bloco 26141501 [E1]. A rede Ethereum confirmou esse resultado de forma independente [E7].
 
-**O dinheiro foi movido?** Sim. Foram transferidos 69,3484 USDC da carteira 0xCA62C34d54b445283121905F19193416212117c4 para a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5]. Nenhum ETH foi enviado nessa operação [E1]. A transferência foi feita chamando a função "transfer" do contrato do USDC [E3].
+**O dinheiro se moveu?** Sim. Foram transferidos 69,3484 USDC da carteira 0xCA62C34d54b445283121905F19193416212117c4 para a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5]. A transação chamou a função "transfer" do contrato do USDC [E3]. Não houve envio de ETH junto, apenas o token [E1].
 
-**O que a função faz:** Segundo o código mostrado, a função só roda se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver numa lista de bloqueio. Depois disso, ela move o valor do remetente para o destinatário [E4]. O código exibido é o da versão atual listada no explorador, que pode ter sido atualizada depois desta transação [E4].
+**O que a função faz:** segundo o código mostrado, ela só executa se o contrato não estiver pausado e se nem quem envia nem quem recebe estiver em uma lista de bloqueio. Depois, move o valor de quem envia para quem recebe [E4]. O código exibido é o que o explorador lista hoje, e o contrato pode ter sido atualizado desde essa transação [E4].
 
-**Taxa cobrada:** A taxa de rede foi de 0,00008537619972948 ETH [E2]. Foram usadas 40360 unidades de gás, de um limite de 45758 [E1].
+**Taxa cobrada:** 0,00008537619972948 ETH, pagos em taxa de rede [E2]. Foram usadas 40360 unidades de gás, de um limite de 45758 [E1].
 
-**O que fazer:** Não há nenhum problema a corrigir. Se você esperava receber esse pagamento, confira se a carteira 0x74AA5387681505c806FF1E972B12cdfd01406828 é a sua e se o valor de 69,3484 USDC é o combinado [E5]. Se algo não bater, entre em contato com quem enviou o pagamento e mostre a página da transação: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952 [E1].
+**O que fazer:** não é necessária nenhuma ação se esse pagamento era esperado. Se você aguardava esse valor, confira se a carteira de destino citada acima é a sua. Os dados não trazem nenhum problema a corrigir [E7].
+
+<details><summary>Sources of the facts it cites</summary>
+
+- **E1** (overview): [Explorer page](https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952)
+- **E2** (fee): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952)
+- **E3** (call): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952), [Explorer API: contract ABI](https://eth.blockscout.com/api/v2/smart-contracts/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)
+- **E4** (code): [Explorer API: verified source](https://eth.blockscout.com/api/v2/smart-contracts/0x43506849D7C04F9138D1A2050bbF3A0c054402dd)
+- **E5** (token_transfer): [Explorer API: token transfers](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952/token-transfers)
+- **E7** (cross_check): [JSON-RPC](https://ethereum-rpc.publicnode.com), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952)
+
+</details>
 
 ### A failure diagnosed with reads on the node (eth_call), developer mode
 
@@ -128,53 +153,58 @@ Network `celo-mainnet`, transaction `0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872
 
 **Assistant:**
 
-**Resumo**
+# Transação falhou: saldo insuficiente de USD₮ na Celo
 
-A transação falhou (revert) no bloco 78962884 [E1]. O motivo reportado é `ERC20: transfer amount exceeds balance` [E3]. O saldo do remetente era menor que o valor pedido [E10].
+**Status:** a transação reverteu no bloco 78962884 [E1]. Foram usados 33839 de 100000 de gas [E1]. A taxa de 0.008222877 CELO foi cobrada mesmo assim [E2].
 
-**Chamada decodificada**
+**Chamada decodificada:** `transfer(address,uint256)` em 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD), com `recipient=0x14634De7D71618013Dc48F2e85E80A28023f4367` e `amount=106500` [E4]. A fonte do ABI é o explorer: contrato verificado TransparentUpgradeableProxy, proxy para TetherTokenCeloExtension [E4].
 
-- Chamada: `transfer(address,uint256)` em 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD), com `recipient=0x14634De7D71618013Dc48F2e85E80A28023f4367` e `amount=106500` [E4].
-- Origem: 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0, valor nativo 0 CELO [E1].
-- Fonte do ABI: explorer, contrato verificado TransparentUpgradeableProxy (proxy) -> TetherTokenCeloExtension [E4].
-- Gas usado: 33839 de um limite de 100000 [E1].
-- Taxa paga: 0,008222877 CELO, cobrada mesmo com a falha [E2].
+**Causa:**
+- CONFIRMED: o explorer reporta o motivo `Error(string reason)` com `'ERC20: transfer amount exceeds balance'` [E3].
+- CONFIRMED: no bloco 78962883, o saldo do remetente 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 era 1445 unidades brutas (0.001445 USD₮) [E7][E10].
+- A chamada pedia 106500 unidades brutas (0.1065 USD₮), mais do que o saldo [E10].
+- Os valores em unidades do token usam `decimals()` = 6 e `symbol()` = USD₮, lidos no bloco 78962883 [E8][E9].
 
-**Transferências de tokens e eventos**
+**Código (ERC20Upgradeable.sol):**
+- `transfer` chama `_transfer(_msgSender(), recipient, amount)` e retorna `true` (linhas 117-120) [E5].
+- Em `_transfer`, a mensagem aparece apenas na linha 236: `require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");`. O erro foi, mais provavelmente, gerado ali, a menos que tenha sido repassado de outra função ou contrato [E11][E12].
+- O código é da implementação que o explorer lista hoje, e ela pode ter sido atualizada desde esta transação [E5][E11].
 
-Nenhuma transferência ocorreu, pois a transação reverteu. Não há eventos nas evidências [E1].
+**Chamadas internas:** houve um `delegatecall` do proxy 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e para a implementação 0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98 (TetherTokenCeloExtension). Ele falhou com "execution reverted" [E6].
 
-**Chamadas internas**
+**Eventos e transferências de token:** nenhum é listado na evidência. A transação reverteu e nenhum valor foi transferido [E1].
 
-- Delegatecall de 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e (Tether USD) para 0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98 (TetherTokenCeloExtension). Essa chamada interna falhou com "execution reverted" [E6].
+**Padrão repetido:**
+- Os nonces 54513 a 54516 do remetente, todos `transfer` para esse mesmo contrato, falharam [E13].
+- A mesma chamada falhou pelo menos 35 vezes seguidas, entre os nonces 54482 e 54516, sem outra transação do remetente no intervalo [E14].
 
-**Código**
+**Notas heurísticas:** o gas usado foi 33.8% do limite de 100000 [E15]. Não há evidência de notas de segurança (`security_note`).
 
-- `transfer` em ERC20Upgradeable (linhas 117-120) apenas chama `_transfer(_msgSender(), recipient, amount)` e retorna `true` [E5].
-- A fonte é da implementação listada hoje pelo explorer e pode ter sido atualizada desde esta transação [E5].
-- Em `_transfer`, a razão está escrita somente na linha 236 do arquivo `@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol`: `require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");`. O erro foi, mais provavelmente, gerado ali, a menos que tenha sido repassado de outra função ou contrato chamado [E11][E12].
+**Próximos passos (desenvolvedor):**
+- Verifique o saldo da conta de origem antes de enviar e transfira no máximo esse valor [E10].
+- Se esperava ter saldo, procure uma transação anterior que o tenha gasto [E10].
 
-**Diagnóstico**
+**Lacuna:** o remetente enviou pelo menos 150 transações depois desta, e as que vêm logo em seguida não aparecem na evidência. Para vê-las, abra a página do remetente no explorer [E1].
 
-- CONFIRMED: no bloco 78962883, o saldo de 0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0 era 1445 unidades brutas (0,001445 USD₮), menor que as 106500 unidades (0,1065 USD₮) pedidas [E7][E10].
-- Os valores usam `decimals()` = 6 e `symbol()` = USD₮, lidos no bloco 78962883 [E8][E9].
-- Próximo passo (dev): verificar o saldo da conta de origem antes de enviar e transferir no máximo esse valor [E10].
-- Próximo passo (dev): se o saldo era esperado, procurar uma transação anterior que o tenha gasto [E10].
+<details><summary>Sources of the facts it cites</summary>
 
-**Padrão de repetição**
+- **E1** (overview): [Explorer page](https://celo.blockscout.com/tx/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817), [Explorer API: transaction](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817)
+- **E2** (fee): [Explorer API: transaction](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817)
+- **E3** (revert): [Explorer API: transaction](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817)
+- **E4** (call): [Explorer API: transaction](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817), [Explorer API: contract ABI](https://celo.blockscout.com/api/v2/smart-contracts/0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e)
+- **E5** (code): [Explorer API: verified source](https://celo.blockscout.com/api/v2/smart-contracts/0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98)
+- **E6** (internal_call): [Explorer API: internal transactions](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817/internal-transactions)
+- **E7** (state_read): [JSON-RPC](https://forno.celo.org)
+- **E8** (state_read): [JSON-RPC](https://forno.celo.org)
+- **E9** (state_read): [JSON-RPC](https://forno.celo.org)
+- **E10** (diagnosis): [Explorer API: transaction](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817), [JSON-RPC](https://forno.celo.org), [JSON-RPC](https://forno.celo.org), [JSON-RPC](https://forno.celo.org)
+- **E11** (code): [Explorer API: verified source](https://celo.blockscout.com/api/v2/smart-contracts/0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98)
+- **E12** (source): [Explorer API: verified source](https://celo.blockscout.com/api/v2/smart-contracts/0xBF83F8436Ac46A8B1da5A9348eD84F68aEe07B98)
+- **E13** (timeline): [Explorer API: the sender's transactions](https://celo.blockscout.com/api/v2/addresses/0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0/transactions?filter=from)
+- **E14** (timeline): [Explorer API: the sender's transactions](https://celo.blockscout.com/api/v2/addresses/0x9695B8367fd1Bb4800667Ff5F35B0CF142F410A0/transactions?filter=from)
+- **E15** (gas_note): [Explorer API: transaction](https://celo.blockscout.com/api/v2/transactions/0x9a8b0c69355a900965e9d3ddb4f4a7d2bb8822872d36e3ba03b55e4e7f419817)
 
-- Esta é a transação de nonce 54516; os nonces 54513, 54514 e 54515 também falharam com `transfer` para o mesmo contrato [E13].
-- A mesma chamada `transfer` falhou ao menos 35 vezes seguidas, sem outra transação do remetente no meio (nonces 54482 a 54516) [E14].
-- Isso sugere um processo automatizado que reenvia sem verificar o saldo, mas as evidências não confirmam isso.
-
-**Notas**
-
-- Nota de gas (heurística): 33839 de 100000 usados (33,8%) [E15].
-- Não há notas de segurança nas evidências.
-
-**Lacunas**
-
-- Linha do tempo: o remetente enviou ao menos 150 transações depois desta e as seguintes não são mostradas. Para vê-las, abra a página do remetente no explorer [E1].
+</details>
 
 **Missing data the answer declares:**
 
@@ -186,36 +216,72 @@ Network `ethereum-mainnet`, transaction `0x73c4c0385483897a8c3cca6e4573c880dab32
 
 **Assistant:**
 
-# Transação revertida: `UniswapV2Router: EXPIRED`
+**Resumo**
 
-**Status:** a transação falhou (reverted) no bloco 26149091, em 2026-10-08T17:11:47Z [E1]. O receipt via RPC confirma o status de falha [E8].
+A transação **falhou** (revert) no bloco 26149091, enviada de 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0 para o UniswapV2Router02 (0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D) [E1]. O RPC confirma de forma independente o status "failed" [E8].
 
-**Causa (CONFIRMED):** o parâmetro `deadline` da chamada é 2400 (1970-01-01T00:40:00Z), e o timestamp do bloco é 1791479507 (2026-10-08T17:11:47Z). O prazo já tinha expirado quando a transação foi incluída, e `UniswapV2Router: EXPIRED` é a verificação de deadline da Uniswap [E6]. O explorer reporta o motivo `Error(string reason)` com `reason='UniswapV2Router: EXPIRED'` [E3].
+**Causa**
 
-**Linha do motivo:** o texto `UniswapV2Router: EXPIRED` está escrito no código-fonte verificado `contracts/UniswapV2Router02.sol`, linha 19 [E7]. As linhas dessa região não foram incluídas na evidência, só a referência de linha.
+- CONFIRMED: o parâmetro `deadline` da chamada é 2400 (1970-01-01T00:40:00Z), e o horário do bloco é 1791479507 (2026-10-08T17:11:47Z). O prazo já havia expirado quando a transação foi incluída [E6].
+- O explorer reporta o motivo do revert: `Error(string reason)` com reason='UniswapV2Router: EXPIRED' [E3].
+- Essa mensagem está escrita no código-fonte verificado, `contracts/UniswapV2Router02.sol`, linha 19 [E7]. A linha 19 é a verificação de deadline do Uniswap [E6].
 
-**Chamada decodificada** (ABI: contrato verificado `UniswapV2Router02` no explorer) [E4]:
-- Função: `swapExactETHForTokens(uint256,address[],address,uint256)` em `0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D` [E4]
-- `amountOutMin=0` [E4]
-- `path=[0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48]` [E4]
-- `to=0x79D6C25dE86bC4A858d7e383A474667aB109FeD0` [E4]
-- `deadline=2400` [E4]
-- Valor nativo anexado: 0.045 ETH, não transferido porque a transação reverteu [E1]
+**Chamada decodificada**
 
-**O que a função faz** (linhas 252-266): ela é `payable` e usa o modificador `ensure(deadline)` (apenas citado pelo nome; seu código não foi fornecido) [E5]. Depois exige `path[0] == WETH`, calcula `amounts` com `UniswapV2Library.getAmountsOut` usando `msg.value`, e exige que a última quantidade seja `>= amountOutMin` [E5]. Em seguida chama `IWETH(WETH).deposit`, transfere o WETH ao par com `transfer` e executa `_swap(amounts, path, to)` [E5]. A reversão ocorreu antes desses passos, no check de deadline.
+- Função: `swapExactETHForTokens(uint256,address[],address,uint256)` [E4].
+- `amountOutMin` = 0 [E4].
+- `path` = [0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48] [E4].
+- `to` = 0x79D6C25dE86bC4A858d7e383A474667aB109FeD0 [E4].
+- `deadline` = 2400 [E4].
+- Fonte do ABI: explorer, contrato verificado UniswapV2Router02 [E4].
+- Valor nativo anexado: 0.045 ETH, não transferido porque a transação reverteu [E1].
 
-**Transferências de tokens, chamadas internas e eventos:** a evidência não lista nenhum. Isso é coerente com a reversão logo no início, mas a evidência não afirma isso explicitamente.
+**O que a função faz (linhas 252-266)**
 
-**Gás e taxa:**
-- Gás usado: 25320 de um limite de 300000 [E1].
-- Taxa paga: 0.00011683874115936 ETH, cobrada mesmo com a falha [E2].
-- Nota heurística: a mesma chamada teve sucesso no nonce 53 usando 119837 de gás, com limite de 300000 [E11].
+- O modificador `ensure(deadline)` é aplicado na linha 257 (o código mostrado só o nomeia) [E5].
+- Exige `path[0] == WETH`, senão `'UniswapV2Router: INVALID_PATH'` (linha 260) [E5].
+- Calcula `amounts` com `UniswapV2Library.getAmountsOut(factory, msg.value, path)` (linha 261) [E5].
+- Exige que o último valor de `amounts` seja `>= amountOutMin`, senão `'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'` (linha 262) [E5].
+- Chama `IWETH(WETH).deposit{value: amounts[0]}()`, transfere o WETH para o par e executa `_swap(amounts, path, to)` (linhas 263-265) [E5].
+- Nada disso foi executado: o revert ocorreu na verificação de deadline, linha 19 [E7], e o gas usado foi de apenas 25320 dos 300000 de limite [E1].
 
-**Contexto do remetente:** esta transação é o nonce 52 [E9]. A mesma chamada `swapExactETHForTokens` teve sucesso 48 segundos depois, no nonce 53 [E10].
+**Transferências, chamadas internas e eventos**
 
-**Próximo passo (desenvolvedor):** verifique o preço atual e reenvie com um novo `deadline` (e uma taxa alta o suficiente para inclusão a tempo) [E6].
+O evidence não lista transferências de tokens, chamadas internas nem eventos para esta transação.
 
-**Notas de segurança:** não há evidência do tipo `security_note`, então nada é afirmado sobre segurança.
+**Taxa**
+
+Taxa paga: 0.00011683874115936 ETH, cobrada mesmo com a falha [E2].
+
+**Contexto**
+
+- A mesma chamada (`swapExactETHForTokens`) teve sucesso 48 segundos depois, no nonce 53 [E10].
+- Essa chamada bem-sucedida usou 119837 de gas, com limite de 300000 [E11].
+- Esta transação é o nonce 52 do remetente [E9].
+
+**Notas de segurança**
+
+Nenhuma nota de segurança (`security_note`) foi fornecida. Isso não significa que o código seja seguro.
+
+**Próximo passo (desenvolvedor)**
+
+Verifique o preço atual e reenvie com um novo `deadline` (e com uma taxa alta o bastante para ser incluída a tempo) [E6].
+
+<details><summary>Sources of the facts it cites</summary>
+
+- **E1** (overview): [Explorer page](https://eth.blockscout.com/tx/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a)
+- **E2** (fee): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a)
+- **E3** (revert): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a)
+- **E4** (call): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a), [Explorer API: contract ABI](https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D)
+- **E5** (code): [Explorer API: verified source](https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D)
+- **E6** (diagnosis): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a), [Source of the rule's meaning](https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L19)
+- **E7** (source): [Explorer API: verified source](https://eth.blockscout.com/api/v2/smart-contracts/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D)
+- **E8** (cross_check): [JSON-RPC](https://ethereum-rpc.publicnode.com), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a)
+- **E9** (timeline): [Explorer API: the sender's transactions](https://eth.blockscout.com/api/v2/addresses/0x79D6C25dE86bC4A858d7e383A474667aB109FeD0/transactions?filter=from)
+- **E10** (timeline): [Explorer API: the sender's transactions](https://eth.blockscout.com/api/v2/addresses/0x79D6C25dE86bC4A858d7e383A474667aB109FeD0/transactions?filter=from)
+- **E11** (gas_note): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x73c4c0385483897a8c3cca6e4573c880dab32265bbacd94923fff2466cb45c8a), [Explorer API: the sender's transactions](https://eth.blockscout.com/api/v2/addresses/0x79D6C25dE86bC4A858d7e383A474667aB109FeD0/transactions?filter=from)
+
+</details>
 
 ### A contract the explorer has not verified (degradation), with a clarifying question (triage)
 
@@ -230,20 +296,56 @@ Network `ethereum-mainnet`, transaction `0x68098e2a69deadd1f60396d667781517a5cfd
 
 **Assistant:**
 
-**O que aconteceu:** a transação falhou (foi revertida) no bloco 26141518 [E1]. A rede (via RPC) confirma de forma independente que ela falhou [E18].
+**O que aconteceu**
 
-**O dinheiro se moveu?** Não. A transação não carregava valor em ETH (0 ETH) [E1]. As tentativas internas de enviar cerca de 0,0915 ETH foram desfeitas, e nada foi transferido [E11][E12].
+A transação **falhou** (foi revertida) no bloco 26141518 [E1]. A rede Ethereum confirmou de forma independente que o status é "falhou" [E18].
 
-**Quanto foi cobrado:** a taxa foi de 0,000294067451118215 ETH. Ela é cobrada mesmo com a falha [E2].
+**O dinheiro se moveu?**
 
-**Causa:** UNKNOWN. O explorador informa o motivo "INSUFFICIENT_OUTPUT_AMOUNT" [E3]. Essas palavras costumam aparecer na verificação de preço mínimo de uma troca (swap) [E17]. Isso é apenas uma possibilidade. Você disse que não estava trocando tokens, o que não combina com essa leitura [E23]. O significado real depende do código do contrato, que não está disponível nas evidências [E23]. Não foi possível decodificar a chamada, porque não há ABI correspondente ao seletor 0x70521ae9 [E4]. A consulta ao banco de assinaturas também falhou, mas pode ser tentada de novo depois.
+Não. Nenhum valor em ETH foi transferido, pois a transação foi revertida [E1]. As tentativas internas de enviar 0,091541598301954665 ETH foram desfeitas e nada foi transferido [E11][E12].
 
-**Contexto:** a mesma chamada, feita pelo mesmo remetente, falhou algumas vezes e teve sucesso em outras nas horas ao redor [E19]. Ela funcionou 372 segundos depois desta falha [E20]. Isso sugere que o problema depende das condições do momento, mas as evidências não confirmam isso.
+**Quanto foi cobrado**
 
-**O que fazer:**
-- Confirme com o aplicativo ou serviço que enviou essa operação o que ela deveria fazer, pois não foi possível identificar isso pelos dados [E4].
-- Se ela mexe com preço ou troca, verifique o preço atual e tente de novo com um valor menor ou com um limite adequado. Se não resolver, procure o suporte do aplicativo [E17].
-- Para uma análise melhor, é preciso o contrato verificado no explorador ou o ABI dele [E4].
+A taxa (fee) foi de 0,000294067451118215 ETH. Ela é cobrada mesmo com a falha [E2].
+
+**Por quê?**
+
+**UNKNOWN (causa desconhecida).** O explorador informa o motivo "INSUFFICIENT_OUTPUT_AMOUNT" [E3]. Essas palavras costumam indicar a verificação de limite de preço de uma troca (o resultado seria menor que o mínimo definido) [E17]. Mas você disse que não estava trocando tokens, o que não combina com essa leitura. O significado real depende do código do contrato, que não temos [E23]. Também não foi possível decodificar a chamada, pois não há ABI do contrato [E4].
+
+A transação passou por um PoolManager e interagiu com WETH9 e BeamToken, mas tudo foi desfeito [E6][E12][E14].
+
+**Contexto**
+
+Essa mesma chamada falhou e deu certo em outros momentos. A próxima tentativa (nonce 10346) funcionou cerca de 372 segundos depois [E19][E20]. Esta falhou 2 vezes seguidas [E21]. O limite de gás não parece ser o problema: foram usados 133145 de 600000 [E1].
+
+**O que fazer**
+
+- Se você não pretendia fazer uma troca, verifique com quem opera o aplicativo ou o robô que envia essas transações pela sua carteira, pois a sequência de chamadas repetidas parece automática [E19].
+- Entre em contato com o suporte do aplicativo, informando o hash da transação [E17].
+- Se for uma troca, confira o preço atual e tente de novo com um valor menor ou um limite compatível [E17].
+
+**O que falta**
+
+Para confirmar a causa, é preciso o contrato verificado no explorador ou o ABI dele [gap: decodificação]. A consulta ao banco de assinaturas falhou e pode ser repetida em alguns minutos [gap: banco de assinaturas].
+
+<details><summary>Sources of the facts it cites</summary>
+
+- **E1** (overview): [Explorer page](https://eth.blockscout.com/tx/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9)
+- **E2** (fee): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9)
+- **E3** (revert): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9)
+- **E4** (call): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9)
+- **E6** (internal_call): [Explorer API: internal transactions](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions)
+- **E11** (internal_call): [Explorer API: internal transactions](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions)
+- **E12** (internal_call): [Explorer API: internal transactions](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions)
+- **E14** (internal_call): [Explorer API: internal transactions](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9/internal-transactions)
+- **E17** (diagnosis): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9), [Source of the rule's meaning](https://github.com/Uniswap/v2-periphery/blob/ed24991304291297c3b4a52818d02f46a17aa9a2/contracts/UniswapV2Router02.sol#L232)
+- **E18** (cross_check): [JSON-RPC](https://ethereum-rpc.publicnode.com), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x68098e2a69deadd1f60396d667781517a5cfdf257a5e35f79f0c47c52f5f51c9)
+- **E19** (timeline): [Explorer API: the sender's transactions](https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from)
+- **E20** (timeline): [Explorer API: the sender's transactions](https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from)
+- **E21** (timeline): [Explorer API: the sender's transactions](https://eth.blockscout.com/api/v2/addresses/0xd05E8724aD399Bb618497b1bf66a4A24Ab156351/transactions?filter=from)
+- **E23** (triage): The reader's answer to the clarifying question
+
+</details>
 
 **Missing data the answer declares:**
 
@@ -264,24 +366,82 @@ Network `ethereum-mainnet`, transaction `0x7909bd56b9a3a0e932fa20ccd7093fcafcad1
 
 **Assistant:**
 
-**Resposta à sua pergunta:** a transação foi concluída com sucesso, mas o pagamento não foi para o endereço que você esperava.
+**Resposta curta:** a transação deu certo e o dinheiro saiu, mas não foi para o endereço que você esperava.
 
-- A transação teve sucesso no bloco 26141501 [E1], e a rede confirmou isso de forma independente [E7].
-- Foram enviados 69,3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].
-- Você disse que esperava um pagamento para 0x000000000000000000000000000000000000dEaD. Nenhuma das movimentações listadas foi para esse endereço [E9]. A comparação tem um limite: tokens que o explorador esconde, como os marcados como golpe, não aparecem na lista [E9].
+- A transação foi concluída com sucesso no bloco 26141501 [E1], e a rede confirmou esse status de forma independente [E7].
+- Foram enviados 69,3484 USDC do endereço 0xCA62C34d54b445283121905F19193416212117c4 para 0x74AA5387681505c806FF1E972B12cdfd01406828 [E5].
+- Você disse que esperava um pagamento para 0x000000000000000000000000000000000000dEaD. Nenhuma das movimentações listadas foi para esse endereço [E9]. Essa comparação é apenas uma possibilidade, pois o explorador não lista tokens que ele esconde [E9].
 
-**O dinheiro se moveu?** Sim. O valor saiu do remetente e foi para o endereço 0x74AA…6828 [E5]. O código mostrado da função de transferência apenas move o valor de quem envia para o destinatário informado [E4]. Esse código é da versão que o explorador lista hoje, e o contrato pode ter sido atualizado desde essa transação [E4].
+**O que isso significa:** se o seu endereço de recebimento é o 0x…dEaD, o pagamento não chegou a ele. O valor foi para o endereço 0x74AA…6828 [E5, E9].
 
-**Taxa cobrada:** 0,00008537619972948 ETH [E2]. Nenhum ETH foi enviado como pagamento [E1].
+**Taxa cobrada:** 0,00008537619972948 ETH, paga por quem enviou a transação [E2].
 
 **O que fazer:**
-1. Confira se o endereço 0x74AA5387681505c806FF1E972B12cdfd01406828 é o da sua carteira ou da sua loja [E5].
-2. Se não for, peça a quem pagou que confirme o endereço usado. Os dados mostram que o pagamento foi para esse endereço, e não para o que você esperava [E5][E9].
-3. Se for o seu endereço, verifique se a sua carteira exibe USDC. Pode ser necessário adicionar o token manualmente. Isso é uma sugestão geral, e não consta nas evidências.
+1. Confira com quem pagou qual endereço foi usado e compare com o 0x74AA…6828 [E5].
+2. Se esse endereço não for o seu, peça ao pagador que revise o envio. As evidências não mostram como recuperar o valor.
+3. Se o endereço 0x74AA…6828 for seu, o pagamento já foi recebido [E5].
 
-Posso ajudar a explicar mais algum detalhe se você me disser qual endereço é o da sua loja.
+<details><summary>Sources of the facts it cites</summary>
 
-Link da transação: https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952
+- **E1** (overview): [Explorer page](https://eth.blockscout.com/tx/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952)
+- **E2** (fee): [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952)
+- **E5** (token_transfer): [Explorer API: token transfers](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952/token-transfers)
+- **E7** (cross_check): [JSON-RPC](https://ethereum-rpc.publicnode.com), [Explorer API: transaction](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952)
+- **E9** (triage): The reader's answer to the clarifying question, [Explorer API: token transfers](https://eth.blockscout.com/api/v2/transactions/0x7909bd56b9a3a0e932fa20ccd7093fcafcad133c51af652c921cd329b2307952/token-transfers)
+
+</details>
+
+### The private demo network: a BRLC call decoded from the configured repository, and the cause the explorer did not give recovered by replaying the call on the node, developer mode
+
+Network `anychain-devnet`, transaction `0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f`, mode `developer`.
+
+**Assistant:**
+
+**Resumo**
+
+A transação falhou (revertida) no bloco 63, em anychain-devnet. Foi enviada de 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC para 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin), com 0 ETH de valor, e usou 28963 de um limite de 200000 de gas [E1]. O recibo do RPC confirma o status failed, de acordo com o explorer [E7]. A taxa de 0.000000007752902729 ETH foi cobrada mesmo com a falha [E2].
+
+**Chamada decodificada**
+
+- Função: `setPauser(address)` em 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (BRL Coin), com `newPauser=0x3C44CDDdb6A900fA2b585D8C4E1a7C9ee5f0f9C3` [E3].
+- Fonte da ABI: repositório cloudwallk/brlc-token@74a5498, BRLCToken, fixado a este endereço na configuração [E3].
+- Transferências de tokens, eventos e chamadas internas: nenhum item na evidência. O explorer ainda indexa as chamadas internas, então vale perguntar de novo em alguns minutos [gaps].
+
+**Causa**
+
+- UNKNOWN (pelo explorer): o explorer não informou o motivo da falha. Para encontrar onde reverteu, é preciso um nó com trace/debug ou consultar os desenvolvedores do contrato [E4].
+- LIKELY (pelo replay, possível causa): o replay no bloco 62 reverteu com `Ownable: caller is not the owner`, ou seja, uma checagem de acesso recusou o chamador. Se a transação original falhou da mesma forma, essa é a causa [E6]. O replay usa o estado do bloco anterior e não inclui as transações anteriores do mesmo bloco, então pode diferir do ocorrido de fato [E5].
+
+**Próximos passos (desenvolvedor)**
+
+- Reenviar a mesma chamada sem alterações falha do mesmo jeito e cobra a taxa de novo [E6].
+- Verificar qual conta a checagem recusou e se ela deveria ter a permissão. Se deveria, peça aos operadores do contrato que a concedam [E6].
+- Para localizar a linha exata do revert, use um nó com trace [E4].
+
+**Contexto adicional**
+
+- O nonce 0 do mesmo remetente (selector 0x23b872dd, para o mesmo contrato) também falhou, em 2026-10-09T01:40:52Z. Este é o nonce 1 [E8].
+- Nota de gás (heurística): 14.5% do limite foi usado [E9].
+- Não há evidência de código-fonte nem de notas de segurança, então não há o que dizer sobre a segurança da função. A linha do revert não foi indicada na evidência.
+
+<details><summary>Sources of the facts it cites</summary>
+
+- **E1** (overview): [Explorer page](http://127.0.0.1:14000/tx/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f), [Explorer API: transaction](http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f)
+- **E2** (fee): [Explorer API: transaction](http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f)
+- **E3** (call): [Explorer API: transaction](http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f), [Repository cloudwallk/brlc-token@74a5498](https://github.com/cloudwallk/brlc-token/blob/74a5498d04b10dc882e48273a38b98b4275463bd/contracts/BRLCToken.sol#L12-L60)
+- **E4** (diagnosis): [Explorer API: transaction](http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f)
+- **E5** (replay): [JSON-RPC](http://127.0.0.1:18545)
+- **E6** (diagnosis): [JSON-RPC](http://127.0.0.1:18545), [Source of the rule's meaning](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/dc44c9f1a4c3b10af99492eed84f83ed244203f6/contracts/access/Ownable.sol#L51)
+- **E7** (cross_check): [JSON-RPC](http://127.0.0.1:18545), [Explorer API: transaction](http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f)
+- **E8** (timeline): [Explorer API: the sender's transactions](http://127.0.0.1:14000/api/v2/addresses/0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC/transactions?filter=from)
+- **E9** (gas_note): [Explorer API: transaction](http://127.0.0.1:14000/api/v2/transactions/0x42864ecb1fdcb0f155cfb0d9c085452fdcfa21170cdf44c7f62bfafb5aed027f)
+
+</details>
+
+**Missing data the answer declares:**
+
+- Revert reason: the explorer did not report why the transaction failed
+- Internal calls: the explorer is still indexing this transaction's internal calls
 
 ---
 
@@ -328,14 +488,32 @@ The allowance category had no real case on a public network (the candidate found
 
 ## 6. Metrics and measuring impact in production
 
-`anychain metrics` prints usage numbers from the event log, each with the SQL that computes it: failure causes per network, conclusion labels, where ABIs came from, satisfaction (👍/👎) by mode, cache hit rate. How the tool would be put in front of support, the hypothesis, primary and guard metrics, the rollout experiment and the criteria to scale or roll back are in [docs/IMPACT.md](docs/IMPACT.md).
+`anychain metrics` prints usage numbers from the local event log (`data/runs.db`, one row per answer given from the CLI or the API; it fills as the tool is used, so a fresh clone shows empty tables), each with the SQL that computes it: failure causes, conclusion labels, where ABIs came from, satisfaction (👍/👎) by mode, cache hit rate. Two of them:
+
+```sql
+-- Failure causes (the diagnosis rule of each failed transaction)
+SELECT COALESCE(rule, 'no conclusion') AS cause, COUNT(*) AS answers,
+       COUNT(DISTINCT network || tx_hash) AS transactions, 100.0 * COUNT(*) / SUM(COUNT(*)) OVER () AS share
+FROM runs
+WHERE ts >= :since AND source IN ('cli', 'api') AND mode IS NOT NULL AND status = 'failed'
+GROUP BY cause ORDER BY answers DESC;
+
+-- Satisfaction by mode (thumbs up and down from the page)
+SELECT mode, COALESCE(SUM(feedback = 'up'), 0) AS up, COALESCE(SUM(feedback = 'down'), 0) AS down,
+       100.0 * SUM(feedback = 'up') / NULLIF(SUM(feedback IS NOT NULL), 0) AS satisfaction
+FROM runs
+WHERE ts >= :since AND source IN ('cli', 'api') AND mode IS NOT NULL
+GROUP BY mode ORDER BY mode;
+```
+
+The other three (labels, ABI source, cache) are printed by the command and kept in `src/anychain/metrics.py`. How the tool would be put in front of support, the hypothesis, primary and guard metrics, the rollout experiment and the criteria to scale or roll back are in [docs/IMPACT.md](docs/IMPACT.md).
 
 ---
 
 ## 7. Known limits and next steps
 
 - **Public infrastructure:** public nodes keep the state of about the last 128 blocks, so reads at the parent block of an older failure are refused (said as a gap); one public node returns some old transactions without a receipt (the outcome is then "unknown", D53). An archive node removes both.
-- **No trace yet:** where the explorer's internal calls do not show the failing frame, `debug_traceTransaction` would (`rpc.supports_debug_trace`; Stratus serves it). Not used with the public nodes here.
+- **No trace yet:** where the explorer's internal calls do not show the failing frame, `debug_traceTransaction` would. The config records whether a node serves it (`rpc.supports_debug_trace`; Stratus does), but the tool does not call it yet: failures are explained from the explorer, reads on the node and a replay.
 - **Explorer-hidden tokens:** a token the explorer marks as scam has its transfers hidden; the tool does not say so yet (backlog C1).
 - **Heuristics stay heuristics:** security and gas notes are pattern matches on the shown code, never an audit.
 - **Private demo network:** built and recorded (devnet/), but on a home server and rebuilt by hand; a CI job that brings it up, sends the transactions and runs `anychain eval` against it would keep the retargeting proof current. Calls inherited from OpenZeppelin are not decoded there, because the library is not in the configured repository: adding its source as a second repository would decode them.
@@ -345,4 +523,4 @@ The allowance category had no real case on a public network (the candidate found
 
 ## 8. How AI was used to build this
 
-The code, tests and documents were written with Claude Code, in phases (each with a written spec, approved before any code, in `docs/specs/`). The human decisions, recorded in `docs/DECISIONS.md` with dates, were mine: the scope and the order of the phases; the acceptance criterion (zero false facts of level A or B on 300 sampled transactions per network, checked against the node); which imprecise wordings to fix now and which to keep for later; running the writer on Claude Code instead of an API key; the retargeting target (CloudWalk) and its sources; and, after the evaluation found a rule that ignored an inner out-of-gas, asking for the diagnosis to start from the failure's origin. The process the model followed: a failing test before each fix, written from a real recorded transaction (nothing in the tests is invented); a review by a separate agent with a clean context before commits; and an independent acceptance run against the network's own node at the end of each phase.
+The code, tests and documents were written with Claude Code, in phases (Phase 1 from the plan in the case itself; Phases 2, 2.5, 3 and 4 each from a written spec approved before any code, in `docs/specs/`). The human decisions, recorded in `docs/DECISIONS.md` with dates, were mine: the scope and the order of the phases; the acceptance criterion (zero false facts of level A or B on 300 sampled transactions per network, checked against the node); which imprecise wordings to fix now and which to keep for later; running the writer on Claude Code instead of an API key; the retargeting target (CloudWalk) and its sources; and, after the evaluation found a rule that ignored an inner out-of-gas, asking for the diagnosis to start from the failure's origin. The process the model followed: a failing test before each fix, written from a real recorded transaction (nothing in the tests is invented); a review by a separate agent with a clean context before commits; and an independent acceptance run against the network's own node at the end of each phase.

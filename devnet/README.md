@@ -4,7 +4,7 @@ The proof that retargeting needs configuration only: a local EVM node and a self
 from the configured repository deployed behind a proxy (as CloudWalk runs it), real transactions on it, and
 AnyChain pointed at it with `configs/devnet.yaml` and no code change (D60).
 
-Built on 2026-10-08 on a home server (home server), everything bound to 127.0.0.1 there:
+Built on 2026-10-08 on a small Linux server (4 GB of RAM), everything bound to 127.0.0.1 there:
 
 1. `docker compose -f compose.yml up -d`: Anvil (chain id 31337, a block every 2 s), Postgres, Redis and the
    Blockscout backend (`ETHEREUM_JSONRPC_VARIANT=anvil`, as Blockscout's own `docker-compose/anvil.yml`; only these
@@ -16,7 +16,7 @@ Built on 2026-10-08 on a home server (home server), everything bound to 127.0.0.
    a pauser, and sends the transactions listed in `transactions.env`: a mint, a transfer, an approve, and four
    failures (an allowance exceeded, a transfer while paused, a non-owner calling `setPauser`, out of gas). Keys
    are Anvil's public test accounts, which exist only on that local network.
-4. On the Mac: `ssh -N -L 14000:127.0.0.1:4000 -L 18545:127.0.0.1:8545 home server`, then
+4. On the workstation: `ssh -N -L 14000:127.0.0.1:4000 -L 18545:127.0.0.1:8545 <server>`, then
    `uv run anychain explain <hash> --config configs/devnet.yaml`.
 
 Three of the transactions are recorded in `tests/fixtures/devnet_*.json` (tests/test_devnet.py), so the tests run

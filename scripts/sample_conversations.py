@@ -29,7 +29,25 @@ SAMPLES = [
      "eth_failed_unverified_bot", "support", None, ("intent", "other")),
     ("Triage: it succeeded, but the reader says the payment did not arrive", "eth_usdc_transfer", "support",
      "não recebi o pagamento", ("expected_receipt", "0x000000000000000000000000000000000000dEaD")),
+    ("The private demo network: a BRLC call decoded from the configured repository, and the cause the explorer did "
+     "not give recovered by replaying the call on the node, developer mode", "devnet_fail_access", "developer", None,
+     None),
 ]
+
+
+def _sources(text: str, bundle) -> list[str]:
+    """Each fact the answer cites, with its sources: what a reader opens to check a citation."""
+    import re
+    cited = sorted({int(n) for n in re.findall(r"E(\d+)", text or "")})
+    by_id = {e.id: e for e in bundle.items}
+    out = []
+    for n in cited:
+        e = by_id.get(f"E{n}")
+        if e is None:
+            continue
+        links = [f"[{s.label}]({s.url})" if s.url else s.label for s in e.sources]
+        out.append(f"- **E{n}** ({e.kind}): " + ", ".join(links))
+    return out
 
 
 def run(fixture: str, mode: str, question, clarified=None):
@@ -69,6 +87,9 @@ def main() -> None:
                 out += [f"**Reader answers:** {shown}", ""]
                 result, _cfg, _tx = run(fixture, mode, question, {"kind": kind, "answer": value})
         out += ["**Assistant:**", "", result.text or f"_(no written answer: {result.summary_status})_", ""]
+        sources = _sources(result.text, result.bundle)
+        if sources:
+            out += ["<details><summary>Sources of the facts it cites</summary>", ""] + sources + ["", "</details>", ""]
         if result.bundle.gaps:
             out += ["**Missing data the answer declares:**", ""] + [f"- {g.what}: {_why(g.why)}" for g in result.bundle.gaps] + [""]
         print(f"{fixture}: {result.summary_status}", file=sys.stderr)

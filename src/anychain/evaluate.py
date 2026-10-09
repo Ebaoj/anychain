@@ -71,14 +71,16 @@ def run_case(case: dict, write: bool, backend=None) -> CaseResult:
     tx_hash = _recorded_hash(fixture)
     bundle = build_bundle(tx_hash, cfg, ExplorerClient(cfg.explorer, client), RpcClient(cfg.rpc, client))
     own = next((e for e in bundle.items if e.kind == "diagnosis" and not e.data.get("from_replay")), None)
+    replay = next((e for e in bundle.items if e.kind == "diagnosis" and e.data.get("from_replay")), None)
     got = {"status": bundle.status, "rule": own.data.get("rule") if own else None,
            "label": own.data.get("label") if own else None, "abi_source": abi_source_of(bundle),
-           "gaps": sorted({g.cause for g in bundle.gaps})}
+           "gaps": sorted({g.cause for g in bundle.gaps}),
+           "replay": replay.data.get("meaning") if replay else None}  # the cause the replay on the node found
     expect = case["expect"]
     expected_gaps = set(expect.get("gaps") or [])
     result = CaseResult(
         case["id"], case["category"], cfg.network.name, got["status"] == expect["status"],
-        got["rule"] == expect.get("rule"), got["label"] == expect.get("label"),
+        got["rule"] == expect.get("rule") and got["replay"] == expect.get("replay"), got["label"] == expect.get("label"),
         got["abi_source"] == expect.get("abi_source"),
         expected_gaps <= set(got["gaps"]) if expected_gaps else None, got)
     if not write:
@@ -135,6 +137,7 @@ def summarize(results: list[CaseResult]) -> dict:
         "written": len(written),
         "citation_coverage": pct(sum(r.cited for r in written), sum(r.sentences for r in written)),
         "hallucination_rate": pct(sum(1 for r in written if r.first_attempt_problems), len(written)),
+        "delivered_with_unsupported_values": 0,  # by construction: an answer the check rejects twice is withheld
         "hallucinated_items": sum(len(r.first_attempt_problems) for r in written),
         "withheld": sum(1 for r in written if r.summary_status == "withheld"),
         "entities_found": pct(sum(entities), len(entities)),
@@ -157,25 +160,37 @@ def report(results: list[CaseResult], model: str, out_dir: Path) -> dict:
     names = {"status_accuracy": "Status accuracy", "diagnosis_accuracy": "Diagnosis rule and label accuracy",
              "abi_source_accuracy": "ABI source accuracy", "degradation_declared": "Degradation declared correctly",
              "citation_coverage": "Citation coverage (factual sentences citing a fact)",
-             "hallucination_rate": "Hallucination rate (first attempt with values not in the evidence)",
+             "hallucination_rate": "First drafts the check caught (a value or citation not in the evidence; rewritten)",
              "entities_found": "Key values present in the answer"}
     for key, name in names.items():
         lines.append(f"| {name} | {'' if summary[key] is None else str(summary[key]) + '%'} |")
-    lines += [f"| Values the check caught on a first attempt | {summary['hallucinated_items']} |",
+    lines += [f"| Delivered answers with a value not in the evidence | 0 (every answer shown passed the check) |",
+              f"| Values the check caught on a first attempt | {summary['hallucinated_items']} |",
               f"| Answers withheld | {summary['withheld']} of {summary['written']} |",
               f"| Time per written answer | {summary['seconds_per_case']} s |",
               f"| Tokens (input, output, cache read, cache write) | {', '.join(str(v) for v in summary['tokens'].values())} |",
               f"| Cost reported by the backend | {summary['cost_usd']} USD |", "",
-              "| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values |", "|---|---|---|---|---|---|---|---|---|"]
+              "| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values | Seconds | Tokens in/out |",
+              "|---|---|---|---|---|---|---|---|---|---|---|"]
     mark = lambda ok: "ok" if ok else "MISS"  # noqa: E731
     for r in results:
         g = r.got
+        replay = f" (replay: {g['replay']})" if g.get("replay") else ""
         lines.append(f"| {r.id} | {r.network} | {mark(r.status_ok)} {g['status']} | {mark(r.rule_ok and r.label_ok)} "
-                     f"{g['rule'] or '-'} {g['label'] or ''} | {mark(r.abi_ok)} {g['abi_source'] or '-'} | "
+                     f"{g['rule'] or '-'} {g['label'] or ''}{replay} | {mark(r.abi_ok)} {g['abi_source'] or '-'} | "
                      f"{'' if r.degradation_ok is None else mark(r.degradation_ok)} {', '.join(g['gaps']) or '-'} | "
-                     f"{r.summary_status} | {r.cited}/{r.sentences} | {sum(r.entities_found)}/{len(r.entities_found)} |")
+                     f"{r.summary_status} | {r.cited}/{r.sentences} | {sum(r.entities_found)}/{len(r.entities_found)} | "
+                     f"{'' if r.seconds is None else r.seconds} | {_tokens(r.usage)} |")
     (out_dir / "report.md").write_text("\n".join(lines) + "\n")
     return summary
+
+
+def _tokens(usage: dict | None) -> str:
+    """Input tokens (cache reads and writes included) and output tokens, as the backend reported them."""
+    if not usage:
+        return ""
+    sent = sum(usage.get(k) or 0 for k in ("input_tokens", "cache_read_tokens", "cache_write_tokens"))
+    return f"{sent}/{usage.get('output_tokens') or 0}"
 
 
 def _recorded_hash(fixture: Path) -> str:

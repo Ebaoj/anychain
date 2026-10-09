@@ -29,7 +29,7 @@ Assumed starting point, to be measured in the baseline weeks before rollout: the
 
 The tool already records what it can see (labels, rule, ABI source, cache, mode, tokens, cost, feedback: D45, `anychain metrics` prints each number with its SQL). Escalation, reopening and time to diagnosis come from the support tool, joined by a ticket id the integration would store with the run (a column not built yet).
 
-What the offline eval shows today (eval/report.md, 10 real cases): 100% status and diagnosis accuracy, 0% hallucination on the first attempt, 76.6% of factual sentences citing a fact, 8.2 s and about 0.02 USD per written answer. Those numbers say the tool is ready for a pilot; they do not say it helps support, which only the experiment below can show.
+What the offline evaluation shows ([eval/report.md](../eval/report.md), 11 real cases on three networks): every case's status and diagnosis right; no answer shown with a value or citation outside the evidence (a first draft that has one is rewritten, or the answer is withheld); about four in five factual sentences citing a fact; under ten seconds and a few US cents per written answer. Those numbers say the tool is ready for a pilot; they do not say it helps support, which only the experiment below can show.
 
 ## 4. The experiment
 

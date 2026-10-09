@@ -151,6 +151,7 @@
     "from_replay": true,
     "label": "LIKELY",
     "level": "candidate",
+    "meaning": "insufficient_allowance",
     "next_steps": {
      "developer": [
       "Approve the spender for at least the amount (an approve transaction from the token holder), then send again."

@@ -1,7 +1,8 @@
 """ABI decoding of calldata and event logs.
 
-Phase 1 uses ABIs from the explorer only. The cascade (repo artifacts, source
-signatures, 4byte, raw) is added in phase 2 behind the same interface.
+The ABI comes from the cascade the bundle runs (explorer, repo artifacts, repo source
+signatures, the public signature database as candidates, raw data); this module decodes
+with whichever ABI it is given.
 """
 from dataclasses import dataclass, field
 

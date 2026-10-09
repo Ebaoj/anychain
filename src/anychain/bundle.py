@@ -892,6 +892,7 @@ class BundleBuilder:
                         "cause. " + steps_text("replay", steps),
                         sources + [Source(kind="repo", label="Source of the rule's meaning", url=u) for u in urls],
                         {"rule": "replay", "level": "candidate", "label": "LIKELY", "from_replay": True,
+                         "meaning": finding.rule if decoded.kind != "panic" else "panic",
                          "replay": fact.id, "reads": [], "next_steps": {"support": SUPPORT_STEPS["replay"],
                                                                        "developer": steps}}, confidence="candidate")
 

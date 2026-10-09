@@ -1,4 +1,4 @@
-"""PHASE4 T6 (D60): the private demo network, recorded on 2026-10-08 (Anvil + a self-hosted Blockscout on home server,
+"""PHASE4 T6 (D60): the private demo network, recorded on 2026-10-08 (Anvil + a self-hosted Blockscout on a Linux server,
 the BRLC token from the configured repo deployed behind a proxy). Retargeting needed configs/devnet.yaml only."""
 from anychain.config import load_config
 from tests.conftest import ROOT, replay_bundle

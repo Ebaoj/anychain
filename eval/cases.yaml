@@ -5,6 +5,7 @@
 # expect:
 #   status       the transaction's status
 #   rule, label  the failure's own diagnosis rule and its label (none for a success)
+#   replay       when the explorer gives no reason: the cause the replay on the node found (its rule)
 #   abi_source   where the main call's ABI came from (D45)
 #   gaps         gap causes the answer must declare (degradation)
 #   entities     each entry is a list of accepted spellings; one of them must appear in the written answer
@@ -102,5 +103,6 @@ cases:
     config: devnet
     fixture: devnet_fail_allowance
     mode: support
-    expect: {status: failed, rule: no_reason, label: UNKNOWN, abi_source: raw, gaps: [not_interpretable],
+    expect: {status: failed, rule: no_reason, label: UNKNOWN, replay: insufficient_allowance, abi_source: raw,
+             gaps: [not_interpretable],
              entities: [["insufficient allowance", "allowance", "aprovação", "autoriza"]]}

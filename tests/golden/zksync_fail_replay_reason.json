@@ -920,6 +920,7 @@
     "from_replay": true,
     "label": "LIKELY",
     "level": "candidate",
+    "meaning": "slippage",
     "next_steps": {
      "developer": [
       "Check the current price before sending again. A wider slippage tolerance lets the swap go through at a worse price and exposes it to front-running (sandwich) losses; prefer waiting for the price to settle or a smaller trade.",

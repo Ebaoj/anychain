@@ -113,7 +113,9 @@ class FeeTokenConfig(BaseModel):
 class RpcConfig(BaseModel):
     url: str
     timeout_s: float = 10
-    supports_debug_trace: bool = False  # used from phase 2
+    # Whether the node serves debug_traceTransaction. Recorded for the next step (the exact failing frame); the
+    # tool does not call it yet: failures are explained from the explorer, reads and a replay (README, limits).
+    supports_debug_trace: bool = False
 
     @field_validator("url")
     @classmethod

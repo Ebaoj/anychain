@@ -30,8 +30,8 @@ rpc:
   # client name from ?app=<name> (or the x-app header), so keep the query string.
   url: "<RPC_URL>?app=anychain"    # read-only JSON-RPC endpoint
   timeout_s: 10
-  # Stratus serves debug_traceTransaction (src/eth/rpc/server.rs); phase 2 uses it to
-  # confirm failure points and code at execution time.
+  # Stratus serves debug_traceTransaction (src/eth/rpc/server.rs). AnyChain does not call it yet
+  # (a next step, see the README's limits): failures are explained from the explorer, reads and a replay.
   supports_debug_trace: true
 
 repos:
