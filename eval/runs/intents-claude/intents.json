@@ -1,6 +1,6 @@
 {
- "date": "2026-10-09 13:05",
- "commit": "1862d65 + uncommitted changes",
+ "date": "2026-10-09 13:10",
+ "commit": "bdb900d",
  "model": "claude-sonnet-5-5",
  "summary": {
   "questions": 60,
@@ -8,7 +8,7 @@
   "by_rules": 13,
   "wrong_into_risky_frame": 0,
   "split_into_two_questions": 1,
-  "seconds": 35.8
+  "seconds": 44.1
  },
  "rows": [
   [

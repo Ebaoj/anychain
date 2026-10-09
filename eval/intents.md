@@ -1,6 +1,6 @@
 # Chat intents: rules, then the classifier
 
-Run 2026-10-09 13:05, commit 1862d65 + uncommitted changes, model gpt-4.1-nano. 60 reader questions in pt-BR, en and es (eval/chat_intents.json). A message with two questions is split and each part routed.
+Run 2026-10-09 13:09, commit bdb900d, model gpt-4.1-nano. 60 reader questions in pt-BR, en and es (eval/chat_intents.json). A message with two questions is split and each part routed.
 
 | Metric | Result |
 |---|---|
@@ -8,7 +8,7 @@ Run 2026-10-09 13:05, commit 1862d65 + uncommitted changes, model gpt-4.1-nano. 
 | Routed by rules, no model | 13 of 60 |
 | Wrong label into a risky frame (what to do, money moved, purpose) | 1 |
 | Messages split into two questions | 1 |
-| Seconds, all questions (6 at a time) | 5.7 |
+| Seconds, all questions (6 at a time) | 6.4 |
 
 | Question | Expected | Got | How |
 |---|---|---|---|

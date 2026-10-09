@@ -1,6 +1,6 @@
 # Chat intents: rules, then the classifier
 
-Run 2026-10-09 13:05, commit 1862d65 + uncommitted changes, model claude-sonnet-5-5. 60 reader questions in pt-BR, en and es (eval/chat_intents.json). A message with two questions is split and each part routed.
+Run 2026-10-09 13:10, commit bdb900d, model claude-sonnet-5-5. 60 reader questions in pt-BR, en and es (eval/chat_intents.json). A message with two questions is split and each part routed.
 
 | Metric | Result |
 |---|---|
@@ -8,7 +8,7 @@ Run 2026-10-09 13:05, commit 1862d65 + uncommitted changes, model claude-sonnet-
 | Routed by rules, no model | 13 of 60 |
 | Wrong label into a risky frame (what to do, money moved, purpose) | 0 |
 | Messages split into two questions | 1 |
-| Seconds, all questions (6 at a time) | 35.8 |
+| Seconds, all questions (6 at a time) | 44.1 |
 
 | Question | Expected | Got | How |
 |---|---|---|---|
