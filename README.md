@@ -569,7 +569,7 @@ Run 2026-10-09 11:14, commit 88155eb, model claude-sonnet-5-5. Every case is a r
 
 </details>
 
-Citation coverage varies between runs while the other metrics hold: 84.0% and 78.1% in two runs of the same prompts and evidence, 81.1% in this run after the repository fact was added (D69); the model writes differently each time.
+The commit ids quoted in reports and decisions are those of the development history; their public ids are in [docs/COMMIT_MAP.md](docs/COMMIT_MAP.md) (the history was rewritten once to remove personal details). Citation coverage varies between runs while the other metrics hold: 84.0% and 78.1% in two runs of the same prompts and evidence, 81.1% in this run after the repository fact was added (D69); the model writes differently each time.
 
 The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network, where the explorer gives no reason and the replay on the node finds "insufficient allowance" (D60). "First drafts the check caught" counts answers the model had to rewrite because they stated a value or cited a fact not in the evidence: none in this run. Earlier runs showed one ("E624"), which turned out to be the check's mistake, not the model's: a shortened address ("0x52b2…E624") read as a citation; fixed (D62).
 
