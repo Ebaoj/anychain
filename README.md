@@ -447,9 +447,9 @@ A transação falhou (revertida) no bloco 63, em anychain-devnet. Foi enviada de
 
 ## 5. Evaluation results
 
-`anychain eval` replays 11 real transactions from their recordings (8 on Ethereum, 2 on Optimism, 1 on the private demo network; `eval/cases.yaml`) through the whole pipeline, the model included, and measures the answer. Latest run ([eval/report.md](eval/report.md)):
+`anychain eval` replays 11 real transactions from their recordings (8 on Ethereum, 2 on Optimism, 1 on the private demo network; `eval/cases.yaml`) through the whole pipeline, the model included, and measures the answer. Latest run ([eval/report.md](eval/report.md), per-case details in `eval/report.json`):
 
-Run 2026-10-08 22:49, commit a4a8dc1, model claude-sonnet-5-5. Every case is a real transaction replayed from its recording (eval/cases.yaml).
+Run 2026-10-09 07:33, commit 969fde3, model claude-sonnet-5-5. Every case is a real transaction replayed from its recording (eval/cases.yaml).
 
 | Metric | Result |
 |---|---|
@@ -457,30 +457,31 @@ Run 2026-10-08 22:49, commit a4a8dc1, model claude-sonnet-5-5. Every case is a r
 | Diagnosis rule and label accuracy | 100.0% |
 | ABI source accuracy | 100.0% |
 | Degradation declared correctly | 100.0% |
-| Citation coverage (factual sentences citing a fact) | 81.2% |
-| Hallucination rate (first attempt with values not in the evidence) | 9.1% |
+| Citation coverage (factual sentences citing a fact) | 76.3% |
+| First drafts the check caught (a value or citation not in the evidence; rewritten) | 0.0% |
 | Key values present in the answer | 100.0% |
-| Values the check caught on a first attempt | 1 |
+| Delivered answers with a value not in the evidence | 0 (every answer shown passed the check) |
+| Values the check caught on a first attempt | 0 |
 | Answers withheld | 0 of 11 |
 | Time per written answer | 8.8 s |
-| Tokens (input, output, cache read, cache write) | 24, 11110, 17408, 45229 |
-| Cost reported by the backend | 0.2955 USD |
+| Tokens (input, output, cache read, cache write) | 22, 10386, 15974, 42140 |
+| Cost reported by the backend | 0.2757 USD |
 
-| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values |
-|---|---|---|---|---|---|---|---|---|
-| erc20_transfer | ethereum-mainnet | ok success | ok -  | ok explorer |  - | ok | 12/12 | 2/2 |
-| dex_swap | ethereum-mainnet | ok success | ok -  | ok explorer |  - | ok | 27/30 | 2/2 |
-| explicit_reason | ethereum-mainnet | ok failed | ok deadline CONFIRMED | ok explorer |  - | ok | 22/23 | 2/2 |
-| inner_out_of_gas | ethereum-mainnet | ok failed | ok out_of_gas LIKELY | ok explorer |  - | ok | 14/20 | 2/2 |
-| out_of_gas | ethereum-mainnet | ok failed | ok out_of_gas CONFIRMED | ok explorer |  not_interpretable | retried | 14/16 | 1/1 |
-| unverified_contract | ethereum-mainnet | ok failed | ok slippage LIKELY | ok raw |  not_interpretable, source_unavailable | ok | 24/35 | 1/1 |
-| custom_error | ethereum-mainnet | ok failed | ok contract_reason CONFIRMED | ok raw |  not_interpretable | ok | 25/31 | 1/1 |
-| node_unavailable | ethereum-mainnet | ok success | ok -  | ok explorer | ok source_unavailable | ok | 10/13 | 1/1 |
-| second_network_transfer | optimism-mainnet | ok success | ok -  | ok explorer |  - | ok | 9/12 | 2/2 |
-| second_network_failure | optimism-mainnet | ok failed | ok deadline LIKELY | ok signature_db |  not_interpretable | ok | 15/18 | 1/1 |
-| allowance_devnet | anychain-devnet | ok failed | ok no_reason UNKNOWN | ok raw | ok not_interpretable, source_behind | ok | 10/14 | 1/1 |
+| Case | Network | Status | Rule / label | ABI | Gaps | Answer | Cited | Values | Seconds | Tokens in/out |
+|---|---|---|---|---|---|---|---|---|---|---|
+| erc20_transfer | ethereum-mainnet | ok success | ok -  | ok explorer |  - | ok | 11/13 | 2/2 | 6.2 | 3704/529 |
+| dex_swap | ethereum-mainnet | ok success | ok -  | ok explorer |  - | ok | 25/26 | 2/2 | 10.8 | 5596/1498 |
+| explicit_reason | ethereum-mainnet | ok failed | ok deadline CONFIRMED | ok explorer |  - | ok | 14/19 | 2/2 | 9.9 | 5195/1148 |
+| inner_out_of_gas | ethereum-mainnet | ok failed | ok out_of_gas LIKELY | ok explorer |  - | ok | 13/19 | 2/2 | 7.3 | 6305/665 |
+| out_of_gas | ethereum-mainnet | ok failed | ok out_of_gas CONFIRMED | ok explorer |  not_interpretable | ok | 12/17 | 1/1 | 7.6 | 4448/723 |
+| unverified_contract | ethereum-mainnet | ok failed | ok slippage LIKELY | ok raw |  not_interpretable, source_unavailable | ok | 22/33 | 1/1 | 12.1 | 6715/1482 |
+| custom_error | ethereum-mainnet | ok failed | ok contract_reason CONFIRMED | ok raw |  not_interpretable | ok | 22/31 | 1/1 | 12.0 | 9890/1590 |
+| node_unavailable | ethereum-mainnet | ok success | ok -  | ok explorer | ok source_unavailable | ok | 11/15 | 1/1 | 9.1 | 3623/690 |
+| second_network_transfer | optimism-mainnet | ok success | ok -  | ok explorer |  - | ok | 13/15 | 2/2 | 6.9 | 3770/646 |
+| second_network_failure | optimism-mainnet | ok failed | ok deadline LIKELY | ok signature_db |  not_interpretable | ok | 14/20 | 1/1 | 8.0 | 4558/781 |
+| allowance_devnet | anychain-devnet | ok failed | ok no_reason UNKNOWN (replay: insufficient_allowance) | ok raw | ok not_interpretable, source_behind | ok | 14/16 | 1/1 | 7.2 | 4332/634 |
 
-The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network (D60). "Hallucination" counts first attempts the check caught; the one caught here cited a fact id that does not exist ("E624"), and the retry was clean: no answer reached a reader with it.
+The allowance category had no real case on a public network (the candidate found was an inner out-of-gas, D50, D51); its real case comes from the private demo network, where the explorer gives no reason and the replay on the node finds "insufficient allowance" (D60). "First drafts the check caught" counts answers the model had to rewrite because they stated a value or cited a fact not in the evidence: none in this run; earlier runs had one (a citation to a fact id that does not exist), rewritten before anyone saw it.
 
 **Acceptance against an independent source:** 1,800 randomly sampled transactions (300 on each of six networks), checked against the network's node: six checks each (status, value, fee, token transfers, no double-counted native value, addresses exist) plus the L1 status on zkSync, 11,100 checks in all: 11,008 passed, 88 had no node data to compare, 4 flagged. The 3 false facts found (a missing receipt called "pending", a blob fee left out on Gnosis) were fixed with tests on the recorded cases; the fourth is a token the explorer hides as scam ([docs/acceptance-report.md](docs/acceptance-report.md)). The run used the Phase 3 code: the Phase 4 facts (timeline, gas notes, triage) come from the same explorer lists and are covered by tests on recordings, not by this run.
 
